@@ -81,9 +81,9 @@
             <!-- 新增按鍵：立即查詢車費及預約 -->
             <div class="flex flex-col items-center md:items-start">
                 <button onclick="quickQueryAndBook()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
-                    <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約</span>
+                    <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約*</span>
                 </button>
-                <span class="text-xs text-gray-400 mt-1.5 ml-1" data-i18n="note_any_car">接受任何隨機車款</span>
+                <span class="text-s text-gray-400 mt-1 ml-1" data-i18n="note_any_car">*接受任何車款</span>
             </div>
 
             <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
@@ -464,7 +464,7 @@
                         <input type="date" id="date" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (最快15分鐘後)</span></label>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (預設15分鐘後用車)</span></label>
                         <input type="time" id="time" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                     </div>
                 </div>
