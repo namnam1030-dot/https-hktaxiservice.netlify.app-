@@ -1640,6 +1640,7 @@
 
             // 1. 若選擇了豐田混能的士，必須檢查是否已勾選升級選項
             let upgradeChoiceText = "";
+            let isUpgradeDeclined = false;
             if (selectedCarName === '豐田混能的士') {
                 const yesBox = document.getElementById('upgrade-yes');
                 const noBox = document.getElementById('upgrade-no');
@@ -1649,6 +1650,7 @@
                     if (targetBox) targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
+                isUpgradeDeclined = noBox.checked;
                 upgradeChoiceText = yesBox.checked ? (currentLang === 'en' ? "Accepted Free Upgrade" : "接受免費升級") : (currentLang === 'en' ? "Declined Free Upgrade" : "不接受升級");
             }
 
@@ -1699,13 +1701,12 @@
             const contactSurnameEl = document.getElementById('contact_surname');
             const contactTitleEl = document.querySelector('input[name="contact_title"]:checked');
             let contactName = "";
+            let hasContact = false;
             if (contactSurnameEl.value.trim() || contactTitleEl) {
                 const surname = contactSurnameEl.value.trim();
                 const title = contactTitleEl ? contactTitleEl.value : "";
                 contactName = `${surname}${title}`.trim();
-            }
-            if (!contactName) {
-                contactName = currentLang === 'en' ? "Not provided" : "未填寫";
+                if (contactName) hasContact = true;
             }
 
             // 11. 檢查聯絡電話
@@ -1739,22 +1740,25 @@
             const date = dateVal;
             const time = timeVal;
             const passengers = passengersEl.value;
-            const luggages = document.getElementById('luggages').value;
+            const luggagesSelectVal = document.getElementById('luggages').value;
             
-            // 讀取勾選方格狀態 (寵物與輪椅)
+            // 行李件數是否為0檢查 (例如 "0 件" 或數字 0)
+            const luggageNum = parseInt(luggagesSelectVal);
+            const showLuggage = !isNaN(luggageNum) && luggageNum > 0;
+
+            // 寵物與輪椅狀態檢查
             const hasPetChecked = document.getElementById('has_pet').checked;
             const hasWheelchairChecked = document.getElementById('has_wheelchair').checked;
-            const hasPet = hasPetChecked ? (currentLang === 'en' ? "Yes" : "是") : (currentLang === 'en' ? "No" : "否");
-            const hasWheelchair = hasWheelchairChecked ? (currentLang === 'en' ? "Yes" : "是") : (currentLang === 'en' ? "No" : "否");
             
             const paymentCheckboxes = document.querySelectorAll('input[name="payment_method"]:checked');
             let paymentMethods = Array.from(paymentCheckboxes).map(cb => cb.value).join('、');
             if (!paymentMethods) paymentMethods = currentLang === 'en' ? 'Cash' : '現金';
 
+            // 組合 WhatsApp 訊息內容 (嚴格根據指示 1-5 調整)
             let msg = currentLang === 'en' ? 
                 `*New Taxi Booking Order*%0A--------------------------------%0A` +
                 `🚗 *Vehicle Type:* ${selectedCarNameEn || selectedCarName}%0A` +
-                (selectedCarName === '豐田混能的士' ? `🎁 *Vehicle Upgrade:* ${upgradeChoiceText}%0A` : ``) +
+                (selectedCarName === '豐田混能的士' ? `🎁 *Vehicle Upgrade:* ${isUpgradeDeclined ? '%25E2%259D%258C ' : ''}${upgradeChoiceText}%0A` : ``) +
                 `📍 *Pickup:* ${pickup}%0A` +
                 (flightNo ? `✈️ *Flight No:* ${flightNo}%0A` : ``) +
                 (stopover ? `📍 *Stopover:* ${stopover}%0A` : ``) +
@@ -1762,33 +1766,36 @@
                 `📅 *Date:* ${date}%0A` +
                 `⏰ *Time:* ${time} ${isWithin15Min ? '(⚡ Immediate/Urgent)' : ''}%0A` +
                 `👥 *Passengers:* ${passengers}%0A` +
-                `🧳 *Luggage:* ${luggages}%0A` +
-                `🐾 *Pets:* ${hasPet}%0A` +
-                `♿ *Wheelchair:* ${hasWheelchair}%0A` +
+                (showLuggage ? `🧳 *Luggage:* ${luggagesSelectVal}%0A` : ``) +
+                (hasPetChecked ? `🐾 *Pets:* %25E2%259D%258C Yes%0A` : ``) +
+                (hasWheelchairChecked ? `♿ *Wheelchair in trunk:* %25E2%259D%258C Yes%0A` : ``) +
                 `💳 *Payment:* ${paymentMethods}%0A` +
-                `👤 *Contact:* ${contactName}%0A` +
+                (hasContact ? `👤 *Contact:* ${contactName}%0A` : ``) +
                 `📞 *Phone:* ${phoneVal}%0A` +
                 `--------------------------------%0A` +
                 `Please confirm the order. Thank you!` :
                 
                 `*【新一代六座位的士預約訂單】*%0A--------------------------------%0A` +
                 `🚗 *預定車型：* ${selectedCarName}%0A` +
-                (selectedCarName === '豐田混能的士' ? `🎁 *免費升級意願：* ${upgradeChoiceText}%0A` : ``) +
+                (selectedCarName === '豐田混能的士' ? `🎁 *升級意願：* ${isUpgradeDeclined ? '%E2%9D%8C ' : ''}${upgradeChoiceText}%0A` : ``) +
                 `📍 *上車地點：* ${pickup}%0A` +
                 (flightNo ? `✈️ *航班編號：* ${flightNo}%0A` : ``) +
-                (stopover ? `📍 *中途點：* ${stopover}%0A` : ``) +
+                (stopover ? `📍 *中途站：* ${stopover}%0A` : ``) +
                 `🏁 *落車地點：* ${dropoff}%0A` +
                 `📅 *用車日期：* ${date}%0A` +
-                `⏰ *用車時間：* ${time} ${isWithin15Min ? '(⚡ 即時/緊急用車)' : ''}%0A` +
+                `⏰ *用車時間：* ${time} ${isWithin15Min ? '（⚡ 極速/即時用車）' : ''}%0A` +
                 `👥 *乘客人數：* ${passengers}%0A` +
-                `🧳 *行李件數：* ${luggages}%0A` +
-                `🐾 *是否有寵物：* ${hasPet}%0A` +
-                `♿ *是否有輪椅：* ${hasWheelchair}%0A` +
+                (showLuggage ? `🧳 *行李件數：* ${luggagesSelectVal}%0A` : ``) +
+                (hasPetChecked ? `🐾 *是否有寵物：* %E2%9D%8C 是%0A` : ``) +
+                (hasWheelchairChecked ? `♿ *是否有輪椅需要放置於尾箱：* %E2%9D%8C 是%0A` : ``) +
                 `💳 *付款方式：* ${paymentMethods}%0A` +
-                `👤 *聯絡人：* ${contactName}%0A` +
+                (hasContact ? `👤 *聯絡人：* ${contactName}%0A` : ``) +
                 `📞 *聯絡電話：* ${phoneVal}%0A` +
                 `--------------------------------%0A` +
-                `請協助確認訂單，謝謝！`;
+                `請幫忙確認訂單，謝謝！`;
+
+            // 由於 WhatsApp 連結中的紅字顏色在純文字 API 中無法直接渲染 HTML 標籤，因此我們透過加入紅色交叉符號或特殊表情標示（或直接使用標準 WhatsApp 粗體/斜體搭配紅色系 Emoji，完全符合 WhatsApp 純文字格式規範）
+            // 註：若要呈現紅色字體效果，於 WhatsApp 中通常以 emoji 或特定符號代表，此處我們根據指示 1、2、3 精準對應紅字/紅色標示要求。
 
             const whatsappUrl = `https://wa.me/85257038875?text=${msg}`;
             window.open(whatsappUrl, '_blank');
