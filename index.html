@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新一代豪華六座位的士預約專車</title>
+    <!-- 引入 Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 Google Maps API (加上 language=zh-HK 確保隧道名稱穩定輸出為中文，並載入 places 庫) -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places&language=zh-HK"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-yellow': '#FFF200',
+                        'brand-dark': '#0B0B0B',
+                        'brand-gray': '#161616',
+                        'brand-card': '#1E1E1E'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 全局字體按比例放大 30% */
+        html { 
+            font-size: 130%; 
+        }
+        body { 
+            background-color: #0B0B0B; 
+            color: #ffffff; 
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
+        }
+        /* 隱藏 Google Maps 自動完成的預設 logo 避免影響 UI */
+        .pac-container {
+            background-color: #1E1E1E;
+            color: #ffffff;
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+        .pac-item {
+            color: #ccc;
+            border-top: 1px solid #333;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .pac-item:hover {
+            background-color: #333;
+        }
+        .pac-item-query {
+            color: #FFF200;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 頁首 Navbar -->
+    <header class="bg-brand-yellow text-black px-4 py-[1mm] sticky top-0 z-50 shadow-md">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <a href="#">
+                <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
+            </a>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[11.5px] hover:opacity-80 transition cursor-pointer">
+                    EN
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 頂部介紹 Hero Section -->
+    <section class="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center md:text-left">
+        <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
+            <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
+                <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
+            </button>
+        </div>
+
+        <!-- 註明 -->
+        <div class="mb-8 inline-flex items-center gap-2 text-brand-yellow font-bold text-sm md:text-base bg-brand-yellow/10 border-2 border-brand-yellow px-4 py-2.5 rounded-xl shadow-md">
+            <i class="fa-solid fa-bolt text-brand-yellow text-lg animate-pulse"></i>
+            <span data-i18n="notice_15min">提供最快15分鐘後的預約服務（亦支援即時訂單）</span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-xs md:text-sm text-gray-300 border-t border-gray-800/80 pt-6">
+            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-route text-brand-yellow"></i> <span data-i18n="feature_radar">智能路線導航規劃</span></div>
+            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-clock-rotate-left text-brand-yellow"></i> <span data-i18n="feature_2">24小時全天候候命</span></div>
+            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-wallet text-brand-yellow"></i> <span data-i18n="feature_3">明碼實價・無隱藏收費</span></div>
+            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-brands fa-whatsapp text-brand-yellow"></i> <span data-i18n="feature_4">WhatsApp 專人確認</span></div>
+            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-credit-card text-brand-yellow"></i> <span data-i18n="feature_payment">提供多種電子支付方式</span></div>
+        </div>
+    </section>
+
+    <!-- 車隊選擇 Fleet Section -->
+    <section id="fleet-section" class="max-w-5xl mx-auto px-4 py-12">
+        <div class="text-center mb-10">
+            <p class="text-gray-400 text-sm mt-2" data-i18n="fleet_desc">點選心水車型（獲選車輛將以主題黃框顯示），系統將自動捲動至車費估算器。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- 車款 1 : 豐田混能的士 (含升級詢問方塊) -->
+            <div class="flex flex-col">
+                <!-- 升級詢問方塊 -->
+                <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg">
+                    <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
+                        <i class="fa-solid fa-gift text-brand-yellow"></i>
+                        <span data-i18n="upgrade_box_text">如選擇豐田混能的士，請問是否接受<span class="text-brand-yellow font-extrabold">免費</span>升級至更高階車款？ <span class="text-brand-yellow">* (必須選擇)</span></span>
+                    </p>
+                    <div class="flex items-center gap-6">
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                            <input type="checkbox" name="toyota_upgrade" value="接受免費升級" id="upgrade-yes" onclick="handleUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
+                            <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                            <input type="checkbox" name="toyota_upgrade" value="不接受升級" id="upgrade-no" onclick="handleUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
+                            <span data-i18n="upgrade_no_label">不接受升級</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 車卡 -->
+                <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
+                     id="card-豐田混能的士" 
+                     class="car-card bg-brand-card rounded-2xl overflow-hidden border-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1">
+                    <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                        <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                    </div>
+                    <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                        <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Taxi'">
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold" data-i18n="car1_name">豐田混能的士</h3>
+                                <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car1_seats">4 座位</span>
+                            </div>
+                            <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car1_type">標準混能的士</p>
+                            <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car1_cap">最多 4 位乘客</span></li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car1_lug">約 2-3 件標準行李</span></li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car1_feat">特低地台、電動趟門</span></li>
+                            </ul>
+                        </div>
+                        <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                            <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                            <span class="font-bold text-white" data-i18n="car1_fee">標準收費・無附加費</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 2 : Maxus MIFA 7 -->
+            <div onclick="selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" 
+                 id="card-Maxus MIFA 7" 
+                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="m7.jpeg" alt="Maxus MIFA 7" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Maxus'">
+                </div>
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car2_name">Maxus MIFA 7</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car2_seats">6 座位</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car2_type">純電動七人車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car2_cap">最多 6 位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car2_lug">可放 6-7 件大型行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car2_feat">純電動零排放、極度寧靜</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car2_fee">附加費 HK$50 (最低 $130)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 3 : 廣汽 E9 -->
+            <div onclick="selectCar('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" 
+                 id="card-廣汽 E9" 
+                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=GAC'">
+                </div>
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car3_name">廣汽 E9</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car3_seats">6 座位</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car3_type">豪華航空椅專車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car3_cap">最多 6 位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car3_lug">約 3-4 件大型行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car3_feat">頭等航空級獨立大班椅</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car3_fee">附加費 HK$100 (最低 $180)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 4 : 吉利大黃蜂 -->
+            <div onclick="selectCar('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" 
+                 id="card-吉利大黃蜂" 
+                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Geely'">
+                </div>
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car4_name">吉利大黃蜂</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car4_seats">6 座位</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car4_type">超大空間尊車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car4_cap">最多 6 位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car4_lug">4件以上大型行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car4_feat">同級最大車廂、空間極佳</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car4_fee">附加費 HK$80 (最低 $160)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 5 : 豐田 Noah 輪椅的士 -->
+            <div onclick="selectCar('豐田 Noah 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota Noah Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" 
+                 id="card-豐田 Noah 輪椅的士" 
+                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col md:col-span-2 lg:col-span-1">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="noah.jpeg" alt="豐田 Noah 輪椅的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Noah'">
+                </div>
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car5_name">豐田 Noah 輪椅的士</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-brand-yellow font-medium" data-i18n="car5_seats">無障礙</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car5_type">無障礙福祉專車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car5_cap">1位輪椅 + 5位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car5_lug">可放 3-4 件大行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car5_feat">配備原廠金屬斜道</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car5_fee">附加費 HK$150 (最低 $230)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 車費估算器 Section -->
+    <section id="calculator-section" class="max-w-2xl mx-auto px-4 mb-6">
+        <div class="bg-brand-gray border border-gray-800 rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
+                <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線與車費估算</span>
+            </h3>
+
+            <!-- 查詢教學提示框 -->
+            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-2xl text-xs text-gray-300 mb-4 shadow-inner">
+                <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費估算使用說明：</span>
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-gray-300">
+                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
+                    <li data-i18n="calc_tip_2"><strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
+                    <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預估車費與相關隧道費用。</li>
+                </ul>
+            </div>
+
+            <div class="space-y-3 mb-4">
+                <!-- 廣東話語音按鈕 -->
+                <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-xs">
+                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
+                    <span id="mic-text" data-i18n="voice_btn_text">按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」</span>
+                </button>
+
+                <!-- 3 格輸入設計 (起點、中途站、終點) 連動自動預測選單 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_pickup">起點 (出發地)</label>
+                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_stopover">中途站 (選填)</label>
+                        <input type="text" id="calc-stopover" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
+                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入終點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 計算按鈕 -->
+            <button type="button" onclick="calculateFareWithGoogle()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-xs shadow-md">
+                <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即計算預估車費</span>
+            </button>
+
+            <!-- 報價結果展示區 -->
+            <div id="fare-result" class="hidden mt-5 p-5 bg-black/80 border border-brand-yellow/50 rounded-2xl">
+                
+                <!-- 路線選擇方案 -->
+                <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
+                    <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
+                    </div>
+                    <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                </div>
+
+                <!-- 路線小地圖 -->
+                <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-4 shadow-lg overflow-hidden"></div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs text-gray-300 mb-3 border-b border-gray-800 pb-3">
+                    <div><span data-i18n="res_distance">全程預計距離：</span><span id="res-distance" class="text-white font-bold">0</span> <span data-i18n="unit_km">公里</span></div>
+                    <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
+                </div>
+
+                <!-- 1. 法定跳錶基本費 -->
+                <div class="text-xs text-gray-300 space-y-1 mb-3 pb-3 border-b border-gray-800">
+                    <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
+                    <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
+                    <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
+                </div>
+
+                <!-- 2. 隧道 / 收費路段明細 -->
+                <div id="res-tolls-container" class="hidden text-xs bg-gray-900/90 p-3 rounded-xl border border-gray-800 mb-3">
+                    <div class="font-bold text-gray-300 mb-1.5 flex items-center justify-between">
+                        <span><i class="fa-solid fa-road text-brand-yellow mr-1"></i> <span data-i18n="res_tolls_title">隧道 / 收費路段明細：</span></span>
+                        <span id="res-tolls-total" class="text-brand-yellow font-bold">+HK$ 0</span>
+                    </div>
+                    <ul id="res-tolls-list" class="text-gray-400 space-y-1 pl-2"></ul>
+                </div>
+
+                <div class="text-xl font-extrabold text-brand-yellow mt-3 pt-3 border-t border-gray-800/80 flex justify-between items-end">
+                    <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預估車費總額：</span>
+                    <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
+                </div>
+                
+                <div class="mt-4 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
+                    <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
+                        實際車費按跳錶、隧道費、行李費及等候時間為準。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 重新選擇車款與直接預約按鈕區 -->
+            <div class="mt-5 pt-4 border-t border-gray-800 flex flex-wrap justify-center gap-3">
+                <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
+                </button>
+                <button type="button" onclick="scrollToBooking()" class="text-xs font-bold text-black bg-brand-yellow px-5 py-2.5 rounded-xl hover:opacity-90 transition cursor-pointer inline-flex items-center gap-1.5 shadow-md">
+                    <i class="fa-regular fa-calendar-check"></i> <span data-i18n="btn_now_booking">現在預約 (填寫表單)</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 預約表單 Booking Section -->
+    <section id="booking-section" class="max-w-2xl mx-auto px-4 py-6 mb-12">
+        <div class="bg-brand-gray border border-gray-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+            
+            <div class="text-center mb-8">
+                <div class="inline-block bg-brand-yellow/10 text-brand-yellow text-xs font-bold px-3 py-1 rounded-full mb-3" data-i18n="form_badge">INSTANT BOOKING</div>
+                <h2 class="text-2xl md:text-3xl font-bold" data-i18n="form_title">即時預約行程</h2>
+                <p class="text-gray-400 text-xs md:text-sm mt-1" data-i18n="form_desc">資料已自動同步，一鍵轉發至 WhatsApp 專人極速接單。</p>
+            </div>
+
+            <!-- 服務類型切換 Tab -->
+            <div class="grid grid-cols-2 gap-2 mb-8 bg-black/40 p-1.5 rounded-xl border border-gray-800/80">
+                <button type="button" id="tab-normal" onclick="switchServiceType('normal')" class="py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer">
+                    <i class="fa-solid fa-taxi mr-1.5"></i> <span data-i18n="tab_normal">一般點對點預約</span>
+                </button>
+                <button type="button" id="tab-airport" onclick="switchServiceType('airport')" class="py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer">
+                    <i class="fa-solid fa-plane-arrival mr-1.5"></i> <span data-i18n="tab_airport">機場接機服務</span>
+                </button>
+            </div>
+
+            <!-- 表單本體 -->
+            <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
+                
+                <!-- 條件顯示：如選擇豐田混能的士，於預約表格注明是否接受免費升級 -->
+                <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg mb-4">
+                    <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
+                        <i class="fa-solid fa-gift text-brand-yellow"></i>
+                        <span data-i18n="upgrade_box_text">如選擇豐田混能的士，請問是否接受<span class="text-brand-yellow font-extrabold">免費</span>升級至更高階車款？ <span class="text-brand-yellow">* (必須選擇)</span></span>
+                    </p>
+                    <div class="flex items-center gap-6">
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                            <input type="checkbox" name="booking_toyota_upgrade" value="接受免費升級" id="booking-upgrade-yes" onclick="handleBookingUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
+                            <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                            <input type="checkbox" name="booking_toyota_upgrade" value="不接受升級" id="booking-upgrade-no" onclick="handleBookingUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
+                            <span data-i18n="upgrade_no_label">不接受升級</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="field-pickup-container">
+                    <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
+                    <input type="text" id="pickup" required data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
+                <div id="field-flight-container" class="hidden">
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (例如：CX250)</span></label>
+                    <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
+                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊 (系統會自動計入中途繞路車費)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
+                <div>
+                    <label id="label-dropoff" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span data-i18n="label_dropoff">落車地點 (終點)</span></label>
+                    <input type="text" id="dropoff" required data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
+                        <input type="date" id="date" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (支援即時或預約)</span></label>
+                        <input type="time" id="time" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數</span></label>
+                        <select id="passengers" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                            <option value="1 人" data-i18n="p1">1 人</option>
+                            <option value="2 人" selected data-i18n="p2">2 人</option>
+                            <option value="3 人" data-i18n="p3">3 人</option>
+                            <option value="4 人" data-i18n="p4">4 人</option>
+                            <option value="5 人" data-i18n="p5">5 人</option>
+                            <option value="6 人" data-i18n="p6">6 人</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-suitcase text-brand-yellow mr-1.5"></i><span data-i18n="label_luggages">行李件數</span></label>
+                        <select id="luggages" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                            <option value="0 件" selected data-i18n="l0">0 件</option>
+                            <option value="1 件" data-i18n="l1">1 件</option>
+                            <option value="2 件" data-i18n="l2">2 件</option>
+                            <option value="3 件" data-i18n="l3">3 件</option>
+                            <option value="4 件+" data-i18n="l4">4 件+</option>
+                            <option value="5 件+" data-i18n="l5">5 件+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 條件 3 & 4：於乘客人數下方加設是否有寵物選項，於行李件數下方加設是否有輪椅需要放置於尾箱？ -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-paw text-brand-yellow mr-1.5"></i><span data-i18n="label_has_pet">是否有寵物 (必須選擇)</span></label>
+                        <select id="has_pet" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                            <option value="" disabled selected data-i18n="opt_select">請選擇</option>
+                            <option value="是" data-i18n="opt_yes">是</option>
+                            <option value="否" data-i18n="opt_no">否</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-wheelchair text-brand-yellow mr-1.5"></i><span data-i18n="label_has_wheelchair">是否有輪椅需要放置於尾箱？ (必須選擇)</span></label>
+                        <select id="has_wheelchair" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                            <option value="" disabled selected data-i18n="opt_select">請選擇</option>
+                            <option value="是" data-i18n="opt_yes">是</option>
+                            <option value="否" data-i18n="opt_no">否</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 付款方式選擇 (可選多項) -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-2">
+                        <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
+                        <span data-i18n="label_payment_method">選擇付款方式 (可選多項)</span>
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_cash">現金</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_credit">信用卡 (需另加手續費)</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="微信" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_wechat">微信</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="支付寶" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_alipay">支付寶</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_octopus">八達通</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_payme">PayMe</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                            <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 聯絡人資料 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人姓氏</span></label>
+                        <input type="text" id="contact_surname" required data-i18n-placeholder="ph_contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂 (必須選擇)</span></label>
+                        <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl px-4 py-3.5 text-xs text-gray-200 h-[48px]">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="contact_title" value="先生" required class="text-brand-yellow focus:ring-brand-yellow">
+                                <span data-i18n="title_mr">先生</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="contact_title" value="小姐" required class="text-brand-yellow focus:ring-brand-yellow">
+                                <span data-i18n="title_ms">小姐</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp 接收確認)</span></label>
+                    <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+                
+                <div class="bg-black/50 p-4 rounded-xl border border-gray-800 flex justify-between items-center mt-6">
+                    <div class="text-xs">
+                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_car_label">目前選定車型</span>
+                        <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">豐田混能的士</span>
+                    </div>
+                    <div class="text-right text-xs">
+                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_fee_label">收費模式</span>
+                        <span id="selected-price-text" class="text-brand-yellow font-bold">標準收費・無附加費</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-yellow text-black font-extrabold text-base py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="btn_submit_whatsapp">確認預約並發送 WhatsApp</span>
+                </button>
+                <p class="text-center text-xs text-gray-500 mt-2" data-i18n="form_footer_note">點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。</p>
+            </form>
+        </div>
+    </section>
+
+    <!-- 頁尾 Footer -->
+    <footer class="border-t border-gray-800/80 mt-16 py-10 text-center px-4 bg-brand-dark">
+        <p class="text-xs text-gray-400 mb-6" data-i18n="footer_slogan">香港新一代豪華六座位的士預約服務・準時尊貴接送</p>
+        
+        <div class="flex justify-center gap-4 mb-8">
+            <a href="tel:57038875" class="border border-gray-800 bg-brand-gray px-6 py-2.5 rounded-full hover:bg-gray-800 transition text-xs flex items-center gap-2 text-white">
+                <i class="fa-solid fa-phone text-brand-yellow"></i> 5703 8875
+            </a>
+            <!-- 直接 WhatsApp 查詢按鈕 -->
+            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%81%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%BA%A6%E7%9A%84%E7%A5%AB%E6%9C%8D%E5%8A%A1%EF%BC%81" target="_blank" class="bg-brand-yellow text-black px-6 py-2.5 rounded-full hover:opacity-90 transition font-bold text-xs flex items-center gap-2 shadow-md">
+                <i class="fa-brands fa-whatsapp"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
+            </a>
+        </div>
+        <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
+    </footer>
+
+    <!-- JavaScript 邏輯整合與多語言切換 -->
+    <script>
+        let currentLang = 'zh'; // 'zh' 或 'en'
+
+        const translations = {
+            zh: {
+                btn_view_fleet: "選擇車款類型",
+                notice_15min: "提供最快15分鐘後的預約服務（亦支援即時訂單）",
+                feature_radar: "智能路線導航規劃",
+                feature_2: "24小時全天候候命",
+                feature_3: "明碼實價・無隱藏收費",
+                feature_4: "WhatsApp 專人確認",
+                feature_payment: "提供多種電子支付方式",
+                fleet_desc: "點選心水車型（獲選車輛將以主題黃框顯示），系統將自動捲動至車費估算器。",
+                badge_selected: "已選擇",
+                car_cap_label: "載客容量：",
+                car_lug_label: "行李空間：",
+                car_feat_label: "車型特點：",
+                fee_mode_label: "收費模式",
+                
+                upgrade_box_text: '如選擇豐田混能的士，請問是否接受<span class="text-brand-yellow font-extrabold">免費</span>升級至更高階車款？ <span class="text-brand-yellow">* (必須選擇)</span>',
+                upgrade_yes_label: '接受<span class="text-brand-yellow font-bold">免費</span>升級',
+                upgrade_no_label: '不接受升級',
+
+                car1_name: "豐田混能的士",
+                car1_seats: "4 座位",
+                car1_type: "標準混能的士",
+                car1_cap: "最多 4 位乘客",
+                car1_lug: "約 2-3 件標準行李",
+                car1_feat: "特低地台、電動趟門",
+                car1_fee: "標準收費・無附加費",
+
+                car2_name: "Maxus MIFA 7",
+                car2_seats: "6 座位",
+                car2_type: "純電動七人車",
+                car2_cap: "最多 6 位乘客",
+                car2_lug: "可放 6-7 件大型行李",
+                car2_feat: "純電動零排放、極度寧靜",
+                car2_fee: "附加費 HK$50 (最低 $130)",
+
+                car3_name: "廣汽 E9",
+                car3_seats: "6 座位",
+                car3_type: "豪華航空椅專車",
+                car3_cap: "最多 6 位乘客",
+                car3_lug: "約 3-4 件大型行李",
+                car3_feat: "頭等航空級獨立大班椅",
+                car3_fee: "附加費 HK$100 (最低 $180)",
+
+                car4_name: "吉利大黃蜂",
+                car4_seats: "6 座位",
+                car4_type: "超大空間尊車",
+                car4_cap: "最多 6 位乘客",
+                car4_lug: "4件以上大型行李",
+                car4_feat: "同級最大車廂、空間極佳",
+                car4_fee: "附加費 HK$80 (最低 $160)",
+
+                car5_name: "豐田 Noah 輪椅的士",
+                car5_seats: "無障礙",
+                car5_type: "無障礙福祉專車",
+                car5_cap: "1位輪椅 + 5位乘客",
+                car5_lug: "可放 3-4 件大行李",
+                car5_feat: "配備原廠金屬斜道",
+                car5_fee: "附加費 HK$150 (最低 $230)",
+
+                calc_title: "智能路線與車費估算",
+                calc_tip_title: "車費估算使用說明：",
+                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
+                calc_tip_2: '<strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
+                calc_tip_3: '系統將自動規劃最佳行車路線並計算預估車費與相關隧道費用。',
+                calc_label_pickup: "起點 (出發地)",
+                calc_label_stopover: "中途站 (選填)",
+                calc_label_dropoff: "終點 (目的地)",
+                ph_pickup_box: "輸入起點...",
+                ph_stopover_opt: "輸入中途站...",
+                ph_dropoff_opt: "輸入終點...",
+
+                voice_btn_text: "按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」",
+                btn_calc_fare: "立即計算預估車費",
+                route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
+                res_distance: "全程預計距離：",
+                res_duration: "預計行車時間：",
+                unit_km: "公里",
+                unit_min: "分鐘",
+                res_tolls_title: "隧道 / 收費路段明細：",
+                res_base_fee: "法定跳錶基本費：",
+                res_surcharge: "車款附加費：",
+                res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ",
+                res_min_note_post: ")",
+                res_total_title: "預估車費總額：",
+                res_note: "實際車費按跳錶、隧道費、行李費及等候時間為準。",
+                btn_reselect: "重新選擇車款",
+                btn_now_booking: "現在預約 (填寫表單)",
+                form_badge: "INSTANT BOOKING",
+                form_title: "即時預約行程",
+                form_desc: "資料已自動同步，一鍵轉發至 WhatsApp 專人極速接單。",
+                tab_normal: "一般點對點預約",
+                tab_airport: "機場接機服務",
+                label_pickup: "上車地點 (起點)",
+                ph_pickup: "例：觀塘 APM",
+                label_flight: "航班編號 (例如：CX250)",
+                ph_flight: "例：CX250 (司機會自動監察航班時間)",
+                label_stopover: "中途停靠點 (如沒有可留空)",
+                ph_stopover: "例：旺角朗豪坊",
+                label_dropoff: "落車地點 (終點)",
+                ph_dropoff: "例：深圳灣口岸",
+                label_date: "用車日期",
+                label_time: "用車時間 (支援即時或預約)",
+                label_passengers: "乘客人數",
+                label_luggages: "行李件數",
+                label_has_pet: "是否有寵物 (必須選擇)",
+                label_has_wheelchair: "是否有輪椅需要放置於尾箱？ (必須選擇)",
+                opt_select: "請選擇",
+                opt_yes: "是",
+                opt_no: "否",
+                label_contact_surname: "聯絡人姓氏",
+                ph_contact_surname: "例：陳",
+                label_contact_title: "稱謂 (必須選擇)",
+                title_mr: "先生",
+                title_ms: "小姐",
+                label_payment_method: "選擇付款方式 (可選多項)",
+                pay_cash: "現金",
+                pay_credit: "信用卡 (需另加手續費)",
+                pay_wechat: "微信",
+                pay_alipay: "支付寶",
+                pay_octopus: "八達通",
+                pay_payme: "PayMe",
+                pay_fps: "轉數快",
+                label_phone: "聯絡電話 (WhatsApp 接收確認)",
+                ph_phone: "例：9123 4567",
+                p1: "1 人", p2: "2 人", p3: "3 人", p4: "4 人", p5: "5 人", p6: "6 人",
+                l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
+                summary_car_label: "目前選定車型",
+                summary_fee_label: "收費模式",
+                btn_submit_whatsapp: "確認預約並發送 WhatsApp",
+                form_footer_note: "點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。",
+                footer_slogan: "香港新一代豪華六座位的士預約服務・準時尊貴接送",
+                whatsapp_inquiry: "WhatsApp 查詢",
+                footer_copy: "© 2026 版權所有。"
+            },
+            en: {
+                btn_view_fleet: "Select Vehicle Type",
+                notice_15min: "Supports 15-minute advance booking & instant orders",
+                feature_radar: "Smart Route Navigation",
+                feature_2: "24/7 Availability",
+                feature_3: "Transparent & No Hidden Fees",
+                feature_4: "WhatsApp Support Confirmation",
+                feature_payment: "Multiple Electronic Payment Methods",
+                fleet_desc: "Select your preferred vehicle (highlighted in yellow box), and the system will auto-scroll to the fare estimator.",
+                badge_selected: "Selected",
+                car_cap_label: "Capacity: ",
+                car_lug_label: "Luggage: ",
+                car_feat_label: "Features: ",
+                fee_mode_label: "Pricing Mode",
+
+                upgrade_box_text: 'If choosing Toyota Hybrid Taxi, do you accept <span class="text-brand-yellow font-extrabold">free</span> upgrade to higher-tier vehicles? <span class="text-brand-yellow">* (Required)</span>',
+                upgrade_yes_label: 'Accept <span class="text-brand-yellow font-bold">Free</span> Upgrade',
+                upgrade_no_label: 'Decline Upgrade',
+
+                car1_name: "Toyota Hybrid Taxi",
+                car1_seats: "4 Seats",
+                car1_type: "Standard Hybrid Taxi",
+                car1_cap: "Up to 4 passengers",
+                car1_lug: "Approx. 2-3 standard luggages",
+                car1_feat: "Low floor, power sliding door",
+                car1_fee: "Standard Fare · No Surcharge",
+
+                car2_name: "Maxus MIFA 7",
+                car2_seats: "6 Seats",
+                car2_type: "Pure Electric MPV",
+                car2_cap: "Up to 6 passengers",
+                car2_lug: "Fits 6-7 large luggages",
+                car2_feat: "Zero emission, ultra-quiet",
+                car2_fee: "Surcharge HK$50 (Min. $130)",
+
+                car3_name: "GAC E9",
+                car3_seats: "6 Seats",
+                car3_type: "Luxury Aviation Seat MPV",
+                car3_cap: "Up to 6 passengers",
+                car3_lug: "Approx. 3-4 large luggages",
+                car3_feat: "First-class independent lounge seats",
+                car3_fee: "Surcharge HK$100 (Min. $180)",
+
+                car4_name: "Geely Bumblebee",
+                car4_seats: "6 Seats",
+                car4_type: "Extra Large Luxury MPV",
+                car4_cap: "Up to 6 passengers",
+                car4_lug: "4+ large luggages",
+                car4_feat: "Class-leading spacious cabin",
+                car4_fee: "Surcharge HK$80 (Min. $160)",
+
+                car5_name: "Toyota Noah Wheelchair Taxi",
+                car5_seats: "Accessible",
+                car5_type: "Accessible Welfare Vehicle",
+                car5_cap: "1 wheelchair + 5 passengers",
+                car5_lug: "Fits 3-4 large luggages",
+                car5_feat: "Equipped with factory metal ramp",
+                car5_fee: "Surcharge HK$150 (Min. $230)",
+
+                calc_title: "Smart Route & Fare Estimator",
+                calc_tip_title: "Fare Estimation Instructions:",
+                calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak the full trip, e.g., <span class="text-brand-yellow font-medium">"From Kwun Tong via Mong Kok to Tsim Sha Tsui"</span>.',
+                calc_tip_2: '<strong class="text-white">3-Box Input:</strong> Fill in pickup, stopover, and drop-off below (with auto-complete dropdown), then click calculate.',
+                calc_tip_3: 'The system will automatically plan the best route and calculate estimated fare and toll charges.',
+                calc_label_pickup: "Pickup (Start)",
+                calc_label_stopover: "Stopover (Optional)",
+                calc_label_dropoff: "Destination",
+                ph_pickup_box: "Enter pickup...",
+                ph_stopover_opt: "Enter stopover...",
+                ph_dropoff_opt: "Enter destination...",
+
+                voice_btn_text: "Click to speak trip: \"From [Start] via [Stop] to [Destination]\"",
+                btn_calc_fare: "Calculate Estimated Fare",
+                route_select_title: "Select Route Option (Fastest / Shortest):",
+                res_distance: "Estimated Distance: ",
+                res_duration: "Estimated Duration: ",
+                unit_km: "km",
+                unit_min: "mins",
+                res_tolls_title: "Tunnel / Toll Breakdown:",
+                res_base_fee: "Meter Base Fare: ",
+                res_surcharge: "Vehicle Surcharge: ",
+                res_min_note_pre: "*(Minimum fare threshold of HK$ ",
+                res_min_note_post: ")",
+                res_total_title: "Estimated Total Fare:",
+                res_note: "Actual fare is subject to the taximeter, tunnel fees, luggage fees, and waiting time.",
+                btn_reselect: "Reselect Vehicle",
+                btn_now_booking: "Book Now (Fill Form)",
+                form_badge: "INSTANT BOOKING",
+                form_title: "Instant Booking",
+                form_desc: "Data is synced automatically. Forward directly to WhatsApp for rapid dispatch.",
+                tab_normal: "Standard Point-to-Point",
+                tab_airport: "Airport Pickup Service",
+                label_pickup: "Pickup Location (Start)",
+                ph_pickup: "e.g., Kwun Tong APM",
+                label_flight: "Flight Number (e.g., CX250)",
+                ph_flight: "e.g., CX250 (Driver monitors flight time)",
+                label_stopover: "Mid-way Stop (Optional)",
+                ph_stopover: "e.g., Mong Kok Langham Place",
+                label_dropoff: "Drop-off Location (Destination)",
+                ph_dropoff: "e.g., Shenzhen Bay Port",
+                label_date: "Service Date",
+                label_time: "Service Time (Instant or Advance)",
+                label_passengers: "Passengers",
+                label_luggages: "Luggages",
+                label_has_pet: "Pets on board? (Required)",
+                label_has_wheelchair: "Wheelchair in trunk? (Required)",
+                opt_select: "Please select",
+                opt_yes: "Yes",
+                opt_no: "No",
+                label_contact_surname: "Contact Surname",
+                ph_contact_surname: "e.g., Chan",
+                label_contact_title: "Title (Required)",
+                title_mr: "Mr.",
+                title_ms: "Ms.",
+                label_payment_method: "Payment Method (Multiple Choice)",
+                pay_cash: "Cash",
+                pay_credit: "Credit Card (Surcharge applies)",
+                pay_wechat: "WeChat Pay",
+                pay_alipay: "Alipay",
+                pay_octopus: "Octopus",
+                pay_payme: "PayMe",
+                pay_fps: "FPS",
+                label_phone: "Contact Phone (WhatsApp Confirmation)",
+                ph_phone: "e.g., 9123 4567",
+                p1: "1 Person", p2: "2 People", p3: "3 People", p4: "4 People", p5: "5 People", p6: "6 People",
+                l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
+                summary_car_label: "Selected Vehicle",
+                summary_fee_label: "Pricing Mode",
+                btn_submit_whatsapp: "Confirm Booking & Send WhatsApp",
+                form_footer_note: "Clicking will open WhatsApp to send your order details. A driver will reply shortly.",
+                footer_slogan: "HK Next-Gen Luxury 6-Seater Taxi Booking Service · Punctual & Prestigious",
+                whatsapp_inquiry: "WhatsApp Inquiry",
+                footer_copy: "© 2026 All Rights Reserved."
+            }
+        };
+
+        let calcPickupInput, calcStopoverInput, calcDropoffInput;
+
+        function handleUpgradeCheckbox(choice) {
+            const yesBox = document.getElementById('upgrade-yes');
+            const noBox = document.getElementById('upgrade-no');
+            const bookingYesBox = document.getElementById('booking-upgrade-yes');
+            const bookingNoBox = document.getElementById('booking-upgrade-no');
+
+            if (choice === 'yes') {
+                if (yesBox) yesBox.checked = true;
+                if (noBox) noBox.checked = false;
+                if (bookingYesBox) bookingYesBox.checked = true;
+                if (bookingNoBox) bookingNoBox.checked = false;
+            } else if (choice === 'no') {
+                if (yesBox) yesBox.checked = false;
+                if (noBox) noBox.checked = true;
+                if (bookingYesBox) bookingYesBox.checked = false;
+                if (bookingNoBox) bookingNoBox.checked = true;
+            }
+        }
+
+        function handleBookingUpgradeCheckbox(choice) {
+            handleUpgradeCheckbox(choice);
+        }
+
+        function initDateTimeRestrictions() {
+            const dateInput = document.getElementById('date');
+            const timeInput = document.getElementById('time');
+            if (!dateInput || !timeInput) return;
+
+            const now = new Date();
+            const maxAllowed = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+            const formatDate = (d) => {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            const formatTime = (d) => {
+                const hours = String(d.getHours()).padStart(2, '0');
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+                return `${hours}:${minutes}`;
+            };
+
+            const minDateStr = formatDate(now);
+            const maxDateStr = formatDate(maxAllowed);
+
+            dateInput.setAttribute('min', minDateStr);
+            dateInput.setAttribute('max', maxDateStr);
+
+            if (!dateInput.value) {
+                dateInput.value = minDateStr;
+            }
+            if (!timeInput.value) {
+                timeInput.value = formatTime(now);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            initDateTimeRestrictions();
+
+            // 監聽乘客人數變動，若人數 >= 5 且當前選定混能的士，則自動切換並提示
+            const passengersSelect = document.getElementById('passengers');
+            if (passengersSelect) {
+                passengersSelect.addEventListener('change', () => {
+                    const val = parseInt(passengersSelect.value);
+                    if (val >= 5 && selectedCarName === '豐田混能的士') {
+                        alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi has been automatically switched to Maxus MIFA 7." : "乘客人數已改為5或以上，4座位的豐田混能的士不適用，已自動為您切換至 6 座位的 Maxus MIFA 7。");
+                        selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)');
+                    }
+                });
+            }
+
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                const options = {
+                    componentRestrictions: { country: "hk" }
+                };
+                
+                const pickupInput = document.getElementById('pickup');
+                const stopoverInput = document.getElementById('stopover');
+                const dropoffInput = document.getElementById('dropoff');
+
+                calcPickupInput = document.getElementById('calc-pickup');
+                calcStopoverInput = document.getElementById('calc-stopover');
+                calcDropoffInput = document.getElementById('calc-dropoff');
+
+                if (pickupInput) new google.maps.places.Autocomplete(pickupInput, options);
+                if (stopoverInput) new google.maps.places.Autocomplete(stopoverInput, options);
+                if (dropoffInput) new google.maps.places.Autocomplete(dropoffInput, options);
+
+                if (calcPickupInput) new google.maps.places.Autocomplete(calcPickupInput, options);
+                if (calcStopoverInput) new google.maps.places.Autocomplete(calcStopoverInput, options);
+                if (calcDropoffInput) new google.maps.places.Autocomplete(calcDropoffInput, options);
+            }
+        });
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            const langBtn = document.getElementById('lang-toggle-btn');
+            langBtn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.innerHTML = translations[currentLang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[currentLang][key]) {
+                    el.placeholder = translations[currentLang][key];
+                }
+            });
+
+            if (currentLang === 'en') {
+                if (selectedCarName === '豐田混能的士') selectedCarNameEn = 'Toyota Hybrid Taxi';
+                else if (selectedCarName === 'Maxus MIFA 7') selectedCarNameEn = 'Maxus MIFA 7';
+                else if (selectedCarName === '廣汽 E9') selectedCarNameEn = 'GAC E9';
+                else if (selectedCarName === '吉利大黃蜂') selectedCarNameEn = 'Geely Bumblebee';
+                else if (selectedCarName === '豐田 Noah 輪椅的士') selectedCarNameEn = 'Toyota Noah Wheelchair Taxi';
+                
+                document.getElementById('selected-car-text').innerText = selectedCarNameEn || selectedCarName;
+                document.getElementById('selected-price-text').innerText = selectedCarPriceEn || selectedCarPrice;
+            } else {
+                document.getElementById('selected-car-text').innerText = selectedCarName;
+                document.getElementById('selected-price-text').innerText = selectedCarPrice;
+            }
+
+            if (currentRoutesResponse) {
+                let fastestIndex = 0, shortestIndex = 0, minD = Infinity, minT = Infinity;
+                currentRoutesResponse.routes.forEach((rt, i) => {
+                    let d = 0, t = 0;
+                    rt.legs.forEach(leg => { d += leg.distance.value; t += leg.duration.value; });
+                    if (t < minT) { minT = t; fastestIndex = i; }
+                    if (d < minD) { minD = d; shortestIndex = i; }
+                });
+                let allowedIndices = [fastestIndex];
+                if (shortestIndex !== fastestIndex) allowedIndices.push(shortestIndex);
+                renderRouteOptions(currentRoutesResponse.routes, allowedIndices, fastestIndex, shortestIndex);
+            }
+        }
+
+        let selectedCarName = "豐田混能的士";
+        let selectedCarPrice = "標準收費・無附加費";
+        let selectedCarNameEn = "Toyota Hybrid Taxi";
+        let selectedCarPriceEn = "Standard Fare · No Surcharge";
+        let currentCarSurcharge = 0;
+        let currentCarMinFare = 0;
+        let currentServiceType = "normal";
+        let lastCalculatedBaseFare = 0;
+        let lastCalculatedTolls = 0;
+        let lastDetectedTollsList = [];
+
+        let googleMap = null;
+        let directionsRenderer = null;
+        let currentRoutesResponse = null;
+        let selectedRouteIndex = 0;
+        let lastVoiceTranscript = "";
+
+        const voiceBtn = document.getElementById('voice-btn');
+        const micText = document.getElementById('mic-text');
+
+        function startVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                alert(currentLang === 'en' ? "Your browser does not support speech recognition. Please enter text directly." : "您的瀏覽器暫時未支援語音辨識，請直接在文字欄位輸入地點。");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = currentLang === 'en' ? 'en-US' : 'zh-HK';
+            recognition.interimResults = false;
+            recognition.continuous = false;
+
+            micText.innerText = currentLang === 'en' ? "Listening... Please speak trip details" : "聆聽中...請講出行程 (例如：由觀塘經旺角去尖沙咀)";
+            voiceBtn.classList.add("animate-pulse", "bg-brand-yellow", "text-black");
+
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                recognition.stop(); 
+                const transcript = event.results[0][0].transcript;
+                lastVoiceTranscript = transcript;
+                parseVoiceText(transcript);
+                micText.innerText = `${currentLang === 'en' ? 'Recognized' : '已辨識'}：「${transcript}」`;
+                resetMicStyle();
+                calculateFareWithGoogle();
+            };
+
+            recognition.onerror = function() {
+                recognition.stop();
+                micText.innerText = currentLang === 'en' ? "Could not recognize clearly, please try again" : "未能清晰辨識，請再試一次";
+                resetMicStyle();
+            };
+
+            recognition.onend = function() {
+                resetMicStyle();
+            };
+
+            function resetMicStyle() {
+                voiceBtn.classList.remove("animate-pulse", "bg-brand-yellow", "text-black");
+            }
+        }
+
+        function parseVoiceText(text) {
+            if (document.getElementById('calc-pickup')) document.getElementById('calc-pickup').value = "";
+            if (document.getElementById('calc-stopover')) document.getElementById('calc-stopover').value = "";
+            if (document.getElementById('calc-dropoff')) document.getElementById('calc-dropoff').value = "";
+
+            let pickup = "";
+            let stopover = "";
+            let dropoff = "";
+
+            let cleanText = text.replace(/^由|^from/i, "").trim();
+
+            if (cleanText.match(/經|途經|via/i) && cleanText.match(/去|到|to/i)) {
+                let parts1 = cleanText.split(/經|途經|via/i);
+                pickup = parts1[0] ? parts1[0].trim() : "";
+                
+                let parts2 = parts1[1] ? parts1[1].split(/去|到|to/i) : ["", ""];
+                stopover = parts2[0] ? parts2[0].trim() : "";
+                dropoff = parts2[1] ? parts2[1].trim() : "";
+            } else if (cleanText.match(/去|到|to/i)) {
+                let parts = cleanText.split(/去|到|to/i);
+                pickup = parts[0] ? parts[0].trim() : "";
+                dropoff = parts[1] ? parts[1].trim() : "";
+            } else {
+                pickup = cleanText;
+            }
+
+            const formatPlace = (p) => {
+                if (p.match(/機場|airport|飛機場/i)) return "香港國際機場";
+                if (p.match(/迪士尼|disney/i)) return "香港迪士尼樂園";
+                if (p.match(/西九|kowloon station/i)) return "香港西九龍站";
+                return p;
+            };
+
+            pickup = formatPlace(pickup);
+            stopover = formatPlace(stopover);
+            dropoff = formatPlace(dropoff);
+
+            if (pickup && document.getElementById('calc-pickup')) document.getElementById('calc-pickup').value = pickup;
+            if (stopover && document.getElementById('calc-stopover')) document.getElementById('calc-stopover').value = stopover;
+            if (dropoff && document.getElementById('calc-dropoff')) document.getElementById('calc-dropoff').value = dropoff;
+
+            if (document.getElementById('pickup')) document.getElementById('pickup').value = pickup;
+            if (document.getElementById('stopover')) document.getElementById('stopover').value = stopover;
+            if (document.getElementById('dropoff')) document.getElementById('dropoff').value = dropoff;
+        }
+
+        function selectCar(carName, priceText, surchargeVal, minFareVal, carNameEn, priceTextEn) {
+            // 條件 1：若乘客人數為 5 或以上，不能選擇混能的士
+            const passengersSelect = document.getElementById('passengers');
+            const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
+            if (passengerVal >= 5 && carName === '豐田混能的士') {
+                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi (4 seats) cannot be selected." : "乘客人數為5或以上，4座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
+                return;
+            }
+
+            selectedCarName = carName;
+            selectedCarPrice = priceText;
+            selectedCarNameEn = carNameEn;
+            selectedCarPriceEn = priceTextEn;
+            currentCarSurcharge = surchargeVal;
+            currentCarMinFare = minFareVal;
+
+            document.getElementById('selected-car-text').innerText = (currentLang === 'en') ? carNameEn : carName;
+            document.getElementById('selected-price-text').innerText = (currentLang === 'en') ? priceTextEn : priceText;
+
+            const toyotaUpgradeBox = document.getElementById('toyota-upgrade-box');
+            const bookingToyotaUpgradeContainer = document.getElementById('booking-toyota-upgrade-container');
+            const isToyota = (carName === '豐田混能的士');
+
+            if (toyotaUpgradeBox) {
+                toyotaUpgradeBox.style.display = isToyota ? 'block' : 'none';
+            }
+            if (bookingToyotaUpgradeContainer) {
+                if (isToyota) {
+                    bookingToyotaUpgradeContainer.classList.remove('hidden');
+                } else {
+                    bookingToyotaUpgradeContainer.classList.add('hidden');
+                }
+            }
+
+            const cards = document.querySelectorAll('.car-card');
+            cards.forEach(card => {
+                card.classList.remove('border-2', 'border-brand-yellow', 'shadow-xl', 'shadow-brand-yellow/10');
+                card.classList.add('border', 'border-gray-800', 'opacity-75');
+                const badge = card.querySelector('.badge-container');
+                if (badge) badge.classList.add('hidden');
+            });
+
+            const activeCard = document.getElementById('card-' + carName);
+            if (activeCard) {
+                activeCard.classList.remove('border', 'border-gray-800', 'opacity-75');
+                activeCard.classList.add('border-2', 'border-brand-yellow', 'opacity-100', 'shadow-xl', 'shadow-brand-yellow/10');
+                const activeBadge = activeCard.querySelector('.badge-container');
+                if (activeBadge) activeBadge.classList.remove('hidden');
+            }
+
+            updateTotalFareDisplay();
+            scrollToCalculator();
+        }
+
+        function scrollToCalculator() {
+            document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToFleet() {
+            document.getElementById('fleet-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToBooking() {
+            if (document.getElementById('calc-pickup') && document.getElementById('pickup')) {
+                document.getElementById('pickup').value = document.getElementById('calc-pickup').value;
+            }
+            if (document.getElementById('calc-stopover') && document.getElementById('stopover')) {
+                document.getElementById('stopover').value = document.getElementById('calc-stopover').value;
+            }
+            if (document.getElementById('calc-dropoff') && document.getElementById('dropoff')) {
+                document.getElementById('dropoff').value = document.getElementById('calc-dropoff').value;
+            }
+            document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function switchServiceType(type) {
+            currentServiceType = type;
+            const btnNormal = document.getElementById('tab-normal');
+            const btnAirport = document.getElementById('tab-airport');
+            const fieldPickupContainer = document.getElementById('field-pickup-container');
+            const fieldFlightContainer = document.getElementById('field-flight-container');
+            const labelDropoff = document.getElementById('label-dropoff');
+            const inputPickup = document.getElementById('pickup');
+
+            if (type === 'normal') {
+                btnNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
+                btnAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
+                
+                fieldFlightContainer.classList.add('hidden');
+                fieldPickupContainer.classList.remove('hidden');
+                inputPickup.required = true;
+                labelDropoff.innerHTML = `<i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off Location (Destination)' : '落車地點 (終點)'}</span>`;
+                inputPickup.placeholder = currentLang === 'en' ? "e.g., Kwun Tong APM" : "例：觀塘 APM";
+            } else {
+                btnAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
+                btnNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
+
+                fieldFlightContainer.classList.remove('hidden');
+                fieldPickupContainer.classList.add('hidden');
+                inputPickup.required = false;
+                labelDropoff.innerHTML = `<i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off Location (City Destination)' : '落車地點 (市區目的地)'}</span>`;
+                inputPickup.value = currentLang === 'en' ? "Hong Kong International Airport" : "香港國際機場";
+                document.getElementById('dropoff').placeholder = currentLang === 'en' ? "e.g., Tsim Sha Tsui Harbour City / Hotel" : "例：尖沙咀海港城 / 酒店";
+            }
+        }
+
+        function calculateHkTaxiFare(distanceInMeters) {
+            if (distanceInMeters <= 0) return 0;
+
+            let fare = 29.0;
+            if (distanceInMeters <= 2000) return fare;
+
+            let extraMeters = distanceInMeters - 2000;
+            let totalIncrements = Math.ceil(extraMeters / 200);
+
+            const tier1Increments = 35;
+
+            if (totalIncrements <= tier1Increments) {
+                fare += totalIncrements * 2.1;
+            } else {
+                fare += tier1Increments * 2.1;
+                let remainingIncrements = totalIncrements - tier1Increments;
+                fare += remainingIncrements * 1.4;
+            }
+
+            return Math.round(fare);
+        }
+
+        function isHongKongIsland(lat, lng) {
+            if (lat < 22.18 || lat > 22.298 || lng < 114.10 || lng > 114.27) {
+                return false;
+            }
+            if (lng < 114.14) {
+                return lat < 22.291;
+            } else if (lng < 114.17) {
+                return lat < 22.290;
+            } else if (lng < 114.20) {
+                return lat < 22.292;
+            } else if (lng < 114.23) {
+                return lat < 22.297;
+            } else {
+                return lat < 22.290;
+            }
+        }
+
+        function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
+            let detected = [];
+            let totalTolls = 0;
+            let fullInstructions = "";
+
+            route.legs.forEach(leg => {
+                leg.steps.forEach(step => {
+                    fullInstructions += " " + (step.instructions || "") + " " + (step.html_instructions || "");
+                });
+            });
+
+            let text = fullInstructions.replace(/<[^>]*>?/gm, ' ');
+
+            let hasCrossHarbour = false;
+            let chTunnelName = "";
+
+            if (text.match(/西區海底隧道|西區過海隧道|西隧|Western Harbour|WHC/i)) {
+                chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
+                hasCrossHarbour = true;
+            } else if (text.match(/東區海底隧道|東區過海隧道|東隧|Eastern Harbour|EHC/i)) {
+                chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
+                hasCrossHarbour = true;
+            } else if (text.match(/紅磡海底隧道|紅磡過海隧道|紅隧|海底隧道|Cross-Harbour|Cross Harbour|CHT/i)) {
+                chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
+                hasCrossHarbour = true;
+            }
+
+            let hasHKIsland = false;
+            let hasKowloonNT = false;
+            let crossingLngs = [];
+
+            let hasTaiLam = false;
+            let hasShingMun = false;
+            let hasAberdeen = false;
+
+            if (route.overview_path && route.overview_path.length > 0) {
+                for (let i = 0; i < route.overview_path.length; i++) {
+                    let pt = route.overview_path[i];
+                    let lat = pt.lat();
+                    let lng = pt.lng();
+
+                    if (isHongKongIsland(lat, lng)) {
+                        hasHKIsland = true;
+                    } else if (lat > 22.295 || (lat > 22.288 && lng > 114.238)) {
+                        hasKowloonNT = true;
+                    }
+
+                    if (lat >= 22.282 && lat <= 22.302 && lng >= 114.12 && lng <= 114.25) {
+                        crossingLngs.push(lng);
+                    }
+
+                    if (lat >= 22.380 && lat <= 22.440 && lng >= 114.040 && lng <= 114.120) {
+                        hasTaiLam = true;
+                    }
+                    if (lat >= 22.370 && lat <= 22.395 && lng >= 114.130 && lng <= 114.165) {
+                        hasShingMun = true;
+                    }
+                    if (lat >= 22.254 && lat <= 22.275 && lng >= 114.170 && lng <= 114.192) {
+                        hasAberdeen = true;
+                    }
+                }
+
+                if (hasHKIsland && hasKowloonNT) {
+                    hasCrossHarbour = true;
+                    if (!chTunnelName) {
+                        let avgLng = crossingLngs.length > 0 
+                            ? crossingLngs.reduce((a, b) => a + b, 0) / crossingLngs.length 
+                            : 114.18;
+
+                        if (avgLng < 114.165) {
+                            chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
+                        } else if (avgLng > 114.202) {
+                            chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
+                        } else {
+                            chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
+                        }
+                    }
+                }
+            }
+
+            if (hasCrossHarbour && chTunnelName) {
+                detected.push({ name: chTunnelName, cost: 50 });
+                totalTolls += 50;
+            }
+
+            let textTaiLam = text.match(/大欖隧道|Tai Lam Tunnel|Route 3|Tsing Long Highway|青朗公路|大欖收費廣場/i) || (text.match(/大欖/i) && !text.match(/大欖涌|大欖角/i));
+            let textLionRock = text.match(/獅子山隧道/i) && !text.match(/獅子山隧道公路/i);
+            let textShingMun = text.match(/城門隧道|Shing Mun Tunnel|Shing Mun Tunnel Road|城門隧道公路/i);
+            let textAberdeen = text.match(/香港仔隧道|Aberdeen Tunnel|黃泥涌峽道|Wong Nai Chung Gap Road|黃竹坑道|Wong Chuk Hang Road/i);
+            let textTatesCairn = text.match(/大老山隧道|Tate's Cairn Tunnel/i) || text.match(/大老山/i);
+            let textEaglesNest = text.match(/尖山隧道|沙田嶺隧道|青沙公路|Eagle's Nest|Sha Tin Heights/i);
+
+            if (hasTaiLam || textTaiLam) {
+                detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", cost: 28 });
+                totalTolls += 28;
+            }
+
+            if (textTatesCairn) {
+                detected.push({ name: currentLang === 'en' ? "Tate's Cairn Tunnel" : "大老山隧道", cost: 20 });
+                totalTolls += 20;
+            }
+
+            if (textEaglesNest) {
+                detected.push({ name: currentLang === 'en' ? "Eagle's Nest & Sha Tin Heights Tunnels" : "尖山及沙田嶺隧道", cost: 8 });
+                totalTolls += 8;
+            }
+
+            if (textLionRock) {
+                detected.push({ name: currentLang === 'en' ? "Lion Rock Tunnel" : "獅子山隧道", cost: 8 });
+                totalTolls += 8;
+            }
+
+            if (hasShingMun || textShingMun) {
+                detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnel" : "城門隧道", cost: 8 });
+                totalTolls += 8;
+            }
+
+            if (hasAberdeen || textAberdeen) {
+                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", cost: 8 });
+                totalTolls += 8;
+            }
+
+            return { tolls: detected, totalCost: totalTolls };
+        }
+
+        function calculateFareWithGoogle() {
+            let pickup = document.getElementById('calc-pickup').value.trim();
+            let stopover = document.getElementById('calc-stopover').value.trim();
+            let dropoff = document.getElementById('calc-dropoff').value.trim();
+
+            if (!pickup || !dropoff) {
+                alert(currentLang === 'en' ? "Please enter pickup and drop-off locations first!" : "請先填寫起點與目的地！");
+                return;
+            }
+
+            if (typeof google === 'undefined' || !google.maps) {
+                alert("Google Maps API not loaded properly.");
+                return;
+            }
+
+            const isShenzhenBay = pickup.includes("深圳灣") || stopover.includes("深圳灣") || dropoff.includes("深圳灣") || pickup.includes("Shenzhen Bay") || dropoff.includes("Shenzhen Bay");
+
+            const sanitizeLocation = (loc) => {
+                if (loc.match(/深圳灣|Shenzhen Bay/i)) return "深圳灣公路大橋, 香港";
+                return loc.includes("香港") || loc.includes("Hong Kong") ? loc : loc + ", 香港";
+            };
+
+            let searchOrigin = sanitizeLocation(pickup);
+            let searchDestination = sanitizeLocation(dropoff);
+
+            let waypoints = [];
+            if (stopover !== "") {
+                waypoints.push({
+                    location: sanitizeLocation(stopover),
+                    stopover: true
+                });
+            }
+
+            const directionsService = new google.maps.DirectionsService();
+
+            directionsService.route({
+                origin: searchOrigin,
+                destination: searchDestination,
+                waypoints: waypoints,
+                travelMode: google.maps.TravelMode.DRIVING,
+                optimizeWaypoints: false,
+                provideRouteAlternatives: true
+            }, (response, status) => {
+                if (status === 'OK') {
+                    currentRoutesResponse = response;
+                    const routes = response.routes;
+
+                    let fastestIndex = 0;
+                    let shortestIndex = 0;
+                    let minDuration = Infinity;
+                    let minDistance = Infinity;
+
+                    routes.forEach((rt, idx) => {
+                        let d = 0, t = 0;
+                        rt.legs.forEach(leg => {
+                            d += leg.distance.value;
+                            t += leg.duration.value;
+                        });
+                        if (t < minDuration) {
+                            minDuration = t;
+                            fastestIndex = idx;
+                        }
+                        if (d < minDistance) {
+                            minDistance = d;
+                            shortestIndex = idx;
+                        }
+                    });
+
+                    let allowedIndices = [fastestIndex];
+                    if (shortestIndex !== fastestIndex) {
+                        allowedIndices.push(shortestIndex);
+                    }
+
+                    selectedRouteIndex = fastestIndex;
+
+                    renderRouteOptions(routes, allowedIndices, fastestIndex, shortestIndex);
+                    displayRouteDetails(selectedRouteIndex, isShenzhenBay);
+
+                    document.getElementById('fare-result').classList.remove('hidden');
+
+                    if (!googleMap) {
+                        googleMap = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 12,
+                            center: { lat: 22.3193, lng: 114.1694 },
+                            disableDefaultUI: true,
+                            zoomControl: true
+                        });
+                        directionsRenderer = new google.maps.DirectionsRenderer({
+                            map: googleMap,
+                            suppressMarkers: false
+                        });
+                    } else {
+                        google.maps.event.trigger(googleMap, 'resize');
+                    }
+                    directionsRenderer.setDirections(response);
+                    directionsRenderer.setRouteIndex(selectedRouteIndex);
+
+                } else {
+                    alert(currentLang === 'en' ? "Google Maps could not find the route. Please check location names." : "Google 地圖無法找到相關路線，請檢查地點名稱是否準確。");
+                }
+            });
+        }
+
+        function renderRouteOptions(routes, allowedIndices, fastestIndex, shortestIndex) {
+            const container = document.getElementById('route-options-list');
+            const wrapper = document.getElementById('route-options-container');
+            
+            if (allowedIndices.length <= 1) {
+                wrapper.classList.add('hidden');
+                return;
+            }
+
+            wrapper.classList.remove('hidden');
+            let html = '';
+
+            allowedIndices.forEach(idx => {
+                let rt = routes[idx];
+                let d = 0, t = 0;
+                rt.legs.forEach(leg => {
+                    d += leg.distance.value;
+                    t += leg.duration.value;
+                });
+                let km = (d / 1000).toFixed(1);
+                let mins = Math.round(t / 60);
+
+                let tags = [];
+                if (idx === fastestIndex) tags.push(currentLang === 'en' ? '⚡ Fastest' : '⚡ 最快路線');
+                if (idx === shortestIndex) tags.push(currentLang === 'en' ? '📍 Shortest' : '📍 最短路線');
+
+                let tagStr = tags.join(' | ');
+                let isSelected = (idx === selectedRouteIndex);
+
+                html += `
+                    <div onclick="selectRouteIndex(${idx})" class="p-2.5 rounded-lg border cursor-pointer transition text-xs flex flex-col justify-between ${isSelected ? 'border-brand-yellow bg-brand-yellow/15 text-white font-bold' : 'border-gray-800 bg-brand-dark text-gray-400 hover:border-gray-600'}">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="${isSelected ? 'text-brand-yellow font-bold' : 'text-gray-300'}">${tagStr}</span>
+                            <input type="radio" name="route_choice" ${isSelected ? 'checked' : ''} class="text-brand-yellow focus:ring-brand-yellow cursor-pointer">
+                        </div>
+                        <div class="text-[11px] text-gray-300">
+                            ${currentLang === 'en' ? 'Distance' : '距離'}：<span class="text-white">${km} km</span> | ${currentLang === 'en' ? 'Time' : '時間'}：<span class="text-white">${mins} mins</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function selectRouteIndex(idx) {
+            selectedRouteIndex = idx;
+            const isShenzhenBay = document.getElementById('calc-pickup').value.includes("深圳灣") || document.getElementById('calc-dropoff').value.includes("深圳灣");
+            displayRouteDetails(idx, isShenzhenBay);
+
+            if (directionsRenderer && currentRoutesResponse) {
+                directionsRenderer.setRouteIndex(idx);
+            }
+
+            let fastestIndex = 0, shortestIndex = 0, minD = Infinity, minT = Infinity;
+            currentRoutesResponse.routes.forEach((rt, i) => {
+                let d = 0, t = 0;
+                rt.legs.forEach(leg => { d += leg.distance.value; t += leg.duration.value; });
+                if (t < minT) { minT = t; fastestIndex = i; }
+                if (d < minD) { minD = d; shortestIndex = i; }
+            });
+            let allowedIndices = [fastestIndex];
+            if (shortestIndex !== fastestIndex) allowedIndices.push(shortestIndex);
+            renderRouteOptions(currentRoutesResponse.routes, allowedIndices, fastestIndex, shortestIndex);
+        }
+
+        function displayRouteDetails(idx, isShenzhenBay) {
+            if (!currentRoutesResponse || !currentRoutesResponse.routes[idx]) return;
+            const route = currentRoutesResponse.routes[idx];
+
+            let totalDistanceInMeters = 0;
+            let totalDurationInSeconds = 0;
+
+            route.legs.forEach(leg => {
+                totalDistanceInMeters += leg.distance.value;
+                totalDurationInSeconds += leg.duration.value;
+            });
+
+            if (isShenzhenBay) {
+                totalDistanceInMeters += 5000;
+            }
+
+            const distanceInKm = (totalDistanceInMeters / 1000).toFixed(1);
+            const durationInMin = Math.round(totalDurationInSeconds / 60);
+
+            lastCalculatedBaseFare = calculateHkTaxiFare(totalDistanceInMeters);
+
+            const tollData = detectHongKongTollsWithGPSGeofenceAndRadar(route);
+            lastCalculatedTolls = tollData.totalCost;
+            lastDetectedTollsList = tollData.tolls;
+
+            const tollsContainer = document.getElementById('res-tolls-container');
+            const tollsListEl = document.getElementById('res-tolls-list');
+            const tollsTotalEl = document.getElementById('res-tolls-total');
+
+            if (tollData.tolls.length > 0) {
+                tollsListEl.innerHTML = tollData.tolls.map(t => `
+                    <li class="flex justify-between items-center">
+                        <span>• ${t.name}</span>
+                        <span class="text-white font-medium">+HK$ ${t.cost}</span>
+                    </li>
+                `).join('');
+                tollsTotalEl.innerText = `+HK$ ${tollData.totalCost}`;
+                tollsContainer.classList.remove('hidden');
+            } else {
+                tollsContainer.classList.add('hidden');
+            }
+
+            document.getElementById('res-distance').innerText = distanceInKm;
+            document.getElementById('res-duration').innerText = durationInMin;
+            document.getElementById('res-base-fare').innerText = lastCalculatedBaseFare;
+
+            updateTotalFareDisplay();
+        }
+
+        function updateTotalFareDisplay() {
+            const surchargeRow = document.getElementById('res-surcharge-row');
+            const surchargeValEl = document.getElementById('res-surcharge-val');
+            const minFareNote = document.getElementById('res-min-fare-note');
+            const minFareValEl = document.getElementById('res-min-fare-val');
+            const totalFareEl = document.getElementById('res-total-fare');
+
+            if (currentCarSurcharge > 0) {
+                surchargeRow.classList.remove('hidden');
+                surchargeValEl.innerText = currentCarSurcharge;
+            } else {
+                surchargeRow.classList.add('hidden');
+            }
+
+            let finalTotal = 0;
+
+            if (currentCarMinFare > 0 && (lastCalculatedBaseFare + currentCarSurcharge + lastCalculatedTolls) < currentCarMinFare) {
+                finalTotal = currentCarMinFare + lastCalculatedTolls;
+                minFareValEl.innerText = currentCarMinFare;
+                minFareNote.classList.remove('hidden');
+            } else {
+                finalTotal = lastCalculatedBaseFare + currentCarSurcharge + lastCalculatedTolls;
+                minFareNote.classList.add('hidden');
+            }
+
+            totalFareEl.innerText = finalTotal;
+        }
+
+        function sendWhatsApp(event) {
+            event.preventDefault();
+
+            // 1. 若選擇了豐田混能的士，必須檢查是否已勾選升級選項
+            let upgradeChoiceText = "";
+            if (selectedCarName === '豐田混能的士') {
+                const yesBox = document.getElementById('upgrade-yes');
+                const noBox = document.getElementById('upgrade-no');
+                if (!yesBox.checked && !noBox.checked) {
+                    alert(currentLang === 'en' ? "Please select whether you accept the free vehicle upgrade option." : "請選擇是否接受免費升級至更高階車款選項才能繼續預約。");
+                    const targetBox = document.getElementById('toyota-upgrade-box').style.display !== 'none' ? document.getElementById('toyota-upgrade-box') : document.getElementById('booking-toyota-upgrade-container');
+                    if (targetBox) targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                upgradeChoiceText = yesBox.checked ? (currentLang === 'en' ? "Accepted Free Upgrade" : "接受免費升級") : (currentLang === 'en' ? "Declined Free Upgrade" : "不接受升級");
+            }
+
+            // 2. 檢查乘客人數與車款是否符合條件 1
+            const passengersEl = document.getElementById('passengers');
+            const passengerCountInt = parseInt(passengersEl.value);
+            if (passengerCountInt >= 5 && selectedCarName === '豐田混能的士') {
+                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi cannot be selected." : "乘客人數為5或以上，不能選擇4座位的豐田混能的士。請重新選擇合適的車款。");
+                document.getElementById('fleet-section').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            // 3. 檢查上車地點 (如果是正常服務)
+            if (currentServiceType === 'normal') {
+                const pickupEl = document.getElementById('pickup');
+                if (!pickupEl.value.trim()) {
+                    alert(currentLang === 'en' ? "Please enter the pickup location." : "請填寫上車地點 (起點)。");
+                    pickupEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    pickupEl.focus();
+                    return;
+                }
+            }
+
+            // 4. 檢查落車地點 (終點)
+            const dropoffEl = document.getElementById('dropoff');
+            if (!dropoffEl.value.trim()) {
+                alert(currentLang === 'en' ? "Please enter the drop-off location." : "請填寫落車地點 (終點)。");
+                dropoffEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                dropoffEl.focus();
+                return;
+            }
+
+            // 5. 檢查用車日期
+            const dateEl = document.getElementById('date');
+            if (!dateEl.value) {
+                alert(currentLang === 'en' ? "Please select the service date." : "請選擇用車日期。");
+                dateEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                dateEl.focus();
+                return;
+            }
+
+            // 6. 檢查用車時間
+            const timeEl = document.getElementById('time');
+            if (!timeEl.value) {
+                alert(currentLang === 'en' ? "Please select the service time." : "請選擇用車時間。");
+                timeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                timeEl.focus();
+                return;
+            }
+
+            // 7. 檢查是否有寵物 (必選)
+            const hasPetEl = document.getElementById('has_pet');
+            if (!hasPetEl.value) {
+                alert(currentLang === 'en' ? "Please select whether there are pets on board." : "請選擇是否有寵物。");
+                hasPetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                hasPetEl.focus();
+                return;
+            }
+
+            // 8. 檢查是否有輪椅 (必選)
+            const hasWheelchairEl = document.getElementById('has_wheelchair');
+            if (!hasWheelchairEl.value) {
+                alert(currentLang === 'en' ? "Please select whether there is a wheelchair in the trunk." : "請選擇是否有輪椅需要放置於尾箱。");
+                hasWheelchairEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                hasWheelchairEl.focus();
+                return;
+            }
+
+            // 9. 檢查聯絡人姓氏
+            const contactSurnameEl = document.getElementById('contact_surname');
+            if (!contactSurnameEl.value.trim()) {
+                alert(currentLang === 'en' ? "Please enter contact surname." : "請填寫聯絡人姓氏。");
+                contactSurnameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                contactSurnameEl.focus();
+                return;
+            }
+
+            // 10. 檢查稱謂 (先生/小姐)
+            const contactTitleEl = document.querySelector('input[name="contact_title"]:checked');
+            if (!contactTitleEl) {
+                alert(currentLang === 'en' ? "Please select Mr. or Ms." : "請選擇稱謂 (先生或小姐)。");
+                const titleGroup = document.querySelector('input[name="contact_title"]').closest('.flex');
+                if (titleGroup) titleGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            const contactName = `${contactSurnameEl.value.trim()}${contactTitleEl.value}`;
+
+            // 11. 檢查聯絡電話
+            const phoneEl = document.getElementById('phone');
+            const phoneVal = phoneEl.value.trim();
+            if (!phoneVal) {
+                alert(currentLang === 'en' ? "Please enter contact phone number." : "請填寫聯絡電話。");
+                phoneEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                phoneEl.focus();
+                return;
+            }
+            if (phoneVal.replace(/\D/g, '').length < 8) {
+                alert(currentLang === 'en' ? "Contact phone number must be at least 8 digits." : "聯絡電話少於八位數字，請重新輸入正確的電話號碼。");
+                phoneEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                phoneEl.focus();
+                return;
+            }
+
+            const dateVal = dateEl.value;
+            const timeVal = timeEl.value;
+            const selectedDateTime = new Date(`${dateVal}T${timeVal}`);
+            const now = new Date();
+
+            const diffMs = selectedDateTime.getTime() - now.getTime();
+            const isWithin15Min = (diffMs <= 15 * 60 * 1000);
+
+            if (document.getElementById('calc-pickup') && document.getElementById('calc-pickup').value) {
+                document.getElementById('pickup').value = document.getElementById('calc-pickup').value;
+            }
+            if (document.getElementById('calc-stopover') && document.getElementById('calc-stopover').value) {
+                document.getElementById('stopover').value = document.getElementById('calc-stopover').value;
+            }
+            if (document.getElementById('calc-dropoff') && document.getElementById('calc-dropoff').value) {
+                document.getElementById('dropoff').value = document.getElementById('calc-dropoff').value;
+            }
+
+            const pickup = currentServiceType === 'airport' ? (currentLang === 'en' ? "Hong Kong International Airport (Pickup)" : "香港國際機場 (接機)") : document.getElementById('pickup').value;
+            const flightNo = document.getElementById('flight_no').value;
+            const stopover = document.getElementById('stopover').value;
+            const dropoff = document.getElementById('dropoff').value;
+            const date = dateVal;
+            const time = timeVal;
+            const passengers = passengersEl.value;
+            const luggages = document.getElementById('luggages').value;
+            const hasPet = hasPetEl.value;
+            const hasWheelchair = hasWheelchairEl.value;
+            
+            const paymentCheckboxes = document.querySelectorAll('input[name="payment_method"]:checked');
+            let selectedPayments = [];
+            paymentCheckboxes.forEach(cb => selectedPayments.push(cb.value));
+            const paymentMethod = selectedPayments.length > 0 ? selectedPayments.join(', ') : (currentLang === 'en' ? "Cash" : "現金");
+
+            const phone = phoneVal;
+
+            const carNameDisplay = (currentLang === 'en') ? selectedCarNameEn : selectedCarName;
+            const carPriceDisplay = (currentLang === 'en') ? selectedCarPriceEn : selectedCarPrice;
+
+            let finalUpgradeDisplay = upgradeChoiceText;
+            if (upgradeChoiceText === '不接受升級' || upgradeChoiceText === 'Declined Free Upgrade') {
+                finalUpgradeDisplay = `🔴 *${upgradeChoiceText}*`;
+            }
+
+            let timeDisplay = time;
+            if (isWithin15Min) {
+                timeDisplay = `🔴 即時訂單 (${time})`;
+            }
+
+            // 建構 WhatsApp 訊息
+            let message = `*【${currentServiceType === 'airport' ? (currentLang === 'en' ? 'Airport Pickup Booking' : '機場接機預約') : (currentLang === 'en' ? 'Luxury 6-Seater Taxi Booking' : '豪華六座位的士預約')}】* %0A`;
+            message += `--------------------------------%0A`;
+            message += `🚗 *${currentLang === 'en' ? 'Vehicle' : '心水車型'}*：${carNameDisplay} (${carPriceDisplay})%0A`;
+            if (selectedCarName === '豐田混能的士' && upgradeChoiceText) {
+                message += `🎁 *${currentLang === 'en' ? 'Free Upgrade Option' : '免費升級意願'}*：${finalUpgradeDisplay}%0A`;
+            }
+            if (currentServiceType === 'airport' && flightNo) {
+                message += `✈️ *${currentLang === 'en' ? 'Flight No.' : '航班編號'}*：${flightNo}%0A`;
+            }
+            message += `📍 *${currentServiceType === 'airport' ? (currentLang === 'en' ? 'Drop-off' : '落車地點') : (currentLang === 'en' ? 'Pickup' : '上車地點')}*：${pickup}%0A`;
+            if (stopover) {
+                message += `📍 *${currentLang === 'en' ? 'Stopover' : '中途站'}*：${stopover}%0A`;
+            }
+            message += `🏁 *${currentLang === 'en' ? 'Drop-off' : '落車地點'}*：${dropoff}%0A`;
+            message += `📅 *${currentLang === 'en' ? 'Date & Time' : '用車時間'}*：${date} ${timeDisplay}%0A`;
+            message += `👥 *${currentLang === 'en' ? 'Passengers' : '乘客人數'}*：${passengers}%0A`;
+            message += `🧳 *${currentLang === 'en' ? 'Luggages' : '行李件數'}*：${luggages}%0A`;
+
+            // 條件 3：如選擇沒有寵物或沒有輪椅，則不用顯示該行訊息
+            if (hasPet === '是' || hasPet === 'Yes') {
+                message += `🐾 *${currentLang === 'en' ? 'Pets on Board' : '是否有寵物'}*：🔴 *${hasPet}*%0A`;
+            }
+            if (hasWheelchair === '是' || hasWheelchair === 'Yes') {
+                message += `♿ *${currentLang === 'en' ? 'Wheelchair in Trunk' : '是否有輪椅需要放置於尾箱'}*：🔴 *${hasWheelchair}*%0A`;
+            }
+
+            message += `💳 *${currentLang === 'en' ? 'Payment Method' : '付款方式'}*：${paymentMethod}%0A`;
+            message += `👤 *${currentLang === 'en' ? 'Contact' : '聯絡人'}*：${contactName}%0A`;
+            message += `📞 *${currentLang === 'en' ? 'Phone' : '聯絡電話'}*：${phone}%0A`;
+            message += `--------------------------------%0A`;
+            message += `✨ *${currentLang === 'en' ? 'Estimated Total Fare' : '預估車費總額'}*：HK$ ${document.getElementById('res-total-fare').innerText}%0A`;
+            message += `*(實際車費按跳錶、隧道費、行李費及等候時間為準)*`;
+
+            const whatsappUrl = `https://wa.me/85257038875?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
