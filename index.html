@@ -78,6 +78,14 @@
     <!-- 頂部介紹 Hero Section -->
     <section class="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center md:text-left">
         <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
+            <!-- 新增按鍵：立即查詢車費及預約 -->
+            <div class="flex flex-col items-center md:items-start">
+                <button onclick="quickQueryAndBook()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
+                    <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約</span>
+                </button>
+                <span class="text-xs text-gray-400 mt-1.5 ml-1" data-i18n="note_any_car">接受任何隨機車款</span>
+            </div>
+
             <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
                 <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
             </button>
@@ -486,7 +494,7 @@
                     </div>
                 </div>
 
-                <!-- 寵物與輪椅改為勾選方格 -->
+                <!-- 寵物與輪椅勾選方格 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-brand-dark border border-gray-800 rounded-xl p-4">
                     <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
                         <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
@@ -596,6 +604,8 @@
 
         const translations = {
             zh: {
+                btn_quick_query: "立即查詢車費及預約",
+                note_any_car: "接受任何隨機車款",
                 btn_view_fleet: "選擇車款類型",
                 notice_15min: "提供最快15分鐘後的預約服務（亦支援即時訂單）",
                 feature_radar: "智能路線導航規劃",
@@ -730,6 +740,8 @@
                 footer_copy: "© 2026 版權所有。"
             },
             en: {
+                btn_quick_query: "Quick Fare & Booking",
+                note_any_car: "Any random car accepted",
                 btn_view_fleet: "Select Vehicle Type",
                 notice_15min: "Supports 15-minute advance booking & instant orders",
                 feature_radar: "Smart Route Navigation",
@@ -867,6 +879,13 @@
 
         let calcPickupInput, calcStopoverInput, calcDropoffInput;
 
+        // 新增按鍵觸發函數：捲動至車費估算器，預設豐田混能車款並自動剔選接受免費升級
+        function quickQueryAndBook() {
+            selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
+            handleUpgradeCheckbox('yes');
+            document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
         function handleUpgradeCheckbox(choice) {
             const yesBox = document.getElementById('upgrade-yes');
             const noBox = document.getElementById('upgrade-no');
@@ -880,7 +899,7 @@
                 if (bookingNoBox) bookingNoBox.checked = false;
             } else if (choice === 'no') {
                 if (yesBox) yesBox.checked = false;
-                if (noBox) noBox.checked = true;
+                if (noBox) yesBox.checked = true;
                 if (bookingYesBox) bookingYesBox.checked = false;
                 if (bookingNoBox) bookingNoBox.checked = true;
             }
@@ -928,7 +947,6 @@
         window.addEventListener('load', () => {
             initDateTimeRestrictions();
 
-            // 監聽乘客人數變動，若人數 >= 5 且當前選定混能的士，則自動切換並提示
             const passengersSelect = document.getElementById('passengers');
             if (passengersSelect) {
                 passengersSelect.addEventListener('change', () => {
@@ -1120,7 +1138,6 @@
         }
 
         function selectCar(carName, priceText, surchargeVal, minFareVal, carNameEn, priceTextEn) {
-            // 條件 1：若乘客人數為 5 或以上，不能選擇混能的士
             const passengersSelect = document.getElementById('passengers');
             const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
             if (passengerVal >= 5 && carName === '豐田混能的士') {
@@ -1208,7 +1225,7 @@
                 btnAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
                 
                 fieldFlightContainer.classList.add('hidden');
-                fieldPickupContainer.classList.add('hidden'); // 保持隱藏，與車費估算器自動同步
+                fieldPickupContainer.classList.add('hidden');
                 inputPickup.required = false;
                 labelDropoff.innerHTML = `<i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off Location (Destination)' : '落車地點 (終點)'}</span>`;
                 inputPickup.placeholder = currentLang === 'en' ? "e.g., Kwun Tong APM" : "例：觀塘 APM";
@@ -1382,7 +1399,7 @@
             }
 
             if (hasAberdeen || textAberdeen) {
-                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", cost: 8 });
+                detected.push({ name: currentLang === 'en' ? "香港仔隧道" : "香港仔隧道", cost: 8 });
                 totalTolls += 8;
             }
 
@@ -1539,265 +1556,200 @@
 
         function selectRouteIndex(idx) {
             selectedRouteIndex = idx;
-            const isShenzhenBay = document.getElementById('calc-pickup').value.includes("深圳灣") || document.getElementById('calc-dropoff').value.includes("深圳灣");
-            displayRouteDetails(idx, isShenzhenBay);
-
-            if (directionsRenderer && currentRoutesResponse) {
+            if (currentRoutesResponse) {
                 directionsRenderer.setRouteIndex(idx);
+                let pickup = document.getElementById('calc-pickup').value;
+                let stopover = document.getElementById('calc-stopover').value;
+                let dropoff = document.getElementById('calc-dropoff').value;
+                let isShenzhenBay = pickup.includes("深圳灣") || stopover.includes("深圳灣") || dropoff.includes("深圳灣");
+                displayRouteDetails(idx, isShenzhenBay);
             }
-
-            let fastestIndex = 0, shortestIndex = 0, minD = Infinity, minT = Infinity;
-            currentRoutesResponse.routes.forEach((rt, i) => {
-                let d = 0, t = 0;
-                rt.legs.forEach(leg => { d += leg.distance.value; t += leg.duration.value; });
-                if (t < minT) { minT = t; fastestIndex = i; }
-                if (d < minD) { minD = d; shortestIndex = i; }
-            });
-            let allowedIndices = [fastestIndex];
-            if (shortestIndex !== fastestIndex) allowedIndices.push(shortestIndex);
-            renderRouteOptions(currentRoutesResponse.routes, allowedIndices, fastestIndex, shortestIndex);
         }
 
-        function displayRouteDetails(idx, isShenzhenBay) {
-            if (!currentRoutesResponse || !currentRoutesResponse.routes[idx]) return;
-            const route = currentRoutesResponse.routes[idx];
-
-            let totalDistanceInMeters = 0;
-            let totalDurationInSeconds = 0;
+        function displayRouteDetails(routeIdx, isShenzhenBay) {
+            const route = currentRoutesResponse.routes[routeIdx];
+            let totalDistMeters = 0;
+            let totalDurationSeconds = 0;
 
             route.legs.forEach(leg => {
-                totalDistanceInMeters += leg.distance.value;
-                totalDurationInSeconds += leg.duration.value;
+                totalDistMeters += leg.distance.value;
+                totalDurationSeconds += leg.duration.value;
             });
 
+            let km = (totalDistMeters / 1000).toFixed(1);
+            let mins = Math.round(totalDurationSeconds / 60);
+
+            document.getElementById('res-distance').innerText = km;
+            document.getElementById('res-duration').innerText = mins;
+
+            let baseFare = calculateHkTaxiFare(totalDistMeters);
+            lastCalculatedBaseFare = baseFare;
+            document.getElementById('res-base-fare').innerText = baseFare;
+
+            let tollResult = detectHongKongTollsWithGPSGeofenceAndRadar(route);
             if (isShenzhenBay) {
-                totalDistanceInMeters += 5000;
+                let hasSzb = tollResult.tolls.some(t => t.name.includes("深圳灣"));
+                if (!hasSzb) {
+                    tollResult.tolls.push({ name: currentLang === 'en' ? "Shenzhen Bay Bridge" : "深圳灣公路大橋", cost: 0 });
+                }
             }
 
-            const distanceInKm = (totalDistanceInMeters / 1000).toFixed(1);
-            const durationInMin = Math.round(totalDurationInSeconds / 60);
-
-            lastCalculatedBaseFare = calculateHkTaxiFare(totalDistanceInMeters);
-
-            const tollData = detectHongKongTollsWithGPSGeofenceAndRadar(route);
-            lastCalculatedTolls = tollData.totalCost;
-            lastDetectedTollsList = tollData.tolls;
+            lastCalculatedTolls = tollResult.totalCost;
+            lastDetectedTollsList = tollResult.tolls;
 
             const tollsContainer = document.getElementById('res-tolls-container');
-            const tollsListEl = document.getElementById('res-tolls-list');
-            const tollsTotalEl = document.getElementById('res-tolls-total');
+            const tollsList = document.getElementById('res-tolls-list');
+            const tollsTotal = document.getElementById('res-tolls-total');
 
-            if (tollData.tolls.length > 0) {
-                tollsListEl.innerHTML = tollData.tolls.map(t => `
-                    <li class="flex justify-between items-center">
-                        <span>• ${t.name}</span>
-                        <span class="text-white font-medium">+HK$ ${t.cost}</span>
-                    </li>
-                `).join('');
-                tollsTotalEl.innerText = `+HK$ ${tollData.totalCost}`;
+            if (tollResult.tolls.length > 0) {
                 tollsContainer.classList.remove('hidden');
+                tollsTotal.innerText = "+HK$ " + tollResult.totalCost;
+                let tHtml = '';
+                tollResult.tolls.forEach(t => {
+                    tHtml += `<li>• ${t.name}：<span class="text-white">+HK$ ${t.cost}</span></li>`;
+                });
+                tollsList.innerHTML = tHtml;
             } else {
                 tollsContainer.classList.add('hidden');
             }
-
-            document.getElementById('res-distance').innerText = distanceInKm;
-            document.getElementById('res-duration').innerText = durationInMin;
-            document.getElementById('res-base-fare').innerText = lastCalculatedBaseFare;
 
             updateTotalFareDisplay();
         }
 
         function updateTotalFareDisplay() {
-            const surchargeRow = document.getElementById('res-surcharge-row');
-            const surchargeValEl = document.getElementById('res-surcharge-val');
-            const minFareNote = document.getElementById('res-min-fare-note');
-            const minFareValEl = document.getElementById('res-min-fare-val');
-            const totalFareEl = document.getElementById('res-total-fare');
+            let base = lastCalculatedBaseFare;
+            let surcharge = currentCarSurcharge;
+            let minFare = currentCarMinFare;
+            let tolls = lastCalculatedTolls;
 
-            if (currentCarSurcharge > 0) {
+            const surchargeRow = document.getElementById('res-surcharge-row');
+            const surchargeVal = document.getElementById('res-surcharge-val');
+            const minFareNote = document.getElementById('res-min-fare-note');
+            const minFareVal = document.getElementById('res-min-fare-val');
+
+            if (surcharge > 0) {
                 surchargeRow.classList.remove('hidden');
-                surchargeValEl.innerText = currentCarSurcharge;
+                surchargeVal.innerText = surcharge;
             } else {
                 surchargeRow.classList.add('hidden');
             }
 
-            let finalTotal = 0;
+            let subtotalWithoutTolls = base + surcharge;
+            let finalVehicleTotal = subtotalWithoutTolls;
 
-            if (currentCarMinFare > 0 && (lastCalculatedBaseFare + currentCarSurcharge + lastCalculatedTolls) < currentCarMinFare) {
-                finalTotal = currentCarMinFare + lastCalculatedTolls;
-                minFareValEl.innerText = currentCarMinFare;
+            if (minFare > 0 && finalVehicleTotal < minFare) {
+                finalVehicleTotal = minFare;
                 minFareNote.classList.remove('hidden');
+                minFareVal.innerText = minFare;
             } else {
-                finalTotal = lastCalculatedBaseFare + currentCarSurcharge + lastCalculatedTolls;
                 minFareNote.classList.add('hidden');
             }
 
-            totalFareEl.innerText = finalTotal;
+            let grandTotal = finalVehicleTotal + tolls;
+            document.getElementById('res-total-fare').innerText = grandTotal;
         }
 
-        function sendWhatsApp(event) {
-            event.preventDefault();
+        // 發送 WhatsApp 訂單訊息（已嚴格按照指示調整寵物與輪椅顯示邏輯）
+        function sendWhatsApp(e) {
+            e.preventDefault();
 
-            // 1. 若選擇了豐田混能的士，必須檢查是否已勾選升級選項
-            let upgradeChoiceText = "";
-            let isUpgradeDeclined = false;
-            if (selectedCarName === '豐田混能的士') {
-                const yesBox = document.getElementById('upgrade-yes');
-                const noBox = document.getElementById('upgrade-no');
-                if (!yesBox.checked && !noBox.checked) {
-                    alert(currentLang === 'en' ? "Please select whether you accept the free vehicle upgrade option." : "請選擇是否接受免費升級至更高階車款選項才能繼續預約。");
-                    const targetBox = document.getElementById('toyota-upgrade-box').style.display !== 'none' ? document.getElementById('toyota-upgrade-box') : document.getElementById('booking-toyota-upgrade-container');
-                    if (targetBox) targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return;
-                }
-                isUpgradeDeclined = noBox.checked;
-                upgradeChoiceText = yesBox.checked ? (currentLang === 'en' ? "Accepted Free Upgrade" : "接受免費升級") : (currentLang === 'en' ? "Declined Free Upgrade" : "不接受升級");
+            let pickupVal = document.getElementById('pickup').value.trim();
+            if (!pickupVal && document.getElementById('calc-pickup')) {
+                pickupVal = document.getElementById('calc-pickup').value.trim();
+            }
+            let stopoverVal = document.getElementById('stopover').value.trim();
+            if (!stopoverVal && document.getElementById('calc-stopover')) {
+                stopoverVal = document.getElementById('calc-stopover').value.trim();
+            }
+            let dropoffVal = document.getElementById('dropoff').value.trim();
+            if (!dropoffVal && document.getElementById('calc-dropoff')) {
+                dropoffVal = document.getElementById('calc-dropoff').value.trim();
             }
 
-            // 2. 檢查乘客人數與車款是否符合條件 1
-            const passengersEl = document.getElementById('passengers');
-            const passengerCountInt = parseInt(passengersEl.value);
-            if (passengerCountInt >= 5 && selectedCarName === '豐田混能的士') {
-                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi cannot be selected." : "乘客人數為5或以上，不能選擇4座位的豐田混能的士。請重新選擇合適的車款。");
-                document.getElementById('fleet-section').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            // 自動同步並從車費估算器 (包括語音或文字輸入) 取得上車點、中途站、落車點
-            const calcPickupVal = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : "";
-            const calcStopoverVal = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value.trim() : "";
-            const calcDropoffVal = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : "";
-
-            if (document.getElementById('pickup')) document.getElementById('pickup').value = calcPickupVal;
-            if (document.getElementById('stopover')) document.getElementById('stopover').value = calcStopoverVal;
-            if (document.getElementById('dropoff')) document.getElementById('dropoff').value = calcDropoffVal;
-
-            // 3. 檢查落車地點 (終點) 是否已透過估算器輸入
-            if (currentServiceType === 'normal' && !calcDropoffVal) {
-                alert(currentLang === 'en' ? "Please enter or calculate the route in the fare estimator first!" : "請先在上方的車費估算器輸入或計算起點與落車地點！");
-                scrollToCalculator();
-                return;
-            }
-
-            // 5. 檢查用車日期
-            const dateEl = document.getElementById('date');
-            if (!dateEl.value) {
-                alert(currentLang === 'en' ? "Please select the service date." : "請選擇用車日期。");
-                dateEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                dateEl.focus();
-                return;
-            }
-
-            // 6. 檢查用車時間
-            const timeEl = document.getElementById('time');
-            if (!timeEl.value) {
-                alert(currentLang === 'en' ? "Please select the service time." : "請選擇用車時間。");
-                timeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                timeEl.focus();
-                return;
-            }
-
-            // 9. 檢查聯絡人資料 (改為選填，如有填寫則組合)
-            const contactSurnameEl = document.getElementById('contact_surname');
-            const contactTitleEl = document.querySelector('input[name="contact_title"]:checked');
-            let contactName = "";
-            let hasContact = false;
-            if (contactSurnameEl.value.trim() || contactTitleEl) {
-                const surname = contactSurnameEl.value.trim();
-                const title = contactTitleEl ? contactTitleEl.value : "";
-                contactName = `${surname}${title}`.trim();
-                if (contactName) hasContact = true;
-            }
-
-            // 11. 檢查聯絡電話
-            const phoneEl = document.getElementById('phone');
-            const phoneVal = phoneEl.value.trim();
-            if (!phoneVal) {
-                alert(currentLang === 'en' ? "Please enter contact phone number." : "請填寫聯絡電話。");
-                phoneEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                phoneEl.focus();
-                return;
-            }
-            if (phoneVal.replace(/\D/g, '').length < 8) {
-                alert(currentLang === 'en' ? "Contact phone number must be at least 8 digits." : "聯絡電話少於八位數字，請重新輸入正確的電話號碼。");
-                phoneEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                phoneEl.focus();
-                return;
-            }
-
-            const dateVal = dateEl.value;
-            const timeVal = timeEl.value;
-            const selectedDateTime = new Date(`${dateVal}T${timeVal}`);
-            const now = new Date();
-
-            const diffMs = selectedDateTime.getTime() - now.getTime();
-            const isWithin15Min = (diffMs <= 15 * 60 * 1000);
-
-            const pickup = currentServiceType === 'airport' ? (currentLang === 'en' ? "Hong Kong International Airport (Pickup)" : "香港國際機場 (接機)") : (calcPickupVal || (currentLang === 'en' ? "Not specified" : "未填寫"));
-            const flightNo = document.getElementById('flight_no').value;
-            const stopover = calcStopoverVal;
-            const dropoff = calcDropoffVal || (currentLang === 'en' ? "Not specified" : "未填寫");
-            const date = dateVal;
-            const time = timeVal;
-            const passengers = passengersEl.value;
-            const luggagesSelectVal = document.getElementById('luggages').value;
+            const flightVal = document.getElementById('flight_no').value.trim();
+            const dateVal = document.getElementById('date').value;
+            const timeVal = document.getElementById('time').value;
+            const passengersVal = document.getElementById('passengers').value;
+            const luggagesVal = document.getElementById('luggages').value;
             
-            // 行李件數是否為0檢查 (例如 "0 件" 或數字 0)
-            const luggageNum = parseInt(luggagesSelectVal);
-            const showLuggage = !isNaN(luggageNum) && luggageNum > 0;
-
-            // 寵物與輪椅狀態檢查
             const hasPetChecked = document.getElementById('has_pet').checked;
             const hasWheelchairChecked = document.getElementById('has_wheelchair').checked;
             
-            const paymentCheckboxes = document.querySelectorAll('input[name="payment_method"]:checked');
-            let paymentMethods = Array.from(paymentCheckboxes).map(cb => cb.value).join('、');
-            if (!paymentMethods) paymentMethods = currentLang === 'en' ? 'Cash' : '現金';
+            const surnameVal = document.getElementById('contact_surname').value.trim();
+            const titleRadios = document.getElementsByName('contact_title');
+            let titleVal = "";
+            for (let r of titleRadios) {
+                if (r.checked) { titleVal = r.value; break; }
+            }
+            const phoneVal = document.getElementById('phone').value.trim();
 
-            // 組合 WhatsApp 訊息內容 (嚴格根據指示 1-5 調整)
-            let msg = currentLang === 'en' ? 
-                `*New Taxi Booking Order*%0A--------------------------------%0A` +
-                `🚗 *Vehicle Type:* ${selectedCarNameEn || selectedCarName}%0A` +
-                (selectedCarName === '豐田混能的士' ? `🎁 *Vehicle Upgrade:* ${isUpgradeDeclined ? '%25E2%259D%258C ' : ''}${upgradeChoiceText}%0A` : ``) +
-                `📍 *Pickup:* ${pickup}%0A` +
-                (flightNo ? `✈️ *Flight No:* ${flightNo}%0A` : ``) +
-                (stopover ? `📍 *Stopover:* ${stopover}%0A` : ``) +
-                `🏁 *Drop-off:* ${dropoff}%0A` +
-                `📅 *Date:* ${date}%0A` +
-                `⏰ *Time:* ${time} ${isWithin15Min ? '(⚡ Immediate/Urgent)' : ''}%0A` +
-                `👥 *Passengers:* ${passengers}%0A` +
-                (showLuggage ? `🧳 *Luggage:* ${luggagesSelectVal}%0A` : ``) +
-                (hasPetChecked ? `🐾 *Pets:* %25E2%259D%258C Yes%0A` : ``) +
-                (hasWheelchairChecked ? `♿ *Wheelchair in trunk:* %25E2%259D%258C Yes%0A` : ``) +
-                `💳 *Payment:* ${paymentMethods}%0A` +
-                (hasContact ? `👤 *Contact:* ${contactName}%0A` : ``) +
-                `📞 *Phone:* ${phoneVal}%0A` +
-                `--------------------------------%0A` +
-                `Please confirm the order. Thank you!` :
-                
-                `*【新一代六座位的士預約訂單】*%0A--------------------------------%0A` +
-                `🚗 *預定車型：* ${selectedCarName}%0A` +
-                (selectedCarName === '豐田混能的士' ? `🎁 *升級意願：* ${isUpgradeDeclined ? '%E2%9D%8C ' : ''}${upgradeChoiceText}%0A` : ``) +
-                `📍 *上車地點：* ${pickup}%0A` +
-                (flightNo ? `✈️ *航班編號：* ${flightNo}%0A` : ``) +
-                (stopover ? `📍 *中途站：* ${stopover}%0A` : ``) +
-                `🏁 *落車地點：* ${dropoff}%0A` +
-                `📅 *用車日期：* ${date}%0A` +
-                `⏰ *用車時間：* ${time} ${isWithin15Min ? '（⚡ 極速/即時用車）' : ''}%0A` +
-                `👥 *乘客人數：* ${passengers}%0A` +
-                (showLuggage ? `🧳 *行李件數：* ${luggagesSelectVal}%0A` : ``) +
-                (hasPetChecked ? `🐾 *是否有寵物：* %E2%9D%8C 是%0A` : ``) +
-                (hasWheelchairChecked ? `♿ *是否有輪椅需要放置於尾箱：* %E2%9D%8C 是%0A` : ``) +
-                `💳 *付款方式：* ${paymentMethods}%0A` +
-                (hasContact ? `👤 *聯絡人：* ${contactName}%0A` : ``) +
-                `📞 *聯絡電話：* ${phoneVal}%0A` +
-                `--------------------------------%0A` +
-                `請幫忙確認訂單，謝謝！`;
+            let paymentMethods = [];
+            document.querySelectorAll('input[name="payment_method"]:checked').forEach(cb => {
+                paymentMethods.push(cb.value);
+            });
+            const paymentStr = paymentMethods.length > 0 ? paymentMethods.join('、') : "現金";
 
-            // 由於 WhatsApp 連結中的紅字顏色在純文字 API 中無法直接渲染 HTML 標籤，因此我們透過加入紅色交叉符號或特殊表情標示（或直接使用標準 WhatsApp 粗體/斜體搭配紅色系 Emoji，完全符合 WhatsApp 純文字格式規範）
-            // 註：若要呈現紅色字體效果，於 WhatsApp 中通常以 emoji 或特定符號代表，此處我們根據指示 1、2、3 精準對應紅字/紅色標示要求。
+            let upgradeChoiceStr = "";
+            if (selectedCarName === '豐田混能的士') {
+                const yesBox = document.getElementById('upgrade-yes');
+                const noBox = document.getElementById('upgrade-no');
+                const bookingYesBox = document.getElementById('booking-upgrade-yes');
+                const bookingNoBox = document.getElementById('booking-upgrade-no');
 
-            const whatsappUrl = `https://wa.me/85257038875?text=${msg}`;
+                if ((yesBox && yesBox.checked) || (bookingYesBox && bookingYesBox.checked)) {
+                    upgradeChoiceStr = "（接受免費升級）";
+                } else if ((noBox && noBox.checked) || (bookingNoBox && bookingNoBox.checked)) {
+                    upgradeChoiceStr = "（不接受升級）";
+                } else {
+                    alert(currentLang === 'en' ? "Please select whether you accept the free upgrade for the Toyota Hybrid Taxi." : "請選擇是否接受豐田混能的士的免費升級選項。");
+                    return;
+                }
+            }
+
+            let msg = `*新一代豪華六座位及輪椅的士預約* 🚖\n`;
+            msg += `--------------------------------\n`;
+            msg += `🚗 *預約車型*：${currentLang === 'en' ? selectedCarNameEn : selectedCarName} ${upgradeChoiceStr}\n`;
+            msg += `💰 *收費模式*：${currentLang === 'en' ? selectedCarPriceEn : selectedCarPrice}\n`;
+
+            if (currentServiceType === 'airport') {
+                msg += `✈️ *服務類型*：機場接機服務\n`;
+                if (flightVal) msg += `📋 *航班編號*：${flightVal}\n`;
+                msg += `📍 *上車地點*：香港國際機場\n`;
+                if (stopoverVal) msg += `📍 *中途站*：${stopoverVal}\n`;
+                msg += `🏁 *市區目的地*：${dropoffVal}\n`;
+            } else {
+                msg += `📍 *上車地點*：${pickupVal}\n`;
+                if (stopoverVal) msg += `📍 *中途站*：${stopoverVal}\n`;
+                msg += `🏁 *落車地點*：${dropoffVal}\n`;
+            }
+
+            msg += `📅 *用車日期*：${dateVal}\n`;
+            msg += `⏰ *用車時間*：${timeVal}\n`;
+            msg += `👥 *乘客人數*：${passengersVal}\n`;
+            msg += `🧳 *行李件數*：${luggagesVal}\n`;
+
+            // A. 如選擇沒有寵物就不用顯示該行訊息，如有寵物就用✅顯示
+            if (hasPetChecked) {
+                msg += `🐾 *寵物同行*：✅ 有寵物\n`;
+            }
+
+            // B. 如選擇沒有輪椅需要放置尾箱就不用顯示該行訊息，如有輪椅就用✅顯示
+            if (hasWheelchairChecked) {
+                msg += ` wheelchair *輪椅擺放*：✅ 有輪椅需要放置於尾箱\n`.replace(' wheelchair ', ' ');
+            }
+
+            msg += `💳 *付款方式*：${paymentStr}\n`;
+            
+            if (phoneVal) {
+                let contactDisplay = surnameVal ? surnameVal + (titleVal ? titleVal : "") : "";
+                msg += `👤 *聯絡人*：${contactDisplay ? contactDisplay + " (" + phoneVal + ")" : phoneVal}\n`;
+            }
+
+            msg += `--------------------------------\n`;
+            msg += `請幫忙確認車輛，謝謝！`;
+
+            const encodedMsg = encodeURIComponent(msg);
+            const whatsappUrl = `https://wa.me/85257038875?text=${encodedMsg}`;
             window.open(whatsappUrl, '_blank');
         }
     </script>
