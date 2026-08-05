@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 引入 Google Maps API (加上 language=zh-HK 確保隧道名稱穩定輸出為中文，並載入 places 庫) -->
+    <!-- 引入 Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places&language=zh-HK"></script>
     <script>
         tailwind.config = {
@@ -25,7 +25,6 @@
         }
     </script>
     <style>
-        /* 全局字體按比例放大 30% */
         html { 
             font-size: 130%; 
         }
@@ -34,7 +33,6 @@
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
         }
-        /* 隱藏 Google Maps 自動完成的預設 logo 避免影響 UI */
         .pac-container {
             background-color: #1E1E1E;
             color: #ffffff;
@@ -78,7 +76,6 @@
     <!-- 頂部介紹 Hero Section -->
     <section class="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center md:text-left">
         <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
-            <!-- 新增按鍵：立即查詢車費及預約 -->
             <div class="flex flex-col items-center md:items-start">
                 <button onclick="quickQueryAndBook()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
                     <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約</span>
@@ -91,7 +88,6 @@
             </button>
         </div>
 
-        <!-- 註明 -->
         <div class="mb-8 inline-flex items-center gap-2 text-brand-yellow font-bold text-sm md:text-base bg-brand-yellow/10 border-2 border-brand-yellow px-4 py-2.5 rounded-xl shadow-md">
             <i class="fa-solid fa-bolt text-brand-yellow text-lg animate-pulse"></i>
             <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
@@ -417,7 +413,6 @@
             <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
                 
-                <!-- 條件顯示：如選擇豐田混能的士，於預約表格注明是否接受免費升級 -->
                 <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg mb-4">
                     <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                         <i class="fa-solid fa-gift text-brand-yellow"></i>
@@ -594,98 +589,123 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
     </footer>
 
-    <!-- JavaScript 邏輯整合與雙重高精度隧道校驗 -->
+    <!-- JavaScript 升級核心判定演算法 -->
     <script>
-        let currentLang = 'zh'; // 'zh' 或 'en'
+        let currentLang = 'zh';
 
-        // 香港主要隧道精確收費廣場 / 隧道口 GPS 中心點座標與關鍵字清單
+        // 精準收費廣場 / 隧道管道核心座標 (加大有效廣義涵蓋半徑至 550-800 米)
         const TUNNEL_DEFINITIONS = [
             {
                 id: "cross_harbour",
                 name: "紅磡海底隧道",
                 nameEn: "Cross Harbour Tunnel",
                 fee: 50,
-                keywords: ["紅磡海底隧道", "紅磡隧道", "海底隧道", "Cross Harbour Tunnel"],
+                regex: /(紅磡海底隧道|紅磡隧道|海底隧道|Cross Harbour Tunnel)/i,
                 center: { lat: 22.3025, lng: 114.1798 },
-                radiusMeters: 300
+                radiusMeters: 600
             },
             {
                 id: "eastern_harbour",
                 name: "東區海底隧道",
                 nameEn: "Eastern Harbour Crossing",
                 fee: 50,
-                keywords: ["東區海底隧道", "東隧", "Eastern Harbour Crossing"],
+                regex: /(東區海底隧道|東隧|Eastern Harbour Crossing)/i,
                 center: { lat: 22.2968, lng: 114.2235 },
-                radiusMeters: 300
+                radiusMeters: 600
             },
             {
                 id: "western_harbour",
                 name: "西區海底隧道",
                 nameEn: "Western Harbour Crossing",
                 fee: 50,
-                keywords: ["西區海底隧道", "西隧", "Western Harbour Crossing"],
+                regex: /(西區海底隧道|西隧|Western Harbour Crossing)/i,
                 center: { lat: 22.3045, lng: 114.1565 },
-                radiusMeters: 300
+                radiusMeters: 600
             },
             {
                 id: "tai_lam",
                 name: "大欖隧道",
                 nameEn: "Tai Lam Tunnel",
                 fee: 28,
-                keywords: ["大欖隧道", "Tai Lam Tunnel"],
+                regex: /(大欖隧道|Tai Lam Tunnel)/i,
                 center: { lat: 22.4035, lng: 114.0620 },
-                radiusMeters: 350
+                radiusMeters: 800
             },
             {
                 id: "tates_cairn",
                 name: "大老山隧道",
                 nameEn: "Tate's Cairn Tunnel",
                 fee: 20,
-                keywords: ["大老山隧道", "Tate's Cairn Tunnel"],
+                regex: /(大老山隧道|Tate's Cairn Tunnel)/i,
                 center: { lat: 22.3685, lng: 114.2045 },
-                radiusMeters: 300
+                radiusMeters: 700
             },
             {
                 id: "aberdeen",
                 name: "香港仔隧道",
                 nameEn: "Aberdeen Tunnel",
                 fee: 8,
-                keywords: ["香港仔隧道", "Aberdeen Tunnel"],
+                regex: /(香港仔隧道|Aberdeen Tunnel)/i,
                 center: { lat: 22.2570, lng: 114.1775 },
-                radiusMeters: 300
+                radiusMeters: 550
             },
             {
                 id: "shing_mun",
                 name: "城門隧道",
                 nameEn: "Shing Mun Tunnels",
                 fee: 8,
-                keywords: ["城門隧道", "Shing Mun Tunnel", "Shing Mun Tunnels"],
+                regex: /(城門隧道|Shing Mun Tunnel|Shing Mun Tunnels)/i,
                 center: { lat: 22.3805, lng: 114.1500 },
-                radiusMeters: 300
+                radiusMeters: 700
             },
             {
                 id: "lion_rock",
                 name: "獅子山隧道",
                 nameEn: "Lion Rock Tunnel",
                 fee: 8,
-                keywords: ["獅子山隧道", "Lion Rock Tunnel"],
+                regex: /(獅子山隧道|Lion Rock Tunnel)/i,
                 center: { lat: 22.3550, lng: 114.1770 },
-                radiusMeters: 300
+                radiusMeters: 650
             },
             {
                 id: "eagles_nest",
                 name: "尖山隧道 / 沙田嶺隧道",
                 nameEn: "Eagle's Nest / Sha Tin Heights Tunnel",
                 fee: 8,
-                keywords: ["尖山隧道", "沙田嶺隧道", "Eagle's Nest Tunnel", "Sha Tin Heights Tunnel"],
+                regex: /(尖山隧道|沙田嶺隧道|Eagle's Nest Tunnel|Sha Tin Heights Tunnel|八號幹線)/i,
                 center: { lat: 22.3530, lng: 114.1570 },
-                radiusMeters: 300
+                radiusMeters: 750
             }
         ];
 
-        // 計算兩個地理座標點之間的距離 (米) - Haversine Formula
+        // 計算點 (lat, lng) 到直線段 (A->B) 的最短大圓距離 (米)
+        function distanceToSegmentMeters(p, a, b) {
+            const R = 6371000;
+            const toRad = x => x * Math.PI / 180;
+            
+            let px = toRad(p.lng), py = toRad(p.lat);
+            let ax = toRad(a.lng), ay = toRad(a.lat);
+            let bx = toRad(b.lng), by = toRad(b.lat);
+
+            let dx = bx - ax;
+            let dy = by - ay;
+
+            if (dx === 0 && dy === 0) {
+                return calculateDistanceMeters(p.lat, p.lng, a.lat, a.lng);
+            }
+
+            let t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy);
+            t = Math.max(0, Math.min(1, t));
+
+            let projLat = (ay + t * dy) * 180 / Math.PI;
+            let projLng = (ax + t * dx) * 180 / Math.PI;
+
+            return calculateDistanceMeters(p.lat, p.lng, projLat, projLng);
+        }
+
+        // Haversine 大圓距離 (米)
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
-            const R = 6371000; // 地球半徑 (米)
+            const R = 6371000;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -695,51 +715,76 @@
             return R * c;
         }
 
-        // 雙重精準校驗隧道函數（1. 導航指引文字解析 + 2. 精確半徑座標比對）
+        // 升級版雙重高精度隧道校驗
         function detectTollsForRoute(route) {
             let detectedTolls = [];
             let totalToll = 0;
 
             if (!route) return { totalToll: 0, tollsList: [] };
 
-            // 1. 搜集該路線所有路段 (steps) 的文字指引 HTML
-            let instructionsText = "";
+            // 1. 清除 HTML 標籤後提取純文字指引
+            let rawInstructions = "";
             if (route.legs) {
                 route.legs.forEach(leg => {
                     if (leg.steps) {
                         leg.steps.forEach(step => {
                             if (step.instructions) {
-                                instructionsText += " " + step.instructions;
+                                rawInstructions += " " + step.instructions.replace(/<[^>]*>?/gm, '');
                             }
                         });
                     }
                 });
             }
 
-            // 2. 搜集該路線所有路徑點 (overview_path)
-            let pathPoints = route.overview_path || [];
+            // 2. 獲取高密度路徑線段 (Dense Steps Path)
+            let densePoints = [];
+            if (route.legs) {
+                route.legs.forEach(leg => {
+                    if (leg.steps) {
+                        leg.steps.forEach(step => {
+                            if (step.path && step.path.length > 0) {
+                                step.path.forEach(pt => {
+                                    let lat = typeof pt.lat === 'function' ? pt.lat() : pt.lat;
+                                    let lng = typeof pt.lng === 'function' ? pt.lng() : pt.lng;
+                                    densePoints.push({ lat, lng });
+                                });
+                            }
+                        });
+                    }
+                });
+            }
 
-            // 3. 對每條隧道進行雙重校驗
+            if (densePoints.length === 0 && route.overview_path) {
+                route.overview_path.forEach(pt => {
+                    let lat = typeof pt.lat === 'function' ? pt.lat() : pt.lat;
+                    let lng = typeof pt.lng === 'function' ? pt.lng() : pt.lng;
+                    densePoints.push({ lat, lng });
+                });
+            }
+
+            // 3. 多重校驗算法
             TUNNEL_DEFINITIONS.forEach(tunnel => {
                 let matchedByText = false;
                 let matchedByGPS = false;
 
-                // 檢查文字指引是否包含該隧道的關鍵字
-                if (instructionsText) {
-                    matchedByText = tunnel.keywords.some(kw => instructionsText.includes(kw));
+                // 算法 A: 純文字指引匹配
+                if (rawInstructions && tunnel.regex.test(rawInstructions)) {
+                    matchedByText = true;
                 }
 
-                // 如果文字未匹配，再使用精確圓形區域（250-350米內）檢查 GPS 軌跡點
-                if (!matchedByText && pathPoints.length > 0) {
-                    matchedByGPS = pathPoints.some(pt => {
-                        let pLat = typeof pt.lat === 'function' ? pt.lat() : pt.lat;
-                        let pLng = typeof pt.lng === 'function' ? pt.lng() : pt.lng;
-                        let dist = calculateDistanceMeters(pLat, pLng, tunnel.center.lat, tunnel.center.lng);
-                        return dist <= tunnel.radiusMeters;
-                    });
+                // 算法 B: 線段-圓形相交高精度距離檢測
+                if (!matchedByText && densePoints.length > 1) {
+                    for (let i = 0; i < densePoints.length - 1; i++) {
+                        let pA = densePoints[i];
+                        let pB = densePoints[i + 1];
+                        let dist = distanceToSegmentMeters(tunnel.center, pA, pB);
+                        if (dist <= tunnel.radiusMeters) {
+                            matchedByGPS = true;
+                            break;
+                        }
+                    }
                 }
 
-                // 只要符合其中一種標準，即可確定行經該隧道
                 if (matchedByText || matchedByGPS) {
                     detectedTolls.push({
                         name: tunnel.name,
@@ -1395,20 +1440,20 @@
         function calculateHkTaxiFare(distanceInMeters) {
             if (distanceInMeters <= 0) return 0;
 
-            let fare = 29.0; // 首2公里起跳價 HK$29
+            let fare = 29.0;
             if (distanceInMeters <= 2000) return fare;
 
             let extraMeters = distanceInMeters - 2000;
             let totalIncrements = Math.ceil(extraMeters / 200);
 
-            const tier1Increments = 35; // 9公里內每200米跳錶 HK$2.1
+            const tier1Increments = 35;
 
             if (totalIncrements <= tier1Increments) {
                 fare += totalIncrements * 2.1;
             } else {
                 fare += tier1Increments * 2.1;
                 let remainingIncrements = totalIncrements - tier1Increments;
-                fare += remainingIncrements * 1.4; // 9公里後每200米跳錶 HK$1.4
+                fare += remainingIncrements * 1.4;
             }
 
             return Math.round(fare);
@@ -1580,7 +1625,7 @@
             lastCalculatedBaseFare = calculateHkTaxiFare(totalDistMeters);
             document.getElementById('res-base-fare').innerText = lastCalculatedBaseFare;
 
-            // 執行雙重高精度隧道判定
+            // 執行升級版高精度隧道校驗
             let detectedTollsInfo = detectTollsForRoute(route);
             lastCalculatedTolls = detectedTollsInfo.totalToll;
             lastDetectedTollsList = detectedTollsInfo.tollsList;
