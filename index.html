@@ -975,11 +975,12 @@
             return lat < 22.290;
         }
 
-        /* 修正後的 GPS 走廊精確隧道偵測函數 */
+        /* 增強版 GPS 地理圍欄 + 智能路線比對隧道檢測算法 */
         function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
             let detected = [];
             let totalTolls = 0;
             let path = route.overview_path || [];
+            let summary = (route.summary || "").toLowerCase();
 
             let hasLionRock = false;
             let hasEagleNest = false;
@@ -995,9 +996,22 @@
             let hasHKIsland = false;
             let hasKowloonNT = false;
 
+            let isAirportOriginOrDestination = false;
+            let isShatinOrTaiPoArea = false;
+
             for (let i = 0; i < path.length; i++) {
                 let lat = path[i].lat();
                 let lng = path[i].lng();
+
+                // 檢測是否來自/前往機場或赤鱲角區域
+                if (lat >= 22.280 && lat <= 22.325 && lng >= 113.880 && lng <= 113.960) {
+                    isAirportOriginOrDestination = true;
+                }
+
+                // 檢測是否位於沙田/大埔區域
+                if (lat >= 22.360 && lat <= 22.460 && lng >= 114.150 && lng <= 114.230) {
+                    isShatinOrTaiPoArea = true;
+                }
 
                 if (isHongKongIsland(lat, lng)) {
                     hasHKIsland = true;
@@ -1005,18 +1019,18 @@
                     hasKowloonNT = true;
                 }
 
-                // 1. 獅子山隧道：經由九龍塘至大圍/沙田 (精確緯度 22.345-22.365, 經度 114.171-114.183)
+                // 1. 獅子山隧道：經由九龍塘至大圍/沙田 (緯度 22.345-22.365, 經度 114.171-114.183)
                 if (lat >= 22.345 && lat <= 22.365 && lng >= 114.171 && lng <= 114.183) {
                     hasLionRock = true;
                 }
 
-                // 2. 尖山隧道 / 沙田嶺隧道 (八號幹線青沙公路)：經由荔枝角至沙田 (經度 114.140-114.162, 緯度 22.338-22.372)
-                if (lat >= 22.338 && lat <= 22.372 && lng >= 114.140 && lng <= 114.162) {
+                // 2. 尖山隧道 / 沙田嶺隧道 (八號幹線青沙公路)：放寬座標點涵蓋範圍
+                if ((lat >= 22.330 && lat <= 22.380 && lng >= 114.135 && lng <= 114.170) || summary.includes("8號幹線") || summary.includes("route 8") || summary.includes("青沙")) {
                     hasEagleNest = true;
                 }
 
                 // 3. 城門隧道：荃灣至沙田 (緯度 22.373-22.388, 經度 114.125-114.162)
-                if (lat >= 22.373 && lat <= 22.388 && lng >= 114.125 && lng <= 114.162) {
+                if ((lat >= 22.373 && lat <= 22.388 && lng >= 114.125 && lng <= 114.162) || summary.includes("城門隧道") || summary.includes("shing mun")) {
                     hasShingMun = true;
                 }
 
@@ -1039,6 +1053,11 @@
                 if (lat >= 22.282 && lat <= 22.304 && lng >= 114.174 && lng <= 114.188) hasCHT = true;
                 if (lat >= 22.285 && lat <= 22.308 && lng >= 114.138 && lng <= 114.162) hasWHC = true;
                 if (lat >= 22.283 && lat <= 22.302 && lng >= 114.208 && lng <= 114.230) hasEHC = true;
+            }
+
+            // 智能邏輯補正：如果為「機場往返沙田/大埔」，且未行經城門隧道或獅子山隧道，必定行經「尖山隧道 (青沙公路)」
+            if (isAirportOriginOrDestination && isShatinOrTaiPoArea && !hasShingMun && !hasLionRock) {
+                hasEagleNest = true;
             }
 
             // 過海隧道判斷 ($50)
@@ -1088,8 +1107,6 @@
                 detected.push({ name: currentLang === 'en' ? "Lion Rock Tunnel" : "獅子山隧道", fee: 8 });
                 totalTolls += 8;
             }
-
-            /* 港珠澳大橋已取消收費 ($0) */
 
             return { tolls: detected, total: totalTolls };
         }
@@ -1194,23 +1211,24 @@
                 let durMin = Math.round(totalDurSec / 60);
 
                 let badgeText = "";
-                if (idx === fastestIndex && idx === shortestIndex) badgeText = currentLang === 'en' ? "Fastest & Shortest" : "最快及最短";
-                else if (idx === fastestIndex) badgeText = currentLang === 'en' ? "Fastest Route" : "最快路線";
-                else if (idx === shortestIndex) badgeText = currentLang === 'en' ? "Shortest Route" : "最短路線";
-                else badgeText = currentLang === 'en' ? "Alternative Route" : "備選路線";
+                if (idx === fastestIndex) badgeText = currentLang === 'en' ? "Fastest" : "最快推薦";
+                else if (idx === shortestIndex) badgeText = currentLang === 'en' ? "Shortest" : "最短路線";
 
                 let btn = document.createElement('button');
                 btn.type = "button";
                 btn.id = "route-opt-btn-" + idx;
-                btn.className = "p-2.5 rounded-xl border border-gray-700 bg-brand-dark text-left hover:border-brand-yellow transition cursor-pointer text-xs";
-                btn.onclick = function() { selectRouteOption(idx); };
+                btn.className = "w-full text-left p-2.5 rounded-lg border border-gray-700 bg-brand-dark hover:border-brand-yellow transition flex justify-between items-center text-xs cursor-pointer";
+                btn.onclick = () => selectRouteOption(idx);
 
                 btn.innerHTML = `
-                    <div class="flex items-center justify-between font-bold text-white mb-1">
-                        <span class="text-brand-yellow">${badgeText}</span>
-                        <span>${distKm} km / ${durMin} min</span>
+                    <div>
+                        <div class="font-bold text-white flex items-center gap-1.5">
+                            <span>${rt.summary || (currentLang === 'en' ? "Route " + (idx+1) : "路線 " + (idx+1))}</span>
+                            ${badgeText ? `<span class="bg-brand-yellow/20 text-brand-yellow text-[10px] px-1.5 py-0.5 rounded border border-brand-yellow/30 font-semibold">${badgeText}</span>` : ''}
+                        </div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">${distKm} km · ${durMin} mins</div>
                     </div>
-                    <div class="text-[11px] text-gray-400 truncate">${rt.summary || (currentLang === 'en' ? 'Route ' + (idx+1) : '路線 ' + (idx+1))}</div>
+                    <i class="fa-regular fa-circle text-gray-500 text-sm check-icon"></i>
                 `;
                 list.appendChild(btn);
             });
@@ -1219,37 +1237,33 @@
         function selectRouteOption(index) {
             if (!currentRoutesResponse || !currentRoutesResponse.routes[index]) return;
             selectedRouteIndex = index;
-            const route = currentRoutesResponse.routes[index];
 
-            const container = document.getElementById('route-options-list');
-            if (container) {
-                container.querySelectorAll('button').forEach(btn => {
+            document.querySelectorAll('#route-options-list button').forEach((btn, idx) => {
+                const checkIcon = btn.querySelector('.check-icon');
+                if (btn.id === 'route-opt-btn-' + index) {
+                    btn.classList.add('border-brand-yellow', 'bg-brand-yellow/10');
+                    btn.classList.remove('border-gray-700', 'bg-brand-dark');
+                    if (checkIcon) checkIcon.className = 'fa-solid fa-circle-check text-brand-yellow text-sm check-icon';
+                } else {
                     btn.classList.remove('border-brand-yellow', 'bg-brand-yellow/10');
                     btn.classList.add('border-gray-700', 'bg-brand-dark');
-                });
-                const activeBtn = document.getElementById('route-opt-btn-' + index);
-                if (activeBtn) {
-                    activeBtn.classList.remove('border-gray-700', 'bg-brand-dark');
-                    activeBtn.classList.add('border-brand-yellow', 'bg-brand-yellow/10');
+                    if (checkIcon) checkIcon.className = 'fa-regular fa-circle text-gray-500 text-sm check-icon';
                 }
-            }
+            });
+
+            const selectedRoute = currentRoutesResponse.routes[index];
 
             if (!googleMap) {
-                const mapContainer = document.getElementById('map');
-                if (mapContainer) {
-                    googleMap = new google.maps.Map(mapContainer, {
-                        zoom: 12,
-                        center: { lat: 22.3193, lng: 114.1694 },
-                        disableDefaultUI: true,
-                        zoomControl: true
-                    });
-                }
-            }
-
-            if (!directionsRenderer) {
+                googleMap = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: { lat: 22.3193, lng: 114.1694 },
+                    disableDefaultUI: true,
+                    zoomControl: true
+                });
                 directionsRenderer = new google.maps.DirectionsRenderer({
                     map: googleMap,
-                    suppressMarkers: false
+                    suppressMarkers: false,
+                    polylineOptions: { strokeColor: "#FFF200", strokeWeight: 5, strokeOpacity: 0.9 }
                 });
             }
 
@@ -1257,19 +1271,23 @@
             directionsRenderer.setRouteIndex(index);
 
             let totalDistMeter = 0, totalDurSec = 0;
-            route.legs.forEach(leg => {
+            selectedRoute.legs.forEach(leg => {
                 totalDistMeter += leg.distance.value;
                 totalDurSec += leg.duration.value;
             });
 
-            document.getElementById('res-distance').innerText = (totalDistMeter / 1000).toFixed(1);
-            document.getElementById('res-duration').innerText = Math.round(totalDurSec / 60);
+            let distKm = (totalDistMeter / 1000).toFixed(1);
+            let durMin = Math.round(totalDurSec / 60);
+
+            document.getElementById('res-distance').innerText = distKm;
+            document.getElementById('res-duration').innerText = durMin;
 
             lastCalculatedBaseFare = calculateHkTaxiFare(totalDistMeter);
+            document.getElementById('res-base-fare').innerText = lastCalculatedBaseFare;
 
-            let tollRes = detectHongKongTollsWithGPSGeofenceAndRadar(route);
-            lastCalculatedTolls = tollRes.total;
-            lastDetectedTollsList = tollRes.tolls;
+            let tollResult = detectHongKongTollsWithGPSGeofenceAndRadar(selectedRoute);
+            lastCalculatedTolls = tollResult.total;
+            lastDetectedTollsList = tollResult.tolls;
 
             const tollsContainer = document.getElementById('res-tolls-container');
             const tollsList = document.getElementById('res-tolls-list');
@@ -1278,12 +1296,12 @@
             if (lastDetectedTollsList.length > 0) {
                 tollsContainer.classList.remove('hidden');
                 tollsTotal.innerText = "+HK$ " + lastCalculatedTolls;
-                tollsList.innerHTML = "";
-                lastDetectedTollsList.forEach(t => {
-                    let li = document.createElement('li');
-                    li.innerHTML = `• ${t.name}: <strong class="text-white">HK$ ${t.fee}</strong>`;
-                    tollsList.appendChild(li);
-                });
+                tollsList.innerHTML = lastDetectedTollsList.map(t => `
+                    <li class="flex justify-between items-center text-xs">
+                        <span><i class="fa-solid fa-angle-right text-brand-yellow mr-1.5 text-[10px]"></i>${t.name}</span>
+                        <span class="font-medium text-gray-200">+HK$ ${t.fee}</span>
+                    </li>
+                `).join('');
             } else {
                 tollsContainer.classList.add('hidden');
             }
@@ -1292,115 +1310,121 @@
         }
 
         function updateTotalFareDisplay() {
-            let baseFare = lastCalculatedBaseFare;
-            let surcharge = currentCarSurcharge;
-            let minFare = currentCarMinFare;
+            let baseAndSurcharge = lastCalculatedBaseFare + currentCarSurcharge;
+            let displayFare = baseAndSurcharge;
+            let isMinFareTriggered = false;
 
-            document.getElementById('res-base-fare').innerText = baseFare;
-
-            const surchargeRow = document.getElementById('res-surcharge-row');
-            const surchargeVal = document.getElementById('res-surcharge-val');
-            const minFareNote = document.getElementById('res-min-fare-note');
-            const minFareVal = document.getElementById('res-min-fare-val');
-
-            if (surcharge > 0) {
-                surchargeRow.classList.remove('hidden');
-                surchargeVal.innerText = surcharge;
-            } else {
-                surchargeRow.classList.add('hidden');
+            if (currentCarMinFare > 0 && baseAndSurcharge < currentCarMinFare) {
+                displayFare = currentCarMinFare;
+                isMinFareTriggered = true;
             }
 
-            let subtotal = baseFare + surcharge;
-            let finalFare = subtotal;
+            let grandTotal = displayFare + lastCalculatedTolls;
 
-            if (minFare > 0 && subtotal < minFare) {
-                finalFare = minFare;
-                minFareNote.classList.remove('hidden');
-                minFareVal.innerText = minFare;
+            const resSurchargeRow = document.getElementById('res-surcharge-row');
+            const resSurchargeVal = document.getElementById('res-surcharge-val');
+            const resMinFareNote = document.getElementById('res-min-fare-note');
+            const resMinFareVal = document.getElementById('res-min-fare-val');
+
+            if (currentCarSurcharge > 0) {
+                resSurchargeRow.classList.remove('hidden');
+                resSurchargeVal.innerText = currentCarSurcharge;
             } else {
-                minFareNote.classList.add('hidden');
+                resSurchargeRow.classList.add('hidden');
             }
 
-            document.getElementById('res-total-fare').innerText = finalFare + lastCalculatedTolls;
+            if (isMinFareTriggered) {
+                resMinFareNote.classList.remove('hidden');
+                resMinFareVal.innerText = currentCarMinFare;
+            } else {
+                resMinFareNote.classList.add('hidden');
+            }
+
+            document.getElementById('res-total-fare').innerText = grandTotal;
         }
 
-        function sendWhatsApp(event) {
-            event.preventDefault();
+        function sendWhatsApp(e) {
+            e.preventDefault();
 
-            let pickup = "", dropoff = "";
-            let flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : "";
-            let stopover = document.getElementById('stopover') ? document.getElementById('stopover').value.trim() : "";
+            let pickup = "", stopover = "", dropoff = "";
 
             if (currentServiceType === 'normal') {
-                pickup = document.getElementById('pickup') ? document.getElementById('pickup').value.trim() : "";
-                dropoff = document.getElementById('dropoff') ? document.getElementById('dropoff').value.trim() : "";
+                pickup = document.getElementById('pickup').value.trim();
+                stopover = document.getElementById('stopover').value.trim();
+                dropoff = document.getElementById('dropoff').value.trim();
             } else {
                 pickup = currentLang === 'en' ? "Hong Kong International Airport" : "香港國際機場";
-                dropoff = document.getElementById('dropoff') ? document.getElementById('dropoff').value.trim() : "";
+                let flight = document.getElementById('flight_no').value.trim();
+                if (flight) pickup += ` (航班編號: ${flight})`;
+                stopover = document.getElementById('stopover').value.trim();
+                dropoff = document.getElementById('dropoff').value.trim();
             }
 
-            let date = document.getElementById('date').value;
-            let time = document.getElementById('time').value;
-            let passengers = document.getElementById('passengers').value;
-            let luggages = document.getElementById('luggages').value;
-            let hasPet = document.getElementById('has_pet').checked ? (currentLang === 'en' ? 'Yes' : '是') : (currentLang === 'en' ? 'No' : '否');
-            let hasWheelchair = document.getElementById('has_wheelchair').checked ? (currentLang === 'en' ? 'Yes' : '是') : (currentLang === 'en' ? 'No' : '否');
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const passengers = document.getElementById('passengers').value;
+            const luggages = document.getElementById('luggages').value;
+            const hasPet = document.getElementById('has_pet').checked ? "是" : "否";
+            const hasWheelchair = document.getElementById('has_wheelchair').checked ? "是" : "否";
 
-            let paymentMethods = [];
+            let payMethods = [];
             document.querySelectorAll('input[name="payment_method"]:checked').forEach(cb => {
-                paymentMethods.push(cb.value);
+                payMethods.push(cb.value);
             });
-            let paymentStr = paymentMethods.join(', ') || (currentLang === 'en' ? 'Cash' : '現金');
+            let paymentStr = payMethods.length > 0 ? payMethods.join(", ") : "現金";
 
-            let contactSurname = document.getElementById('contact_surname') ? document.getElementById('contact_surname').value.trim() : "";
-            let titleRadio = document.querySelector('input[name="contact_title"]:checked');
-            let contactTitle = titleRadio ? titleRadio.value : "";
-            let phone = document.getElementById('phone').value.trim();
+            const contactSurname = document.getElementById('contact_surname').value.trim();
+            let contactTitle = "";
+            document.querySelectorAll('input[name="contact_title"]:checked').forEach(r => {
+                contactTitle = r.value;
+            });
 
-            let carUpgradeChoice = "";
+            let clientName = contactSurname ? `${contactSurname}${contactTitle}` : "客戶";
+            const phone = document.getElementById('phone').value.trim();
+
+            let upgradeChoiceStr = "";
             if (selectedCarName === '豐田混能的士') {
-                let upgradeYes = document.getElementById('booking-upgrade-yes');
-                let upgradeNo = document.getElementById('booking-upgrade-no');
-                if (upgradeYes && upgradeYes.checked) carUpgradeChoice = upgradeYes.value;
-                else if (upgradeNo && upgradeNo.checked) carUpgradeChoice = upgradeNo.value;
+                const upgradeYes = document.getElementById('booking-upgrade-yes');
+                const upgradeNo = document.getElementById('booking-upgrade-no');
+                if (upgradeYes && upgradeYes.checked) upgradeChoiceStr = "【接受免費升級】";
+                else if (upgradeNo && upgradeNo.checked) upgradeChoiceStr = "【不接受升級】";
                 else {
-                    alert(currentLang === 'en' ? "Please select whether you accept a free vehicle upgrade!" : "請選擇是否接受免費升級至更高階車款！");
+                    alert(currentLang === 'en' ? "Please select if you accept a free vehicle upgrade." : "請選擇是否接受免費升級車款！");
                     return;
                 }
             }
 
-            let serviceTypeName = currentServiceType === 'normal' ? (currentLang === 'en' ? 'Standard Booking' : '一般點對點預約') : (currentLang === 'en' ? 'Airport Pickup' : '機場接機服務');
+            let text = `🚕 *新一代豪華位的士預約專車* 🚕\n\n`;
+            text += `👤 *聯絡人*：${clientName}\n`;
+            text += `📞 *聯絡電話*：${phone}\n`;
+            text += `🚘 *選擇車款*：${selectedCarName} ${upgradeChoiceStr}\n`;
+            text += `💰 *收費模式*：${selectedCarPrice}\n\n`;
 
-            let msg = `🚕 *【新的士預約訂單】*\n`;
-            msg += `---------------------------\n`;
-            msg += `📌 *服務類型：* ${serviceTypeName}\n`;
-            msg += `🚘 *預約車款：* ${selectedCarName}\n`;
-            msg += `💰 *車款收費：* ${selectedCarPrice}\n`;
-            if (carUpgradeChoice) msg += `🎁 *免費升級選項：* ${carUpgradeChoice}\n`;
-            msg += `---------------------------\n`;
-            msg += `📍 *上車地點：* ${pickup}\n`;
-            if (currentServiceType === 'airport' && flightNo) msg += `✈️ *航班編號：* ${flightNo}\n`;
-            if (stopover) msg += `🛑 *中途停靠：* ${stopover}\n`;
-            msg += `🏁 *落車地點：* ${dropoff}\n`;
-            msg += `---------------------------\n`;
-            msg += `📅 *用車日期：* ${date}\n`;
-            msg += `⏰ *用車時間：* ${time}\n`;
-            msg += `👥 *乘客人數：* ${passengers}\n`;
-            msg += `🧳 *行李件數：* ${luggages}\n`;
-            msg += `🐾 *攜帶寵物：* ${hasPet}\n`;
-            msg += `👩‍🦽 *尾箱輪椅：* ${hasWheelchair}\n`;
-            msg += `💳 *付款方式：* ${paymentStr}\n`;
-            msg += `---------------------------\n`;
-            if (contactSurname || contactTitle) msg += `👤 *聯絡人：* ${contactSurname}${contactTitle}\n`;
-            msg += `📞 *聯絡電話：* ${phone}\n`;
+            text += `📍 *上車地點*：${pickup}\n`;
+            if (stopover) text += `📌 *中途停靠*：${stopover}\n`;
+            text += `🏁 *落車地點*：${dropoff}\n\n`;
 
-            let totalFareText = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : "0";
-            if (totalFareText && totalFareText !== "0") {
-                msg += `---------------------------\n`;
-                msg += `💵 *估算車費總額：* HK$ ${totalFareText} (供參考)\n`;
+            text += `📅 *用車日期*：${date}\n`;
+            text += `⏰ *用車時間*：${time}\n`;
+            text += `👥 *乘客人數*：${passengers}\n`;
+            text += `🧳 *行李件數*：${luggages}\n`;
+            text += `🐾 *攜帶寵物*：${hasPet}\n`;
+            text += `♿ *輪椅放置*：${hasWheelchair}\n`;
+            text += `💳 *付款方式*：${paymentStr}\n\n`;
+
+            let estimatedTotal = document.getElementById('res-total-fare').innerText;
+            if (estimatedTotal && estimatedTotal !== '0') {
+                text += `📊 *預估車費總額*：HK$ ${estimatedTotal}\n`;
+                if (lastDetectedTollsList.length > 0) {
+                    text += `🛣️ *包含隧道明細*：${lastDetectedTollsList.map(t => t.name).join(" + ")}\n`;
+                }
+                text += `\n`;
             }
 
-            let whatsappUrl = `https://wa.me/85257038875?text=${encodeURIComponent(msg)}`;
+            text += `請儘快安排司機接單確認，謝謝！`;
+
+            const encodedText = encodeURIComponent(text);
+            const whatsappUrl = `https://wa.me/85257038875?text=${encodedText}`;
             window.open(whatsappUrl, '_blank');
         }
     </script>
