@@ -1280,7 +1280,7 @@
             }
         }
 
-        // 隧道費識別邏輯 (加入精準地理圍欄與文字雷達)
+        // 隧道費識別邏輯 (修正版：完美適配新隧道費標準與各項路線修正需求)
         function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
             let detected = [];
             let totalTolls = 0;
@@ -1297,6 +1297,7 @@
             let hasCrossHarbour = false;
             let chTunnelName = "";
 
+            // 檢查過海隧道（紅隧、東隧、西隧統一調整為 $50）
             if (text.match(/西區海底隧道|西區過海隧道|西隧|Western Harbour|WHC/i)) {
                 chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
                 hasCrossHarbour = true;
@@ -1319,8 +1320,8 @@
             let hasTatesCairn = false;
             let hasEaglesNest = false;
 
-            // 文字雷達補充觸發
-            if (text.match(/獅子山隧道|獅隧道|Lion Rock Tunnel|Lion Rock/i)) hasLionRock = true;
+            // 文字雷達補充觸發 (嚴格過濾避免錯誤)
+            if (text.match(/獅子山隧道|Lion Rock Tunnel|Lion Rock/i) && !text.match(/尖山|沙田嶺|八號幹線/i)) hasLionRock = true;
             if (text.match(/大老山隧道|Tate's Cairn|Tates Cairn/i)) hasTatesCairn = true;
             if (text.match(/尖山隧道|沙田嶺隧道|八號幹線|Eagle's Nest|Sha Tin Heights/i)) hasEaglesNest = true;
             if (text.match(/大欖隧道|Tai Lam Tunnel/i)) hasTaiLam = true;
@@ -1343,19 +1344,19 @@
                         crossingLngs.push(lng);
                     }
 
-                    // 獅子山隧道圍欄 (樂富/九龍塘去大圍必經)
-                    if (lat >= 22.345 && lat <= 22.375 && lng >= 114.170 && lng <= 114.188) {
+                    // 獅子山隧道圍欄 (嚴格限縮九龍塘北至大圍南範圍)
+                    if (lat >= 22.348 && lat <= 22.368 && lng >= 114.175 && lng <= 114.185) {
                         hasLionRock = true;
                     }
                     // 大老山隧道圍欄
                     if (lat >= 22.355 && lat <= 22.388 && lng >= 114.200 && lng <= 114.225) {
                         hasTatesCairn = true;
                     }
-                    // 尖山 / 沙田嶺隧道圍欄
-                    if (lat >= 22.340 && lat <= 22.375 && lng >= 114.140 && lng <= 114.162) {
+                    // 尖山 / 沙田嶺隧道圍欄 (青沙公路九龍段/長沙灣至沙田段)
+                    if (lat >= 22.338 && lat <= 22.372 && lng >= 114.142 && lng <= 114.162) {
                         hasEaglesNest = true;
                     }
-                    // 精準大欖隧道圍欄 (收緊範圍避免屯門公路誤判)
+                    // 大欖隧道圍欄
                     if (lat >= 22.388 && lat <= 22.432 && lng >= 114.060 && lng <= 114.082) {
                         hasTaiLam = true;
                     }
@@ -1363,8 +1364,8 @@
                     if (lat >= 22.370 && lat <= 22.395 && lng >= 114.130 && lng <= 114.165) {
                         hasShingMun = true;
                     }
-                    // 香港仔隧道圍欄
-                    if (lat >= 22.254 && lat <= 22.275 && lng >= 114.170 && lng <= 114.192) {
+                    // 香港仔隧道圍欄 (嚴格限縮黃泥涌峽道至黃竹坑道交界範圍，排除未經過路線)
+                    if (lat >= 22.261 && lat <= 22.272 && lng >= 114.176 && lng <= 114.188) {
                         hasAberdeen = true;
                     }
                 }
@@ -1386,10 +1387,10 @@
                 }
             }
 
-            // 匯總隧道費用 (的士法定收費)
+            // 依最新隧道收費調整彙整費用
             if (hasCrossHarbour) {
-                detected.push({ name: chTunnelName || (currentLang === 'en' ? "Cross-Harbour Tunnel" : "過海隧道"), fee: 25 });
-                totalTolls += 25;
+                detected.push({ name: chTunnelName || (currentLang === 'en' ? "Cross-Harbour Tunnel" : "過海隧道"), fee: 50 });
+                totalTolls += 50;
             }
             if (hasLionRock) {
                 detected.push({ name: currentLang === 'en' ? "Lion Rock Tunnel" : "獅子山隧道", fee: 8 });
@@ -1399,21 +1400,21 @@
                 detected.push({ name: currentLang === 'en' ? "Tate's Cairn Tunnel" : "大老山隧道", fee: 20 });
                 totalTolls += 20;
             }
-            if (hasEaglesNest && !hasLionRock) {
+            if (hasEaglesNest) {
                 detected.push({ name: currentLang === 'en' ? "Eagle's Nest / Sha Tin Heights Tunnel" : "尖山 / 沙田嶺隧道", fee: 8 });
                 totalTolls += 8;
             }
             if (hasTaiLam) {
-                detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", fee: 58 });
-                totalTolls += 58;
+                detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", fee: 28 });
+                totalTolls += 28;
             }
             if (hasShingMun) {
-                detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnels" : "城門隧道", fee: 5 });
-                totalTolls += 5;
+                detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnels" : "城門隧道", fee: 8 });
+                totalTolls += 8;
             }
             if (hasAberdeen) {
-                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", fee: 5 });
-                totalTolls += 5;
+                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", fee: 8 });
+                totalTolls += 8;
             }
 
             return { list: detected, total: totalTolls };
@@ -1472,16 +1473,14 @@
                     renderRouteOptions(response.routes, allowedIndices, fastestIndex, shortestIndex);
                     applySelectedRoute(fastestIndex);
 
-                    // 計算完成後，自動滑動捲動至地圖與車資展示區
                     scrollAndHighlightFareResult();
 
                 } else {
-                    alert((currentLang === 'en' ? "Could not compute route: " : "無法規劃路線，請檢查輸入的地點名稱名稱：") + status);
+                    alert((currentLang === 'en' ? "Could not compute route: " : "無法規劃路線，請檢查輸入的地點名稱：") + status);
                 }
             });
         }
 
-        // 滑動至地圖與車資資訊
         function scrollAndHighlightFareResult() {
             const resultDiv = document.getElementById('fare-result');
             if (resultDiv) {
@@ -1594,7 +1593,6 @@
             renderTollsUI(tollsData);
             updateTotalFareDisplay();
 
-            // 更新選項卡 UI
             const container = document.getElementById('route-options-list');
             if (container) {
                 const childs = container.children;
