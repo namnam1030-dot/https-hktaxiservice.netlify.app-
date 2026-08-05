@@ -594,76 +594,164 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
     </footer>
 
-    <!-- JavaScript 邏輯整合與 GPS Geofencing 隧道校驗 -->
+    <!-- JavaScript 邏輯整合與雙重高精度隧道校驗 -->
     <script>
         let currentLang = 'zh'; // 'zh' 或 'en'
 
-        // 定義 GPS 座標走廊雙重校驗（GPS Geofencing）標準數據
-        const TUNNEL_GEOFENCES = [
+        // 香港主要隧道精確收費廣場 / 隧道口 GPS 中心點座標與關鍵字清單
+        const TUNNEL_DEFINITIONS = [
             {
-                name: "大欖隧道",
-                nameEn: "Tai Lam Tunnel",
-                fee: 28,
-                lngMin: 114.055, lngMax: 114.075,
-                latMin: 22.375, latMax: 22.425
-            },
-            {
-                name: "大老山隧道",
-                nameEn: "Tate's Cairn Tunnel",
-                fee: 20,
-                lngMin: 114.195, lngMax: 114.215,
-                latMin: 22.340, latMax: 22.380
-            },
-            {
-                name: "香港仔隧道",
-                nameEn: "Aberdeen Tunnel",
-                fee: 8,
-                lngMin: 114.170, lngMax: 114.185,
-                latMin: 22.245, latMax: 22.270
-            },
-            {
-                name: "城門隧道",
-                nameEn: "Shing Mun Tunnels",
-                fee: 8,
-                lngMin: 114.135, lngMax: 114.175,
-                latMin: 22.375, latMax: 22.385
-            },
-            {
-                name: "獅子山隧道",
-                nameEn: "Lion Rock Tunnel",
-                fee: 8,
-                lngMin: 114.171, lngMax: 114.183,
-                latMin: 22.345, latMax: 22.365
-            },
-            {
-                name: "尖山隧道 / 沙田嶺隧道",
-                nameEn: "Eagle's Nest / Sha Tin Heights Tunnel",
-                fee: 8,
-                lngMin: 114.145, lngMax: 114.175,
-                latMin: 22.340, latMax: 22.375
-            },
-            {
+                id: "cross_harbour",
                 name: "紅磡海底隧道",
                 nameEn: "Cross Harbour Tunnel",
                 fee: 50,
-                lngMin: 114.175, lngMax: 114.185,
-                latMin: 22.280, latMax: 22.305
+                keywords: ["紅磡海底隧道", "紅磡隧道", "海底隧道", "Cross Harbour Tunnel"],
+                center: { lat: 22.3025, lng: 114.1798 },
+                radiusMeters: 300
             },
             {
+                id: "eastern_harbour",
                 name: "東區海底隧道",
                 nameEn: "Eastern Harbour Crossing",
                 fee: 50,
-                lngMin: 114.215, lngMax: 114.230,
-                latMin: 22.290, latMax: 22.310
+                keywords: ["東區海底隧道", "東隧", "Eastern Harbour Crossing"],
+                center: { lat: 22.2968, lng: 114.2235 },
+                radiusMeters: 300
             },
             {
+                id: "western_harbour",
                 name: "西區海底隧道",
                 nameEn: "Western Harbour Crossing",
                 fee: 50,
-                lngMin: 114.140, lngMax: 114.160,
-                latMin: 22.285, latMax: 22.305
+                keywords: ["西區海底隧道", "西隧", "Western Harbour Crossing"],
+                center: { lat: 22.3045, lng: 114.1565 },
+                radiusMeters: 300
+            },
+            {
+                id: "tai_lam",
+                name: "大欖隧道",
+                nameEn: "Tai Lam Tunnel",
+                fee: 28,
+                keywords: ["大欖隧道", "Tai Lam Tunnel"],
+                center: { lat: 22.4035, lng: 114.0620 },
+                radiusMeters: 350
+            },
+            {
+                id: "tates_cairn",
+                name: "大老山隧道",
+                nameEn: "Tate's Cairn Tunnel",
+                fee: 20,
+                keywords: ["大老山隧道", "Tate's Cairn Tunnel"],
+                center: { lat: 22.3685, lng: 114.2045 },
+                radiusMeters: 300
+            },
+            {
+                id: "aberdeen",
+                name: "香港仔隧道",
+                nameEn: "Aberdeen Tunnel",
+                fee: 8,
+                keywords: ["香港仔隧道", "Aberdeen Tunnel"],
+                center: { lat: 22.2570, lng: 114.1775 },
+                radiusMeters: 300
+            },
+            {
+                id: "shing_mun",
+                name: "城門隧道",
+                nameEn: "Shing Mun Tunnels",
+                fee: 8,
+                keywords: ["城門隧道", "Shing Mun Tunnel", "Shing Mun Tunnels"],
+                center: { lat: 22.3805, lng: 114.1500 },
+                radiusMeters: 300
+            },
+            {
+                id: "lion_rock",
+                name: "獅子山隧道",
+                nameEn: "Lion Rock Tunnel",
+                fee: 8,
+                keywords: ["獅子山隧道", "Lion Rock Tunnel"],
+                center: { lat: 22.3550, lng: 114.1770 },
+                radiusMeters: 300
+            },
+            {
+                id: "eagles_nest",
+                name: "尖山隧道 / 沙田嶺隧道",
+                nameEn: "Eagle's Nest / Sha Tin Heights Tunnel",
+                fee: 8,
+                keywords: ["尖山隧道", "沙田嶺隧道", "Eagle's Nest Tunnel", "Sha Tin Heights Tunnel"],
+                center: { lat: 22.3530, lng: 114.1570 },
+                radiusMeters: 300
             }
         ];
+
+        // 計算兩個地理座標點之間的距離 (米) - Haversine Formula
+        function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // 地球半徑 (米)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // 雙重精準校驗隧道函數（1. 導航指引文字解析 + 2. 精確半徑座標比對）
+        function detectTollsForRoute(route) {
+            let detectedTolls = [];
+            let totalToll = 0;
+
+            if (!route) return { totalToll: 0, tollsList: [] };
+
+            // 1. 搜集該路線所有路段 (steps) 的文字指引 HTML
+            let instructionsText = "";
+            if (route.legs) {
+                route.legs.forEach(leg => {
+                    if (leg.steps) {
+                        leg.steps.forEach(step => {
+                            if (step.instructions) {
+                                instructionsText += " " + step.instructions;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // 2. 搜集該路線所有路徑點 (overview_path)
+            let pathPoints = route.overview_path || [];
+
+            // 3. 對每條隧道進行雙重校驗
+            TUNNEL_DEFINITIONS.forEach(tunnel => {
+                let matchedByText = false;
+                let matchedByGPS = false;
+
+                // 檢查文字指引是否包含該隧道的關鍵字
+                if (instructionsText) {
+                    matchedByText = tunnel.keywords.some(kw => instructionsText.includes(kw));
+                }
+
+                // 如果文字未匹配，再使用精確圓形區域（250-350米內）檢查 GPS 軌跡點
+                if (!matchedByText && pathPoints.length > 0) {
+                    matchedByGPS = pathPoints.some(pt => {
+                        let pLat = typeof pt.lat === 'function' ? pt.lat() : pt.lat;
+                        let pLng = typeof pt.lng === 'function' ? pt.lng() : pt.lng;
+                        let dist = calculateDistanceMeters(pLat, pLng, tunnel.center.lat, tunnel.center.lng);
+                        return dist <= tunnel.radiusMeters;
+                    });
+                }
+
+                // 只要符合其中一種標準，即可確定行經該隧道
+                if (matchedByText || matchedByGPS) {
+                    detectedTolls.push({
+                        name: tunnel.name,
+                        nameEn: tunnel.nameEn,
+                        fee: tunnel.fee
+                    });
+                    totalToll += tunnel.fee;
+                }
+            });
+
+            return { totalToll, tollsList: detectedTolls };
+        }
 
         const translations = {
             zh: {
@@ -960,34 +1048,6 @@
 
         const voiceBtn = document.getElementById('voice-btn');
         const micText = document.getElementById('mic-text');
-
-        // 通用 GPS Geofencing 比對邏輯：檢測 overview_path 座標點是否落在隧道邊界框內
-        function detectTollsFromOverviewPath(overviewPath) {
-            if (!overviewPath || !overviewPath.length) return { totalToll: 0, tollsList: [] };
-
-            let detectedTolls = [];
-            let totalToll = 0;
-
-            TUNNEL_GEOFENCES.forEach(tunnel => {
-                let inside = overviewPath.some(pt => {
-                    let lat = typeof pt.lat === 'function' ? pt.lat() : pt.lat;
-                    let lng = typeof pt.lng === 'function' ? pt.lng() : pt.lng;
-                    return (lng >= tunnel.lngMin && lng <= tunnel.lngMax &&
-                            lat >= tunnel.latMin && lat <= tunnel.latMax);
-                });
-
-                if (inside) {
-                    detectedTolls.push({
-                        name: tunnel.name,
-                        nameEn: tunnel.nameEn,
-                        fee: tunnel.fee
-                    });
-                    totalToll += tunnel.fee;
-                }
-            });
-
-            return { totalToll, tollsList: detectedTolls };
-        }
 
         function quickQueryAndBook() {
             selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
@@ -1433,7 +1493,7 @@
                 if (idx === fastestIndex) tagText = currentLang === 'en' ? "Fastest Route" : "最快路線";
                 else if (idx === shortestIndex) tagText = currentLang === 'en' ? "Shortest Route" : "最短路線";
 
-                let detected = detectTollsFromOverviewPath(rt.overview_path);
+                let detected = detectTollsForRoute(rt);
                 let tollText = detected.tollsList.length > 0 
                     ? (currentLang === 'en' ? `Tolls: +HK$${detected.totalToll}` : `隧道費: +HK$${detected.totalToll}`)
                     : (currentLang === 'en' ? "No Tolls" : "免費路段");
@@ -1520,8 +1580,8 @@
             lastCalculatedBaseFare = calculateHkTaxiFare(totalDistMeters);
             document.getElementById('res-base-fare').innerText = lastCalculatedBaseFare;
 
-            // 執行 GPS Geofencing 檢查
-            let detectedTollsInfo = detectTollsFromOverviewPath(route.overview_path);
+            // 執行雙重高精度隧道判定
+            let detectedTollsInfo = detectTollsForRoute(route);
             lastCalculatedTolls = detectedTollsInfo.totalToll;
             lastDetectedTollsList = detectedTollsInfo.tollsList;
 
