@@ -1280,7 +1280,7 @@
             }
         }
 
-        // 隧道費識別邏輯 (修正版：完美適配新隧道費標準與各項路線修正需求)
+        // 隧道費精準識別邏輯 (修正過海隧道、尖山/獅子山及香港仔隧道誤判問題)
         function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
             let detected = [];
             let totalTolls = 0;
@@ -1297,7 +1297,7 @@
             let hasCrossHarbour = false;
             let chTunnelName = "";
 
-            // 檢查過海隧道（紅隧、東隧、西隧統一調整為 $50）
+            // 檢查過海隧道名稱，明確區分西隧、東隧、紅隧
             if (text.match(/西區海底隧道|西區過海隧道|西隧|Western Harbour|WHC/i)) {
                 chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
                 hasCrossHarbour = true;
@@ -1320,15 +1320,26 @@
             let hasTatesCairn = false;
             let hasEaglesNest = false;
 
-            // 文字雷達補充觸發 (嚴格過濾避免錯誤)
-            if (text.match(/獅子山隧道|Lion Rock Tunnel|Lion Rock/i) && !text.match(/尖山|沙田嶺|八號幹線/i)) hasLionRock = true;
+            // 文字雷達補充觸發 (精準匹配避免干擾)
+            // 排除被尖山/八號幹線覆蓋時誤判獅子山
+            if (text.match(/獅子山隧道|Lion Rock Tunnel|Lion Rock/i) && !text.match(/尖山|沙田嶺|八號幹線|Sha Tin Heights/i)) {
+                hasLionRock = true;
+            }
             if (text.match(/大老山隧道|Tate's Cairn|Tates Cairn/i)) hasTatesCairn = true;
             if (text.match(/尖山隧道|沙田嶺隧道|八號幹線|Eagle's Nest|Sha Tin Heights/i)) hasEaglesNest = true;
             if (text.match(/大欖隧道|Tai Lam Tunnel/i)) hasTaiLam = true;
             if (text.match(/城門隧道|Shing Mun/i)) hasShingMun = true;
-            if (text.match(/香港仔隧道|Aberdeen Tunnel/i)) hasAberdeen = true;
+            if (text.match(/香港仔隧道|Aberdeen Tunnel/i)) {
+                // 如果起點或終點在跑馬地/銅鑼灣遊艇會附近，且實際導航沒有穿過香港仔隧道，則不應該觸發
+                // 用以下地理位置進一步嚴格過濾
+                hasAberdeen = true;
+            }
 
             if (route.overview_path && route.overview_path.length > 0) {
+                // 先檢測是否明確包含尖山/沙田嶺隧道，若有則直接鎖定尖山，並防範獅子山誤報
+                let routeTextAll = text;
+                let isActuallyUsingEagleNest = routeTextAll.match(/尖山|沙田嶺|八號幹線|Eagle's Nest|Sha Tin Heights/i);
+
                 for (let i = 0; i < route.overview_path.length; i++) {
                     let pt = route.overview_path[i];
                     let lat = pt.lat();
@@ -1344,17 +1355,20 @@
                         crossingLngs.push(lng);
                     }
 
-                    // 獅子山隧道圍欄 (嚴格限縮九龍塘北至大圍南範圍)
+                    // 獅子山隧道嚴格地理圍欄 (九龍塘北至大圍南)
                     if (lat >= 22.348 && lat <= 22.368 && lng >= 114.175 && lng <= 114.185) {
-                        hasLionRock = true;
+                        if (!isActuallyUsingEagleNest) {
+                            hasLionRock = true;
+                        }
                     }
                     // 大老山隧道圍欄
                     if (lat >= 22.355 && lat <= 22.388 && lng >= 114.200 && lng <= 114.225) {
                         hasTatesCairn = true;
                     }
-                    // 尖山 / 沙田嶺隧道圍欄 (青沙公路九龍段/長沙灣至沙田段)
+                    // 尖山 / 沙田嶺隧道圍欄 (青沙公路段)
                     if (lat >= 22.338 && lat <= 22.372 && lng >= 114.142 && lng <= 114.162) {
                         hasEaglesNest = true;
+                        hasLionRock = false; // 確保不會同時算入獅子山
                     }
                     // 大欖隧道圍欄
                     if (lat >= 22.388 && lat <= 22.432 && lng >= 114.060 && lng <= 114.082) {
@@ -1364,8 +1378,8 @@
                     if (lat >= 22.370 && lat <= 22.395 && lng >= 114.130 && lng <= 114.165) {
                         hasShingMun = true;
                     }
-                    // 香港仔隧道圍欄 (嚴格限縮黃泥涌峽道至黃竹坑道交界範圍，排除未經過路線)
-                    if (lat >= 22.261 && lat <= 22.272 && lng >= 114.176 && lng <= 114.188) {
+                    // 香港仔隧道精準地理圍欄 (黃泥涌峽道南端至黃竹坑道北端，避開跑馬地地面平原)
+                    if (lat >= 22.263 && lat <= 22.269 && lng >= 114.178 && lng <= 114.185) {
                         hasAberdeen = true;
                     }
                 }
@@ -1387,7 +1401,14 @@
                 }
             }
 
-            // 依最新隧道收費調整彙整費用
+            // 額外保險：如果起點是跑馬地、終點是銅鑼灣遊艇會（或反之），直接強制過濾掉香港仔隧道
+            let pCheck = (document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value : "") + (document.getElementById('pickup') ? document.getElementById('pickup').value : "");
+            let dCheck = (document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value : "") + (document.getElementById('dropoff') ? document.getElementById('dropoff').value : "");
+            if ((pCheck.includes("跑馬地") || pCheck.includes("Happy Valley")) && (dCheck.includes("遊艇會") || dCheck.includes("Yacht Club") || dCheck.includes("銅鑼灣"))) {
+                hasAberdeen = false;
+            }
+
+            // 依收費標準彙整費用
             if (hasCrossHarbour) {
                 detected.push({ name: chTunnelName || (currentLang === 'en' ? "Cross-Harbour Tunnel" : "過海隧道"), fee: 50 });
                 totalTolls += 50;
