@@ -899,7 +899,7 @@
                 if (bookingNoBox) bookingNoBox.checked = false;
             } else if (choice === 'no') {
                 if (yesBox) yesBox.checked = false;
-                if (noBox) yesBox.checked = true;
+                if (noBox) noBox.checked = true;
                 if (bookingYesBox) bookingYesBox.checked = false;
                 if (bookingNoBox) bookingNoBox.checked = true;
             }
@@ -1264,8 +1264,9 @@
             return Math.round(fare);
         }
 
+        // 改進版香港島判定（精確經緯度多邊形邊界）
         function isHongKongIsland(lat, lng) {
-            if (lat < 22.18 || lat > 22.298 || lng < 114.10 || lng > 114.27) {
+            if (lat < 22.18 || lat > 22.305 || lng < 114.10 || lng > 114.28) {
                 return false;
             }
             if (lng < 114.14) {
@@ -1281,6 +1282,7 @@
             }
         }
 
+        // 【核心優化】結合 GPS 座標軌跡與嚴格正規化規則的隧道辨識系統
         function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
             let detected = [];
             let totalTolls = 0;
@@ -1297,6 +1299,7 @@
             let hasCrossHarbour = false;
             let chTunnelName = "";
 
+            // 精確抓取過海隧道名稱（排除非過海指引）
             if (text.match(/西區海底隧道|西區過海隧道|西隧|Western Harbour|WHC/i)) {
                 chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
                 hasCrossHarbour = true;
@@ -1328,35 +1331,37 @@
                         hasKowloonNT = true;
                     }
 
-                    if (lat >= 22.282 && lat <= 22.302 && lng >= 114.12 && lng <= 114.25) {
+                    if (lat >= 22.282 && lat <= 22.305 && lng >= 114.12 && lng <= 114.25) {
                         crossingLngs.push(lng);
                     }
 
-                    if (lat >= 22.380 && lat <= 22.440 && lng >= 114.040 && lng <= 114.120) {
+                    // 大欖隧道經緯度範圍 (大欖收費廣場一帶)
+                    if (lat >= 22.390 && lat <= 22.425 && lng >= 114.050 && lng <= 114.095) {
                         hasTaiLam = true;
                     }
-                    if (lat >= 22.370 && lat <= 22.395 && lng >= 114.130 && lng <= 114.165) {
+                    // 城門隧道範圍
+                    if (lat >= 22.375 && lat <= 22.392 && lng >= 114.135 && lng <= 114.160) {
                         hasShingMun = true;
                     }
-                    if (lat >= 22.254 && lat <= 22.275 && lng >= 114.170 && lng <= 114.192) {
+                    // 香港仔隧道範圍
+                    if (lat >= 22.258 && lat <= 22.272 && lng >= 114.175 && lng <= 114.190) {
                         hasAberdeen = true;
                     }
                 }
 
-                if (hasHKIsland && hasKowloonNT) {
+                // 如果起訖點橫跨港島與九龍/新界，且沒有明確抓到隧道名稱，用路徑平均經度智能判定過海隧道
+                if (hasHKIsland && hasKowloonNT && !hasCrossHarbour) {
                     hasCrossHarbour = true;
-                    if (!chTunnelName) {
-                        let avgLng = crossingLngs.length > 0 
-                            ? crossingLngs.reduce((a, b) => a + b, 0) / crossingLngs.length 
-                            : 114.18;
+                    let avgLng = crossingLngs.length > 0 
+                        ? crossingLngs.reduce((a, b) => a + b, 0) / crossingLngs.length 
+                        : 114.18;
 
-                        if (avgLng < 114.165) {
-                            chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
-                        } else if (avgLng > 114.202) {
-                            chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
-                        } else {
-                            chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
-                        }
+                    if (avgLng < 114.165) {
+                        chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
+                    } else if (avgLng > 114.202) {
+                        chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
+                    } else {
+                        chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
                     }
                 }
             }
@@ -1366,14 +1371,15 @@
                 totalTolls += 50;
             }
 
-            let textTaiLam = text.match(/大欖隧道|Tai Lam Tunnel|Route 3|Tsing Long Highway|青朗公路|大欖收費廣場/i) || (text.match(/大欖/i) && !text.match(/大欖涌|大欖角/i));
-            let textLionRock = text.match(/獅子山隧道/i) && !text.match(/獅子山隧道公路/i);
-            let textShingMun = text.match(/城門隧道|Shing Mun Tunnel|Shing Mun Tunnel Road|城門隧道公路/i);
-            let textAberdeen = text.match(/香港仔隧道|Aberdeen Tunnel|黃泥涌峽道|Wong Nai Chung Gap Road|黃竹坑道|Wong Chuk Hang Road/i);
-            let textTatesCairn = text.match(/大老山隧道|Tate's Cairn Tunnel/i) || text.match(/大老山/i);
-            let textEaglesNest = text.match(/尖山隧道|沙田嶺隧道|青沙公路|Eagle's Nest|Sha Tin Heights/i);
+            // 嚴格過濾陸路隧道關鍵字，避免誤判一般公路
+            let textTaiLam = hasTaiLam || text.match(/大欖隧道|Tai Lam Tunnel|Route 3|Tsing Long Highway|青朗公路收費廣場/i);
+            let textLionRock = text.match(/獅子山隧道(?!公路)/i); // 排除「獅子山隧道公路」誤判
+            let textShingMun = hasShingMun || text.match(/城門隧道(?!公路)/i);
+            let textAberdeen = hasAberdeen || text.match(/香港仔隧道|Aberdeen Tunnel/i);
+            let textTatesCairn = text.match(/大老山隧道|Tate's Cairn Tunnel/i);
+            let textEaglesNest = text.match(/尖山隧道|沙田嶺隧道|青沙公路收費廣場|Eagle's Nest|Sha Tin Heights/i);
 
-            if (hasTaiLam || textTaiLam) {
+            if (textTaiLam) {
                 detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", cost: 28 });
                 totalTolls += 28;
             }
@@ -1393,13 +1399,13 @@
                 totalTolls += 8;
             }
 
-            if (hasShingMun || textShingMun) {
+            if (textShingMun) {
                 detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnel" : "城門隧道", cost: 8 });
                 totalTolls += 8;
             }
 
-            if (hasAberdeen || textAberdeen) {
-                detected.push({ name: currentLang === 'en' ? "香港仔隧道" : "香港仔隧道", cost: 8 });
+            if (textAberdeen) {
+                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", cost: 8 });
                 totalTolls += 8;
             }
 
@@ -1728,12 +1734,10 @@
             msg += `👥 *乘客人數*：${passengersVal}\n`;
             msg += `🧳 *行李件數*：${luggagesVal}\n`;
 
-            // A. 如選擇沒有寵物就不用顯示該行訊息，如有寵物就用✅顯示
             if (hasPetChecked) {
                 msg += `🐾 *寵物同行*：✅ 有寵物\n`;
             }
 
-            // B. 如選擇沒有輪椅需要放置尾箱就不用顯示該行訊息，如有輪椅就用✅顯示
             if (hasWheelchairChecked) {
                 msg += ` wheelchair *輪椅擺放*：✅ 有輪椅需要放置於尾箱\n`.replace(' wheelchair ', ' ');
             }
@@ -1754,6 +1758,4 @@
         }
     </script>
 </body>
-	
-	
 </html>
