@@ -1175,7 +1175,7 @@
         }
 
         // ==========================================
-        // 核心計算與地圖邏輯 (補充完成)
+        // 核心計算與地圖邏輯 (增強隧道偵測與回程費)
         // ==========================================
         
         function calculateHkTaxiFare(distanceInMeters) {
@@ -1297,16 +1297,16 @@
             }
         }
 
-        // 隧道收費字典 (利用正則表達式偵測 Google Maps 指引)
+        // 優化版香港隧道收費與回程費規則字典 (支援雙向中英文正規表達式配對)
         const HK_TOLLS = [
-            { regex: /紅磡海底隧道|Cross[- ]Harbour Tunnel/i, name: "紅磡海底隧道 (包回程)", price: 50 },
-            { regex: /東區海底隧道|Eastern Harbour Crossing/i, name: "東區海底隧道 (包回程)", price: 50 },
-            { regex: /西區海底隧道|Western Harbour Crossing/i, name: "西區海底隧道 (包回程)", price: 50 },
+            { regex: /紅磡海底隧道|Cross[- ]Harbour Tunnel|红磡海底隧道/i, name: "紅磡海底隧道 (含回程費)", price: 50 },
+            { regex: /東區海底隧道|Eastern Harbour Crossing|东区海底隧道/i, name: "東區海底隧道 (含回程費)", price: 50 },
+            { regex: /西區海底隧道|Western Harbour Crossing|西区海底隧道/i, name: "西區海底隧道 (含回程費)", price: 50 },
             { regex: /大老山隧道|Tate's Cairn Tunnel/i, name: "大老山隧道", price: 20 },
-            { regex: /大欖隧道|Tai Lam Tunnel/i, name: "大欖隧道", price: 58 },
+            { regex: /大欖隧道|Tai Lam Tunnel|大榄隧道/i, name: "大欖隧道", price: 58 },
             { regex: /獅子山隧道|Lion Rock Tunnel/i, name: "獅子山隧道", price: 8 },
             { regex: /尖山隧道|沙田嶺隧道|Eagle's Nest Tunnel/i, name: "尖山/沙田嶺隧道", price: 8 },
-            { regex: /城門隧道|Shing Mun Tunnel/i, name: "城門隧道", price: 5 },
+            { regex: /城門隧道|Shing Mun Tunnels|城门隧道/i, name: "城門隧道", price: 5 },
             { regex: /香港仔隧道|Aberdeen Tunnel/i, name: "香港仔隧道", price: 5 }
         ];
 
@@ -1324,7 +1324,7 @@
                 totalDistance += leg.distance.value;
                 totalDuration += leg.duration.value;
                 leg.steps.forEach(step => {
-                    routeInstructions += step.instructions + " ";
+                    routeInstructions += (step.instructions || "") + " ";
                 });
             });
             
@@ -1334,14 +1334,17 @@
             lastCalculatedBaseFare = calculateHkTaxiFare(totalDistance);
             document.getElementById('res-base-fare').innerText = Math.ceil(lastCalculatedBaseFare);
             
-            // 偵測隧道收費
+            // 精準導航字串比對隧道收費
             let detected = [];
             let tollTotal = 0;
             
             HK_TOLLS.forEach(toll => {
                 if (toll.regex.test(routeInstructions)) {
-                    detected.push(toll);
-                    tollTotal += toll.price;
+                    // 避免同一隧道因多段 step 重複累加
+                    if (!detected.some(item => item.name === toll.name)) {
+                        detected.push(toll);
+                        tollTotal += toll.price;
+                    }
                 }
             });
             
@@ -1368,7 +1371,6 @@
         function updateTotalFareDisplay() {
             if (lastCalculatedBaseFare === 0) return;
 
-            // 已在此處修正：將 基礎跳錶費 + 隧道費 加總作為起點
             let total = Math.ceil(lastCalculatedBaseFare) + lastCalculatedTolls;
             let subtotalWithoutTolls = Math.ceil(lastCalculatedBaseFare);
             
