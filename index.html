@@ -78,7 +78,6 @@
     <!-- 頂部介紹 Hero Section -->
     <section class="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center md:text-left">
         <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
-            <!-- 新增按鍵：立即查詢車費及預約 -->
             <div class="flex flex-col items-center md:items-start">
                 <button onclick="quickQueryAndBook()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
                     <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約*</span>
@@ -91,7 +90,6 @@
             </button>
         </div>
 
-        <!-- 註明 -->
         <div class="mb-8 inline-flex items-center gap-2 text-brand-yellow font-bold text-sm md:text-base bg-brand-yellow/10 border-2 border-brand-yellow px-4 py-2.5 rounded-xl shadow-md">
             <i class="fa-solid fa-bolt text-brand-yellow text-lg animate-pulse"></i>
             <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
@@ -114,9 +112,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
-            <!-- 車款 1 : 豐田混能的士 (含升級詢問方塊) -->
+            <!-- 車款 1 : 豐田混能的士 -->
             <div class="flex flex-col">
-                <!-- 升級詢問方塊 -->
                 <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg">
                     <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                         <i class="fa-solid fa-gift text-brand-yellow"></i>
@@ -134,7 +131,6 @@
                     </div>
                 </div>
 
-                <!-- 車卡 -->
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
                      class="car-card bg-brand-card rounded-2xl overflow-hidden border-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1">
@@ -314,7 +310,7 @@
                     <span id="mic-text" data-i18n="voice_btn_text">按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」</span>
                 </button>
 
-                <!-- 3 格輸入設計 (起點、中途站、終點) 連動自動預測選單 -->
+                <!-- 3 格輸入設計 -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div>
                         <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_pickup">起點 (出發地)</label>
@@ -384,7 +380,7 @@
                 </div>
             </div>
 
-            <!-- 重新選擇車款與直接預約按鈕區 -->
+            <!-- 按鈕區 -->
             <div class="mt-5 pt-4 border-t border-gray-800 flex flex-wrap justify-center gap-3">
                 <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
                     <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
@@ -419,7 +415,6 @@
             <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
                 
-                <!-- 條件顯示：如選擇豐田混能的士，於預約表格注明是否接受免費升級 -->
                 <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg mb-4">
                     <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                         <i class="fa-solid fa-gift text-brand-yellow"></i>
@@ -437,10 +432,9 @@
                     </div>
                 </div>
 
-                <!-- 隱藏的起點、中途站、終點輸入欄位（自動與車費估算器同步，並在發送 WhatsApp 時顯示） -->
-                <div id="field-pickup-container" class="hidden">
+                <div id="field-pickup-container">
                     <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
-                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <input type="text" id="pickup" required data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
                 <div id="field-flight-container" class="hidden">
@@ -448,14 +442,14 @@
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
-                <div id="field-stopover-container" class="hidden">
+                <div id="field-stopover-container">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
                     <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊 (系統會自動計入中途繞路車費)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
-                <div id="field-dropoff-container" class="hidden">
+                <div id="field-dropoff-container">
                     <label id="label-dropoff" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span data-i18n="label_dropoff">落車地點 (終點)</span></label>
-                    <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <input type="text" id="dropoff" required data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -494,7 +488,7 @@
                     </div>
                 </div>
 
-                <!-- 寵物與輪椅勾選方格 -->
+                <!-- 寵物與輪椅 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-brand-dark border border-gray-800 rounded-xl p-4">
                     <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
                         <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
@@ -506,7 +500,7 @@
                     </label>
                 </div>
 
-                <!-- 付款方式選擇 (可選多項) -->
+                <!-- 付款方式選擇 -->
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-2">
                         <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
@@ -590,7 +584,6 @@
             <a href="tel:57038875" class="border border-gray-800 bg-brand-gray px-6 py-2.5 rounded-full hover:bg-gray-800 transition text-xs flex items-center gap-2 text-white">
                 <i class="fa-solid fa-phone text-brand-yellow"></i> 5703 8875
             </a>
-            <!-- 直接 WhatsApp 查詢按鈕 -->
             <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%81%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%BA%A6%E7%9A%84%E7%A5%AB%E6%9C%8D%E5%8A%A1%EF%BC%81" target="_blank" class="bg-brand-yellow text-black px-6 py-2.5 rounded-full hover:opacity-90 transition font-bold text-xs flex items-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
             </a>
@@ -598,9 +591,9 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
     </footer>
 
-    <!-- JavaScript 邏輯整合與多語言切換 -->
+    <!-- JavaScript 邏輯整合 -->
     <script>
-        let currentLang = 'zh'; // 'zh' 或 'en'
+        let currentLang = 'zh';
 
         const translations = {
             zh: {
@@ -636,7 +629,7 @@
                 car2_seats: "6 座位",
                 car2_type: "純電動七人車",
                 car2_cap: "最多 6 位乘客",
-                car2_lug: "可放 6-7 件大型行李",
+                car2_lug: "可放 3-4 件大型行李",
                 car2_feat: "純電動零排放、極度寧靜",
                 car2_fee: "附加費 HK$50 (最低 $130)",
 
@@ -666,13 +659,13 @@
 
                 calc_title: "智能路線與車費估算",
                 calc_tip_title: "車費估算使用說明：",
-                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
-                calc_tip_2: '<strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
+                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
+                calc_tip_2: '<strong class="text-white">3格輸入：</strong>填寫起點、中途站及終點（支援自動預測選單），再按計算按鈕。',
                 calc_tip_3: '系統將自動規劃最佳行車路線並計算預估車費與相關隧道費用。',
                 calc_label_pickup: "起點 (出發地)",
                 calc_label_stopover: "中途站 (選填)",
                 calc_label_dropoff: "終點 (目的地)",
-                ph_pickup_box: "輸入起點...",
+                ph_pickup: "例：觀塘 APM",
                 ph_stopover_opt: "輸入中途站...",
                 ph_dropoff_opt: "輸入終點...",
 
@@ -698,7 +691,6 @@
                 tab_normal: "一般點對點預約",
                 tab_airport: "機場接機服務",
                 label_pickup: "上車地點 (起點)",
-                ph_pickup: "例：觀塘 APM",
                 label_flight: "航班編號 (例如：CX250)",
                 ph_flight: "例：CX250 (司機會自動監察航班時間)",
                 label_stopover: "中途停靠點 (如沒有可留空)",
@@ -711,9 +703,6 @@
                 label_luggages: "行李件數",
                 label_has_pet: "是否有寵物",
                 label_has_wheelchair: "是否有輪椅需要放置於尾箱",
-                opt_select: "請選擇",
-                opt_yes: "是",
-                opt_no: "否",
                 label_contact_surname: "聯絡人",
                 ph_contact_surname: "例：陳",
                 label_contact_title: "稱謂 (選填)",
@@ -734,7 +723,7 @@
                 summary_car_label: "目前選定車型",
                 summary_fee_label: "收費模式",
                 btn_submit_whatsapp: "確認預約並發送 WhatsApp",
-                form_footer_note: "點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。",
+                form_footer_note: "點擊後將自動開啟 WhatsApp 傳送訂單資料，司機會盡快回覆確認。",
                 footer_slogan: "香港新一代豪華六座位的士預約服務・準時尊貴接送",
                 whatsapp_inquiry: "WhatsApp 查詢",
                 footer_copy: "© 2026 版權所有。"
@@ -772,7 +761,7 @@
                 car2_seats: "6 Seats",
                 car2_type: "Pure Electric MPV",
                 car2_cap: "Up to 6 passengers",
-                car2_lug: "Fits 6-7 large luggages",
+                car2_lug: "Fits 3-4 large luggages",
                 car2_feat: "Zero emission, ultra-quiet",
                 car2_fee: "Surcharge HK$50 (Min. $130)",
 
@@ -803,12 +792,12 @@
                 calc_title: "Smart Route & Fare Estimator",
                 calc_tip_title: "Fare Estimation Instructions:",
                 calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak the full trip, e.g., <span class="text-brand-yellow font-medium">"From Kwun Tong via Mong Kok to Tsim Sha Tsui"</span>.',
-                calc_tip_2: '<strong class="text-white">3-Box Input:</strong> Fill in pickup, stopover, and drop-off below (with auto-complete dropdown), then click calculate.',
+                calc_tip_2: '<strong class="text-white">3-Box Input:</strong> Fill in pickup, stopover, and drop-off below, then click calculate.',
                 calc_tip_3: 'The system will automatically plan the best route and calculate estimated fare and toll charges.',
                 calc_label_pickup: "Pickup (Start)",
                 calc_label_stopover: "Stopover (Optional)",
                 calc_label_dropoff: "Destination",
-                ph_pickup_box: "Enter pickup...",
+                ph_pickup: "e.g., Kwun Tong APM",
                 ph_stopover_opt: "Enter stopover...",
                 ph_dropoff_opt: "Enter destination...",
 
@@ -834,7 +823,6 @@
                 tab_normal: "Standard Point-to-Point",
                 tab_airport: "Airport Pickup Service",
                 label_pickup: "Pickup Location (Start)",
-                ph_pickup: "e.g., Kwun Tong APM",
                 label_flight: "Flight Number (e.g., CX250)",
                 ph_flight: "e.g., CX250 (Driver monitors flight time)",
                 label_stopover: "Mid-way Stop (Optional)",
@@ -847,9 +835,6 @@
                 label_luggages: "Luggages",
                 label_has_pet: "Pets on board",
                 label_has_wheelchair: "Wheelchair in trunk",
-                opt_select: "Please select",
-                opt_yes: "Yes",
-                opt_no: "No",
                 label_contact_surname: "Contact",
                 ph_contact_surname: "e.g., Chan",
                 label_contact_title: "Title (Optional)",
@@ -877,9 +862,21 @@
             }
         };
 
-        let calcPickupInput, calcStopoverInput, calcDropoffInput;
+        let selectedCarName = "豐田混能的士";
+        let selectedCarPrice = "標準收費・無附加費";
+        let selectedCarNameEn = "Toyota Hybrid Taxi";
+        let selectedCarPriceEn = "Standard Fare · No Surcharge";
+        let currentCarSurcharge = 0;
+        let currentCarMinFare = 0;
+        let currentServiceType = "normal";
+        let lastCalculatedBaseFare = 0;
+        let lastCalculatedTolls = 0;
 
-        // 新增按鍵觸發函數：捲動至車費估算器，預設豐田混能車款並自動剔選接受免費升級
+        let googleMap = null;
+        let directionsRenderer = null;
+        let currentRoutesResponse = null;
+        let selectedRouteIndex = 0;
+
         function quickQueryAndBook() {
             selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
             handleUpgradeCheckbox('yes');
@@ -930,18 +927,11 @@
                 return `${hours}:${minutes}`;
             };
 
-            const minDateStr = formatDate(now);
-            const maxDateStr = formatDate(maxAllowed);
+            dateInput.setAttribute('min', formatDate(now));
+            dateInput.setAttribute('max', formatDate(maxAllowed));
 
-            dateInput.setAttribute('min', minDateStr);
-            dateInput.setAttribute('max', maxDateStr);
-
-            if (!dateInput.value) {
-                dateInput.value = minDateStr;
-            }
-            if (!timeInput.value) {
-                timeInput.value = formatTime(now);
-            }
+            if (!dateInput.value) dateInput.value = formatDate(now);
+            if (!timeInput.value) timeInput.value = formatTime(now);
         }
 
         window.addEventListener('load', () => {
@@ -952,116 +942,57 @@
                 passengersSelect.addEventListener('change', () => {
                     const val = parseInt(passengersSelect.value);
                     if (val >= 5 && selectedCarName === '豐田混能的士') {
-                        alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi has been automatically switched to Maxus MIFA 7." : "乘客人數已改為5或以上，4座位的豐田混能的士不適用，已自動為您切換至 6 座位的 Maxus MIFA 7。");
+                        alert(currentLang === 'en' ? "Passenger count is 5 or more. Switched to Maxus MIFA 7." : "乘客人數已改為5或以上，已自動切換至 6 座位的 Maxus MIFA 7。");
                         selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)');
                     }
                 });
             }
 
             if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                const options = {
-                    componentRestrictions: { country: "hk" }
-                };
+                const options = { componentRestrictions: { country: "hk" } };
                 
-                const pickupInput = document.getElementById('pickup');
-                const stopoverInput = document.getElementById('stopover');
-                const dropoffInput = document.getElementById('dropoff');
-
-                calcPickupInput = document.getElementById('calc-pickup');
-                calcStopoverInput = document.getElementById('calc-stopover');
-                calcDropoffInput = document.getElementById('calc-dropoff');
-
-                if (pickupInput) new google.maps.places.Autocomplete(pickupInput, options);
-                if (stopoverInput) new google.maps.places.Autocomplete(stopoverInput, options);
-                if (dropoffInput) new google.maps.places.Autocomplete(dropoffInput, options);
-
-                if (calcPickupInput) new google.maps.places.Autocomplete(calcPickupInput, options);
-                if (calcStopoverInput) new google.maps.places.Autocomplete(calcStopoverInput, options);
-                if (calcDropoffInput) new google.maps.places.Autocomplete(calcDropoffInput, options);
+                ['pickup', 'stopover', 'dropoff', 'calc-pickup', 'calc-stopover', 'calc-dropoff'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) new google.maps.places.Autocomplete(el, options);
+                });
             }
         });
 
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
-            const langBtn = document.getElementById('lang-toggle-btn');
-            langBtn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+            document.getElementById('lang-toggle-btn').innerText = currentLang === 'zh' ? 'EN' : '繁';
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    el.innerHTML = translations[currentLang][key];
-                }
+                if (translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
             });
 
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[currentLang][key]) {
-                    el.placeholder = translations[currentLang][key];
-                }
+                if (translations[currentLang][key]) el.placeholder = translations[currentLang][key];
             });
 
-            if (currentLang === 'en') {
-                if (selectedCarName === '豐田混能的士') selectedCarNameEn = 'Toyota Hybrid Taxi';
-                else if (selectedCarName === 'Maxus MIFA 7') selectedCarNameEn = 'Maxus MIFA 7';
-                else if (selectedCarName === '廣汽 E9') selectedCarNameEn = 'GAC E9';
-                else if (selectedCarName === '吉利大黃蜂') selectedCarNameEn = 'Geely Bumblebee';
-                else if (selectedCarName === '豐田 Noah 輪椅的士') selectedCarNameEn = 'Toyota Noah Wheelchair Taxi';
-                
-                document.getElementById('selected-car-text').innerText = selectedCarNameEn || selectedCarName;
-                document.getElementById('selected-price-text').innerText = selectedCarPriceEn || selectedCarPrice;
-            } else {
-                document.getElementById('selected-car-text').innerText = selectedCarName;
-                document.getElementById('selected-price-text').innerText = selectedCarPrice;
-            }
+            document.getElementById('selected-car-text').innerText = (currentLang === 'en') ? selectedCarNameEn : selectedCarName;
+            document.getElementById('selected-price-text').innerText = (currentLang === 'en') ? selectedCarPriceEn : selectedCarPrice;
 
             if (currentRoutesResponse) {
-                let fastestIndex = 0, shortestIndex = 0, minD = Infinity, minT = Infinity;
-                currentRoutesResponse.routes.forEach((rt, i) => {
-                    let d = 0, t = 0;
-                    rt.legs.forEach(leg => { d += leg.distance.value; t += leg.duration.value; });
-                    if (t < minT) { minT = t; fastestIndex = i; }
-                    if (d < minD) { minD = d; shortestIndex = i; }
-                });
-                let allowedIndices = [fastestIndex];
-                if (shortestIndex !== fastestIndex) allowedIndices.push(shortestIndex);
-                renderRouteOptions(currentRoutesResponse.routes, allowedIndices, fastestIndex, shortestIndex);
+                calculateFareWithGoogle();
             }
         }
 
-        let selectedCarName = "豐田混能的士";
-        let selectedCarPrice = "標準收費・無附加費";
-        let selectedCarNameEn = "Toyota Hybrid Taxi";
-        let selectedCarPriceEn = "Standard Fare · No Surcharge";
-        let currentCarSurcharge = 0;
-        let currentCarMinFare = 0;
-        let currentServiceType = "normal";
-        let lastCalculatedBaseFare = 0;
-        let lastCalculatedTolls = 0;
-        let lastDetectedTollsList = [];
-
-        let googleMap = null;
-        let directionsRenderer = null;
-        let currentRoutesResponse = null;
-        let selectedRouteIndex = 0;
-        let lastVoiceTranscript = "";
-
-        const voiceBtn = document.getElementById('voice-btn');
-        const micText = document.getElementById('mic-text');
-
         function startVoiceRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
             if (!SpeechRecognition) {
-                alert(currentLang === 'en' ? "Your browser does not support speech recognition. Please enter text directly." : "您的瀏覽器暫時未支援語音辨識，請直接在文字欄位輸入地點。");
+                alert(currentLang === 'en' ? "Speech recognition not supported." : "您的瀏覽器暫未支援語音辨識，請直接輸入地點。");
                 return;
             }
 
             const recognition = new SpeechRecognition();
             recognition.lang = currentLang === 'en' ? 'en-US' : 'zh-HK';
-            recognition.interimResults = false;
-            recognition.continuous = false;
+            const voiceBtn = document.getElementById('voice-btn');
+            const micText = document.getElementById('mic-text');
 
-            micText.innerText = currentLang === 'en' ? "Listening... Please speak trip details" : "聆聽中...請講出行程 (例如：由觀塘經旺角去尖沙咀)";
+            micText.innerText = currentLang === 'en' ? "Listening..." : "聆聽中...請講出行程 (例：由觀塘經旺角去尖沙咀)";
             voiceBtn.classList.add("animate-pulse", "bg-brand-yellow", "text-black");
 
             recognition.start();
@@ -1069,43 +1000,26 @@
             recognition.onresult = function(event) {
                 recognition.stop(); 
                 const transcript = event.results[0][0].transcript;
-                lastVoiceTranscript = transcript;
                 parseVoiceText(transcript);
                 micText.innerText = `${currentLang === 'en' ? 'Recognized' : '已辨識'}：「${transcript}」`;
-                resetMicStyle();
+                voiceBtn.classList.remove("animate-pulse", "bg-brand-yellow", "text-black");
                 calculateFareWithGoogle();
             };
 
             recognition.onerror = function() {
                 recognition.stop();
-                micText.innerText = currentLang === 'en' ? "Could not recognize clearly, please try again" : "未能清晰辨識，請再試一次";
-                resetMicStyle();
-            };
-
-            recognition.onend = function() {
-                resetMicStyle();
-            };
-
-            function resetMicStyle() {
+                micText.innerText = currentLang === 'en' ? "Could not recognize, try again" : "未能清晰辨識，請再試一次";
                 voiceBtn.classList.remove("animate-pulse", "bg-brand-yellow", "text-black");
-            }
+            };
         }
 
         function parseVoiceText(text) {
-            if (document.getElementById('calc-pickup')) document.getElementById('calc-pickup').value = "";
-            if (document.getElementById('calc-stopover')) document.getElementById('calc-stopover').value = "";
-            if (document.getElementById('calc-dropoff')) document.getElementById('calc-dropoff').value = "";
-
-            let pickup = "";
-            let stopover = "";
-            let dropoff = "";
-
             let cleanText = text.replace(/^由|^from/i, "").trim();
+            let pickup = "", stopover = "", dropoff = "";
 
             if (cleanText.match(/經|途經|via/i) && cleanText.match(/去|到|to/i)) {
                 let parts1 = cleanText.split(/經|途經|via/i);
                 pickup = parts1[0] ? parts1[0].trim() : "";
-                
                 let parts2 = parts1[1] ? parts1[1].split(/去|到|to/i) : ["", ""];
                 stopover = parts2[0] ? parts2[0].trim() : "";
                 dropoff = parts2[1] ? parts2[1].trim() : "";
@@ -1117,34 +1031,15 @@
                 pickup = cleanText;
             }
 
-            const formatPlace = (p) => {
-                if (p.match(/機場|airport|飛機場/i)) return "香港國際機場";
-                if (p.match(/迪士尼|disney/i)) return "香港迪士尼樂園";
-                if (p.match(/西九|kowloon station/i)) return "香港西九龍站";
-                return p;
-            };
-
-            pickup = formatPlace(pickup);
-            stopover = formatPlace(stopover);
-            dropoff = formatPlace(dropoff);
-
-            if (pickup && document.getElementById('calc-pickup')) document.getElementById('calc-pickup').value = pickup;
-            if (stopover && document.getElementById('calc-stopover')) document.getElementById('calc-stopover').value = stopover;
-            if (dropoff && document.getElementById('calc-dropoff')) document.getElementById('calc-dropoff').value = dropoff;
-
+            if (document.getElementById('calc-pickup')) document.getElementById('calc-pickup').value = pickup;
+            if (document.getElementById('calc-stopover')) document.getElementById('calc-stopover').value = stopover;
+            if (document.getElementById('calc-dropoff')) document.getElementById('calc-dropoff').value = dropoff;
             if (document.getElementById('pickup')) document.getElementById('pickup').value = pickup;
             if (document.getElementById('stopover')) document.getElementById('stopover').value = stopover;
             if (document.getElementById('dropoff')) document.getElementById('dropoff').value = dropoff;
         }
 
         function selectCar(carName, priceText, surchargeVal, minFareVal, carNameEn, priceTextEn) {
-            const passengersSelect = document.getElementById('passengers');
-            const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
-            if (passengerVal >= 5 && carName === '豐田混能的士') {
-                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi (4 seats) cannot be selected." : "乘客人數為5或以上，4座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
-                return;
-            }
-
             selectedCarName = carName;
             selectedCarPrice = priceText;
             selectedCarNameEn = carNameEn;
@@ -1155,23 +1050,17 @@
             document.getElementById('selected-car-text').innerText = (currentLang === 'en') ? carNameEn : carName;
             document.getElementById('selected-price-text').innerText = (currentLang === 'en') ? priceTextEn : priceText;
 
-            const toyotaUpgradeBox = document.getElementById('toyota-upgrade-box');
-            const bookingToyotaUpgradeContainer = document.getElementById('booking-toyota-upgrade-container');
+            const toyotaBox = document.getElementById('toyota-upgrade-box');
+            const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
             const isToyota = (carName === '豐田混能的士');
 
-            if (toyotaUpgradeBox) {
-                toyotaUpgradeBox.style.display = isToyota ? 'block' : 'none';
-            }
-            if (bookingToyotaUpgradeContainer) {
-                if (isToyota) {
-                    bookingToyotaUpgradeContainer.classList.remove('hidden');
-                } else {
-                    bookingToyotaUpgradeContainer.classList.add('hidden');
-                }
+            if (toyotaBox) toyotaBox.style.display = isToyota ? 'block' : 'none';
+            if (bookingToyotaBox) {
+                if (isToyota) bookingToyotaBox.classList.remove('hidden');
+                else bookingToyotaBox.classList.add('hidden');
             }
 
-            const cards = document.querySelectorAll('.car-card');
-            cards.forEach(card => {
+            document.querySelectorAll('.car-card').forEach(card => {
                 card.classList.remove('border-2', 'border-brand-yellow', 'shadow-xl', 'shadow-brand-yellow/10');
                 card.classList.add('border', 'border-gray-800', 'opacity-75');
                 const badge = card.querySelector('.badge-container');
@@ -1187,27 +1076,14 @@
             }
 
             updateTotalFareDisplay();
-            scrollToCalculator();
         }
 
-        function scrollToCalculator() {
-            document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function scrollToFleet() {
-            document.getElementById('fleet-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
+        function scrollToCalculator() { document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' }); }
+        function scrollToFleet() { document.getElementById('fleet-section').scrollIntoView({ behavior: 'smooth' }); }
         function scrollToBooking() {
-            if (document.getElementById('calc-pickup') && document.getElementById('pickup')) {
-                document.getElementById('pickup').value = document.getElementById('calc-pickup').value;
-            }
-            if (document.getElementById('calc-stopover') && document.getElementById('stopover')) {
-                document.getElementById('stopover').value = document.getElementById('calc-stopover').value;
-            }
-            if (document.getElementById('calc-dropoff') && document.getElementById('dropoff')) {
-                document.getElementById('dropoff').value = document.getElementById('calc-dropoff').value;
-            }
+            if (document.getElementById('calc-pickup')) document.getElementById('pickup').value = document.getElementById('calc-pickup').value;
+            if (document.getElementById('calc-stopover')) document.getElementById('stopover').value = document.getElementById('calc-stopover').value;
+            if (document.getElementById('calc-dropoff')) document.getElementById('dropoff').value = document.getElementById('calc-dropoff').value;
             document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1215,7 +1091,6 @@
             currentServiceType = type;
             const btnNormal = document.getElementById('tab-normal');
             const btnAirport = document.getElementById('tab-airport');
-            const fieldPickupContainer = document.getElementById('field-pickup-container');
             const fieldFlightContainer = document.getElementById('field-flight-container');
             const labelDropoff = document.getElementById('label-dropoff');
             const inputPickup = document.getElementById('pickup');
@@ -1223,66 +1098,44 @@
             if (type === 'normal') {
                 btnNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
                 btnAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
-                
                 fieldFlightContainer.classList.add('hidden');
-                fieldPickupContainer.classList.add('hidden');
-                inputPickup.required = false;
-                labelDropoff.innerHTML = `<i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off Location (Destination)' : '落車地點 (終點)'}</span>`;
-                inputPickup.placeholder = currentLang === 'en' ? "e.g., Kwun Tong APM" : "例：觀塘 APM";
+                labelDropoff.innerHTML = `<i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off Location' : '落車地點 (終點)'}</span>`;
             } else {
                 btnAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
                 btnNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
-
                 fieldFlightContainer.classList.remove('hidden');
-                fieldPickupContainer.classList.add('hidden');
-                inputPickup.required = false;
-                labelDropoff.innerHTML = `<i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off Location (City Destination)' : '落車地點 (市區目的地)'}</span>`;
+                labelDropoff.innerHTML = `<i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span>${currentLang === 'en' ? 'Drop-off (City Destination)' : '落車地點 (市區目的地)'}</span>`;
                 inputPickup.value = currentLang === 'en' ? "Hong Kong International Airport" : "香港國際機場";
-                document.getElementById('dropoff').placeholder = currentLang === 'en' ? "e.g., Tsim Sha Tsui Harbour City / Hotel" : "例：尖沙咀海港城 / 酒店";
             }
         }
 
-        function calculateHkTaxiFare(distanceInMeters) {
-            if (distanceInMeters <= 0) return 0;
-
+        function calculateHkTaxiFare(distanceMeters) {
+            if (distanceMeters <= 0) return 0;
             let fare = 29.0;
-            if (distanceInMeters <= 2000) return fare;
+            if (distanceMeters <= 2000) return fare;
 
-            let extraMeters = distanceInMeters - 2000;
+            let extraMeters = distanceMeters - 2000;
             let totalIncrements = Math.ceil(extraMeters / 200);
-
-            const tier1Increments = 35;
+            const tier1Increments = 35; // 首9公里內 ($2.1/跳)
 
             if (totalIncrements <= tier1Increments) {
                 fare += totalIncrements * 2.1;
             } else {
-                fare += tier1Increments * 2.1;
-                let remainingIncrements = totalIncrements - tier1Increments;
-                fare += remainingIncrements * 1.4;
+                fare += tier1Increments * 2.1 + (totalIncrements - tier1Increments) * 1.4;
             }
-
             return Math.round(fare);
         }
 
-        // 改進版香港島判定（精確經緯度多邊形邊界）
         function isHongKongIsland(lat, lng) {
-            if (lat < 22.18 || lat > 22.305 || lng < 114.10 || lng > 114.28) {
-                return false;
-            }
-            if (lng < 114.14) {
-                return lat < 22.291;
-            } else if (lng < 114.17) {
-                return lat < 22.290;
-            } else if (lng < 114.20) {
-                return lat < 22.292;
-            } else if (lng < 114.23) {
-                return lat < 22.297;
-            } else {
-                return lat < 22.290;
-            }
+            if (lat < 22.18 || lat > 22.305 || lng < 114.10 || lng > 114.28) return false;
+            if (lng < 114.14) return lat < 22.291;
+            if (lng < 114.17) return lat < 22.290;
+            if (lng < 114.20) return lat < 22.292;
+            if (lng < 114.23) return lat < 22.297;
+            return lat < 22.290;
         }
 
-        // 【核心優化】結合 GPS 座標軌跡與嚴格正規化規則的隧道辨識系統
+        /* 核心精確 GPS 地理圍欄 + 文字判定系統 */
         function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
             let detected = [];
             let totalTolls = 0;
@@ -1293,468 +1146,297 @@
                     fullInstructions += " " + (step.instructions || "") + " " + (step.html_instructions || "");
                 });
             });
-
             let text = fullInstructions.replace(/<[^>]*>?/gm, ' ');
-
-            let hasCrossHarbour = false;
-            let chTunnelName = "";
-
-            // 精確抓取過海隧道名稱（排除非過海指引）
-            if (text.match(/西區海底隧道|西區過海隧道|西隧|Western Harbour|WHC/i)) {
-                chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
-                hasCrossHarbour = true;
-            } else if (text.match(/東區海底隧道|東區過海隧道|東隧|Eastern Harbour|EHC/i)) {
-                chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
-                hasCrossHarbour = true;
-            } else if (text.match(/紅磡海底隧道|紅磡過海隧道|紅隧|海底隧道|Cross-Harbour|Cross Harbour|CHT/i)) {
-                chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
-                hasCrossHarbour = true;
-            }
 
             let hasHKIsland = false;
             let hasKowloonNT = false;
-            let crossingLngs = [];
 
-            let hasTaiLam = false;
-            let hasShingMun = false;
-            let hasAberdeen = false;
+            let passesWHC = false, passesCHT = false, passesEHC = false;
+            let passesTaiLam = false, passesTatesCairn = false, passesLionRock = false;
+            let passesEagleNest = false, passesShingMun = false, passesAberdeen = false;
 
-            if (route.overview_path && route.overview_path.length > 0) {
-                for (let i = 0; i < route.overview_path.length; i++) {
-                    let pt = route.overview_path[i];
-                    let lat = pt.lat();
-                    let lng = pt.lng();
+            let path = route.overview_path || [];
 
-                    if (isHongKongIsland(lat, lng)) {
-                        hasHKIsland = true;
-                    } else if (lat > 22.295 || (lat > 22.288 && lng > 114.238)) {
-                        hasKowloonNT = true;
-                    }
+            for (let i = 0; i < path.length; i++) {
+                let lat = path[i].lat();
+                let lng = path[i].lng();
 
-                    if (lat >= 22.282 && lat <= 22.305 && lng >= 114.12 && lng <= 114.25) {
-                        crossingLngs.push(lng);
-                    }
+                if (isHongKongIsland(lat, lng)) hasHKIsland = true;
+                else if (lat > 22.295 || (lat > 22.288 && lng > 114.238)) hasKowloonNT = true;
 
-                    // 大欖隧道經緯度範圍 (大欖收費廣場一帶)
-                    if (lat >= 22.390 && lat <= 22.425 && lng >= 114.050 && lng <= 114.095) {
-                        hasTaiLam = true;
-                    }
-                    // 城門隧道範圍
-                    if (lat >= 22.375 && lat <= 22.392 && lng >= 114.135 && lng <= 114.160) {
-                        hasShingMun = true;
-                    }
-                    // 香港仔隧道範圍
-                    if (lat >= 22.258 && lat <= 22.272 && lng >= 114.175 && lng <= 114.190) {
-                        hasAberdeen = true;
-                    }
-                }
+                // 座標邊界觸發點判定
+                if (lat >= 22.285 && lat <= 22.305 && lng >= 114.145 && lng <= 114.162) passesWHC = true;
+                if (lat >= 22.280 && lat <= 22.302 && lng >= 114.172 && lng <= 114.188) passesCHT = true;
+                if (lat >= 22.282 && lat <= 22.298 && lng >= 114.218 && lng <= 114.238) passesEHC = true;
 
-                // 如果起訖點橫跨港島與九龍/新界，且沒有明確抓到隧道名稱，用路徑平均經度智能判定過海隧道
-                if (hasHKIsland && hasKowloonNT && !hasCrossHarbour) {
-                    hasCrossHarbour = true;
-                    let avgLng = crossingLngs.length > 0 
-                        ? crossingLngs.reduce((a, b) => a + b, 0) / crossingLngs.length 
-                        : 114.18;
-
-                    if (avgLng < 114.165) {
-                        chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
-                    } else if (avgLng > 114.202) {
-                        chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
-                    } else {
-                        chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
-                    }
-                }
+                if (lat >= 22.390 && lat <= 22.425 && lng >= 114.050 && lng <= 114.095) passesTaiLam = true;
+                if (lat >= 22.358 && lat <= 22.385 && lng >= 114.198 && lng <= 114.215) passesTatesCairn = true;
+                if (lat >= 22.350 && lat <= 22.375 && lng >= 114.175 && lng <= 114.188) passesLionRock = true;
+                if (lat >= 22.345 && lat <= 22.370 && lng >= 114.140 && lng <= 114.160) passesEagleNest = true;
+                if (lat >= 22.375 && lat <= 22.392 && lng >= 114.135 && lng <= 114.160) passesShingMun = true;
+                if (lat >= 22.258 && lat <= 22.272 && lng >= 114.175 && lng <= 114.190) passesAberdeen = true;
             }
 
-            if (hasCrossHarbour && chTunnelName) {
-                detected.push({ name: chTunnelName, cost: 50 });
+            // 文字關聯比對
+            if (text.match(/西區海底隧道|西隧|Western Harbour/i)) passesWHC = true;
+            if (text.match(/紅磡海底隧道|紅隧|Cross-Harbour Tunnel/i)) passesCHT = true;
+            if (text.match(/東區海底隧道|東隧|Eastern Harbour/i)) passesEHC = true;
+            if (text.match(/大欖隧道|Tai Lam Tunnel/i)) passesTaiLam = true;
+            if (text.match(/大老山隧道|Tate's Cairn Tunnel/i)) passesTatesCairn = true;
+            if (text.match(/獅子山隧道|Lion Rock Tunnel/i)) passesLionRock = true;
+            if (text.match(/尖山隧道|沙田嶺隧道|Eagle's Nest Tunnel/i)) passesEagleNest = true;
+            if (text.match(/城門隧道|Shing Mun Tunnel/i)) passesShingMun = true;
+            if (text.match(/香港仔隧道|Aberdeen Tunnel/i)) passesAberdeen = true;
+
+            // 的士過海收費：劃一的士費 HK$25 + 回程費 HK$25 = HK$50
+            if (passesWHC) {
+                detected.push({ name: currentLang === 'en' ? "Western Harbour Crossing (Taxi Toll + Return Fee)" : "西區海底隧道 (的士費 + 回程費)", cost: 50 });
+                totalTolls += 50;
+            } else if (passesEHC) {
+                detected.push({ name: currentLang === 'en' ? "Eastern Harbour Crossing (Taxi Toll + Return Fee)" : "東區海底隧道 (的士費 + 回程費)", cost: 50 });
+                totalTolls += 50;
+            } else if (passesCHT) {
+                detected.push({ name: currentLang === 'en' ? "Cross-Harbour Tunnel (Taxi Toll + Return Fee)" : "紅磡海底隧道 (的士費 + 回程費)", cost: 50 });
+                totalTolls += 50;
+            } else if (hasHKIsland && hasKowloonNT) {
+                // 跨區域防漏底機制
+                detected.push({ name: currentLang === 'en' ? "Cross-Harbour Tunnel (Est. Taxi Toll + Return Fee)" : "過海隧道 (預估的士費 + 回程費)", cost: 50 });
                 totalTolls += 50;
             }
 
-            // 嚴格過濾陸路隧道關鍵字，避免誤判一般公路
-            let textTaiLam = hasTaiLam || text.match(/大欖隧道|Tai Lam Tunnel|Route 3|Tsing Long Highway|青朗公路收費廣場/i);
-            let textLionRock = text.match(/獅子山隧道(?!公路)/i); // 排除「獅子山隧道公路」誤判
-            let textShingMun = hasShingMun || text.match(/城門隧道(?!公路)/i);
-            let textAberdeen = hasAberdeen || text.match(/香港仔隧道|Aberdeen Tunnel/i);
-            let textTatesCairn = text.match(/大老山隧道|Tate's Cairn Tunnel/i);
-            let textEaglesNest = text.match(/尖山隧道|沙田嶺隧道|青沙公路收費廣場|Eagle's Nest|Sha Tin Heights/i);
+            if (passesTaiLam) { detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", cost: 58 }); totalTolls += 58; }
+            if (passesTatesCairn) { detected.push({ name: currentLang === 'en' ? "Tate's Cairn Tunnel" : "大老山隧道", cost: 20 }); totalTolls += 20; }
+            if (passesLionRock) { detected.push({ name: currentLang === 'en' ? "Lion Rock Tunnel" : "獅子山隧道", cost: 8 }); totalTolls += 8; }
+            if (passesEagleNest) { detected.push({ name: currentLang === 'en' ? "Eagle's Nest Tunnel" : "尖山 / 沙田嶺隧道", cost: 8 }); totalTolls += 8; }
+            if (passesShingMun) { detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnel" : "城門隧道", cost: 5 }); totalTolls += 5; }
+            if (passesAberdeen) { detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", cost: 5 }); totalTolls += 5; }
 
-            if (textTaiLam) {
-                detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", cost: 28 });
-                totalTolls += 28;
-            }
-
-            if (textTatesCairn) {
-                detected.push({ name: currentLang === 'en' ? "Tate's Cairn Tunnel" : "大老山隧道", cost: 20 });
-                totalTolls += 20;
-            }
-
-            if (textEaglesNest) {
-                detected.push({ name: currentLang === 'en' ? "Eagle's Nest & Sha Tin Heights Tunnels" : "尖山及沙田嶺隧道", cost: 8 });
-                totalTolls += 8;
-            }
-
-            if (textLionRock) {
-                detected.push({ name: currentLang === 'en' ? "Lion Rock Tunnel" : "獅子山隧道", cost: 8 });
-                totalTolls += 8;
-            }
-
-            if (textShingMun) {
-                detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnel" : "城門隧道", cost: 8 });
-                totalTolls += 8;
-            }
-
-            if (textAberdeen) {
-                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", cost: 8 });
-                totalTolls += 8;
-            }
-
-            return { tolls: detected, totalCost: totalTolls };
+            return { list: detected, total: totalTolls };
         }
 
         function calculateFareWithGoogle() {
-            let pickup = document.getElementById('calc-pickup').value.trim();
-            let stopover = document.getElementById('calc-stopover').value.trim();
-            let dropoff = document.getElementById('calc-dropoff').value.trim();
+            const pickup = document.getElementById('calc-pickup').value || document.getElementById('pickup').value;
+            const stopover = document.getElementById('calc-stopover').value || document.getElementById('stopover').value;
+            const dropoff = document.getElementById('calc-dropoff').value || document.getElementById('dropoff').value;
 
             if (!pickup || !dropoff) {
-                alert(currentLang === 'en' ? "Please enter pickup and drop-off locations first!" : "請先填寫起點與目的地！");
+                alert(currentLang === 'en' ? "Please enter both pickup and drop-off locations." : "請輸入起點及終點。");
                 return;
-            }
-
-            if (typeof google === 'undefined' || !google.maps) {
-                alert("Google Maps API not loaded properly.");
-                return;
-            }
-
-            const isShenzhenBay = pickup.includes("深圳灣") || stopover.includes("深圳灣") || dropoff.includes("深圳灣") || pickup.includes("Shenzhen Bay") || dropoff.includes("Shenzhen Bay");
-
-            const sanitizeLocation = (loc) => {
-                if (loc.match(/深圳灣|Shenzhen Bay/i)) return "深圳灣公路大橋, 香港";
-                return loc.includes("香港") || loc.includes("Hong Kong") ? loc : loc + ", 香港";
-            };
-
-            let searchOrigin = sanitizeLocation(pickup);
-            let searchDestination = sanitizeLocation(dropoff);
-
-            let waypoints = [];
-            if (stopover !== "") {
-                waypoints.push({
-                    location: sanitizeLocation(stopover),
-                    stopover: true
-                });
             }
 
             const directionsService = new google.maps.DirectionsService();
 
+            let waypoints = [];
+            if (stopover) {
+                waypoints.push({ location: stopover, stopover: true });
+            }
+
             directionsService.route({
-                origin: searchOrigin,
-                destination: searchDestination,
+                origin: pickup,
+                destination: dropoff,
                 waypoints: waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
-                optimizeWaypoints: false,
                 provideRouteAlternatives: true
-            }, (response, status) => {
+            }, function(response, status) {
                 if (status === 'OK') {
                     currentRoutesResponse = response;
-                    const routes = response.routes;
-
-                    let fastestIndex = 0;
-                    let shortestIndex = 0;
-                    let minDuration = Infinity;
-                    let minDistance = Infinity;
-
-                    routes.forEach((rt, idx) => {
-                        let d = 0, t = 0;
-                        rt.legs.forEach(leg => {
-                            d += leg.distance.value;
-                            t += leg.duration.value;
-                        });
-                        if (t < minDuration) {
-                            minDuration = t;
-                            fastestIndex = idx;
-                        }
-                        if (d < minDistance) {
-                            minDistance = d;
-                            shortestIndex = idx;
-                        }
-                    });
-
-                    let allowedIndices = [fastestIndex];
-                    if (shortestIndex !== fastestIndex) {
-                        allowedIndices.push(shortestIndex);
-                    }
-
-                    selectedRouteIndex = fastestIndex;
-
-                    renderRouteOptions(routes, allowedIndices, fastestIndex, shortestIndex);
-                    displayRouteDetails(selectedRouteIndex, isShenzhenBay);
-
+                    selectedRouteIndex = 0;
+                    renderRouteOptions(response.routes);
+                    displayRouteDetails(response.routes[0]);
                     document.getElementById('fare-result').classList.remove('hidden');
-
-                    if (!googleMap) {
-                        googleMap = new google.maps.Map(document.getElementById('map'), {
-                            zoom: 12,
-                            center: { lat: 22.3193, lng: 114.1694 },
-                            disableDefaultUI: true,
-                            zoomControl: true
-                        });
-                        directionsRenderer = new google.maps.DirectionsRenderer({
-                            map: googleMap,
-                            suppressMarkers: false
-                        });
-                    } else {
-                        google.maps.event.trigger(googleMap, 'resize');
-                    }
-                    directionsRenderer.setDirections(response);
-                    directionsRenderer.setRouteIndex(selectedRouteIndex);
-
                 } else {
-                    alert(currentLang === 'en' ? "Google Maps could not find the route. Please check location names." : "Google 地圖無法找到相關路線，請檢查地點名稱是否準確。");
+                    alert(currentLang === 'en' ? "Could not calculate route. Please check input addresses." : "未能計算路線，請檢查輸入的地點是否正確。");
                 }
             });
         }
 
-        function renderRouteOptions(routes, allowedIndices, fastestIndex, shortestIndex) {
-            const container = document.getElementById('route-options-list');
-            const wrapper = document.getElementById('route-options-container');
-            
-            if (allowedIndices.length <= 1) {
-                wrapper.classList.add('hidden');
+        function renderRouteOptions(routes) {
+            const container = document.getElementById('route-options-container');
+            const list = document.getElementById('route-options-list');
+            list.innerHTML = '';
+
+            if (routes.length <= 1) {
+                container.classList.add('hidden');
                 return;
             }
+            container.classList.remove('hidden');
 
-            wrapper.classList.remove('hidden');
-            let html = '';
+            routes.forEach((rt, index) => {
+                let dist = 0, duration = 0;
+                rt.legs.forEach(leg => { dist += leg.distance.value; duration += leg.duration.value; });
 
-            allowedIndices.forEach(idx => {
-                let rt = routes[idx];
-                let d = 0, t = 0;
-                rt.legs.forEach(leg => {
-                    d += leg.distance.value;
-                    t += leg.duration.value;
-                });
-                let km = (d / 1000).toFixed(1);
-                let mins = Math.round(t / 60);
-
-                let tags = [];
-                if (idx === fastestIndex) tags.push(currentLang === 'en' ? '⚡ Fastest' : '⚡ 最快路線');
-                if (idx === shortestIndex) tags.push(currentLang === 'en' ? '📍 Shortest' : '📍 最短路線');
-
-                let tagStr = tags.join(' | ');
-                let isSelected = (idx === selectedRouteIndex);
-
-                html += `
-                    <div onclick="selectRouteIndex(${idx})" class="p-2.5 rounded-lg border cursor-pointer transition text-xs flex flex-col justify-between ${isSelected ? 'border-brand-yellow bg-brand-yellow/15 text-white font-bold' : 'border-gray-800 bg-brand-dark text-gray-400 hover:border-gray-600'}">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="${isSelected ? 'text-brand-yellow font-bold' : 'text-gray-300'}">${tagStr}</span>
-                            <input type="radio" name="route_choice" ${isSelected ? 'checked' : ''} class="text-brand-yellow focus:ring-brand-yellow cursor-pointer">
-                        </div>
-                        <div class="text-[11px] text-gray-300">
-                            ${currentLang === 'en' ? 'Distance' : '距離'}：<span class="text-white">${km} km</span> | ${currentLang === 'en' ? 'Time' : '時間'}：<span class="text-white">${mins} mins</span>
-                        </div>
-                    </div>
-                `;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `p-2.5 rounded-xl border text-left text-xs transition cursor-pointer ${index === selectedRouteIndex ? 'bg-brand-yellow text-black font-bold border-brand-yellow' : 'bg-black text-gray-300 border-gray-800 hover:border-brand-yellow'}`;
+                
+                const label = index === 0 ? (currentLang === 'en' ? 'Fastest Route' : '最快推薦路線') : `${currentLang === 'en' ? 'Alternative' : '路線方案'} ${index + 1}`;
+                btn.innerHTML = `<div class="font-bold">${label}</div><div class="text-[11px] opacity-80">${(dist/1000).toFixed(1)} km · ${Math.ceil(duration/60)} mins</div>`;
+                btn.onclick = () => {
+                    selectedRouteIndex = index;
+                    renderRouteOptions(routes);
+                    displayRouteDetails(routes[index]);
+                };
+                list.appendChild(btn);
             });
-
-            container.innerHTML = html;
         }
 
-        function selectRouteIndex(idx) {
-            selectedRouteIndex = idx;
-            if (currentRoutesResponse) {
-                directionsRenderer.setRouteIndex(idx);
-                let pickup = document.getElementById('calc-pickup').value;
-                let stopover = document.getElementById('calc-stopover').value;
-                let dropoff = document.getElementById('calc-dropoff').value;
-                let isShenzhenBay = pickup.includes("深圳灣") || stopover.includes("深圳灣") || dropoff.includes("深圳灣");
-                displayRouteDetails(idx, isShenzhenBay);
-            }
-        }
-
-        function displayRouteDetails(routeIdx, isShenzhenBay) {
-            const route = currentRoutesResponse.routes[routeIdx];
+        function displayRouteDetails(route) {
             let totalDistMeters = 0;
-            let totalDurationSeconds = 0;
+            let totalDurationSec = 0;
 
             route.legs.forEach(leg => {
                 totalDistMeters += leg.distance.value;
-                totalDurationSeconds += leg.duration.value;
+                totalDurationSec += leg.duration.value;
             });
 
-            let km = (totalDistMeters / 1000).toFixed(1);
-            let mins = Math.round(totalDurationSeconds / 60);
+            const distanceKm = (totalDistMeters / 1000).toFixed(1);
+            const durationMin = Math.ceil(totalDurationSec / 60);
 
-            document.getElementById('res-distance').innerText = km;
-            document.getElementById('res-duration').innerText = mins;
+            document.getElementById('res-distance').innerText = distanceKm;
+            document.getElementById('res-duration').innerText = durationMin;
 
-            let baseFare = calculateHkTaxiFare(totalDistMeters);
-            lastCalculatedBaseFare = baseFare;
-            document.getElementById('res-base-fare').innerText = baseFare;
+            lastCalculatedBaseFare = calculateHkTaxiFare(totalDistMeters);
+            document.getElementById('res-base-fare').innerText = lastCalculatedBaseFare;
 
-            let tollResult = detectHongKongTollsWithGPSGeofenceAndRadar(route);
-            if (isShenzhenBay) {
-                let hasSzb = tollResult.tolls.some(t => t.name.includes("深圳灣"));
-                if (!hasSzb) {
-                    tollResult.tolls.push({ name: currentLang === 'en' ? "Shenzhen Bay Bridge" : "深圳灣公路大橋", cost: 0 });
-                }
-            }
-
-            lastCalculatedTolls = tollResult.totalCost;
-            lastDetectedTollsList = tollResult.tolls;
+            const tollData = detectHongKongTollsWithGPSGeofenceAndRadar(route);
+            lastCalculatedTolls = tollData.total;
 
             const tollsContainer = document.getElementById('res-tolls-container');
             const tollsList = document.getElementById('res-tolls-list');
-            const tollsTotal = document.getElementById('res-tolls-total');
+            tollsList.innerHTML = '';
 
-            if (tollResult.tolls.length > 0) {
+            if (tollData.list.length > 0) {
                 tollsContainer.classList.remove('hidden');
-                tollsTotal.innerText = "+HK$ " + tollResult.totalCost;
-                let tHtml = '';
-                tollResult.tolls.forEach(t => {
-                    tHtml += `<li>• ${t.name}：<span class="text-white">+HK$ ${t.cost}</span></li>`;
+                document.getElementById('res-tolls-total').innerText = `+HK$ ${tollData.total}`;
+                tollData.list.forEach(t => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center";
+                    li.innerHTML = `<span>• ${t.name}</span><span class="font-bold text-white">HK$ ${t.cost}</span>`;
+                    tollsList.appendChild(li);
                 });
-                tollsList.innerHTML = tHtml;
             } else {
                 tollsContainer.classList.add('hidden');
             }
 
             updateTotalFareDisplay();
+            drawMapRoute(route);
         }
 
         function updateTotalFareDisplay() {
-            let base = lastCalculatedBaseFare;
-            let surcharge = currentCarSurcharge;
-            let minFare = currentCarMinFare;
-            let tolls = lastCalculatedTolls;
+            let subtotal = lastCalculatedBaseFare + currentCarSurcharge;
+            let isMinFareApplied = false;
+
+            if (subtotal < currentCarMinFare) {
+                subtotal = currentCarMinFare;
+                isMinFareApplied = true;
+            }
+
+            const grandTotal = subtotal + lastCalculatedTolls;
+            document.getElementById('res-total-fare').innerText = grandTotal;
 
             const surchargeRow = document.getElementById('res-surcharge-row');
-            const surchargeVal = document.getElementById('res-surcharge-val');
-            const minFareNote = document.getElementById('res-min-fare-note');
-            const minFareVal = document.getElementById('res-min-fare-val');
+            const minNoteRow = document.getElementById('res-min-fare-note');
 
-            if (surcharge > 0) {
+            if (currentCarSurcharge > 0) {
                 surchargeRow.classList.remove('hidden');
-                surchargeVal.innerText = surcharge;
+                document.getElementById('res-surcharge-val').innerText = currentCarSurcharge;
             } else {
                 surchargeRow.classList.add('hidden');
             }
 
-            let subtotalWithoutTolls = base + surcharge;
-            let finalVehicleTotal = subtotalWithoutTolls;
-
-            if (minFare > 0 && finalVehicleTotal < minFare) {
-                finalVehicleTotal = minFare;
-                minFareNote.classList.remove('hidden');
-                minFareVal.innerText = minFare;
+            if (isMinFareApplied) {
+                minNoteRow.classList.remove('hidden');
+                document.getElementById('res-min-fare-val').innerText = currentCarMinFare;
             } else {
-                minFareNote.classList.add('hidden');
+                minNoteRow.classList.add('hidden');
             }
-
-            let grandTotal = finalVehicleTotal + tolls;
-            document.getElementById('res-total-fare').innerText = grandTotal;
         }
 
-        // 發送 WhatsApp 訂單訊息（已嚴格按照指示調整寵物與輪椅顯示邏輯）
+        function drawMapRoute(route) {
+            const mapContainer = document.getElementById('map');
+            if (!googleMap) {
+                googleMap = new google.maps.Map(mapContainer, {
+                    zoom: 12,
+                    center: { lat: 22.3193, lng: 114.1694 },
+                    disableDefaultUI: true
+                });
+                directionsRenderer = new google.maps.DirectionsRenderer({
+                    map: googleMap,
+                    polylineOptions: { strokeColor: '#FFF200', strokeWeight: 5 }
+                });
+            }
+            directionsRenderer.setDirections({
+                routes: [route],
+                request: { travelMode: google.maps.TravelMode.DRIVING }
+            });
+        }
+
         function sendWhatsApp(e) {
             e.preventDefault();
 
-            let pickupVal = document.getElementById('pickup').value.trim();
-            if (!pickupVal && document.getElementById('calc-pickup')) {
-                pickupVal = document.getElementById('calc-pickup').value.trim();
-            }
-            let stopoverVal = document.getElementById('stopover').value.trim();
-            if (!stopoverVal && document.getElementById('calc-stopover')) {
-                stopoverVal = document.getElementById('calc-stopover').value.trim();
-            }
-            let dropoffVal = document.getElementById('dropoff').value.trim();
-            if (!dropoffVal && document.getElementById('calc-dropoff')) {
-                dropoffVal = document.getElementById('calc-dropoff').value.trim();
-            }
+            const car = selectedCarName;
+            const price = selectedCarPrice;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const passengers = document.getElementById('passengers').value;
+            const luggages = document.getElementById('luggages').value;
+            const phone = document.getElementById('phone').value;
 
-            const flightVal = document.getElementById('flight_no').value.trim();
-            const dateVal = document.getElementById('date').value;
-            const timeVal = document.getElementById('time').value;
-            const passengersVal = document.getElementById('passengers').value;
-            const luggagesVal = document.getElementById('luggages').value;
+            const pickup = document.getElementById('pickup').value || document.getElementById('calc-pickup').value;
+            const stopover = document.getElementById('stopover').value || document.getElementById('calc-stopover').value;
+            const dropoff = document.getElementById('dropoff').value || document.getElementById('calc-dropoff').value;
+            const flightNo = document.getElementById('flight_no').value;
+
+            const hasPet = document.getElementById('has_pet').checked ? "是" : "否";
+            const hasWheelchair = document.getElementById('has_wheelchair').checked ? "是" : "否";
+
+            let payments = [];
+            document.querySelectorAll('input[name="payment_method"]:checked').forEach(cb => payments.push(cb.value));
+            const paymentStr = payments.join(', ') || "現金";
+
+            const surname = document.getElementById('contact_surname').value;
+            const titleRadios = document.querySelectorAll('input[name="contact_title"]:checked');
+            let titleStr = titleRadios.length > 0 ? titleRadios[0].value : "";
+            const contactName = surname ? `${surname} ${titleStr}`.trim() : "未填寫";
+
+            let msg = `🚕 *【新一代的士專車預約訂單】*\n`;
+            msg += `------------------------------\n`;
+            msg += `🚘 *選擇車款*：${car} (${price})\n`;
             
-            const hasPetChecked = document.getElementById('has_pet').checked;
-            const hasWheelchairChecked = document.getElementById('has_wheelchair').checked;
+            if (car === '豐田混能的士') {
+                const upgradeYes = document.getElementById('upgrade-yes')?.checked || document.getElementById('booking-upgrade-yes')?.checked;
+                msg += `🎁 *免費升級選項*：${upgradeYes ? "接受免費升級" : "不接受升級"}\n`;
+            }
+
+            msg += `📅 *用車日期*：${date}\n`;
+            msg += `⏰ *用車時間*：${time}\n`;
             
-            const surnameVal = document.getElementById('contact_surname').value.trim();
-            const titleRadios = document.getElementsByName('contact_title');
-            let titleVal = "";
-            for (let r of titleRadios) {
-                if (r.checked) { titleVal = r.value; break; }
-            }
-            const phoneVal = document.getElementById('phone').value.trim();
-
-            let paymentMethods = [];
-            document.querySelectorAll('input[name="payment_method"]:checked').forEach(cb => {
-                paymentMethods.push(cb.value);
-            });
-            const paymentStr = paymentMethods.length > 0 ? paymentMethods.join('、') : "現金";
-
-            let upgradeChoiceStr = "";
-            if (selectedCarName === '豐田混能的士') {
-                const yesBox = document.getElementById('upgrade-yes');
-                const noBox = document.getElementById('upgrade-no');
-                const bookingYesBox = document.getElementById('booking-upgrade-yes');
-                const bookingNoBox = document.getElementById('booking-upgrade-no');
-
-                if ((yesBox && yesBox.checked) || (bookingYesBox && bookingYesBox.checked)) {
-                    upgradeChoiceStr = "（接受免費升級）";
-                } else if ((noBox && noBox.checked) || (bookingNoBox && bookingNoBox.checked)) {
-                    upgradeChoiceStr = "（不接受升級）";
-                } else {
-                    alert(currentLang === 'en' ? "Please select whether you accept the free upgrade for the Toyota Hybrid Taxi." : "請選擇是否接受豐田混能的士的免費升級選項。");
-                    return;
-                }
-            }
-
-            let msg = `*新一代豪華六座位及輪椅的士預約* 🚖\n`;
-            msg += `--------------------------------\n`;
-            msg += `🚗 *預約車型*：${currentLang === 'en' ? selectedCarNameEn : selectedCarName} ${upgradeChoiceStr}\n`;
-            msg += `💰 *收費模式*：${currentLang === 'en' ? selectedCarPriceEn : selectedCarPrice}\n`;
-
             if (currentServiceType === 'airport') {
-                msg += `✈️ *服務類型*：機場接機服務\n`;
-                if (flightVal) msg += `📋 *航班編號*：${flightVal}\n`;
+                msg += `✈️ *航班編號*：${flightNo || "未提供"}\n`;
                 msg += `📍 *上車地點*：香港國際機場\n`;
-                if (stopoverVal) msg += `📍 *中途站*：${stopoverVal}\n`;
-                msg += `🏁 *市區目的地*：${dropoffVal}\n`;
             } else {
-                msg += `📍 *上車地點*：${pickupVal}\n`;
-                if (stopoverVal) msg += `📍 *中途站*：${stopoverVal}\n`;
-                msg += `🏁 *落車地點*：${dropoffVal}\n`;
+                msg += `📍 *上車地點*：${pickup}\n`;
             }
 
-            msg += `📅 *用車日期*：${dateVal}\n`;
-            msg += `⏰ *用車時間*：${timeVal}\n`;
-            msg += `👥 *乘客人數*：${passengersVal}\n`;
-            msg += `🧳 *行李件數*：${luggagesVal}\n`;
-
-            if (hasPetChecked) {
-                msg += `🐾 *寵物同行*：✅ 有寵物\n`;
-            }
-
-            if (hasWheelchairChecked) {
-                msg += ` wheelchair *輪椅擺放*：✅ 有輪椅需要放置於尾箱\n`.replace(' wheelchair ', ' ');
-            }
-
+            if (stopover) msg += `📍 *中途停靠*：${stopover}\n`;
+            msg += `🏁 *落車地點*：${dropoff}\n`;
+            msg += `👥 *乘客人數*：${passengers}\n`;
+            msg += `🧳 *行李件數*：${luggages}\n`;
+            msg += `🐾 *攜帶寵物*：${hasPet}\n`;
+            msg += `♿ *放置輪椅*：${hasWheelchair}\n`;
             msg += `💳 *付款方式*：${paymentStr}\n`;
+            msg += `👤 *聯絡人*：${contactName}\n`;
+            msg += `📞 *聯絡電話*：${phone}\n`;
             
-            if (phoneVal) {
-                let contactDisplay = surnameVal ? surnameVal + (titleVal ? titleVal : "") : "";
-                msg += `👤 *聯絡人*：${contactDisplay ? contactDisplay + " (" + phoneVal + ")" : phoneVal}\n`;
+            const totalFare = document.getElementById('res-total-fare').innerText;
+            if (totalFare && totalFare !== '0') {
+                msg += `💰 *系統估算車費*：約 HK$ ${totalFare}\n`;
             }
-
-            msg += `--------------------------------\n`;
-            msg += `請幫忙確認車輛，謝謝！`;
+            msg += `------------------------------\n`;
+            msg += `請司機盡快確認接單，謝謝！`;
 
             const encodedMsg = encodeURIComponent(msg);
-            const whatsappUrl = `https://wa.me/85257038875?text=${encodedMsg}`;
-            window.open(whatsappUrl, '_blank');
+            window.open(`https://wa.me/85257038875?text=${encodedMsg}`, '_blank');
         }
     </script>
 </body>
