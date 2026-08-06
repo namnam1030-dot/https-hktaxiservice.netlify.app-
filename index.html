@@ -1193,9 +1193,6 @@
 
                     const fareResultEl = document.getElementById('fare-result');
                     fareResultEl.classList.remove('hidden');
-                    
-                    // 要求 1: 自動捲動至地圖和預估車費位置
-                    fareResultEl.scrollIntoView({ behavior: 'smooth' });
 
                     const routeListContainer = document.getElementById('route-options-list');
                     const routeOptionsBox = document.getElementById('route-options-container');
@@ -1229,6 +1226,9 @@
                     }
 
                     displaySelectedRoute(result, 0, isShenzhenBay);
+
+                    // 1. 搜尋路線後，自動捲動至地圖和預估車費位置
+                    fareResultEl.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
                 }
@@ -1319,7 +1319,7 @@
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-        // WhatsApp 預約訊息發送邏輯修改
+        // 5. WhatsApp 預約訊息發送調整邏輯
         function sendWhatsApp(event) {
             event.preventDefault();
 
@@ -1354,49 +1354,56 @@
             const paymentStr = payments.join(' / ');
 
             let msgLines = [];
-            
-            // 要求 2A: 「預約行程專車」文字改為「24小時的士預約服務」
+            // 2A.「預約行程專車」文字改為「24小時的士預約服務」
             msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
-            
-            // 要求 2B: 「車型」文字改為「預約車款」
+            // 2B.「車型」文字改為「預約車款」
             msgLines.push(`🚘 預約車款：${selectedCarName}`);
 
+            // C. 如選擇豐田混能且不接受升級就用❌顯示，如接受升級則顯示✅
             if (selectedCarName === '豐田混能的士') {
-                const upgradeYes = document.getElementById('booking-upgrade-yes') || document.getElementById('upgrade-yes');
+                const upgradeYes = document.getElementById('upgrade-yes') || document.getElementById('booking-upgrade-yes');
                 if (upgradeYes && upgradeYes.checked) {
-                    msgLines.push(`🎁 免費升級：✅ 接受免費升級`);
+                    msgLines.push(`🎁 接受免費升級：✅ 接受`);
                 } else {
-                    msgLines.push(`🎁 免費升級：❌ 不接受升級`);
+                    msgLines.push(`🎁 接受免費升級：❌ 不接受`);
                 }
             }
 
             if (serviceType === 'airport' && flightNo) {
                 msgLines.push(`✈️ 航班編號：${flightNo}`);
             }
+
             if (pickup) msgLines.push(`📍 上車地點：${pickup}`);
-            if (stopover) msgLines.push(`📍 中途站：${stopover}`);
+            if (stopover) msgLines.push(`📍 中途停靠：${stopover}`);
             if (dropoff) msgLines.push(`🏁 落車地點：${dropoff}`);
+
             if (date) msgLines.push(`📅 用車日期：${date}`);
             if (time) msgLines.push(`⏰ 用車時間：${time}`);
             if (passengers) msgLines.push(`👥 乘客人數：${passengers}`);
             if (luggages) msgLines.push(`🧳 行李件數：${luggages}`);
-            msgLines.push(`🐾 攜帶寵物：${hasPet ? '是' : '否'}`);
-            msgLines.push(`👩‍🦽 輪椅放置：${hasWheelchair ? '是' : '否'}`);
+
+            if (hasPet) msgLines.push(`🐾 攜帶寵物：是`);
+            if (hasWheelchair) msgLines.push(`👩‍🦽 尾箱放輪椅：是`);
+
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
-            if (surname) msgLines.push(`👤 聯絡人：${surname} ${title}`);
-            if (phone) msgLines.push(`📞 聯絡電話：${phone}`);
 
-            // 要求 2C: 加多一項，顯示計算後的預估車費
-            const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            msgLines.push(`💰預估車費：HK$${totalFare}（不含隧道/行李/停車場費）`);
+            let contactName = surname ? (surname + (title ? ' ' + title : '')) : '未提供';
+            msgLines.push(`👤 聯絡人：${contactName}`);
+            msgLines.push(`📞 聯絡電話：${phone}`);
 
-            // 要求 2D: 在預估車費下面+1條分隔線，分隔線下方寫明請回覆訊息確認預約，謝謝！
+            // 2C. 加多一項，顯示計算後的預估車費：💰預估車費：HK$xxx（不含隧道/行李/停車場費）
+            const resTotalFareEl = document.getElementById('res-total-fare');
+            const estimatedFare = resTotalFareEl ? resTotalFareEl.innerText : '0';
+            msgLines.push(`💰預估車費：HK$${estimatedFare}（不含隧道/行李/停車場費）`);
+
+            // 2D. 在預估車費下面+1條分隔線，分隔線下方寫明請回覆訊息確認預約，謝謝！
             msgLines.push(`--------------------`);
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
             const fullMsg = msgLines.join('\n');
-            const encodedMsg = encodeURIComponent(fullMsg);
-            const whatsappUrl = `https://wa.me/85257038875?text=${encodedMsg}`;
+            const targetPhone = '85257038875';
+            const whatsappUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(fullMsg)}`;
+
             window.open(whatsappUrl, '_blank');
         }
     </script>
