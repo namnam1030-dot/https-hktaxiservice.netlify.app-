@@ -1191,7 +1191,11 @@
                     routesData = processRoutes(result.routes);
                     result.routes = routesData;
 
-                    document.getElementById('fare-result').classList.remove('hidden');
+                    const fareResultEl = document.getElementById('fare-result');
+                    fareResultEl.classList.remove('hidden');
+                    
+                    // 要求 1: 自動捲動至地圖和預估車費位置
+                    fareResultEl.scrollIntoView({ behavior: 'smooth' });
 
                     const routeListContainer = document.getElementById('route-options-list');
                     const routeOptionsBox = document.getElementById('route-options-container');
@@ -1315,7 +1319,7 @@
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-        // 5. WhatsApp 預約訊息發送調整邏輯
+        // WhatsApp 預約訊息發送邏輯修改
         function sendWhatsApp(event) {
             event.preventDefault();
 
@@ -1350,17 +1354,19 @@
             const paymentStr = payments.join(' / ');
 
             let msgLines = [];
-            msgLines.push(`🚕 *${currentLang === 'en' ? 'Taxi Booking Request' : '預約行程專車'}*`);
-            msgLines.push(`🚘 車型：${selectedCarName}`);
+            
+            // 要求 2A: 「預約行程專車」文字改為「24小時的士預約服務」
+            msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
+            
+            // 要求 2B: 「車型」文字改為「預約車款」
+            msgLines.push(`🚘 預約車款：${selectedCarName}`);
 
-            // C. 如選擇豐田混能且不接受升級就用❌顯示，如接受升級則顯示✅
             if (selectedCarName === '豐田混能的士') {
-                const upgradeYes = document.getElementById('booking-upgrade-yes');
-                const upgradeNo = document.getElementById('booking-upgrade-no');
-                if (upgradeNo && upgradeNo.checked) {
-                    msgLines.push(`🎁 免費升級：❌`);
-                } else if (upgradeYes && upgradeYes.checked) {
-                    msgLines.push(`🎁 免費升級：✅`);
+                const upgradeYes = document.getElementById('booking-upgrade-yes') || document.getElementById('upgrade-yes');
+                if (upgradeYes && upgradeYes.checked) {
+                    msgLines.push(`🎁 免費升級：✅ 接受免費升級`);
+                } else {
+                    msgLines.push(`🎁 免費升級：❌ 不接受升級`);
                 }
             }
 
@@ -1368,65 +1374,31 @@
                 msgLines.push(`✈️ 航班編號：${flightNo}`);
             }
             if (pickup) msgLines.push(`📍 上車地點：${pickup}`);
-            if (stopover) msgLines.push(`📍 中途停靠：${stopover}`);
+            if (stopover) msgLines.push(`📍 中途站：${stopover}`);
             if (dropoff) msgLines.push(`🏁 落車地點：${dropoff}`);
-
-            msgLines.push(`📅 用車日期：${date}`);
-            msgLines.push(`⏰ 用車時間：${time}`);
-            msgLines.push(`👥 乘客人數：${passengers}`);
-
-            // 5E. 如行李件數為 0 就不用顯示該行訊息
-            if (luggages && !luggages.startsWith('0')) {
-                msgLines.push(`🧳 行李件數：${luggages}`);
-            }
-
-            // 5A. 如選擇「沒有寵物」則不顯示寵物行；如選擇「有寵物」則以 ⁠✅⁠ 顯示。
-            if (hasPet) {
-                msgLines.push(`🐾 寵物：✅`);
-            }
-
-            // 5B. 如選擇「沒有輪椅需要放置尾箱」則不顯示輪椅行；如選擇「有輪椅」則以 ⁠✅⁠ 顯示。
-            if (hasWheelchair) {
-                msgLines.push(`♿ 輪椅放置尾箱：✅`);
-            }
-
-            // 5D. 如沒填寫聯絡人就不用顯示該行訊息
-            if (surname) {
-                msgLines.push(`👤 聯絡人：${surname}${title ? ' ' + title : ''}`);
-            }
-
-            msgLines.push(`📞 聯絡電話：${phone}`);
+            if (date) msgLines.push(`📅 用車日期：${date}`);
+            if (time) msgLines.push(`⏰ 用車時間：${time}`);
+            if (passengers) msgLines.push(`👥 乘客人數：${passengers}`);
+            if (luggages) msgLines.push(`🧳 行李件數：${luggages}`);
+            msgLines.push(`🐾 攜帶寵物：${hasPet ? '是' : '否'}`);
+            msgLines.push(`👩‍🦽 輪椅放置：${hasWheelchair ? '是' : '否'}`);
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
+            if (surname) msgLines.push(`👤 聯絡人：${surname} ${title}`);
+            if (phone) msgLines.push(`📞 聯絡電話：${phone}`);
 
-            const message = msgLines.join('\n');
-            const waUrl = `https://wa.me/85257038875?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
+            // 要求 2C: 加多一項，顯示計算後的預估車費
+            const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            msgLines.push(`💰預估車費：HK$${totalFare}（不含隧道/行李/停車場費）`);
+
+            // 要求 2D: 在預估車費下面+1條分隔線，分隔線下方寫明請回覆訊息確認預約，謝謝！
+            msgLines.push(`--------------------`);
+            msgLines.push(`請回覆訊息確認預約，謝謝！`);
+
+            const fullMsg = msgLines.join('\n');
+            const encodedMsg = encodeURIComponent(fullMsg);
+            const whatsappUrl = `https://wa.me/85257038875?text=${encodedMsg}`;
+            window.open(whatsappUrl, '_blank');
         }
-
-        // 初始化自動載入
-        window.addEventListener('DOMContentLoaded', () => {
-            // 2. 預約行程表單的用車日期和用車時間自動顯示為即時時間
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-
-            const dateInput = document.getElementById('date');
-            const timeInput = document.getElementById('time');
-            if (dateInput) dateInput.value = `${year}-${month}-${day}`;
-            if (timeInput) timeInput.value = `${hours}:${minutes}`;
-
-            // 初始化 Google Places Autocomplete 欄位
-            if (window.google && google.maps && google.maps.places) {
-                const options = { componentRestrictions: { country: 'hk' } };
-                ['calc-pickup', 'calc-stopover', 'calc-dropoff', 'pickup', 'stopover', 'dropoff'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) new google.maps.places.Autocomplete(el, options);
-                });
-            }
-        });
     </script>
 </body>
 </html>
