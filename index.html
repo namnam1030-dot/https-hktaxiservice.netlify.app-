@@ -1405,11 +1405,24 @@
             msgLines.push(`📅 日期：${date}`);
             msgLines.push(`⏰ 時間：${time}`);
             msgLines.push(`👥 人數：${passengers}`);
-            msgLines.push(`🧳 行李：${luggages}`);
-            msgLines.push(`🐾 攜帶寵物：${hasPet ? '是' : '否'}`);
-            msgLines.push(`👩‍🦽 輪椅放置：${hasWheelchair ? '是' : '否'}`);
+            // 行李件數：若選取「0 件」，不顯示
+            if (luggages && luggages !== '0 件') {
+                msgLines.push(`🧳 *行李件數：* ${luggages}`);
+            }
+
+            // 寵物：選取才顯示
+            if (hasPet) {
+                msgLines.push(`寵物：✅`);
+            }
+
+            // 輪椅：選取才顯示
+            if (hasWheelchair) {
+                msgLines.push(`輪椅（放置尾箱）：✅`);
+            }
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
-            if (surname) msgLines.push(`👤 聯絡人：${surname} ${title}`);
+            // 聯絡人：未填寫姓氏不顯示；有填寫則顯示姓氏與稱謂
+            if (surname) {
+                msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);}
             msgLines.push(`📞 電話：${phone}`);
 
 const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
