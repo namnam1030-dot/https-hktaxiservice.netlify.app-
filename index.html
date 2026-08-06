@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新一代豪華六座位的士預約服務</title>
+    <title>新一代豪華六座位的士預約專車</title>
     <!-- 引入 Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 FontAwesome 圖示庫 -->
@@ -355,41 +355,42 @@
                     <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
                 </div>
 
-                <!-- 1. 法定跳錶基本費 (已根據要求 1 移除顯示) -->
-                <div class="text-xs text-gray-300 space-y-1 mb-3 pb-3 border-b border-gray-800 hidden">
+                <!-- 1. 法定跳錶基本費 -->
+                <div class="text-xs text-gray-300 space-y-1 mb-3 pb-3 border-b border-gray-800">
                     <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
                     <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
                     <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
-                <div class="text-xl font-extrabold text-brand-yellow mt-3 pt-3 border-t border-gray-800/80 flex justify-between items-end">
+                <div class="text-xl font-extrabold text-brand-yellow mt-3 pt-3 border-t border-gray-800/80 flex justify-between items-end mb-4">
                     <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計基本車費：</span>
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
-                
-                <!-- 要求 2C: 顯示位置和免責聲明對調 (聲明移至上方) -->
-                <div class="mt-4 p-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
-                    <i class="fa-solid fa-circle-info text-brand-yellow text-sm mt-0.5"></i>
-                    <p class="text-[11px] md:text-xs font-bold text-brand-yellow leading-tight" data-i18n="res_note">
+
+                <!-- 提示語 (按要求對調：搬至隧道明細上方) -->
+                <div class="mb-3 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
+                    <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
                         以上預計車費並未包含任何隧道、停車場、行李及等候時間等收費，一切按實際情況為準。
                     </p>
                 </div>
-
-                <!-- 要求 2A & 2B: 隧道 / 其他收費明細 (加入機場1號停車場 $16，並盡量縮小文字與行距) -->
-                <div class="mt-3 p-2.5 bg-sky-950/40 border border-sky-500/40 rounded-xl text-[10px] space-y-1 text-sky-200">
-                    <div class="font-bold text-sky-400 flex items-center gap-1 mb-0.5 text-[11px]">
+                
+                <!-- 隧道 / 其他收費明細 (按要求對調：搬至提示語下方，且文字與行距盡量縮小，並加入機場1號停車場 $16) -->
+                <div class="p-3 bg-sky-950/40 border border-sky-500/40 rounded-xl text-[11px] leading-tight space-y-1.5 text-sky-200">
+                    <div class="font-bold text-sky-400 flex items-center gap-1">
                         <i class="fa-solid fa-road"></i> <span>隧道 / 其他收費明細：</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-gray-300">
                         <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>大欖隧道</span><span class="font-bold text-white">$28</span></div>
                         <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>大老山隧道</span><span class="font-bold text-white">$20</span></div>
-                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded border border-sky-900/40"><span>機場1號停車場</span><span class="font-bold text-white">$16</span></div>
                         <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40 sm:col-span-2"><span>香港仔 / 城門 / 獅子山 / 尖山隧道</span><span class="font-bold text-white">$8</span></div>
                         <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40 sm:col-span-2"><span>來回過海隧道（紅隧 / 東隧 / 西隧）</span><span class="font-bold text-white">$50</span></div>
-                        <div class="flex justify-between bg-black/30 px-2.5 py-1 rounded border border-sky-900/40"><span>行李費</span><span class="font-bold text-white">$6/件</span></div>
-                        <div class="flex justify-between bg-black/30 px-2.5 py-1 rounded border border-sky-900/40"><span>等候時間</span><span class="font-bold text-white">停頓每分鐘 $2.1 / $1.4</span></div>
+                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>機場1號停車場</span><span class="font-bold text-white">$16</span></div>
+                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>行李費</span><span class="font-bold text-white">$6/件</span></div>
+                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40 sm:col-span-2"><span>等候時間</span><span class="font-bold text-white">停頓每分鐘 $2.1 / $1.4</span></div>
                     </div>
                 </div>
+
             </div>
 
             <!-- 重新選擇車款與直接預約按鈕區 -->
@@ -1041,7 +1042,6 @@
         let currentCarMinFare = 0;
         let currentServiceType = "normal";
         let lastCalculatedBaseFare = 0;
-        let distanceBonusKm = 0; // 紀錄額外增加的公里數
 
         let googleMap = null;
         let directionsRenderer = null;
@@ -1113,8 +1113,8 @@
                 let parts2 = parts1[1] ? parts1[1].split(/去|到|to/i) : ["", ""];
                 stopover = parts2[0] ? parts2[0].trim() : "";
                 dropoff = parts2[1] ? parts2[1].trim() : "";
-            } else if (cleanText.match(/去|導航|到|to/i)) {
-                let parts = cleanText.split(/去|導航|到|to/i);
+            } else if (cleanText.match(/去|到|to/i)) {
+                let parts = cleanText.split(/去|到|to/i);
                 pickup = parts[0] ? parts[0].trim() : "";
                 dropoff = parts[1] ? parts[1].trim() : "";
             } else {
@@ -1270,7 +1270,7 @@
 
         function calculateFareWithGoogle() {
             let pVal = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : "";
-            const sVal = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value.trim() : "";
+            let sVal = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value.trim() : "";
             let dVal = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : "";
 
             if (!pVal || !dVal) {
@@ -1278,16 +1278,17 @@
                 return;
             }
 
-            // 要求 3: 假如乘客查詢位置的關鍵字有深圳灣，則自動預設為導航至深圳灣公路大橋，然後計算車費距離自動加多5公里收費
-            distanceBonusKm = 0;
-            const fullQueryText = (pVal + " " + sVal + " " + dVal);
-            if (fullQueryText.includes("深圳灣")) {
-                dVal = "深圳灣公路大橋";
-                if (document.getElementById('calc-dropoff')) {
-                    document.getElementById('calc-dropoff').value = dVal;
+            // 檢查關鍵字是否包含「深圳灣」，若有則預設導航至「深圳灣公路大橋」
+            const processShenzhenBay = (loc) => {
+                if (loc.includes("深圳灣") && !loc.includes("深圳灣公路大橋")) {
+                    return loc + " 深圳灣公路大橋";
                 }
-                distanceBonusKm = 5;
-            }
+                return loc;
+            };
+
+            let pValQuery = processShenzhenBay(pVal);
+            let sValQuery = processShenzhenBay(sVal);
+            let dValQuery = processShenzhenBay(dVal);
 
             if (typeof google === 'undefined' || !google.maps || !google.maps.DirectionsService) {
                 alert(currentLang === 'en' ? "Google Maps Service Unavailable." : "Google Maps 服務暫時無法載入，請重新重載頁面。");
@@ -1297,13 +1298,13 @@
             const directionsService = new google.maps.DirectionsService();
 
             let waypoints = [];
-            if (sVal) {
-                waypoints.push({ location: sVal + ", Hong Kong", stopover: true });
+            if (sValQuery) {
+                waypoints.push({ location: sValQuery + ", Hong Kong", stopover: true });
             }
 
             directionsService.route({
-                origin: pVal + ", Hong Kong",
-                destination: dVal + ", Hong Kong",
+                origin: pValQuery + ", Hong Kong",
+                destination: dValQuery + ", Hong Kong",
                 waypoints: waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
                 provideRouteAlternatives: true
@@ -1362,6 +1363,12 @@
             container.classList.remove('hidden');
             listDiv.innerHTML = "";
 
+            let hasShenzhenBay = (
+                (document.getElementById('calc-pickup') && document.getElementById('calc-pickup').value.includes("深圳灣")) ||
+                (document.getElementById('calc-stopover') && document.getElementById('calc-stopover').value.includes("深圳灣")) ||
+                (document.getElementById('calc-dropoff') && document.getElementById('calc-dropoff').value.includes("深圳灣"))
+            );
+
             allowedIndices.forEach(index => {
                 const rt = routes[index];
                 let dist = 0, duration = 0;
@@ -1370,7 +1377,11 @@
                     duration += leg.duration.value;
                 });
 
-                let km = (dist / 1000 + distanceBonusKm).toFixed(1);
+                if (hasShenzhenBay) {
+                    dist += 5000; // 自動加多5公里 (5000米)
+                }
+
+                let km = (dist / 1000).toFixed(1);
                 let mins = Math.ceil(duration / 60);
 
                 let isFastest = (index === fastestIdx);
@@ -1436,8 +1447,14 @@
                 totalDurationSeconds += leg.duration.value;
             });
 
-            // 加上深圳灣額外的 5 公里（即 5000 米）
-            totalDistanceMeters += (distanceBonusKm * 1000);
+            // 檢查關鍵字是否有「深圳灣」，有的話額外增加 5 公里（5,000 米）
+            let pVal = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value : "";
+            let sVal = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value : "";
+            let dVal = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value : "";
+
+            if (pVal.includes("深圳灣") || sVal.includes("深圳灣") || dVal.includes("深圳灣")) {
+                totalDistanceMeters += 5000;
+            }
 
             let km = (totalDistanceMeters / 1000).toFixed(1);
             let mins = Math.ceil(totalDurationSeconds / 60);
@@ -1539,7 +1556,7 @@
             let toyotaUpgradeStatus = "";
             if (selectedCarName === '豐田混能的士') {
                 const upgradeYes = document.getElementById('upgrade-yes') ? document.getElementById('upgrade-yes').checked : false;
-                const upgradeNo = document.getElementById('upgrade-no') ? document.getElementById('upgrade-no'].checked : false;
+                const upgradeNo = document.getElementById('upgrade-no') ? document.getElementById('upgrade-no').checked : false;
                 if (upgradeYes) {
                     toyotaUpgradeStatus = currentLang === 'en' ? "Accept Free Upgrade" : "接受免費升級";
                 } else if (upgradeNo) {
