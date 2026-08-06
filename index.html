@@ -367,7 +367,7 @@
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
 
-                <!-- 提示語 -->
+                <!-- 提示語 (按要求對調：搬至隧道明細上方) -->
                 <div class="mb-3 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
                     <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
@@ -547,7 +547,7 @@
                         <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂 (選填)</span></label>
                         <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl px-4 py-3.5 text-xs text-gray-200 h-[48px]">
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="contact_title" value="先生" checked class="text-brand-yellow focus:ring-brand-yellow">
+                                <input type="radio" name="contact_title" value="先生" class="text-brand-yellow focus:ring-brand-yellow">
                                 <span data-i18n="title_mr">先生</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
@@ -600,6 +600,28 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
+        // 頁面載入時自動帶入即時日期與時間
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('date');
+            const timeInput = document.getElementById('time');
+            
+            const now = new Date();
+            
+            // 格式化日期：YYYY-MM-DD
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            // 格式化時間：HH:MM
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const formattedTime = `${hours}:${minutes}`;
+            
+            if (dateInput) dateInput.value = formattedDate;
+            if (timeInput) timeInput.value = formattedTime;
+        });
+
         let currentLang = 'zh'; // 'zh' 或 'en'
 
         const translations = {
@@ -881,22 +903,6 @@
         let routesData = [];
 
         let calcPickupInput, calcStopoverInput, calcDropoffInput;
-
-        // 初始化日期與時間為即時時間
-        window.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-
-            const dateEl = document.getElementById('date');
-            const timeEl = document.getElementById('time');
-
-            if (dateEl) dateEl.value = `${year}-${month}-${day}`;
-            if (timeEl) timeEl.value = `${hours}:${minutes}`;
-        });
 
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -1225,7 +1231,7 @@
                                 durSeconds += leg.duration.value;
                             });
                             let distKm = distMeters / 1000;
-                            if (isShenzhenBay) distKm += 5; // 深圳灣額外計費 5 公里
+                            if (isShenzhenBay) distKm += 5;
 
                             let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
@@ -1243,7 +1249,6 @@
 
                     displaySelectedRoute(result, 0, isShenzhenBay);
 
-                    // 搜尋路線後，自動捲動至地圖和預估車費位置
                     fareResultEl.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
@@ -1301,10 +1306,7 @@
             });
 
             let routeKm = totalMeters / 1000;
-            
-            // 深圳灣額外計費改為 5 公里
             let finalKm = isShenzhenBay ? (routeKm + 5) : routeKm;
-
             let durationMinutes = Math.round(totalSeconds / 60);
 
             let baseMeterFare = calculateTaxiBaseFare(finalKm);
@@ -1328,14 +1330,12 @@
                 minNoteRow.classList.add('hidden');
             }
 
-            // 更新介面距離與費用
             document.getElementById('res-distance').innerText = finalKm.toFixed(1);
             document.getElementById('res-duration').innerText = durationMinutes;
             document.getElementById('res-base-fare').innerText = baseMeterFare;
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-        // WhatsApp 預約訊息發送調整邏輯
         function sendWhatsApp(event) {
             event.preventDefault();
 
@@ -1370,60 +1370,38 @@
             const paymentStr = payments.join(' / ');
 
             let msgLines = [];
-            msgLines.push("【24小時的士預約服務】");
-            msgLines.push(`預約車型：${selectedCarName}`);
-            
-            // 升級選項判斷（只有選擇豐田混能的士時調整及顯示）
-            if (selectedCarName === '豐田混能的士') {
-                const upgradeYes = document.getElementById('booking-upgrade-yes') && document.getElementById('booking-upgrade-yes').checked;
-                msgLines.push(`免費升級：${upgradeYes ? '✅' : '❌'}`);
-            }
+            msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
+            msgLines.push(`🚘 預約車款：${selectedCarName}`);
 
-            msgLines.push(`服務類型：${serviceType === 'airport' ? '機場接機服務' : '一般點對點預約'}`);
+            if (selectedCarName === '豐田混能的士') {
+                const upgradeYes = document.getElementById('booking-upgrade-yes');
+                const isAccept = upgradeYes && upgradeYes.checked;
+                msgLines.push(`🎁 免費升級：${isAccept ? '✅ 接受免費升級' : '❌ 不接受升級'}`);
+            }
 
             if (serviceType === 'airport' && flightNo) {
-                msgLines.push(`航班編號：${flightNo}`);
+                msgLines.push(`✈️ 航班編號：${flightNo}`);
             }
 
-            if (pickup) msgLines.push(`上車地點：${pickup}`);
-            if (stopover) msgLines.push(`中途停靠：${stopover}`);
-            if (dropoff) msgLines.push(`落車地點：${dropoff}`);
+            msgLines.push(`📍 起點：${pickup}`);
+            if (stopover) msgLines.push(`🛑 中途站：${stopover}`);
+            msgLines.push(`🏁 終點：${dropoff}`);
+            msgLines.push(`📅 用車日期：${date}`);
+            msgLines.push(`⏰ 用車時間：${time}`);
+            msgLines.push(`👥 人數：${passengers}`);
+            msgLines.push(`🧳 行李：${luggages}`);
 
-            msgLines.push(`用車日期：${date}`);
-            msgLines.push(`用車時間：${time}`);
-            msgLines.push(`乘客人數：${passengers}`);
+            if (hasPet) msgLines.push(`🐾 攜帶寵物：是`);
+            if (hasWheelchair) msgLines.push(`♿ 輪椅放置：是`);
 
-            // 行李件數非 0 件才顯示
-            if (luggages && luggages !== '0 件') {
-                msgLines.push(`行李件數：${luggages}`);
-            }
+            if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
+            if (surname) msgLines.push(`👤 聯絡人：${surname} ${title}`);
+            msgLines.push(`📞 聯絡電話：${phone}`);
 
-            // 寵物勾選判斷
-            if (hasPet) {
-                msgLines.push("寵物：⁠✅⁠");
-            }
+            const fullMsg = msgLines.join('\n');
+            const encodedMsg = encodeURIComponent(fullMsg);
+            const whatsappUrl = `https://wa.me/85257038875?text=${encodedMsg}`;
 
-            // 輪椅勾選判斷
-            if (hasWheelchair) {
-                msgLines.push("輪椅（放置尾箱）：⁠✅⁠");
-            }
-
-            if (paymentStr) msgLines.push(`付款方式：${paymentStr}`);
-
-            // 聯絡人未填寫就不顯示
-            if (surname) {
-                msgLines.push(`聯絡人：${surname} ${title}`);
-            }
-
-            msgLines.push(`聯絡電話：${phone}`);
-
-            const totalFareEl = document.getElementById('res-total-fare');
-            if (totalFareEl && !document.getElementById('fare-result').classList.contains('hidden')) {
-                msgLines.push(`預估車費：HK$ ${totalFareEl.innerText}`);
-            }
-
-            const fullText = msgLines.join("\n");
-            const whatsappUrl = `https://wa.me/85257038875?text=${encodeURIComponent(fullText)}`;
             window.open(whatsappUrl, '_blank');
         }
     </script>
