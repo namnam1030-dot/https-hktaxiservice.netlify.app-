@@ -1131,18 +1131,21 @@
             return Math.round(fare);
         }
 
-        // 規範化地點名稱，修復機場及深圳灣無法預測路線問題，並預設深圳灣導航為「深圳灣公路大橋」
-        function normalizeLocation(loc) {
-            if (!loc) return "";
-            let trimmed = loc.trim();
-            if (trimmed.includes("深圳灣")) {
-                return "深圳灣公路大橋";
-            }
-            if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) {
-                return "香港國際機場";
-            }
-            return trimmed;
-        }
+// 規範化地點名稱，修復機場、深圳灣及落馬洲無法預測路線問題
+function normalizeLocation(loc) {
+    if (!loc) return "";
+    let trimmed = loc.trim();
+    if (trimmed.includes("落馬洲")) {
+        return "落馬洲支線出入境管制站";
+    }
+    if (trimmed.includes("深圳灣")) {
+        return "深圳灣公路大橋";
+    }
+    if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) {
+        return "香港國際機場";
+    }
+    return trimmed;
+}
 
         // 篩選最快與最短路線，只提供最多兩條路線給乘客選擇（最快路線和最短路線）
         function processRoutes(routes) {
