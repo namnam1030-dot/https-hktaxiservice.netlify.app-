@@ -303,7 +303,7 @@
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
                     <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
                     <li data-i18n="calc_tip_2"><strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
-                    <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預估車費與相關隧道費用。</li>
+                    <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預估基本車費。</li>
                 </ul>
             </div>
 
@@ -362,24 +362,30 @@
                     <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
-                <!-- 2. 隧道 / 收費路段明細 -->
-                <div id="res-tolls-container" class="hidden text-xs bg-gray-900/90 p-3 rounded-xl border border-gray-800 mb-3">
-                    <div class="font-bold text-gray-300 mb-1.5 flex items-center justify-between">
-                        <span><i class="fa-solid fa-road text-brand-yellow mr-1"></i> <span data-i18n="res_tolls_title">隧道 / 收費路段明細：</span></span>
-                        <span id="res-tolls-total" class="text-brand-yellow font-bold">+HK$ 0</span>
-                    </div>
-                    <ul id="res-tolls-list" class="text-gray-400 space-y-1 pl-2"></ul>
-                </div>
-
                 <div class="text-xl font-extrabold text-brand-yellow mt-3 pt-3 border-t border-gray-800/80 flex justify-between items-end">
-                    <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預估車費總額：</span>
+                    <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計基本車費：</span>
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
                 
+                <!-- 隧道 / 其他收費明細 (藍色圈風格) -->
+                <div class="mt-4 p-4 bg-sky-950/40 border border-sky-500/40 rounded-2xl text-xs space-y-2 text-sky-200">
+                    <div class="font-bold text-sky-400 flex items-center gap-1.5 mb-1">
+                        <i class="fa-solid fa-road"></i> <span>隧道 / 其他收費明細：</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-gray-300">
+                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded-lg border border-sky-900/40"><span>大欖隧道</span><span class="font-bold text-white">$28</span></div>
+                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded-lg border border-sky-900/40"><span>大老山隧道</span><span class="font-bold text-white">$20</span></div>
+                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded-lg border border-sky-900/40 sm:col-span-2"><span>香港仔 / 城門 / 獅子山 / 尖山隧道</span><span class="font-bold text-white">$8</span></div>
+                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded-lg border border-sky-900/40 sm:col-span-2"><span>來回過海隧道（紅隧 / 東隧 / 西隧）</span><span class="font-bold text-white">$50</span></div>
+                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded-lg border border-sky-900/40"><span>行李費</span><span class="font-bold text-white">$6/件</span></div>
+                        <div class="flex justify-between bg-black/30 px-2.5 py-1.5 rounded-lg border border-sky-900/40"><span>等候時間</span><span class="font-bold text-white">停頓每分鐘 $2.1 / $1.4</span></div>
+                    </div>
+                </div>
+
                 <div class="mt-4 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
                     <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
-                        實際車費按跳錶、隧道費、行李費及等候時間為準。
+                        以上預計車費並未包含任何隧道、停車場、行李及等候時間等收費，一切按實際情況為準。
                     </p>
                 </div>
             </div>
@@ -450,7 +456,7 @@
 
                 <div id="field-stopover-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
-                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊 (系統會自動計入中途繞路車費)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
                 <div id="field-dropoff-container" class="hidden">
@@ -668,7 +674,7 @@
                 calc_tip_title: "車費估算使用說明：",
                 calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
                 calc_tip_2: '<strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
-                calc_tip_3: '系統將自動規劃最佳行車路線並計算預估車費與相關隧道費用。',
+                calc_tip_3: '系統將自動規劃最佳行車路線並計算預估基本車費。',
                 calc_label_pickup: "起點 (出發地)",
                 calc_label_stopover: "中途站 (選填)",
                 calc_label_dropoff: "終點 (目的地)",
@@ -683,13 +689,12 @@
                 res_duration: "預計行車時間：",
                 unit_km: "公里",
                 unit_min: "分鐘",
-                res_tolls_title: "隧道 / 收費路段明細：",
                 res_base_fee: "法定跳錶基本費：",
                 res_surcharge: "車款附加費：",
                 res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ",
                 res_min_note_post: ")",
-                res_total_title: "預估車費總額：",
-                res_note: "實際車費按跳錶、隧道費、行李費及等候時間為準。",
+                res_total_title: "預計基本車費：",
+                res_note: "以上預計車費並未包含任何隧道、停車場、行李及等候時間等收費，一切按實際情況為準。",
                 btn_reselect: "重新選擇車款",
                 btn_now_booking: "現在預約 (填寫表單)",
                 form_badge: "INSTANT BOOKING",
@@ -804,7 +809,7 @@
                 calc_tip_title: "Fare Estimation Instructions:",
                 calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak the full trip, e.g., <span class="text-brand-yellow font-medium">"From Kwun Tong via Mong Kok to Tsim Sha Tsui"</span>.',
                 calc_tip_2: '<strong class="text-white">3-Box Input:</strong> Fill in pickup, stopover, and drop-off below (with auto-complete dropdown), then click calculate.',
-                calc_tip_3: 'The system will automatically plan the best route and calculate estimated fare and toll charges.',
+                calc_tip_3: 'The system will automatically plan the best route and calculate estimated basic fare.',
                 calc_label_pickup: "Pickup (Start)",
                 calc_label_stopover: "Stopover (Optional)",
                 calc_label_dropoff: "Destination",
@@ -819,13 +824,12 @@
                 res_duration: "Estimated Duration: ",
                 unit_km: "km",
                 unit_min: "mins",
-                res_tolls_title: "Tunnel / Toll Breakdown:",
                 res_base_fee: "Meter Base Fare: ",
                 res_surcharge: "Vehicle Surcharge: ",
                 res_min_note_pre: "*(Minimum fare threshold of HK$ ",
                 res_min_note_post: ")",
-                res_total_title: "Estimated Total Fare:",
-                res_note: "Actual fare is subject to the taximeter, tunnel fees, luggage fees, and waiting time.",
+                res_total_title: "Estimated Basic Fare:",
+                res_note: "The estimated fare above does not include any tunnel, parking, luggage, or waiting time charges. Everything is subject to actual conditions.",
                 btn_reselect: "Reselect Vehicle",
                 btn_now_booking: "Book Now (Fill Form)",
                 form_badge: "INSTANT BOOKING",
@@ -1035,8 +1039,6 @@
         let currentCarMinFare = 0;
         let currentServiceType = "normal";
         let lastCalculatedBaseFare = 0;
-        let lastCalculatedTolls = 0;
-        let lastDetectedTollsList = [];
 
         let googleMap = null;
         let directionsRenderer = null;
@@ -1263,184 +1265,6 @@
             return Math.round(fare);
         }
 
-        function isHongKongIsland(lat, lng) {
-            if (lat < 22.18 || lat > 22.298 || lng < 114.10 || lng > 114.27) {
-                return false;
-            }
-            if (lng < 114.14) {
-                return lat < 22.291;
-            } else if (lng < 114.17) {
-                return lat < 22.290;
-            } else if (lng < 114.20) {
-                return lat < 22.292;
-            } else if (lng < 114.23) {
-                return lat < 22.297;
-            } else {
-                return lat < 22.290;
-            }
-        }
-
-        // 隧道費精準識別邏輯 (修正過海隧道、尖山/獅子山及香港仔隧道誤判問題)
-        function detectHongKongTollsWithGPSGeofenceAndRadar(route) {
-            let detected = [];
-            let totalTolls = 0;
-            let fullInstructions = "";
-
-            route.legs.forEach(leg => {
-                leg.steps.forEach(step => {
-                    fullInstructions += " " + (step.instructions || "") + " " + (step.html_instructions || "");
-                });
-            });
-
-            let text = fullInstructions.replace(/<[^>]*>?/gm, ' ');
-
-            let hasCrossHarbour = false;
-            let chTunnelName = "";
-
-            // 檢查過海隧道名稱，明確區分西隧、東隧、紅隧
-            if (text.match(/西區海底隧道|西區過海隧道|西隧|Western Harbour|WHC/i)) {
-                chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
-                hasCrossHarbour = true;
-            } else if (text.match(/東區海底隧道|東區過海隧道|東隧|Eastern Harbour|EHC/i)) {
-                chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
-                hasCrossHarbour = true;
-            } else if (text.match(/紅磡海底隧道|紅磡過海隧道|紅隧|海底隧道|Cross-Harbour|Cross Harbour|CHT/i)) {
-                chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
-                hasCrossHarbour = true;
-            }
-
-            let hasHKIsland = false;
-            let hasKowloonNT = false;
-            let crossingLngs = [];
-
-            let hasTaiLam = false;
-            let hasShingMun = false;
-            let hasAberdeen = false;
-            let hasLionRock = false;
-            let hasTatesCairn = false;
-            let hasEaglesNest = false;
-
-            // 文字雷達補充觸發 (精準匹配避免干擾)
-            // 排除被尖山/八號幹線覆蓋時誤判獅子山
-            if (text.match(/獅子山隧道|Lion Rock Tunnel|Lion Rock/i) && !text.match(/尖山|沙田嶺|八號幹線|Sha Tin Heights/i)) {
-                hasLionRock = true;
-            }
-            if (text.match(/大老山隧道|Tate's Cairn|Tates Cairn/i)) hasTatesCairn = true;
-            if (text.match(/尖山隧道|沙田嶺隧道|八號幹線|Eagle's Nest|Sha Tin Heights/i)) hasEaglesNest = true;
-            if (text.match(/大欖隧道|Tai Lam Tunnel/i)) hasTaiLam = true;
-            if (text.match(/城門隧道|Shing Mun/i)) hasShingMun = true;
-            if (text.match(/香港仔隧道|Aberdeen Tunnel/i)) {
-                // 如果起點或終點在跑馬地/銅鑼灣遊艇會附近，且實際導航沒有穿過香港仔隧道，則不應該觸發
-                // 用以下地理位置進一步嚴格過濾
-                hasAberdeen = true;
-            }
-
-            if (route.overview_path && route.overview_path.length > 0) {
-                // 先檢測是否明確包含尖山/沙田嶺隧道，若有則直接鎖定尖山，並防範獅子山誤報
-                let routeTextAll = text;
-                let isActuallyUsingEagleNest = routeTextAll.match(/尖山|沙田嶺|八號幹線|Eagle's Nest|Sha Tin Heights/i);
-
-                for (let i = 0; i < route.overview_path.length; i++) {
-                    let pt = route.overview_path[i];
-                    let lat = pt.lat();
-                    let lng = pt.lng();
-
-                    if (isHongKongIsland(lat, lng)) {
-                        hasHKIsland = true;
-                    } else if (lat > 22.295 || (lat > 22.288 && lng > 114.238)) {
-                        hasKowloonNT = true;
-                    }
-
-                    if (lat >= 22.282 && lat <= 22.302 && lng >= 114.12 && lng <= 114.25) {
-                        crossingLngs.push(lng);
-                    }
-
-                    // 獅子山隧道嚴格地理圍欄 (九龍塘北至大圍南)
-                    if (lat >= 22.348 && lat <= 22.368 && lng >= 114.175 && lng <= 114.185) {
-                        if (!isActuallyUsingEagleNest) {
-                            hasLionRock = true;
-                        }
-                    }
-                    // 大老山隧道圍欄
-                    if (lat >= 22.355 && lat <= 22.388 && lng >= 114.200 && lng <= 114.225) {
-                        hasTatesCairn = true;
-                    }
-                    // 尖山 / 沙田嶺隧道圍欄 (青沙公路段)
-                    if (lat >= 22.338 && lat <= 22.372 && lng >= 114.142 && lng <= 114.162) {
-                        hasEaglesNest = true;
-                        hasLionRock = false; // 確保不會同時算入獅子山
-                    }
-                    // 大欖隧道圍欄
-                    if (lat >= 22.388 && lat <= 22.432 && lng >= 114.060 && lng <= 114.082) {
-                        hasTaiLam = true;
-                    }
-                    // 城門隧道圍欄
-                    if (lat >= 22.370 && lat <= 22.395 && lng >= 114.130 && lng <= 114.165) {
-                        hasShingMun = true;
-                    }
-                    // 香港仔隧道精準地理圍欄 (黃泥涌峽道南端至黃竹坑道北端，避開跑馬地地面平原)
-                    if (lat >= 22.263 && lat <= 22.269 && lng >= 114.178 && lng <= 114.185) {
-                        hasAberdeen = true;
-                    }
-                }
-
-                if (hasHKIsland && hasKowloonNT) {
-                    hasCrossHarbour = true;
-                    if (!chTunnelName) {
-                        let avgLng = crossingLngs.length > 0 
-                            ? crossingLngs.reduce((a, b) => a + b, 0) / crossingLngs.length 
-                            : 114.18;
-                        if (avgLng < 114.148) {
-                            chTunnelName = currentLang === 'en' ? "Western Harbour Crossing" : "西區海底隧道";
-                        } else if (avgLng > 114.200) {
-                            chTunnelName = currentLang === 'en' ? "Eastern Harbour Crossing" : "東區海底隧道";
-                        } else {
-                            chTunnelName = currentLang === 'en' ? "Cross-Harbour Tunnel" : "紅磡海底隧道";
-                        }
-                    }
-                }
-            }
-
-            // 額外保險：如果起點是跑馬地、終點是銅鑼灣遊艇會（或反之），直接強制過濾掉香港仔隧道
-            let pCheck = (document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value : "") + (document.getElementById('pickup') ? document.getElementById('pickup').value : "");
-            let dCheck = (document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value : "") + (document.getElementById('dropoff') ? document.getElementById('dropoff').value : "");
-            if ((pCheck.includes("跑馬地") || pCheck.includes("Happy Valley")) && (dCheck.includes("遊艇會") || dCheck.includes("Yacht Club") || dCheck.includes("銅鑼灣"))) {
-                hasAberdeen = false;
-            }
-
-            // 依收費標準彙整費用
-            if (hasCrossHarbour) {
-                detected.push({ name: chTunnelName || (currentLang === 'en' ? "Cross-Harbour Tunnel" : "過海隧道"), fee: 50 });
-                totalTolls += 50;
-            }
-            if (hasLionRock) {
-                detected.push({ name: currentLang === 'en' ? "Lion Rock Tunnel" : "獅子山隧道", fee: 8 });
-                totalTolls += 8;
-            }
-            if (hasTatesCairn) {
-                detected.push({ name: currentLang === 'en' ? "Tate's Cairn Tunnel" : "大老山隧道", fee: 20 });
-                totalTolls += 20;
-            }
-            if (hasEaglesNest) {
-                detected.push({ name: currentLang === 'en' ? "Eagle's Nest / Sha Tin Heights Tunnel" : "尖山 / 沙田嶺隧道", fee: 8 });
-                totalTolls += 8;
-            }
-            if (hasTaiLam) {
-                detected.push({ name: currentLang === 'en' ? "Tai Lam Tunnel" : "大欖隧道", fee: 28 });
-                totalTolls += 28;
-            }
-            if (hasShingMun) {
-                detected.push({ name: currentLang === 'en' ? "Shing Mun Tunnels" : "城門隧道", fee: 8 });
-                totalTolls += 8;
-            }
-            if (hasAberdeen) {
-                detected.push({ name: currentLang === 'en' ? "Aberdeen Tunnel" : "香港仔隧道", fee: 8 });
-                totalTolls += 8;
-            }
-
-            return { list: detected, total: totalTolls };
-        }
-
         function calculateFareWithGoogle() {
             const pVal = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : "";
             const sVal = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value.trim() : "";
@@ -1607,11 +1431,6 @@
             let baseMeterFare = calculateHkTaxiFare(totalDistanceMeters);
             lastCalculatedBaseFare = baseMeterFare;
 
-            let tollsData = detectHongKongTollsWithGPSGeofenceAndRadar(selectedRoute);
-            lastCalculatedTolls = tollsData.total;
-            lastDetectedTollsList = tollsData.list;
-
-            renderTollsUI(tollsData);
             updateTotalFareDisplay();
 
             const container = document.getElementById('route-options-list');
@@ -1630,26 +1449,6 @@
                         if (icon) icon.className = "fa-solid fa-circle text-gray-700 text-base";
                     }
                 }
-            }
-        }
-
-        function renderTollsUI(tollsData) {
-            const tollsContainer = document.getElementById('res-tolls-container');
-            const tollsList = document.getElementById('res-tolls-list');
-            const tollsTotal = document.getElementById('res-tolls-total');
-
-            if (tollsData.list.length > 0) {
-                tollsContainer.classList.remove('hidden');
-                tollsTotal.innerText = `+HK$ ${tollsData.total}`;
-                tollsList.innerHTML = tollsData.list.map(t => 
-                    `<li class="flex justify-between items-center">
-                        <span>• ${t.name}</span>
-                        <span class="font-bold text-white">+HK$ ${t.fee}</span>
-                    </li>`
-                ).join('');
-            } else {
-                tollsContainer.classList.add('hidden');
-                tollsList.innerHTML = "";
             }
         }
 
@@ -1680,8 +1479,7 @@
                 minFareNote.classList.add('hidden');
             }
 
-            let grandTotal = finalFare + lastCalculatedTolls;
-            document.getElementById('res-total-fare').innerText = grandTotal;
+            document.getElementById('res-total-fare').innerText = finalFare;
         }
 
         function sendWhatsApp(event) {
@@ -1765,7 +1563,7 @@
 
             const totalFareVal = document.getElementById('res-total-fare').innerText;
             if (totalFareVal && totalFareVal !== "0") {
-                msg += `💵 *${currentLang === 'en' ? 'Est. Total Fare' : '系統估算車費'}：* HK$ ${totalFareVal}\n`;
+                msg += `💵 *${currentLang === 'en' ? 'Est. Basic Fare' : '系統估算基本車費'}：* HK$ ${totalFareVal}\n`;
             }
 
             msg += `----------------------------\n`;
