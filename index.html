@@ -1408,14 +1408,23 @@
             msgLines.push(`🧳 行李：${luggages}`);
             msgLines.push(`🐾 攜帶寵物：${hasPet ? '是' : '否'}`);
             msgLines.push(`👩‍🦽 輪椅放置：${hasWheelchair ? '是' : '否'}`);
+            // A. 如選擇沒有寵物就不用顯示該行訊息，如有寵物就用✅顯示
+            if (hasPetChecked) {
+                msg += `🐾 *寵物同行*：✅ 有寵物\n`;
+            }
+
+            // B. 如選擇沒有輪椅需要放置尾箱就不用顯示該行訊息，如有輪椅就用✅顯示
+            if (hasWheelchairChecked) {
+                msg += ` wheelchair *輪椅擺放*：✅ 有輪椅需要放置於尾箱\n`.replace(' wheelchair ', ' ');
+            }
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
             if (surname) msgLines.push(`👤 聯絡人：${surname} ${title}`);
             msgLines.push(`📞 電話：${phone}`);
 
-            const estimatedFare = document.getElementById('res-total-fare')?.innerText;
-            if (estimatedFare && estimatedFare !== '0') {
-                msgLines.push(`💰 系統估算參考車費：HK$ ${estimatedFare}`);
-            }
+const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            msgLines.push(`💰預估車費：HK$${totalFare}（不含隧道/行李/停車場費）`);
+            msgLines.push(`--------------------`);
+            msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
             const encodedMessage = encodeURIComponent(msgLines.join('\n'));
             window.open(`https://wa.me/85257038875?text=${encodedMessage}`, '_blank');
