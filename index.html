@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 引入 Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places&language=zh-HK&callback=initAutocomplete" async defer></script>
+    <!-- 引入 Google Maps API (加上 language=zh-HK 確保隧道名稱穩定輸出為中文，並載入 places 庫) -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places&language=zh-HK&callback=initAutocomplete" async defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -318,7 +318,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div>
                         <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_pickup">起點 (出發地)</label>
-                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup_box" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_stopover">中途站 (選填)</label>
@@ -367,7 +367,7 @@
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
 
-                <!-- 提示語 -->
+                <!-- 提示語 (按要求對調：搬至隧道明細上方) -->
                 <div class="mb-3 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
                     <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
@@ -437,11 +437,27 @@
                     </div>
                 </div>
 
+                <!-- 隱藏的起點、中途站、終點輸入欄位（自動與車費估算器同步，並在發送 WhatsApp 時顯示） -->
+                <div id="field-pickup-container" class="hidden">
+                    <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
+                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
                 <div id="field-flight-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (例如：CX250)</span></label>
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
+                <div id="field-stopover-container" class="hidden">
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
+                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
+                <div id="field-dropoff-container" class="hidden">
+                    <label id="label-dropoff" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span data-i18n="label_dropoff">落車地點 (終點)</span></label>
+                    <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
@@ -584,22 +600,20 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
-        window.initAutocomplete = function() {
-            if (typeof initAutocomplete === 'function' && window.initAutocomplete !== initAutocomplete) {
-                initAutocomplete();
-            }
-        };
-
+        // 頁面載入時自動帶入即時日期與時間
         window.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('date');
             const timeInput = document.getElementById('time');
             
             const now = new Date();
+            
+            // 格式化日期：YYYY-MM-DD
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             const formattedDate = `${year}-${month}-${day}`;
             
+            // 格式化時間：HH:MM
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const formattedTime = `${hours}:${minutes}`;
@@ -607,8 +621,7 @@
             if (dateInput) dateInput.value = formattedDate;
             if (timeInput) timeInput.value = formattedTime;
         });
-
-        let currentLang = 'zh';
+        let currentLang = 'zh'; // 'zh' 或 'en'
 
         const translations = {
             zh: {
@@ -890,6 +903,7 @@
 
         let calcPickupInput, calcStopoverInput, calcDropoffInput;
 
+        // 初始化 Google Places 自動預測功能
         function initAutocomplete() {
             const options = {
                 componentRestrictions: { country: "hk" }
@@ -1111,6 +1125,7 @@
             };
         }
 
+        // 市區的士跳錶車費計算邏輯
         function calculateTaxiBaseFare(km) {
             if (km <= 0) return 0;
             if (km <= 2) return 29;
@@ -1130,6 +1145,7 @@
             return Math.round(fare);
         }
 
+        // 規範化地點名稱
         function normalizeLocation(loc) {
             if (!loc) return "";
             let trimmed = loc.trim();
@@ -1145,6 +1161,7 @@
             return trimmed;
         }
 
+        // 篩選最快與最短路線
         function processRoutes(routes) {
             if (!routes || routes.length === 0) return [];
             if (routes.length === 1) {
@@ -1187,6 +1204,10 @@
                 alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
                 return;
             }
+
+            if (document.getElementById('pickup')) document.getElementById('pickup').value = pickupVal;
+            if (document.getElementById('stopover')) document.getElementById('stopover').value = stopoverVal;
+            if (document.getElementById('dropoff')) document.getElementById('dropoff').value = dropoffVal;
 
             if (!directionsService) directionsService = new google.maps.DirectionsService();
 
@@ -1344,94 +1365,60 @@
             const passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
             const luggages = document.getElementById('luggages') ? document.getElementById('luggages').value : '';
             const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
-            const surname = document.getElementById('contact_surname') ? document.getElementById('contact_surname').value.trim() : '';
 
-            let titleVal = '';
-            const titleRadios = document.getElementsByName('contact_title');
-            for (let r of titleRadios) {
-                if (r.checked) {
-                    titleVal = r.value;
+            const hasPet = document.getElementById('has_pet') && document.getElementById('has_pet').checked;
+            const hasWheelchair = document.getElementById('has_wheelchair') && document.getElementById('has_wheelchair').checked;
+
+            const surname = document.getElementById('contact_surname') ? document.getElementById('contact_surname').value.trim() : '';
+            const titleEls = document.getElementsByName('contact_title');
+            let title = '';
+            for (let el of titleEls) {
+                if (el.checked) {
+                    title = el.value;
                     break;
                 }
             }
 
-            if (!pickup || !dropoff) {
-                alert('請先於車費估算區輸入「起點」及「目的地」！');
-                document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            // 付款方式 (多選)
+            const payEls = document.getElementsByName('payment_method');
             let payments = [];
-            document.querySelectorAll('input[name="payment_method"]:checked').forEach(cb => {
-                payments.push(cb.value);
-            });
-            let paymentStr = payments.length > 0 ? payments.join('、') : '現金';
+            for (let el of payEls) {
+                if (el.checked) payments.push(el.value);
+            }
+            const paymentStr = payments.join(' / ');
 
-            // 豐田升級選項
-            let upgradeStr = '';
+            let msgLines = [];
+            msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
+            msgLines.push(`🚘 預約車款：${selectedCarName}`);
+
             if (selectedCarName === '豐田混能的士') {
-                const yesChecked = document.getElementById('upgrade-yes') ? document.getElementById('upgrade-yes').checked : false;
-                const noChecked = document.getElementById('upgrade-no') ? document.getElementById('upgrade-no').checked : false;
-                if (yesChecked) upgradeStr = '（接受免費升級）';
-                else if (noChecked) upgradeStr = '（不接受升級）';
+                const isAccepted = document.getElementById('booking-upgrade-yes')?.checked;
+                msgLines.push(`🎁 免費升級車款：${isAccepted ? '✅ 接受' : '❌ 不接受'}`);
             }
 
-            // 構建 WhatsApp 訊息內文
-            let message = `🚖 *【豪華的士預約專車服務】*\n`;
-            message += `------------------------------\n`;
-            message += `🚘 *選擇車款：* ${selectedCarName} ${upgradeStr}\n`;
-            message += `💰 *收費模式：* ${selectedFeeMode}\n`;
-            
             if (serviceType === 'airport' && flightNo) {
-                message += `✈️ *航班編號：* ${flightNo}\n`;
-            }
-            
-            message += `📍 *上車地點：* ${pickup}\n`;
-            if (stopover) {
-                message += `🛑 *中途停靠：* ${stopover}\n`;
-            }
-            message += `🏁 *落車地點：* ${dropoff}\n`;
-            message += `📅 *用車日期：* ${date}\n`;
-            message += `⏰ *用車時間：* ${time}\n`;
-            message += `👥 *乘客人數：* ${passengers}\n`;
-            message += `🧳 *行李件數：* ${luggages}\n`;
-
-            // A. 寵物判斷：有勾選才顯示，沒有不顯示
-            const hasPet = document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false;
-            if (hasPet) {
-                message += `🐾 *寵物：* ✅\n`;
+                msgLines.push(`✈️ 航班編號：${flightNo}`);
             }
 
-            // B. 輪椅判斷：有勾選才顯示，沒有不顯示
-            const hasWheelchair = document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false;
-            if (hasWheelchair) {
-                message += `🧑‍🦽 *輪椅：* ✅\n`;
-            }
+            msgLines.push(`📍 起點：${pickup}`);
+            if (stopover) msgLines.push(`🛑 中途站：${stopover}`);
+            msgLines.push(`🏁 終點：${dropoff}`);
+            msgLines.push(`📅 日期：${date}`);
+            msgLines.push(`⏰ 時間：${time}`);
+            msgLines.push(`👥 人數：${passengers}`);
+            msgLines.push(`🧳 行李：${luggages}`);
+            msgLines.push(`🐾 攜帶寵物：${hasPet ? '是' : '否'}`);
+            msgLines.push(`👩‍🦽 輪椅放置：${hasWheelchair ? '是' : '否'}`);
+            if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
+            if (surname) msgLines.push(`👤 聯絡人：${surname} ${title}`);
+            msgLines.push(`📞 電話：${phone}`);
 
-            message += `💳 *付款方式：* ${paymentStr}\n`;
-            
-            if (surname) {
-                message += `👤 *聯絡人：* ${surname} ${titleVal}\n`;
-            }
-            message += `📞 *聯絡電話：* ${phone}\n`;
+const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            msgLines.push(`💰預估車費：HK$${totalFare}（不含隧道/行李/停車場費）`);
+            msgLines.push(`--------------------`);
+            msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
-            const fareResultEl = document.getElementById('fare-result');
-            if (fareResultEl && !fareResultEl.classList.contains('hidden')) {
-                const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '';
-                if (totalFare) {
-                    message += `📊 *系統預估車費：* HK$ ${totalFare} (不含隧道/停車場等附加費)\n`;
-                }
-            }
-            
-            message += `------------------------------\n`;
-            message += `請回覆訊息確認預約，謝謝！`;
-
-            const targetPhone = "85257038875";
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${targetPhone}?text=${encodedMessage}`;
-
-            window.open(whatsappUrl, '_blank');
+            const encodedMessage = encodeURIComponent(msgLines.join('\n'));
+            window.open(`https://wa.me/85257038875?text=${encodedMessage}`, '_blank');
         }
     </script>
 </body>
