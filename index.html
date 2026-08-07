@@ -472,7 +472,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數</span></label>
-                        <select id="passengers" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <select id="passengers" onchange="checkPassengerLimit()" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                             <option value="1 人" data-i18n="p1">1 人</option>
                             <option value="2 人" selected data-i18n="p2">2 人</option>
                             <option value="3 人" data-i18n="p3">3 人</option>
@@ -976,7 +976,36 @@
             handleUpgradeCheckbox(choice);
         }
 
+        // 核心驗證函數：檢查乘客人數與車款是否匹配
+        function validatePassengerAndCar(carName) {
+            const passengersSelect = document.getElementById('passengers');
+            const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
+            if (passengerVal >= 5 && carName === '豐田混能的士') {
+                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi (4 seats) cannot be selected." : "乘客人數為5或以上，4座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
+                return false;
+            }
+            return true;
+        }
+
+        // 當人數更改時，若當前為豐田混能的士且人數 >= 5，自動切換至 Maxus MIFA 7
+        function checkPassengerLimit() {
+            const passengersSelect = document.getElementById('passengers');
+            const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
+            
+            if (passengerVal >= 5 && selectedCarName === '豐田混能的士') {
+                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi cannot be selected. Automatically switched to Maxus MIFA 7 (6-seater)." : "乘客人數為 5 或以上，4 座位的豐田混能的士無法選擇，系統已自動為您切換至 6 座位車款（Maxus MIFA 7）。");
+                
+                // 自動切換至 Maxus MIFA 7
+                selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)');
+            }
+        }
+
         function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
+            // 點擊車款時進行防護檢查
+            if (!validatePassengerAndCar(name)) {
+                return;
+            }
+
             selectedCarName = name;
             selectedCarNameEn = nameEn;
             selectedSurcharge = surcharge;
@@ -1356,6 +1385,12 @@
         function sendWhatsApp(event) {
             event.preventDefault();
 
+            // 提交前進行最後安全檢查
+            if (!validatePassengerAndCar(selectedCarName)) {
+                scrollToFleet();
+                return;
+            }
+
             const pickup = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : '';
             const stopover = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value.trim() : '';
             const dropoff = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : '';
@@ -1405,27 +1440,26 @@
             msgLines.push(`📅 日期：${date}`);
             msgLines.push(`⏰ 時間：${time}`);
             msgLines.push(`👥 人數：${passengers}`);
-            // 行李件數：若選取「0 件」，不顯示
+            
             if (luggages && luggages !== '0 件') {
                 msgLines.push(`🧳 *行李件數：* ${luggages}`);
             }
 
-            // 寵物：選取才顯示
             if (hasPet) {
                 msgLines.push(`🐶寵物：✅`);
             }
 
-            // 輪椅：選取才顯示
             if (hasWheelchair) {
                 msgLines.push(`♿️輪椅放置尾箱：✅`);
             }
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
-            // 聯絡人：未填寫姓氏不顯示；有填寫則顯示姓氏與稱謂
+            
             if (surname) {
-                msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);}
+                msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);
+            }
             msgLines.push(`📞 電話：${phone}`);
 
-const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
             msgLines.push(`💰預估車費：HK$${totalFare}（不含隧道/行李/停車場費）`);
             msgLines.push(`--------------------`);
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
