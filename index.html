@@ -137,7 +137,7 @@
                 <!-- 車卡 -->
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
-                     class="car-card bg-brand-card rounded-2xl overflow-hidden border-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1">
+                     class="car-card bg-brand-card rounded-2xl overflow-hidden border-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
                     <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                         <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                     </div>
@@ -620,6 +620,9 @@
             
             if (dateInput) dateInput.value = formattedDate;
             if (timeInput) timeInput.value = formattedTime;
+
+            // 初始化時檢查人數與車款狀態
+            checkPassengerLimit();
         });
         let currentLang = 'zh'; // 'zh' 或 'en'
 
@@ -980,23 +983,38 @@
         function validatePassengerAndCar(carName) {
             const passengersSelect = document.getElementById('passengers');
             const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
-            if (passengerVal >= 5 && carName === '豐田混能的士') {
-                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi (4 seats) cannot be selected." : "乘客人數為5或以上，4座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
+            if (passengerVal > 4 && carName === '豐田混能的士') {
+                alert(currentLang === 'en' ? "Passenger count exceeds 4. Toyota Hybrid Taxi (4 seats) cannot be selected. Please choose other 6-seater vehicle models." : "乘客人數超過四人，4 座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
                 return false;
             }
             return true;
         }
 
-        // 當人數更改時，若當前為豐田混能的士且人數 >= 5，自動切換至 Maxus MIFA 7
+        // 當人數更改時：超過四人時限制選擇豐田混能的士，提示客人選擇其他六人車款
         function checkPassengerLimit() {
             const passengersSelect = document.getElementById('passengers');
             const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
+            const toyotaCard = document.getElementById('card-豐田混能的士');
+            const toyotaUpgradeBox = document.getElementById('toyota-upgrade-box');
             
-            if (passengerVal >= 5 && selectedCarName === '豐田混能的士') {
-                alert(currentLang === 'en' ? "Passenger count is 5 or more. Toyota Hybrid Taxi cannot be selected. Automatically switched to Maxus MIFA 7 (6-seater)." : "乘客人數為 5 或以上，4 座位的豐田混能的士無法選擇，系統已自動為您切換至 6 座位車款（Maxus MIFA 7）。");
+            if (passengerVal > 4) {
+                // 將豐田混能的士卡片視覺上設為禁用/透明
+                if (toyotaCard) {
+                    toyotaCard.style.opacity = '0.3';
+                    toyotaCard.style.pointerEvents = 'none';
+                }
                 
-                // 自動切換至 Maxus MIFA 7
-                selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)');
+                // 如果當前已選定豐田混能的士，自動切換至 Maxus MIFA 7
+                if (selectedCarName === '豐田混能的士') {
+                    alert(currentLang === 'en' ? "Passenger count exceeds 4. Toyota Hybrid Taxi cannot be selected. Please select other 6-seater vehicle models. Automatically switched to Maxus MIFA 7." : "乘客人數超過四人，4 座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。系統已自動為您切換至 Maxus MIFA 7。");
+                    selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)');
+                }
+            } else {
+                // 恢復豐田混能的士卡片可用狀態
+                if (toyotaCard) {
+                    toyotaCard.style.opacity = '1';
+                    toyotaCard.style.pointerEvents = 'auto';
+                }
             }
         }
 
