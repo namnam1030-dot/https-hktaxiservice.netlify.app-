@@ -9,7 +9,7 @@
     <!-- 引入 FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 引入 Google Maps API (加上 language=zh-HK 確保隧道名稱穩定輸出為中文，並載入 places 庫) -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places&language=zh-HK&callback=initAutocomplete" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -338,14 +338,18 @@
 
             <!-- 報價結果展示區 -->
             <div id="fare-result" class="hidden mt-5 p-5 bg-black/80 border border-brand-yellow/50 rounded-2xl">
-                
-                <!-- 路線選擇方案 -->
+               <!-- 路線選擇方案 -->
                 <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
                         <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
                     </div>
                     <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
+<!-- 2. 放在 <!-- 路線小地圖 --> 
+<div id="detected-tunnels-container" class="hidden mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-xs text-sky-200">
+    <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
+    <span id="detected-tunnels-list" class="text-white font-medium"></span>
+</div>
 
                 <!-- 路線小地圖 -->
                 <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-4 shadow-lg overflow-hidden"></div>
@@ -359,6 +363,10 @@
                 <div class="text-xs text-gray-300 space-y-0.5 mb-1 pb-1 border-b border-gray-800/60">
                     <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
                     <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
+<!-- 1. 放在車款附加費下方（約第 394 行附近） -->
+<div id="res-tunnel-row" class="hidden text-sky-300">
+    <span>預計自動偵測隧道費：</span><span class="font-bold">+HK$ <span id="res-tunnel-val">0</span></span>
+</div>
                     <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
@@ -1237,6 +1245,49 @@
                 return [fastest.route];
             }
         }
+// 隧道資料庫（根據您提供的座標及觸發半徑）
+const tunnelDatabase = [
+    { name: "紅隧 (連回程)", fee: 50, lat: 22.2896118, lng: 114.1823943, radius: 300 },
+    { name: "東隧 (連回程)", fee: 50, lat: 22.294889, lng: 114.22223, radius: 300 },
+    { name: "西隧 (連回程)", fee: 50, lat: 22.2940599, lng: 114.150204, radius: 300 },
+    { name: "大欖隧道", fee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500 },
+    { name: "城門隧道", fee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300 },
+    { name: "香港仔隧道", fee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
+    { name: "大老山隧道", fee: 20, lat: 22.3587759, lng: 114.2102199, radius: 400 },
+    { name: "獅子山隧道", fee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
+    { name: "尖山隧道", fee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
+];
+
+// 檢查路線是否經過隧道
+function checkTunnelsForRoute(route) {
+    let matchedTunnels = [];
+    let totalTunnelFee = 0;
+    const pathPoints = route.overview_path; // Google Maps 提供的路線經緯度點集合
+
+    if (!window.google || !google.maps.geometry) {
+        return { matchedTunnels, totalTunnelFee };
+    }
+
+    tunnelDatabase.forEach(tunnel => {
+        let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
+        let triggered = false;
+
+        for (let i = 0; i < pathPoints.length; i++) {
+            let distance = google.maps.geometry.spherical.computeDistanceBetween(pathPoints[i], tunnelLatLng);
+            if (distance <= tunnel.radius) {
+                triggered = true;
+                break;
+            }
+        }
+
+        if (triggered) {
+            matchedTunnels.push(tunnel);
+            totalTunnelFee += tunnel.fee;
+        }
+    });
+
+    return { matchedTunnels, totalTunnelFee };
+}
 
         function calculateFareWithGoogle() {
             calcPickupInput = document.getElementById('calc-pickup');
@@ -1335,6 +1386,94 @@
         }
 
         function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBay) {
+    if (!map) {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: { lat: 22.3193, lng: 114.1694 },
+            disableDefaultUI: true,
+            zoomControl: true
+        });
+    }
+
+    if (!directionsRenderer) {
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: false,
+            polylineOptions: {
+                strokeColor: '#FFF200',
+                strokeWeight: 5,
+                strokeOpacity: 0.9
+            }
+        });
+    }
+
+    directionsRenderer.setDirections(directionsResult);
+    directionsRenderer.setRouteIndex(routeIndex);
+
+    const selectedRoute = directionsResult.routes[routeIndex];
+    let totalMeters = 0;
+    let totalSeconds = 0;
+
+    selectedRoute.legs.forEach(leg => {
+        totalMeters += leg.distance.value;
+        totalSeconds += leg.duration.value;
+    });
+
+    let routeKm = totalMeters / 1000;
+    let finalKm = isShenzhenBay ? (routeKm + 5) : routeKm;
+    let durationMinutes = Math.round(totalSeconds / 60);
+
+    let baseMeterFare = calculateTaxiBaseFare(finalKm);
+
+    // 【新增】自動計算隧道費及偵測隧道
+    let tunnelResult = checkTunnelsForRoute(selectedRoute);
+    let tunnelFee = tunnelResult.totalTunnelFee;
+
+    const detectedContainer = document.getElementById('detected-tunnels-container');
+    const detectedList = document.getElementById('detected-tunnels-list');
+    if (tunnelResult.matchedTunnels.length > 0) {
+        detectedContainer.classList.remove('hidden');
+        let tunnelNames = tunnelResult.matchedTunnels.map(t => `${t.name} ($${t.fee})`).join('、');
+        detectedList.innerText = tunnelNames;
+    } else {
+        detectedContainer.classList.add('hidden');
+    }
+
+    // 計算總額（跳錶基本費 + 車款附加費 + 自動偵測隧道費）
+    let calculatedTotal = baseMeterFare + selectedSurcharge + tunnelFee;
+
+    const minNoteRow = document.getElementById('res-min-fare-note');
+    const surchargeRow = document.getElementById('res-surcharge-row');
+    const tunnelRow = document.getElementById('res-tunnel-row');
+
+    if (selectedSurcharge > 0) {
+        surchargeRow.classList.remove('hidden');
+        document.getElementById('res-surcharge-val').innerText = selectedSurcharge;
+    } else {
+        surchargeRow.classList.add('hidden');
+    }
+
+    if (tunnelFee > 0) {
+        tunnelRow.classList.remove('hidden');
+        document.getElementById('res-tunnel-val').innerText = tunnelFee;
+    } else {
+        tunnelRow.classList.add('hidden');
+    }
+
+    if (selectedMinFare > 0 && calculatedTotal < selectedMinFare) {
+        calculatedTotal = selectedMinFare;
+        minNoteRow.classList.remove('hidden');
+        document.getElementById('res-min-fare-val').innerText = selectedMinFare;
+    } else {
+        minNoteRow.classList.add('hidden');
+    }
+
+    document.getElementById('res-distance').innerText = finalKm.toFixed(1);
+    document.getElementById('res-duration').innerText = durationMinutes;
+    document.getElementById('res-base-fare').innerText = baseMeterFare;
+    document.getElementById('res-total-fare').innerText = calculatedTotal;
+}
+ {
             if (!map) {
                 map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 12,
@@ -1477,8 +1616,15 @@
             }
             msgLines.push(`📞 電話：${phone}`);
 
-            const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            msgLines.push(`💰預估車費：HK$${totalFare}（不含隧道/行李/停車場費）`);
+            const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
+const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
+if (detectedTunnelsText) {
+    msgLines.push(`🛣️ 途經隧道：${detectedTunnelsText} (+$${tunnelValText})`);
+}
+
+const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+msgLines.push(`💰預估車費總額：HK$${totalFare} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
+
             msgLines.push(`--------------------`);
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
