@@ -1482,7 +1482,13 @@
                 else document.getElementById('calc-dropoff')?.focus();
                 return;
             }
-
+            // 2. 【聯絡電話位數驗證】：必須八位數字以上才可發送
+            const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+            if (phone.length < 8) {
+                alert(currentLang === 'en' ? "Contact phone must be at least 8 digits before sending WhatsApp!" : "聯絡電話必須輸入最少八位數字才可發送 WhatsApp 預約訊息！");
+                document.getElementById('phone')?.focus();
+                return;
+            }
             // 提交前進行最後安全檢查
             if (!validatePassengerAndCar(selectedCarName)) {
                 scrollToFleet();
