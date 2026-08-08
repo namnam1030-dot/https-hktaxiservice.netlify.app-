@@ -302,7 +302,7 @@
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
                     <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
-                    <li data-i18n="calc_tip_2"><strong class="text-white">多點輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
+                    <li data-i18n="calc_tip_2"><strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
                     <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預估基本車費。</li>
                 </ul>
             </div>
@@ -314,39 +314,20 @@
                     <span id="mic-text" data-i18n="voice_btn_text">按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」</span>
                 </button>
 
-                <!-- 起點輸入 -->
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_pickup">起點 (出發地) <span class="text-brand-yellow">* (必須填寫)</span></label>
-                    <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                </div>
-
-                <!-- 展開/隱藏「新增中途站」按鍵 (與其他按鍵採用相同字體大小及設計) -->
-                <div>
-                    <button type="button" onclick="toggleStopoverSection()" class="w-full bg-brand-yellow/10 border border-brand-yellow/40 text-brand-yellow py-2.5 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer text-xs shadow-sm">
-                        <i class="fa-solid fa-circle-plus"></i> <span id="toggle-stopover-text">新增中途站 (最多3個)</span>
-                    </button>
-                </div>
-
-                <!-- 中途站容器 (預設隱藏，最多三個) -->
-                <div id="stopovers-container" class="hidden space-y-2.5 bg-brand-dark/50 p-3 rounded-xl border border-gray-800">
+                <!-- 3 格輸入設計 (起點、中途站、終點) 連動自動預測選單 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-[11px] font-bold text-gray-400 mb-1">第 1 個中途站 (選填)</label>
-                        <input type="text" id="calc-stopover-1" placeholder="輸入第 1 個中途站..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_pickup">起點 (出發地)</label>
+                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-gray-400 mb-1">第 2 個中途站 (選填)</label>
-                        <input type="text" id="calc-stopover-2" placeholder="輸入第 2 個中途站..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_stopover">中途站 (選填)</label>
+                        <input type="text" id="calc-stopover" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-gray-400 mb-1">第 3 個中途站 (選填)</label>
-                        <input type="text" id="calc-stopover-3" placeholder="輸入第 3 個中途站..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
+                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入終點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                     </div>
-                </div>
-
-                <!-- 終點輸入 -->
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地) <span class="text-brand-yellow">* (必須填寫)</span></label>
-                    <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入終點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                 </div>
             </div>
 
@@ -459,7 +440,7 @@
                     </div>
                 </div>
 
-                <!-- 隱藏的起點與終點輸入欄位（自動與車費估算器同步） -->
+                <!-- 隱藏的起點、中途站、終點輸入欄位（自動與車費估算器同步，並在發送 WhatsApp 時顯示） -->
                 <div id="field-pickup-container" class="hidden">
                     <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
                     <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
@@ -468,6 +449,11 @@
                 <div id="field-flight-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (例如：CX250)</span></label>
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
+                <div id="field-stopover-container" class="hidden">
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
+                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
                 <div id="field-dropoff-container" class="hidden">
@@ -641,8 +627,7 @@
             // 初始化時檢查人數與車款狀態
             checkPassengerLimit();
         });
-
-        let currentLang = 'zh';
+        let currentLang = 'zh'; // 'zh' 或 'en'
 
         const translations = {
             zh: {
@@ -709,10 +694,15 @@
                 calc_title: "智能路線與車費估算",
                 calc_tip_title: "車費估算使用說明：",
                 calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
-                calc_tip_2: '<strong class="text-white">多點輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
+                calc_tip_2: '<strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
                 calc_tip_3: '系統將自動規劃最佳行車路線並計算預估基本車費。',
                 calc_label_pickup: "起點 (出發地)",
+                calc_label_stopover: "中途站 (選填)",
                 calc_label_dropoff: "終點 (目的地)",
+                ph_pickup_box: "輸入起點...",
+                ph_stopover_opt: "輸入中途站...",
+                ph_dropoff_opt: "輸入終點...",
+
                 voice_btn_text: "按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」",
                 btn_calc_fare: "立即計算預估車費",
                 route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
@@ -733,6 +723,8 @@
                 ph_pickup: "例：觀塘 APM",
                 label_flight: "航班編號 (例如：CX250)",
                 ph_flight: "例：CX250 (司機會自動監察航班時間)",
+                label_stopover: "中途停靠點 (如沒有可留空)",
+                ph_stopover: "例：旺角朗豪坊",
                 label_dropoff: "落車地點 (終點)",
                 ph_dropoff: "例：深圳灣口岸",
                 label_date: "用車日期",
@@ -741,6 +733,9 @@
                 label_luggages: "行李件數",
                 label_has_pet: "是否有寵物",
                 label_has_wheelchair: "是否有輪椅需要放置於尾箱",
+                opt_select: "請選擇",
+                opt_yes: "是",
+                opt_no: "否",
                 label_contact_surname: "聯絡人",
                 ph_contact_surname: "例：陳",
                 label_contact_title: "稱謂 (選填)",
@@ -830,10 +825,15 @@
                 calc_title: "Smart Route & Fare Estimator",
                 calc_tip_title: "Fare Estimation Instructions:",
                 calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak the full trip, e.g., <span class="text-brand-yellow font-medium">"From Kwun Tong via Mong Kok to Tsim Sha Tsui"</span>.',
-                calc_tip_2: '<strong class="text-white">Multi-stop Input:</strong> Fill in pickup, stopovers, and drop-off below (with auto-complete dropdown), then click calculate.',
+                calc_tip_2: '<strong class="text-white">3-Box Input:</strong> Fill in pickup, stopover, and drop-off below (with auto-complete dropdown), then click calculate.',
                 calc_tip_3: 'The system will automatically plan the best route and calculate estimated basic fare.',
                 calc_label_pickup: "Pickup (Start)",
+                calc_label_stopover: "Stopover (Optional)",
                 calc_label_dropoff: "Destination",
+                ph_pickup_box: "Enter pickup...",
+                ph_stopover_opt: "Enter stopover...",
+                ph_dropoff_opt: "Enter destination...",
+
                 voice_btn_text: "Click to speak trip: \"From [Start] via [Stop] to [Destination]\"",
                 btn_calc_fare: "Calculate Estimated Fare",
                 route_select_title: "Select Route Option (Fastest / Shortest):",
@@ -854,6 +854,8 @@
                 ph_pickup: "e.g., Kwun Tong APM",
                 label_flight: "Flight Number (e.g., CX250)",
                 ph_flight: "e.g., CX250 (Driver monitors flight time)",
+                label_stopover: "Mid-way Stop (Optional)",
+                ph_stopover: "e.g., Mong Kok Langham Place",
                 label_dropoff: "Drop-off Location (Destination)",
                 ph_dropoff: "e.g., Shenzhen Bay Port",
                 label_date: "Service Date",
@@ -862,6 +864,9 @@
                 label_luggages: "Luggages",
                 label_has_pet: "Pets on board",
                 label_has_wheelchair: "Wheelchair in trunk",
+                opt_select: "Please select",
+                opt_yes: "Yes",
+                opt_no: "No",
                 label_contact_surname: "Contact",
                 ph_contact_surname: "e.g., Chan",
                 label_contact_title: "Title (Optional)",
@@ -902,6 +907,8 @@
         let directionsRenderer = null;
         let routesData = [];
 
+        let calcPickupInput, calcStopoverInput, calcDropoffInput;
+
         // 初始化 Google Places 自動預測功能
         function initAutocomplete() {
             const options = {
@@ -909,33 +916,12 @@
             };
 
             const pickupEl = document.getElementById('calc-pickup');
+            const stopoverEl = document.getElementById('calc-stopover');
             const dropoffEl = document.getElementById('calc-dropoff');
-            const stop1 = document.getElementById('calc-stopover-1');
-            const stop2 = document.getElementById('calc-stopover-2');
-            const stop3 = document.getElementById('calc-stopover-3');
 
             if (pickupEl) new google.maps.places.Autocomplete(pickupEl, options);
+            if (stopoverEl) new google.maps.places.Autocomplete(stopoverEl, options);
             if (dropoffEl) new google.maps.places.Autocomplete(dropoffEl, options);
-            if (stop1) new google.maps.places.Autocomplete(stop1, options);
-            if (stop2) new google.maps.places.Autocomplete(stop2, options);
-            if (stop3) new google.maps.places.Autocomplete(stop3, options);
-        }
-
-        // 切換展開/隱藏「新增中途站」按鍵
-        function toggleStopoverSection() {
-            const container = document.getElementById('stopovers-container');
-            const toggleText = document.getElementById('toggle-stopover-text');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                toggleText.innerText = "隱藏中途站";
-            } else {
-                container.classList.add('hidden');
-                toggleText.innerText = "新增中途站 (最多3個)";
-                // 清空已填寫的中途站
-                document.getElementById('calc-stopover-1').value = '';
-                document.getElementById('calc-stopover-2').value = '';
-                document.getElementById('calc-stopover-3').value = '';
-            }
         }
 
         function toggleLanguage() {
@@ -996,6 +982,7 @@
             handleUpgradeCheckbox(choice);
         }
 
+        // 核心驗證函數：檢查乘客人數與車款是否匹配
         function validatePassengerAndCar(carName) {
             const passengersSelect = document.getElementById('passengers');
             const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
@@ -1006,21 +993,27 @@
             return true;
         }
 
+        // 當人數更改時：超過四人時限制選擇豐田混能的士，提示客人選擇其他六人車款
         function checkPassengerLimit() {
             const passengersSelect = document.getElementById('passengers');
             const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
             const toyotaCard = document.getElementById('card-豐田混能的士');
+            const toyotaUpgradeBox = document.getElementById('toyota-upgrade-box');
             
             if (passengerVal > 4) {
+                // 將豐田混能的士卡片視覺上設為禁用/透明
                 if (toyotaCard) {
                     toyotaCard.style.opacity = '0.3';
                     toyotaCard.style.pointerEvents = 'none';
                 }
+                
+                // 如果當前已選定豐田混能的士，自動切換至 Maxus MIFA 7
                 if (selectedCarName === '豐田混能的士') {
                     alert(currentLang === 'en' ? "Passenger count exceeds 4. Toyota Hybrid Taxi cannot be selected. Please select other 6-seater vehicle models. Automatically switched to Maxus MIFA 7." : "乘客人數超過四人，4 座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。系統已自動為您切換至 Maxus MIFA 7。");
                     selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)');
                 }
             } else {
+                // 恢復豐田混能的士卡片可用狀態
                 if (toyotaCard) {
                     toyotaCard.style.opacity = '1';
                     toyotaCard.style.pointerEvents = 'auto';
@@ -1029,6 +1022,7 @@
         }
 
         function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
+            // 點擊車款時進行防護檢查
             if (!validatePassengerAndCar(name)) {
                 return;
             }
@@ -1118,7 +1112,7 @@
                 const speechResult = event.results[0][0].transcript;
                 micText.innerText = "聽到：「" + speechResult + "」";
 
-                let pickup = "", dropoff = "";
+                let pickup = "", stopover = "", dropoff = "";
                 let text = speechResult;
                 text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "");
 
@@ -1129,7 +1123,18 @@
                 if (text.includes("由") || text.includes("從")) {
                     const fromSplit = text.split(/由|從/);
                     const afterFrom = fromSplit[1] || "";
-                    if (afterFrom.includes("去") || afterFrom.includes("到") || afterFrom.includes("至")) {
+                    if (afterFrom.includes("經")) {
+                        const viaSplit = afterFrom.split("經");
+                        pickup = viaSplit[0];
+                        const afterVia = viaSplit[1] || "";
+                        if (afterVia.includes("去") || afterVia.includes("到") || afterVia.includes("至")) {
+                            const toSplit = afterVia.split(/去|到|至/);
+                            stopover = toSplit[0];
+                            dropoff = toSplit[1];
+                        } else {
+                            stopover = afterVia;
+                        }
+                    } else if (afterFrom.includes("去") || afterFrom.includes("到") || afterFrom.includes("至")) {
                         const toSplit = afterFrom.split(/去|到|至/);
                         pickup = toSplit[0];
                         dropoff = toSplit[1];
@@ -1143,6 +1148,7 @@
                 }
 
                 if (pickup) document.getElementById('calc-pickup').value = pickup.trim();
+                if (stopover) document.getElementById('calc-stopover').value = stopover.trim();
                 if (dropoff) document.getElementById('calc-dropoff').value = dropoff.trim();
 
                 setTimeout(() => {
@@ -1169,6 +1175,7 @@
             };
         }
 
+        // 市區的士跳錶車費計算邏輯
         function calculateTaxiBaseFare(km) {
             if (km <= 0) return 0;
             if (km <= 2) return 29;
@@ -1188,6 +1195,7 @@
             return Math.round(fare);
         }
 
+        // 規範化地點名稱
         function normalizeLocation(loc) {
             if (!loc) return "";
             let trimmed = loc.trim();
@@ -1203,6 +1211,7 @@
             return trimmed;
         }
 
+        // 篩選最快與最短路線
         function processRoutes(routes) {
             if (!routes || routes.length === 0) return [];
             if (routes.length === 1) {
@@ -1232,6 +1241,7 @@
             }
         }
 
+        // 隧道資料庫
         const tunnelDatabase = [
             { name: "紅隧 (連回程)", fee: 50, lat: 22.2896118, lng: 114.1823943, radius: 300 },
             { name: "東隧 (連回程)", fee: 50, lat: 22.294889, lng: 114.22223, radius: 300 },
@@ -1244,6 +1254,7 @@
             { name: "尖山隧道", fee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
         ];
 
+        // 檢查路線是否經過隧道
         function checkTunnelsForRoute(route) {
             let matchedTunnels = [];
             let totalTunnelFee = 0;
@@ -1275,35 +1286,30 @@
         }
 
         function calculateFareWithGoogle() {
-            const pickupVal = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : "";
-            const dropoffVal = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : "";
+            calcPickupInput = document.getElementById('calc-pickup');
+            calcStopoverInput = document.getElementById('calc-stopover');
+            calcDropoffInput = document.getElementById('calc-dropoff');
 
-            // 必須填寫起點和終點
+            let pickupVal = calcPickupInput ? calcPickupInput.value.trim() : "";
+            let stopoverVal = calcStopoverInput ? calcStopoverInput.value.trim() : "";
+            let dropoffVal = calcDropoffInput ? calcDropoffInput.value.trim() : "";
+
             if (!pickupVal || !dropoffVal) {
-                alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "必須填寫起點和終點才可以計算車費！");
+                alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
                 return;
             }
 
-            // 同步至預約表格
             if (document.getElementById('pickup')) document.getElementById('pickup').value = pickupVal;
+            if (document.getElementById('stopover')) document.getElementById('stopover').value = stopoverVal;
             if (document.getElementById('dropoff')) document.getElementById('dropoff').value = dropoffVal;
 
             if (!directionsService) directionsService = new google.maps.DirectionsService();
 
-            let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣");
+            let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverVal.includes("深圳灣");
 
             let targetPickup = normalizeLocation(pickupVal);
             let targetDropoff = normalizeLocation(dropoffVal);
-            
-            // 收集最多三個中途站
-            let waypoints = [];
-            const stop1 = document.getElementById('calc-stopover-1') ? document.getElementById('calc-stopover-1').value.trim() : "";
-            const stop2 = document.getElementById('calc-stopover-2') ? document.getElementById('calc-stopover-2').value.trim() : "";
-            const stop3 = document.getElementById('calc-stopover-3') ? document.getElementById('calc-stopover-3').value.trim() : "";
-            
-            if (stop1) waypoints.push({ location: normalizeLocation(stop1), stopover: true });
-            if (stop2) waypoints.push({ location: normalizeLocation(stop2), stopover: true });
-            if (stop3) waypoints.push({ location: normalizeLocation(stop3), stopover: true });
+            const waypoints = stopoverVal ? [{ location: normalizeLocation(stopoverVal), stopover: true }] : [];
 
             const request = {
                 origin: targetPickup,
@@ -1466,30 +1472,24 @@
         function sendWhatsApp(event) {
             event.preventDefault();
 
+            // 1. 【必填起點和終點驗證】：檢查起點與終點是否完整填寫
+            const pickup = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : '';
+            const dropoff = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : '';
+            
+            if (!pickup || !dropoff) {
+                alert(currentLang === 'en' ? "Please fill in both Pickup and Destination locations before sending WhatsApp!" : "請必須完整填寫「起點」和「終點」才可發送 WhatsApp 預約訊息！");
+                if (!pickup) document.getElementById('calc-pickup')?.focus();
+                else document.getElementById('calc-dropoff')?.focus();
+                return;
+            }
+
+            // 提交前進行最後安全檢查
             if (!validatePassengerAndCar(selectedCarName)) {
                 scrollToFleet();
                 return;
             }
 
-            const pickup = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : '';
-            const dropoff = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : '';
-
-            // 必須填寫起點和終點才可以發送 WhatsApp
-            if (!pickup || !dropoff) {
-                alert("必須填寫起點和終點才可以發送 WhatsApp 預約訊息！");
-                document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            const stop1 = document.getElementById('calc-stopover-1') ? document.getElementById('calc-stopover-1').value.trim() : '';
-            const stop2 = document.getElementById('calc-stopover-2') ? document.getElementById('calc-stopover-2').value.trim() : '';
-            const stop3 = document.getElementById('calc-stopover-3') ? document.getElementById('calc-stopover-3').value.trim() : '';
-            
-            let stopoversArr = [];
-            if (stop1) stopoversArr.push(stop1);
-            if (stop2) stopoversArr.push(stop2);
-            if (stop3) stopoversArr.push(stop3);
-
+            const stopover = document.getElementById('calc-stopover') ? document.getElementById('calc-stopover').value.trim() : '';
             const flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
             const date = document.getElementById('date') ? document.getElementById('date').value : '';
             const time = document.getElementById('time') ? document.getElementById('time').value : '';
@@ -1517,17 +1517,18 @@
             }
             const paymentStr = payments.join(' / ');
 
-            // 判斷用車時間是否在發送訊息時間的15分鐘內
-            let isInstant = false;
+            // 2. 【即時用車提示】：加入時間比對邏輯（15分鐘之內加上「‼️即時用車‼️」）
+            let timeStringFormatted = time;
             if (date && time) {
                 const now = new Date();
-                const [year, month, day] = date.split('-').map(Number);
-                const [hour, minute] = time.split(':').map(Number);
-                const targetDateTime = new Date(year, month - 1, day, hour, minute);
-                const diffMs = targetDateTime - now;
-                const diffMins = diffMs / (1000 * 60);
-                if (diffMins >= 0 && diffMins <= 15) {
-                    isInstant = true;
+                const [targetYear, targetMonth, targetDay] = date.split('-').map(Number);
+                const [targetHour, targetMinute] = time.split(':').map(Number);
+                const targetDateTime = new Date(targetYear, targetMonth - 1, targetDay, targetHour, targetMinute);
+                
+                const diffMinutes = (targetDateTime - now) / (1000 * 60);
+                
+                if (diffMinutes <= 15) {
+                    timeStringFormatted = `${time} ‼️即時用車‼️`;
                 }
             }
 
@@ -1545,21 +1546,10 @@
             }
 
             msgLines.push(`📍 起點：${pickup}`);
-            if (stopoversArr.length > 0) {
-                stopoversArr.forEach((s, idx) => {
-                    msgLines.push(`🛑 中途站 ${idx + 1}：${s}`);
-                });
-            }
+            if (stopover) msgLines.push(`🛑 中途站：${stopover}`);
             msgLines.push(`🏁 終點：${dropoff}`);
             msgLines.push(`📅 日期：${date}`);
-            
-            // 如果在15分鐘內，在時間行後加額外提示
-            let timeStr = `⏰ 時間：${time}`;
-            if (isInstant) {
-                timeStr += ` ‼️即時用車‼️`;
-            }
-            msgLines.push(timeStr);
-
+            msgLines.push(`⏰ 時間：${timeStringFormatted}`);
             msgLines.push(`👥 人數：${passengers}`);
             
             if (luggages && luggages !== '0 件') {
