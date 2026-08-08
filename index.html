@@ -301,7 +301,7 @@
                     <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費估算使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
-                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
+                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經青衣去機場」</span>。</li>
                     <li data-i18n="calc_tip_2"><strong class="text-white">3格輸入：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
                     <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預估基本車費。</li>
                 </ul>
@@ -333,7 +333,7 @@
 
             <!-- 計算按鈕 -->
             <button type="button" onclick="calculateFareWithGoogle()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-xs shadow-md">
-                <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即計算預估車費</span>
+                <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即計算預計車費</span>
             </button>
 
             <!-- 報價結果展示區 -->
@@ -467,7 +467,7 @@
                         <input type="date" id="date" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (最快15分鐘後)</span></label>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (如沒輸入，自動預設15分鐘後)</span></label>
                         <input type="time" id="time" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                     </div>
                 </div>
@@ -507,9 +507,17 @@
                         <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
                         <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span data-i18n="label_has_wheelchair">是否有輪椅需要放置於尾箱</span>
                     </label>
+                </div>                <!-- 備注其他要求勾選方格及動態輸入框 -->
+                <div class="bg-brand-dark border border-gray-800 rounded-xl p-4 space-y-3">
+                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
+                        <input type="checkbox" id="has_other_note" value="是" onchange="toggleOtherNoteInput()" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+                        <i class="fa-solid fa-pen-to-square text-brand-yellow text-base"></i> <span data-i18n="label_other_note">備注其他要求</span>
+                    </label>
+                    <div id="other-note-container" class="hidden">
+                        <input type="text" id="other_note_text" maxlength="20" data-i18n-placeholder="ph_other_note" placeholder="請輸入其他要求 (最多20字)..." class="w-full bg-black border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                    </div>
                 </div>
-
-                <!-- 付款方式選擇 (可選多項) -->
+     <!-- 付款方式選擇 (可選多項) -->
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-2">
                         <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
@@ -704,7 +712,7 @@
                 ph_dropoff_opt: "輸入終點...",
 
                 voice_btn_text: "按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」",
-                btn_calc_fare: "立即計算預估車費",
+                btn_calc_fare: "立即計算預計車費",
                 route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
                 res_distance: "全程預計距離：",
                 res_duration: "預計行車時間：",
@@ -1563,6 +1571,12 @@
             if (hasWheelchair) {
                 msgLines.push(`♿️輪椅放置尾箱：✅`);
             }
+            const hasOtherNote = document.getElementById('has_other_note') && document.getElementById('has_other_note').checked;
+            const otherNoteText = document.getElementById('other_note_text') ? document.getElementById('other_note_text').value.trim() : '';
+            if (hasOtherNote && otherNoteText) {
+                msgLines.push(`📝其他要求：${otherNoteText}`);
+            }
+
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
             
             if (surname) {
@@ -1585,6 +1599,28 @@
             const encodedMessage = encodeURIComponent(msgLines.join('\n'));
             window.open(`https://wa.me/85257038875?text=${encodedMessage}`, '_blank');
         }
+
+        function toggleOtherNoteInput() {
+            const hasOtherNote = document.getElementById('has_other_note');
+            const container = document.getElementById('other-note-container');
+            if (hasOtherNote && container) {
+                if (hasOtherNote.checked) {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                    document.getElementById('other_note_text').value = '';
+                }
+            }
+        }
+            // 2. 【聯絡電話位數驗證】：必須八位數字以上才可發送
+            const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+            if (phone.length < 8) {
+                alert(currentLang === 'en' ? "Contact phone must be at least 8 digits before sending WhatsApp!" : "聯絡電話必須輸入最少八位數字才可發送 WhatsApp 預約訊息！");
+                document.getElementById('phone')?.focus();
+                return;
+            }
+
+
     </script>
 </body>
 </html>
