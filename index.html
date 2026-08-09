@@ -1195,93 +1195,24 @@
             return Math.round(fare);
         }
 
-        // --- 修改後的核心處理函數 ---
-
-// 1. 地點規範化：針對深圳灣設定特定經緯度
-function normalizeLocation(loc, isOrigin) {
-    if (!loc) return "";
-    let trimmed = loc.trim();
-    
-    // 如果包含深圳灣，依照起點或終點回傳不同經緯度
-    if (trimmed.includes("深圳灣")) {
-        if (isOrigin) {
-            // 起點：22°28'11.3"N 113°57'44.5"E (轉為十進位)
-            return { lat: 22.469806, lng: 113.962361 };
-        } else {
-            // 終點：22°28'10.8"N 113°57'43.9"E (轉為十進位)
-            return { lat: 22.469667, lng: 113.962194 };
-        }
-    }
-    
-    if (trimmed.includes("落馬洲")) return "落馬洲支線出入境管制站";
-    if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) return "香港國際機場";
-    return trimmed;
-}
-
-// 2. 修改路線計算邏輯：偵測深圳灣並自動增加 3.4km
-function calculateFareWithGoogle() {
-    calcPickupInput = document.getElementById('calc-pickup');
-    calcStopoverInput = document.getElementById('calc-stopover');
-    calcDropoffInput = document.getElementById('calc-dropoff');
-
-    let pickupVal = calcPickupInput ? calcPickupInput.value.trim() : "";
-    let stopoverVal = calcStopoverInput ? calcStopoverInput.value.trim() : "";
-    let dropoffVal = calcDropoffInput ? calcDropoffInput.value.trim() : "";
-
-    if (!pickupVal || !dropoffVal) {
-        alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
-        return;
-    }
-
-    if (!directionsService) directionsService = new google.maps.DirectionsService();
-
-    // 檢查起點或終點是否為深圳灣
-    let isStartShenzhen = pickupVal.includes("深圳灣");
-    let isEndShenzhen = dropoffVal.includes("深圳灣");
-
-    // 傳入 true/false 以區分起點或終點經緯度
-    let targetPickup = normalizeLocation(pickupVal, true);
-    let targetDropoff = normalizeLocation(dropoffVal, false);
-    
-    let waypoints = [];
-    if (stopoverVal) {
-        waypoints.push({ location: normalizeLocation(stopoverVal, false), stopover: true });
-    }
-
-    const request = {
-        origin: targetPickup,
-        destination: targetDropoff,
-        waypoints: waypoints,
-        travelMode: google.maps.TravelMode.DRIVING,
-        provideRouteAlternatives: true
-    };
-
-    directionsService.route(request, (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-            routesData = processRoutes(result.routes);
-            result.routes = routesData;
-            
-            // 這裡進行車費計算展示
-            // 注意：在計算距離時，如果是深圳灣出發或到達，自動加上 3.4km
-            // 該 3.4km 僅參與計算，不影響顯示的原始路程數據，符合您的要求
-            const selectedRoute = routesData[0];
-            let rawDistMeters = 0;
-            selectedRoute.legs.forEach(leg => rawDistMeters += leg.distance.value);
-            
-            let finalDistKm = rawDistMeters / 1000;
-            if (isStartShenzhen || isEndShenzhen) {
-                finalDistKm += 3.4; 
+        // 規範化地點名稱 (修改：當包含深圳灣時，自動對應圖片指定的經緯度物件)
+        function normalizeLocation(loc) {
+            if (!loc) return "";
+            let trimmed = loc.trim();
+            if (trimmed.includes("落馬洲")) {
+                return "落馬洲支線出入境管制站";
             }
-            
-            // 之後呼叫 calculateTaxiBaseFare(finalDistKm) 即可得到包含額外收費的結果
-            // ... (後續 UI 更新代碼保持不變)
+            if (trimmed.includes("深圳灣")) {
+                return { lat: 22.469667, lng: 113.962194 }; // 對應 22°28'10.8"N 113°57'43.9"E
+            }
+            if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) {
+                return "香港國際機場";
+            }
+            return trimmed;
         }
-    });
-}
-
 
         // 篩選最快與最短路線
-        function processRoutes(routes) {
+        function processRoutes(routes, isShenzhenBayRoute) {
             if (!routes || routes.length === 0) return [];
             if (routes.length === 1) {
                 routes[0].customLabel = "最佳路線";
@@ -1374,16 +1305,16 @@ function calculateFareWithGoogle() {
 
             if (!directionsService) directionsService = new google.maps.DirectionsService();
 
-            // 檢查終點是否為深圳灣
-            let isShenzhenBayDropoff = dropoffVal.includes("深圳灣");
+            // 檢查起點、終點或中途站是否包含深圳灣
+            let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverVal.includes("深圳灣");
 
-            let targetPickup = normalizeLocation(pickupVal, false);
-            let targetDropoff = normalizeLocation(dropoffVal, true); // 傳入 true 代表終點，如果是深圳灣會返回經緯度物件
+            let targetPickup = normalizeLocation(pickupVal);
+            let targetDropoff = normalizeLocation(dropoffVal);
             
             // 建立 waypoints 陣列
             let waypoints = [];
             if (stopoverVal) {
-                waypoints.push({ location: normalizeLocation(stopoverVal, false), stopover: true });
+                waypoints.push({ location: normalizeLocation(stopoverVal), stopover: true });
             }
 
             const request = {
@@ -1396,7 +1327,7 @@ function calculateFareWithGoogle() {
 
             directionsService.route(request, (result, status) => {
                 if (status === google.maps.DirectionsStatus.OK) {
-                    routesData = processRoutes(result.routes);
+                    routesData = processRoutes(result.routes, isShenzhenBay);
                     result.routes = routesData;
 
                     const fareResultEl = document.getElementById('fare-result');
@@ -1417,14 +1348,14 @@ function calculateFareWithGoogle() {
                                 durSeconds += leg.duration.value;
                             });
                             let distKm = distMeters / 1000;
-                            if (isShenzhenBayDropoff) distKm += 3.6; // 內部計算車費額外+3.6公里，不額外展示
+                            if (isShenzhenBay) distKm += 3.4; // 內部計算車費額外+3.4公里，不額外顯示
 
                             let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
                             const btn = document.createElement('button');
                             btn.type = 'button';
                             btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
-                            btn.onclick = () => selectRouteOption(index, isShenzhenBayDropoff);
+                            btn.onclick = () => selectRouteOption(index, isShenzhenBay);
                             btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
                                             <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
                             routeListContainer.appendChild(btn);
@@ -1433,7 +1364,7 @@ function calculateFareWithGoogle() {
                         routeOptionsBox.classList.add('hidden');
                     }
 
-                    displaySelectedRoute(result, 0, isShenzhenBayDropoff);
+                    displaySelectedRoute(result, 0, isShenzhenBay);
                     fareResultEl.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
@@ -1441,7 +1372,7 @@ function calculateFareWithGoogle() {
             });
         }
 
-        function selectRouteOption(index, isShenzhenBayDropoff) {
+        function selectRouteOption(index, isShenzhenBay) {
             const btns = document.querySelectorAll('#route-options-list button');
             btns.forEach((btn, i) => {
                 if (i === index) {
@@ -1452,11 +1383,11 @@ function calculateFareWithGoogle() {
             });
 
             if (directionsRenderer && directionsRenderer.getDirections()) {
-                displaySelectedRoute(directionsRenderer.getDirections(), index, isShenzhenBayDropoff);
+                displaySelectedRoute(directionsRenderer.getDirections(), index, isShenzhenBay);
             }
         }
 
-        function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayDropoff) {
+        function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBay) {
             if (!map) {
                 map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 12,
@@ -1491,8 +1422,8 @@ function calculateFareWithGoogle() {
             });
 
             let routeKm = totalMeters / 1000;
-            // 假如終點為深圳灣，車費總額按原本路程加多 3.6 公里計算（不在介面額外展示）
-            let finalKm = isShenzhenBayDropoff ? (routeKm + 3.6) : routeKm;
+            // 假如為深圳灣，總車費按原本路程加多 3.4 公里計算（畫面上展示的裡数依然維持正常或按要求隱藏額外收費提示）
+            let finalKm = isShenzhenBay ? (routeKm + 3.4) : routeKm;
             let durationMinutes = Math.round(totalSeconds / 60);
 
             let baseMeterFare = calculateTaxiBaseFare(finalKm);
@@ -1538,6 +1469,7 @@ function calculateFareWithGoogle() {
                 minNoteRow.classList.add('hidden');
             }
 
+            // 畫面上顯示的公里數維持原狀或包含自動加載（此處為了不讓客人知道額外收費，畫面上顯示原始距離 routeKm 即可，但結算用 finalKm。如果你想畫面顯示也包含3.4公里，可改為 finalKm）
             document.getElementById('res-distance').innerText = routeKm.toFixed(1);
             document.getElementById('res-duration').innerText = durationMinutes;
             document.getElementById('res-base-fare').innerText = baseMeterFare;
