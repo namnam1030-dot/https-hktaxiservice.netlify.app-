@@ -1151,7 +1151,7 @@
             }
         }
 
-        function startVoiceRecognition() {
+                function startVoiceRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 alert("您的瀏覽器暫不支援語音辨識，請直接使用輸入框填寫。");
@@ -1177,32 +1177,71 @@
                 const speechResult = event.results[0][0].transcript;
                 micText.innerText = "聽到：「" + speechResult + "」";
 
-                let pickup = "", dropoff = "";
+                let pickup = "", dropoff = "", stopover = "";
                 let text = speechResult;
-                text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "");
+                
+                // 清除冗餘對話字眼
+                text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
+                // 特別處理常見口語地標
                 if (text.includes("深圳灣")) {
-                    dropoff = "深圳灣";
+                    // 如果沒有明確說明去向，預設歸納在終點或適當位置，這裡保留完整字串由系統處理
                 }
 
-                if (text.includes("由") || text.includes("從")) {
-                    const fromSplit = text.split(/由|從/);
-                    const afterFrom = fromSplit[1] || "";
-                    if (afterFrom.includes("去") || afterFrom.includes("到") || afterFrom.includes("至")) {
-                        const toSplit = afterFrom.split(/去|到|至/);
-                        pickup = toSplit[0];
-                        dropoff = toSplit[1];
-                    } else {
-                        pickup = afterFrom;
+                // 核心拆解邏輯：支援「由 [起點] 經 [中途站] 去 [終點]」格式
+                // 1. 先處理起點 (由 / 從 之後，到 經 / 去 / 到 / 至 之前)
+                let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
+                if (fromMatch && fromMatch[1]) {
+                    pickup = fromMatch[1].trim();
+                }
+
+                // 2. 處理中途站 (經 / 途經 之後，到 去 / 到 / 至 之前)
+                let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
+                if (viaMatch && viaMatch[1]) {
+                    // 確保中途站不會把終點包含進去
+                    let viaText = viaMatch[1].trim();
+                    // 如果裡面剛好包含「去/到/證」，再切一次
+                    let subToSplit = viaText.split(/去|到|至/);
+                    stopover = subToSplit[0].trim();
+                }
+
+                // 3. 處理終點 (去 / 到 / 至 之後的文字)
+                let toMatch = text.match(/(?:去|到|至)(.+)$/);
+                if (toMatch && toMatch[1]) {
+                    dropoff = toMatch[1].trim();
+                } else {
+                    // 如果沒有「去/到/至」，但有「經」，則「經」之後未被抓去當中途站的可能是終點
+                    // 這裡做一個簡單的備用防禦性處理
+                    let parts = text.split(/由|從|經|途經/);
+                    if (parts.length >= 3) {
+                        // 若語句結構為 「由A經BC」
+                        let lastPart = parts[parts.length - 1].trim();
+                        // 嘗試智慧配對
                     }
-                } else if (text.includes("去") || text.includes("到") || text.includes("至")) {
-                    const toSplit = text.split(/去|到|至/);
-                    pickup = toSplit[0];
-                    dropoff = toSplit[1];
                 }
 
-                if (pickup) document.getElementById('calc-pickup').value = pickup.trim();
-                if (dropoff) document.getElementById('calc-dropoff').value = dropoff.trim();
+                // 額外保險：如果正規表達式漏掉，改用簡單字串包含判定
+                if (!pickup && (text.includes("由") || text.includes("從"))) {
+                    let temp = text.split(/由|從/)[1];
+                    if (temp) pickup = temp.split(/經|去|到/)[0].trim();
+                }
+                if (!dropoff && (text.includes("去") || text.includes("到") || text.includes("至"))) {
+                    let temp = text.split(/去|到|至/);
+                    dropoff = temp[temp.length - 1].trim();
+                }
+
+                // 將解析結果填入對應的輸入框中
+                if (pickup) document.getElementById('calc-pickup').value = pickup;
+                
+                if (stopover) {
+                    // 自動展開第一個中途站欄位並填入
+                    if (currentStopCount === 0) {
+                        addStopoverField();
+                    }
+                    document.getElementById('calc-stopover-1').value = stopover;
+                }
+                
+                if (dropoff) document.getElementById('calc-dropoff').value = dropoff;
 
                 setTimeout(() => {
                     micBtn.classList.remove('bg-brand-yellow', 'text-black');
@@ -1227,6 +1266,7 @@
                 micIcon.className = "fa-solid fa-microphone text-base";
             };
         }
+
 
         // 市區的士跳錶車費計算邏輯
         function calculateTaxiBaseFare(km) {
