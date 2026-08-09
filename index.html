@@ -1422,8 +1422,8 @@
             });
 
             let routeKm = totalMeters / 1000;
-            // 假如為深圳灣，總車費按原本路程加多 5 公里計算（畫面上展示的裡数依然維持正常或按要求隱藏額外收費提示）
-            let finalKm = isShenzhenBay ? (routeKm + 5) : routeKm;
+            // 假如為深圳灣，總車費按原本路程加多 4 公里計算（畫面上展示的裡数依然維持正常或按要求隱藏額外收費提示）
+            let finalKm = isShenzhenBay ? (routeKm + 4) : routeKm;
             let durationMinutes = Math.round(totalSeconds / 60);
 
             let baseMeterFare = calculateTaxiBaseFare(finalKm);
