@@ -1195,15 +1195,16 @@
             return Math.round(fare);
         }
 
-        // 規範化地點名稱 (支援自動檢測起點或終點為深圳灣，設定為深圳灣公路大橋)
+        // 規範化地點名稱 (支援深圳灣自動定義為指定經緯度)
         function normalizeLocation(loc) {
             if (!loc) return "";
             let trimmed = loc.trim();
             if (trimmed.includes("落馬洲")) {
                 return "落馬洲支線出入境管制站";
             }
+            // 假如起點或終點包含「深圳灣」，自動設定為圖片指定的經緯度位置
             if (trimmed.includes("深圳灣")) {
-                return "深圳灣公路大橋";
+                return new google.maps.LatLng(22.457306, 113.970444);
             }
             if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) {
                 return "香港國際機場";
@@ -1305,7 +1306,7 @@
 
             if (!directionsService) directionsService = new google.maps.DirectionsService();
 
-            // 檢查起點、終點或中途站是否包含深圳灣
+            // 判斷起點或終點是否包含深圳灣
             let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverVal.includes("深圳灣");
 
             let targetPickup = normalizeLocation(pickupVal);
@@ -1343,7 +1344,8 @@
                                 durSeconds += leg.duration.value;
                             });
                             let distKm = distMeters / 1000;
-                            if (isShenzhenBay) distKm += 5; // 深圳灣自動加 5 公里
+                            // 總車費按原本路程加多 5 公里計算 (不顯示另外加錢給客人看)
+                            if (isShenzhenBay) distKm += 5;
 
                             let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
@@ -1417,7 +1419,7 @@
             });
 
             let routeKm = totalMeters / 1000;
-            // 如果是深圳灣，總距離自動加多 5 公里計算車費
+            // 總車費按原本路程自動加多 5 公里計算 (不額外顯示加了錢的明細)
             let finalKm = isShenzhenBay ? (routeKm + 5) : routeKm;
             let durationMinutes = Math.round(totalSeconds / 60);
 
@@ -1487,10 +1489,12 @@
 
             const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
 
-            // 2. 【聯絡電話位數驗證】：聯絡電話必須多於八位數字才可發送 WhatsApp
-            if (phone.length <= 8) {
-                alert(currentLang === 'en' ? "Please enter a contact phone number with more than 8 digits!" : "聯絡電話必須多於八位數字才可發送預約訊息！");
-                document.getElementById('phone').focus();
+            // 2. 【電話號碼位數驗證】：聯絡電話不可少於八個數字才可發送 WhatsApp 預約訊息
+            // 清理電話號碼中的空格或非數字字符後檢查長度
+            const cleanPhone = phone.replace(/\D/g, '');
+            if (cleanPhone.length < 8) {
+                alert(currentLang === 'en' ? "Contact phone number must be at least 8 digits long!" : "聯絡電話必須不少於 8 個數字才可發送預約訊息！");
+                document.getElementById('phone')?.focus();
                 return;
             }
 
