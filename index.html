@@ -303,7 +303,7 @@
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
                     <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
                     <li data-i18n="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
-                    <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預估基本車費。</li>
+                    <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預計基本車費。</li>
                 </ul>
             </div>
 
@@ -319,9 +319,9 @@
                     <!-- 起點連對調按鈕 (移至中途站左方，並改為上下箭嘴) -->
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[11px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點 (出發地)</label>
+                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
                             <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-dark border border-gray-800 hover:border-brand-yellow text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-[10px]">對調起點終點</span>
+                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-[17px]">起點🔃目的地</span>
                             </button>
                         </div>
                         <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
@@ -329,7 +329,7 @@
 
                     <!-- 展開中途站按鈕與容器 -->
                     <div class="flex justify-between items-center pt-1">
-                        <label class="block text-[11px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (最多3個)</label>
+                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (最多3個)</label>
                         <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="text-xs text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-2.5 py-1 rounded-md hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
                         </button>
@@ -358,8 +358,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-[11px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
-                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入終點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">目的地</label>
+                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                     </div>
                 </div>
             </div>
