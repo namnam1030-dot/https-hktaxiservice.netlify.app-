@@ -1348,7 +1348,7 @@
                                 durSeconds += leg.duration.value;
                             });
                             let distKm = distMeters / 1000;
-                            if (isShenzhenBay) distKm += 5; // 內部計算車費額外+5公里，不額外顯示
+                            if (isShenzhenBay) distKm += 4; // 內部計算車費額外+4公里，不額外顯示
 
                             let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
