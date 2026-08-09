@@ -88,7 +88,7 @@
                     <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
-                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
+                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「由中環去機場」</span>。</li>
                     <li data-i18n="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。</li>
                 </ul>
             </div>
@@ -97,7 +97,7 @@
                 <!-- 廣東話語音按鈕 -->
                 <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-xs">
                     <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
-                    <span id="mic-text" data-i18n="voice_btn_text">：由 [起點] 經 [中途站] 去 [目的地]</span>
+                    <span id="mic-text" data-i18n="voice_btn_text">：[起點] 經 [中途站] 去 [目的地]</span>
                 </button>
 
                 <!-- 起點、中途站、終點輸入結構 -->
@@ -723,7 +723,7 @@
                 ph_stopover_opt: "輸入中途站...",
                 ph_dropoff_opt: "輸入終點...",
 
-                voice_btn_text: "：由 [起點] 經 [中途站] 去 [目的地]",
+                voice_btn_text: "：[起點] 經 [中途站] 去 [目的地]",
                 btn_calc_fare: "立即預計車費",
                 route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
                 res_distance: "全程預計距離：",
@@ -855,7 +855,7 @@
                 ph_stopover_opt: "Enter stopover...",
                 ph_dropoff_opt: "Enter destination...",
 
-                voice_btn_text: "Click to speak trip: \"From [Start] via [Stop] to [Destination]\"",
+                voice_btn_text: "Click to speak trip: \"[Start] via [Stop] to [Destination]\"",
                 btn_calc_fare: "Calculate Estimated Fare",
                 route_select_title: "Select Route Option (Fastest / Shortest):",
                 res_distance: "Estimated Distance: ",
@@ -1151,7 +1151,7 @@
             }
         }
 
-                function startVoiceRecognition() {
+        function startVoiceRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 alert("您的瀏覽器暫不支援語音辨識，請直接使用輸入框填寫。");
@@ -1183,58 +1183,53 @@
                 // 清除冗餘對話字眼
                 text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
-                // 特別處理常見口語地標
-                if (text.includes("深圳灣")) {
-                    // 如果沒有明確說明去向，預設歸納在終點或適當位置，這裡保留完整字串由系統處理
-                }
-
-                // 核心拆解邏輯：支援「由 [起點] 經 [中途站] 去 [終點]」格式
-                // 1. 先處理起點 (由 / 從 之後，到 經 / 去 / 到 / 至 之前)
+                // 核心解構邏輯：支援「由/從 [起點] 經 [中途站] 去/到/至 [終點]」或直接講出「[起點] 去 [終點]」
                 let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
                 if (fromMatch && fromMatch[1]) {
                     pickup = fromMatch[1].trim();
+                } else {
+                    // 如果沒有「由」或「從」，則取第一個「經」、「去」、「到」、「至」之前的文字作為起點
+                    let firstSplit = text.split(/經|途經|去|到|至/)[0];
+                    if (firstSplit) {
+                        pickup = firstSplit.trim();
+                    }
                 }
 
-                // 2. 處理中途站 (經 / 途經 之後，到 去 / 到 / 至 之前)
+                // 處理中途站
                 let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
                 if (viaMatch && viaMatch[1]) {
-                    // 確保中途站不會把終點包含進去
                     let viaText = viaMatch[1].trim();
-                    // 如果裡面剛好包含「去/到/證」，再切一次
                     let subToSplit = viaText.split(/去|到|至/);
                     stopover = subToSplit[0].trim();
                 }
 
-                // 3. 處理終點 (去 / 到 / 至 之後的文字)
+                // 處理終點
                 let toMatch = text.match(/(?:去|到|至)(.+)$/);
                 if (toMatch && toMatch[1]) {
                     dropoff = toMatch[1].trim();
                 } else {
-                    // 如果沒有「去/到/至」，但有「經」，則「經」之後未被抓去當中途站的可能是終點
-                    // 這裡做一個簡單的備用防禦性處理
-                    let parts = text.split(/由|從|經|途經/);
-                    if (parts.length >= 3) {
-                        // 若語句結構為 「由A經BC」
+                    // 如果沒有「去/到/至」，但有「經」，則抓「經」後面的部分作為終點
+                    let parts = text.split(/經|途經/);
+                    if (parts.length >= 2) {
                         let lastPart = parts[parts.length - 1].trim();
-                        // 嘗試智慧配對
+                        // 確保如果沒有包含在中途站內，就當作終點
+                        if (lastPart && lastPart !== stopover) {
+                            dropoff = lastPart;
+                        }
+                    } else if (!dropoff) {
+                        // 若完全沒有關鍵字，將後半段分給終點
+                        let words = text.split(/\s+/);
+                        if (words.length >= 2 && !pickup) {
+                            pickup = words[0];
+                            dropoff = words[words.length - 1];
+                        }
                     }
-                }
-
-                // 額外保險：如果正規表達式漏掉，改用簡單字串包含判定
-                if (!pickup && (text.includes("由") || text.includes("從"))) {
-                    let temp = text.split(/由|從/)[1];
-                    if (temp) pickup = temp.split(/經|去|到/)[0].trim();
-                }
-                if (!dropoff && (text.includes("去") || text.includes("到") || text.includes("至"))) {
-                    let temp = text.split(/去|到|至/);
-                    dropoff = temp[temp.length - 1].trim();
                 }
 
                 // 將解析結果填入對應的輸入框中
                 if (pickup) document.getElementById('calc-pickup').value = pickup;
                 
                 if (stopover) {
-                    // 自動展開第一個中途站欄位並填入
                     if (currentStopCount === 0) {
                         addStopoverField();
                     }
