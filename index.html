@@ -1195,7 +1195,7 @@
             return Math.round(fare);
         }
 
-        // 規範化地點名稱
+        // 規範化地點名稱 (支援自動檢測起點或終點為深圳灣，設定為深圳灣公路大橋)
         function normalizeLocation(loc) {
             if (!loc) return "";
             let trimmed = loc.trim();
@@ -1305,6 +1305,7 @@
 
             if (!directionsService) directionsService = new google.maps.DirectionsService();
 
+            // 檢查起點、終點或中途站是否包含深圳灣
             let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverVal.includes("深圳灣");
 
             let targetPickup = normalizeLocation(pickupVal);
@@ -1342,7 +1343,7 @@
                                 durSeconds += leg.duration.value;
                             });
                             let distKm = distMeters / 1000;
-                            if (isShenzhenBay) distKm += 5;
+                            if (isShenzhenBay) distKm += 5; // 深圳灣自動加 5 公里
 
                             let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
@@ -1416,6 +1417,7 @@
             });
 
             let routeKm = totalMeters / 1000;
+            // 如果是深圳灣，總距離自動加多 5 公里計算車費
             let finalKm = isShenzhenBay ? (routeKm + 5) : routeKm;
             let durationMinutes = Math.round(totalSeconds / 60);
 
@@ -1483,6 +1485,15 @@
                 return;
             }
 
+            const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+
+            // 2. 【聯絡電話位數驗證】：聯絡電話必須多於八位數字才可發送 WhatsApp
+            if (phone.length <= 8) {
+                alert(currentLang === 'en' ? "Please enter a contact phone number with more than 8 digits!" : "聯絡電話必須多於八位數字才可發送預約訊息！");
+                document.getElementById('phone').focus();
+                return;
+            }
+
             // 提交前進行最後安全檢查
             if (!validatePassengerAndCar(selectedCarName)) {
                 scrollToFleet();
@@ -1495,7 +1506,6 @@
             const time = document.getElementById('time') ? document.getElementById('time').value : '';
             const passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
             const luggages = document.getElementById('luggages') ? document.getElementById('luggages').value : '';
-            const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
 
             const hasPet = document.getElementById('has_pet') && document.getElementById('has_pet').checked;
             const hasWheelchair = document.getElementById('has_wheelchair') && document.getElementById('has_wheelchair').checked;
@@ -1517,7 +1527,7 @@
             }
             const paymentStr = payments.join(' / ');
 
-            // 2. 【即時用車提示】：加入時間比對邏輯（15分鐘之內加上「‼️即時用車‼️」）
+            // 3. 【即時用車提示】：加入時間比對邏輯（15分鐘之內加上「‼️即時用車‼️」）
             let timeStringFormatted = time;
             if (date && time) {
                 const now = new Date();
