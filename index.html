@@ -75,6 +75,155 @@
         </div>
     </header>
 
+    <!-- 車費估算器 Section (已移至導覽列與 Hero Section 之間) -->
+    <section id="calculator-section" class="max-w-2xl mx-auto px-4" style="margin-top: 0px; margin-bottom: 30px;">
+        <div class="bg-brand-gray border border-gray-800 rounded-3xl p-6 shadow-2xl">
+            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
+                <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
+            </h3>
+
+            <!-- 查詢教學提示框 -->
+            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-2xl text-xs text-gray-300 mb-4 shadow-inner">
+                <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-gray-300">
+                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
+                    <li data-i18n="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。</li>
+                </ul>
+            </div>
+
+            <div class="space-y-3 mb-4">
+                <!-- 廣東話語音按鈕 -->
+                <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-xs">
+                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
+                    <span id="mic-text" data-i18n="voice_btn_text">：由 [起點] 經 [中途站] 去 [目的地]</span>
+                </button>
+
+                <!-- 起點、中途站、終點輸入結構 -->
+                <div class="space-y-2">
+                    <!-- 起點連對調按鈕 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
+                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-dark border border-gray-800 hover:border-brand-yellow text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-[17px]">起點🔃目的地</span>
+                            </button>
+                        </div>
+                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+
+                    <!-- 展開中途站按鈕與容器 -->
+                    <div class="flex justify-between items-center pt-1">
+                        <label class="block text-[15px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
+                        <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="text-xs text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-2.5 py-1 rounded-md hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
+                        </button>
+                    </div>
+
+                    <!-- 中途站 1 (預設隱藏) -->
+                    <div id="stopover-container-1" class="hidden flex items-center gap-2">
+                        <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <button type="button" onclick="removeStopoverField(1)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- 中途站 2 (預設隱藏) -->
+                    <div id="stopover-container-2" class="hidden flex items-center gap-2">
+                        <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <button type="button" onclick="removeStopoverField(2)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                    </div>
+                    <!-- 中途站 3 (預設隱藏) -->
+                    <div id="stopover-container-3" class="hidden flex items-center gap-2">
+                        <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <button type="button" onclick="removeStopoverField(3)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">目的地</label>
+                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 計算按鈕 -->
+            <button type="button" onclick="calculateFareWithGoogle()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-xs shadow-md">
+                <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即預計車費</span>
+            </button>
+
+            <!-- 報價結果展示區 -->
+            <div id="fare-result" class="hidden mt-5 p-5 bg-black/80 border border-brand-yellow/50 rounded-2xl">
+               <!-- 路線選擇方案 -->
+                <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
+                    <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
+                    </div>
+                    <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                </div>
+
+                <div id="detected-tunnels-container" class="hidden mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-xs text-sky-200">
+                    <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
+                    <span id="detected-tunnels-list" class="text-white font-medium"></span>
+                </div>
+
+                <!-- 路線小地圖 -->
+                <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-4 shadow-lg overflow-hidden"></div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs text-gray-300 mb-3 border-b border-gray-800 pb-3">
+                    <div><span data-i18n="res_distance">全程預計距離：</span><span id="res-distance" class="text-white font-bold">0</span> <span data-i18n="unit_km">公里</span></div>
+                    <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
+                </div>
+
+                <!-- 法定跳錶基本費及總額 -->
+                <div class="text-xs text-gray-300 space-y-0.5 mb-1 pb-1 border-b border-gray-800/60">
+                    <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
+                    <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
+                    <div id="res-tunnel-row" class="hidden text-sky-300">
+                        <span>預計自動偵測隧道費：</span><span class="font-bold">+HK$ <span id="res-tunnel-val">0</span></span>
+                    </div>
+                    <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
+                </div>
+
+                <div class="text-xl font-extrabold text-brand-yellow mt-1 pt-1 flex justify-between items-end mb-3">
+                    <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計車費總額：</span>
+                    <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
+                </div>
+
+                <!-- 提示語 -->
+                <div class="mb-3 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
+                    <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
+                        以上預計車費並未包含停車場、行李及等候時間等收費，一切按實際情況為準。
+                    </p>
+                </div>
+                
+                <!-- 隧道 / 其他收費明細 -->
+                <div class="p-3 bg-sky-950/40 border border-sky-500/40 rounded-xl text-[11px] leading-tight space-y-1.5 text-sky-200">
+                    <div class="font-bold text-sky-400 flex items-center gap-1">
+                        <i class="fa-solid fa-road"></i> <span>其他收費明細：</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-gray-300">
+                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>機場1號停車場</span><span class="font-bold text-white">$16</span></div>
+                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>行李費</span><span class="font-bold text-white">$6/件</span></div>
+                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40 sm:col-span-2"><span>等候時間</span><span class="font-bold text-white">停頓每分鐘 $2.1 / $1.4</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 重新選擇車款按鈕區 -->
+            <div class="mt-5 pt-4 border-t border-gray-800 flex justify-center">
+                <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- 頂部介紹 Hero Section -->
     <section class="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center md:text-left">
         <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
@@ -285,156 +434,6 @@
                 </div>
             </div>
 
-        </div>
-    </section>
-
-    <!-- 車費估算器 Section -->
-    <section id="calculator-section" class="max-w-2xl mx-auto px-4 mb-3">
-        <div class="bg-brand-gray border border-gray-800 rounded-3xl p-6 shadow-2xl">
-            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
-                <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線與車費估算</span>
-            </h3>
-
-            <!-- 查詢教學提示框 -->
-            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-2xl text-xs text-gray-300 mb-4 shadow-inner">
-                <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費估算使用說明：</span>
-                </p>
-                <ul class="list-disc list-inside space-y-1 text-gray-300">
-                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。</li>
-                    <li data-i18n="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。</li>
-                    <li data-i18n="calc_tip_3">系統將自動規劃最佳行車路線並計算預計基本車費。</li>
-                </ul>
-            </div>
-
-            <div class="space-y-3 mb-4">
-                <!-- 廣東話語音按鈕 -->
-                <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-xs">
-                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
-                    <span id="mic-text" data-i18n="voice_btn_text">按此講出行程：「由 [起點] 經 [中途站] 去 [目的地]」</span>
-                </button>
-
-                <!-- 起點、中途站、終點輸入結構 -->
-                <div class="space-y-2">
-                    <!-- 起點連對調按鈕 (移至中途站左方，並改為上下箭嘴) -->
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
-                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-dark border border-gray-800 hover:border-brand-yellow text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-[17px]">起點🔃目的地</span>
-                            </button>
-                        </div>
-                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                    </div>
-
-                    <!-- 展開中途站按鈕與容器 -->
-                    <div class="flex justify-between items-center pt-1">
-                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (最多3個)</label>
-                        <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="text-xs text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-2.5 py-1 rounded-md hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1">
-                            <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
-                        </button>
-                    </div>
-
-                    <!-- 中途站 1 (預設隱藏) -->
-                    <div id="stopover-container-1" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                        <button type="button" onclick="removeStopoverField(1)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                    </div>
-                    <!-- 中途站 2 (預設隱藏) -->
-                    <div id="stopover-container-2" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                        <button type="button" onclick="removeStopoverField(2)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                    </div>
-                    <!-- 中途站 3 (預設隱藏) -->
-                    <div id="stopover-container-3" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                        <button type="button" onclick="removeStopoverField(3)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                    </div>
-
-                    <div>
-                        <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">目的地</label>
-                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 計算按鈕 -->
-            <button type="button" onclick="calculateFareWithGoogle()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-xs shadow-md">
-                <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即計算預估車費</span>
-            </button>
-
-            <!-- 報價結果展示區 -->
-            <div id="fare-result" class="hidden mt-5 p-5 bg-black/80 border border-brand-yellow/50 rounded-2xl">
-               <!-- 路線選擇方案 -->
-                <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
-                    <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
-                    </div>
-                    <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-                </div>
-
-                <div id="detected-tunnels-container" class="hidden mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-xs text-sky-200">
-                    <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
-                    <span id="detected-tunnels-list" class="text-white font-medium"></span>
-                </div>
-
-                <!-- 路線小地圖 -->
-                <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-4 shadow-lg overflow-hidden"></div>
-
-                <div class="grid grid-cols-2 gap-2 text-xs text-gray-300 mb-3 border-b border-gray-800 pb-3">
-                    <div><span data-i18n="res_distance">全程預計距離：</span><span id="res-distance" class="text-white font-bold">0</span> <span data-i18n="unit_km">公里</span></div>
-                    <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
-                </div>
-
-                <!-- 法定跳錶基本費及總額 -->
-                <div class="text-xs text-gray-300 space-y-0.5 mb-1 pb-1 border-b border-gray-800/60">
-                    <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
-                    <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
-                    <div id="res-tunnel-row" class="hidden text-sky-300">
-                        <span>預計自動偵測隧道費：</span><span class="font-bold">+HK$ <span id="res-tunnel-val">0</span></span>
-                    </div>
-                    <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
-                </div>
-
-                <div class="text-xl font-extrabold text-brand-yellow mt-1 pt-1 flex justify-between items-end mb-3">
-                    <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計車費總額：</span>
-                    <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
-                </div>
-
-                <!-- 提示語 -->
-                <div class="mb-3 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
-                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
-                    <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
-                        以上預計車費並未包含停車場、行李及等候時間等收費，一切按實際情況為準。
-                    </p>
-                </div>
-                
-                <!-- 隧道 / 其他收費明細 -->
-                <div class="p-3 bg-sky-950/40 border border-sky-500/40 rounded-xl text-[11px] leading-tight space-y-1.5 text-sky-200">
-                    <div class="font-bold text-sky-400 flex items-center gap-1">
-                        <i class="fa-solid fa-road"></i> <span>其他收費明細：</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-gray-300">
-                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>機場1號停車場</span><span class="font-bold text-white">$16</span></div>
-                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40"><span>行李費</span><span class="font-bold text-white">$6/件</span></div>
-                        <div class="flex justify-between bg-black/30 px-2 py-1 rounded border border-sky-900/40 sm:col-span-2"><span>等候時間</span><span class="font-bold text-white">停頓每分鐘 $2.1 / $1.4</span></div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- 重新選擇車款按鈕區 -->
-            <div class="mt-5 pt-4 border-t border-gray-800 flex justify-center">
-                <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
-                    <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
-                </button>
-            </div>
         </div>
     </section>
 
@@ -724,11 +723,11 @@
                 car5_feat: "配備原廠金屬斜道",
                 car5_fee: "附加費 HK$150 (最低 $230)",
 
-                calc_title: "智能路線與車費估算",
-                calc_tip_title: "車費估算使用說明：",
+                calc_title: "智能規劃路線與預計車費",
+                calc_tip_title: "預計車費使用說明：",
                 calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
                 calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
-                calc_tip_3: '系統將自動規劃最佳行車路線並計算預估基本車費。',
+                calc_tip_3: '系統將自動規劃最佳行車路線並預計基本車費。',
                 calc_label_pickup: "起點 (出發地)",
                 calc_label_stopover: "中途站 (最多3個)",
                 calc_label_dropoff: "終點 (目的地)",
