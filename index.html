@@ -1348,7 +1348,7 @@
                                 durSeconds += leg.duration.value;
                             });
                             let distKm = distMeters / 1000;
-                            if (isShenzhenBay) distKm += 5; // 隱藏額外 +5 公里
+                            if (isShenzhenBay) distKm += 2.9; // 隱藏額外 +2.9 公里
 
                             let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
@@ -1422,8 +1422,8 @@
             });
 
             let routeKm = totalMeters / 1000;
-            // 假如為深圳灣，總車費按原本路程加多 5 公里計算（隱藏收費）
-            let finalKm = isShenzhenBay ? (routeKm + 5) : routeKm;
+            // 假如為深圳灣，總車費按原本路程加多 2.9 公里計算（隱藏收費）
+            let finalKm = isShenzhenBay ? (routeKm + 2.9) : routeKm;
             let durationMinutes = Math.round(totalSeconds / 60);
 
             let baseMeterFare = calculateTaxiBaseFare(finalKm);
