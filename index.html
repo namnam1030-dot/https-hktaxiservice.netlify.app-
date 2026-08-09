@@ -1310,7 +1310,17 @@
 
             let targetPickup = normalizeLocation(pickupVal);
             let targetDropoff = normalizeLocation(dropoffVal);
-            const waypoints = stopoverVal ? [{ location: normalizeLocation(stopoverVal), stopover: true }] : [];
+            
+            // 建立 waypoints 陣列
+            let waypoints = [];
+            if (stopoverVal) {
+                waypoints.push({ location: normalizeLocation(stopoverVal), stopover: true });
+            }
+
+            // 【修改重點】如果起點或終點是深圳灣，且當前沒有手動設定深圳灣為中途點，則強制加入深圳灣公路大橋為途經點
+            if (isShenzhenBay && !stopoverVal.includes("深圳灣")) {
+                waypoints.push({ location: "深圳灣公路大橋", stopover: true });
+            }
 
             const request = {
                 origin: targetPickup,
