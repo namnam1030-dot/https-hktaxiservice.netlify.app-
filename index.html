@@ -1286,6 +1286,16 @@
         function normalizeLocation(loc) {
             if (!loc) return "";
             let trimmed = loc.trim();
+            
+            // 1. 迪士尼默認定位
+            if (trimmed.includes("迪士尼")) {
+                return "迪士尼樂園度假區的士站";
+            }
+            // 2. 蓮塘默認定位
+            if (trimmed.includes("蓮塘")) {
+                return "香園圍口岸";
+            }
+
             if (trimmed.includes("落馬洲")) {
                 return "落馬洲支線出入境管制站";
             }
