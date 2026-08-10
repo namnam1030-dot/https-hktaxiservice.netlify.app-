@@ -932,8 +932,17 @@
 
         // 初始化 Google Places 自動預測功能
         function initAutocomplete() {
+            // 設定香港的地理範圍邊界 (Bounds)，讓搜尋結果更偏向香港本地詳細街道與大廈
+            const hkBounds = new google.maps.LatLngBounds(
+                new google.maps.LatLng(22.15, 113.83), // 西南面
+                new google.maps.LatLng(22.58, 114.50)  // 東北面
+            );
+
             const options = {
-                componentRestrictions: { country: "hk" }
+                bounds: hkBounds,
+                componentRestrictions: { country: "hk" },
+                fields: ["formatted_address", "geometry", "name"],
+                types: ['geocode', 'establishment'] // 同時搜尋「地理位置/街道」與「商場/大廈/機構」
             };
 
             const pickupEl = document.getElementById('calc-pickup');
@@ -1307,6 +1316,7 @@
             if (trimmed.includes("愉景灣")) {
                 return "愉景灣的士站";
             }
+
             if (trimmed.includes("落馬洲")) {
                 return "落馬洲支線出入境管制站";
             }
