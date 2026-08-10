@@ -964,7 +964,7 @@
             if (stop3) new google.maps.places.Autocomplete(stop3, options);
         }
 
-        // 自動獲取當前位置函數
+        // 自動獲取當前位置函數（優化：尋找最接近的大廈、街道或門牌）
         function getCurrentLocation() {
             if (!navigator.geolocation) {
                 alert("您的瀏覽器不支援地理定位功能。");
@@ -972,7 +972,7 @@
             }
 
             const pickupInput = document.getElementById('calc-pickup');
-            pickupInput.value = "正在獲取當前位置...";
+            pickupInput.value = "正在獲取最準確當前位置...";
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -982,11 +982,31 @@
 
                     const geocoder = new google.maps.Geocoder();
                     geocoder.geocode({ location: latlng, language: 'zh-HK' }, (results, status) => {
-                        if (status === "OK" && results[0]) {
-                            // 將獲取到的地址填入起點
-                            pickupInput.value = results[0].formatted_address;
+                        if (status === "OK" && results.length > 0) {
+                            let bestAddress = "";
+                            
+                            // 優先尋找包含大廈名稱 (premise) 或街道號碼 (street_address) 的最精確結果
+                            for (let res of results) {
+                                const types = res.types;
+                                if (types.includes("premise") || types.includes("street_address") || types.includes("subpremise") || types.includes("establishment")) {
+                                    bestAddress = res.formatted_address;
+                                    break;
+                                }
+                            }
+
+                            // 如果找不到特定類型，則退而求其次取第一個最詳細的結果
+                            if (!bestAddress) {
+                                bestAddress = results[0].formatted_address;
+                            }
+
+                            // 清理香港地址常見冗餘字眼，讓起點顯示更簡潔精準
+                            bestAddress = bestAddress.replace(/^香港|^九龍|^新界/, "").trim();
+                            if (bestAddress.startsWith("香港")) {
+                                bestAddress = bestAddress.replace("香港", "").trim();
+                            }
+
+                            pickupInput.value = bestAddress || results[0].formatted_address;
                         } else {
-                            // 若逆向解析失敗，退而求其次填入經緯度座標
                             pickupInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
                         }
                     });
