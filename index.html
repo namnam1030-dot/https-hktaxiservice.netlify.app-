@@ -1304,7 +1304,9 @@
             if (trimmed.includes("香園圍口岸")) {
                 return new google.maps.LatLng(22.553780, 114.153662);
             }
-
+            if (trimmed.includes("愉景灣")) {
+                return "愉景灣的士站";
+            }
             if (trimmed.includes("落馬洲")) {
                 return "落馬洲支線出入境管制站";
             }
@@ -1316,6 +1318,7 @@
             }
             return trimmed;
         }
+
 
         function processRoutes(routes, isShenzhenBay) {
             if (!routes || routes.length === 0) return [];
