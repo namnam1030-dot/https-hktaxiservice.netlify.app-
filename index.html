@@ -964,74 +964,85 @@
             if (stop3) new google.maps.places.Autocomplete(stop3, options);
         }
 
-        // 自動獲取當前位置函數（優化：尋找最接近的大廈、街道或門牌）
-        function getCurrentLocation() {
-            if (!navigator.geolocation) {
-                alert("您的瀏覽器不支援地理定位功能。");
-                return;
-            }
+// 自動獲取當前位置函數（優化：尋找最接近的大廈、街道或門牌）
+function getCurrentLocation() {
+    if (!navigator.geolocation) {
+        alert("您的瀏覽器不支援地理定位功能。");
+        return;
+    }
 
-            const pickupInput = document.getElementById('calc-pickup');
-            pickupInput.value = "正在獲取最準確當前位置...";
+    const pickupInput = document.getElementById('calc-pickup');
+    pickupInput.value = "正在獲取最準確當前位置...";
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    const latlng = { lat: lat, lng: lng };
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const latlng = { lat: lat, lng: lng };
 
-                    const geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ location: latlng, language: 'zh-HK' }, (results, status) => {
-                        if (status === "OK" && results.length > 0) {
-                            let bestAddress = "";
-                            
-                            // 優先尋找包含大廈名稱 (premise) 或街道號碼 (street_address) 的最精確結果
-                            for (let res of results) {
-                                const types = res.types;
-                                if (types.includes("premise") || types.includes("street_address") || types.includes("subpremise") || types.includes("establishment")) {
-                                    bestAddress = res.formatted_address;
-                                    break;
-                                }
-                            }
-
-                            // 如果找不到特定類型，則退而求其次取第一個最詳細的結果
-                            if (!bestAddress) {
-                                bestAddress = results[0].formatted_address;
-                            }
-
-                            // 清理香港地址常見冗餘字眼，讓起點顯示更簡潔精準
-                            bestAddress = bestAddress.replace(/^香港|^九龍|^新界/, "").trim();
-                            if (bestAddress.startsWith("香港")) {
-                                bestAddress = bestAddress.replace("香港", "").trim();
-                            }
-
-                            pickupInput.value = bestAddress || results[0].formatted_address;
-                        } else {
-                            pickupInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latlng, language: 'zh-HK' }, (results, status) => {
+                if (status === "OK" && results.length > 0) {
+                    let bestAddress = "";
+                    
+                    // 1. 優先尋找包含「大廈 (premise)」、「商場/地標 (establishment)」或「街道地址 (street_address)」的精確結果
+                    for (let res of results) {
+                        const types = res.types;
+                        if (types.includes("premise") || types.includes("establishment") || types.includes("street_address")) {
+                            bestAddress = res.formatted_address;
+                            break;
                         }
-                    });
-                },
-                (error) => {
-                    pickupInput.value = "";
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            alert("您拒絕了定位權限請求，請在瀏覽器設定中允許定位。");
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            alert("暫時無法獲取位置資訊。");
-                            break;
-                        case error.TIMEOUT:
-                            alert("獲取位置超時，請重試。");
-                            break;
-                        default:
-                            alert("獲取位置時發生未知錯誤。");
-                            break;
                     }
-                },
-                { timeout: 10000, enableHighAccuracy: true }
-            );
-        }
 
+                    // 2. 如果第一輪沒找到，則尋找包含「道路 (route)」的結果
+                    if (!bestAddress) {
+                        for (let res of results) {
+                            if (res.types.includes("route")) {
+                                bestAddress = res.formatted_address;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 3. 若還是找不到，才取第一個結果
+                    if (!bestAddress) {
+                        bestAddress = results[0].formatted_address;
+                    }
+
+                    // 清理香港地址常見的冗餘字眼（如「香港」、「九龍」、「新界」以及Plus Code等），讓起點更簡潔
+                    bestAddress = bestAddress
+                        .replace(/^[A-Z0-9\+\s]+\s*香港|^[A-Z0-9\+\s]+\s*九龍|^[A-Z0-9\+\s]+\s*新界/i, "")
+                        .replace(/^香港|^九龍|^新界/, "")
+                        .trim();
+
+                    // 如果清理後為空，則使用原始的第一個結果
+                    pickupInput.value = bestAddress || results[0].formatted_address;
+                } else {
+                    alert("無法解析當前位置的詳細地址。");
+                    pickupInput.value = "";
+                }
+            });
+        },
+        (error) => {
+            pickupInput.value = "";
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("您拒絕了定位權限請求，請在瀏覽器設定中允許定位。");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("暫時無法獲取位置資訊。");
+                    break;
+                case error.TIMEOUT:
+                    alert("獲取位置超時，請重試。");
+                    break;
+                default:
+                    alert("獲取位置時發生未知錯誤。");
+                    break;
+            }
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+    );
+}
         // 展開中途站控制函數
         let currentStopCount = 0;
         function addStopoverField() {
