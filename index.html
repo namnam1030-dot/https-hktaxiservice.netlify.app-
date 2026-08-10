@@ -102,13 +102,20 @@
 
                 <!-- 起點、中途站、終點輸入結構 -->
                 <div class="space-y-2">
-                    <!-- 起點連對調按鈕 -->
+                    <!-- 起點連對調按鈕與定位按鈕 -->
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
-                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-dark border border-gray-800 hover:border-brand-yellow text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-[17px]">起點🔃目的地</span>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <!-- 自動獲取當前位置按鈕 -->
+                                <button type="button" onclick="getCurrentLocation()" title="自動獲取當前位置" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-bold">
+                                    <i class="fa-solid fa-location-crosshairs"></i> <span>當前位置</span>
+                                </button>
+                                <!-- 對調起點與終點按鈕 (已統一風格) -->
+                                <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-bold">
+                                    <i class="fa-solid fa-arrow-up-down"></i> <span>起點🔃目的地</span>
+                                </button>
+                            </div>
                         </div>
                         <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
                     </div>
@@ -200,7 +207,6 @@
                         以上預計車費並未包含停車場、行李及等候時間等收費，一切按實際情況為準。
                     </p>
                 </div>
-                
                 
             <!-- 重新選擇車款按鈕區 -->
             <div class="mt-5 pt-4 border-t border-gray-800 flex justify-center">
@@ -958,6 +964,54 @@
             if (stop3) new google.maps.places.Autocomplete(stop3, options);
         }
 
+        // 自動獲取當前位置函數
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                alert("您的瀏覽器不支援地理定位功能。");
+                return;
+            }
+
+            const pickupInput = document.getElementById('calc-pickup');
+            pickupInput.value = "正在獲取當前位置...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const latlng = { lat: lat, lng: lng };
+
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ location: latlng, language: 'zh-HK' }, (results, status) => {
+                        if (status === "OK" && results[0]) {
+                            // 將獲取到的地址填入起點
+                            pickupInput.value = results[0].formatted_address;
+                        } else {
+                            // 若逆向解析失敗，退而求其次填入經緯度座標
+                            pickupInput.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                        }
+                    });
+                },
+                (error) => {
+                    pickupInput.value = "";
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            alert("您拒絕了定位權限請求，請在瀏覽器設定中允許定位。");
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            alert("暫時無法獲取位置資訊。");
+                            break;
+                        case error.TIMEOUT:
+                            alert("獲取位置超時，請重試。");
+                            break;
+                        default:
+                            alert("獲取位置時發生未知錯誤。");
+                            break;
+                    }
+                },
+                { timeout: 10000, enableHighAccuracy: true }
+            );
+        }
+
         // 展開中途站控制函數
         let currentStopCount = 0;
         function addStopoverField() {
@@ -1197,7 +1251,7 @@
                 if (fromMatch && fromMatch[1]) {
                     pickup = fromMatch[1].trim();
                 } else {
-                    // 如果沒有「由」或「從」，則取第一個「經」、「去」、「到」、「至」之前的文字作為起點
+                    // 如果沒有「由」或「從」，則取第一個「經」、「去」、「到」、「至」剩下的文字作為起點
                     let firstSplit = text.split(/經|途經|去|到|至/)[0];
                     if (firstSplit) {
                         pickup = firstSplit.trim();
@@ -1217,16 +1271,13 @@
                 if (toMatch && toMatch[1]) {
                     dropoff = toMatch[1].trim();
                 } else {
-                    // 如果沒有「去/到/至」，但有「經」，則抓「經」後面的部分作為終點
                     let parts = text.split(/經|途經/);
                     if (parts.length >= 2) {
                         let lastPart = parts[parts.length - 1].trim();
-                        // 確保如果沒有包含在中途站內，就當作終點
                         if (lastPart && lastPart !== stopover) {
                             dropoff = lastPart;
                         }
                     } else if (!dropoff) {
-                        // 若完全沒有關鍵字，將後半段分給終點
                         let words = text.split(/\s+/);
                         if (words.length >= 2 && !pickup) {
                             pickup = words[0];
@@ -1235,7 +1286,6 @@
                     }
                 }
 
-                // 將解析結果填入對應的輸入框中
                 if (pickup) document.getElementById('calc-pickup').value = pickup;
                 
                 if (stopover) {
@@ -1296,27 +1346,15 @@
             if (!loc) return "";
             let trimmed = loc.trim();
             
-            // 1. 迪士尼默認定位
             if (trimmed.includes("迪士尼")) {
                 return "迪士尼樂園度假區的士站";
             }
-            // 2. 蓮塘默認定位
-            if (trimmed.includes("蓮塘")) {
-                return new google.maps.LatLng(22.553780, 114.153662);
-            }
-
-            if (trimmed.includes("香園圍")) {
-
-                return new google.maps.LatLng(22.553780, 114.153662);
-            }
-
-            if (trimmed.includes("香園圍口岸")) {
+            if (trimmed.includes("蓮塘") || trimmed.includes("香園圍") || trimmed.includes("香園圍口岸")) {
                 return new google.maps.LatLng(22.553780, 114.153662);
             }
             if (trimmed.includes("愉景灣")) {
                 return "愉景灣的士站";
             }
-
             if (trimmed.includes("落馬洲")) {
                 return "落馬洲支線出入境管制站";
             }
@@ -1328,7 +1366,6 @@
             }
             return trimmed;
         }
-
 
         function processRoutes(routes, isShenzhenBay) {
             if (!routes || routes.length === 0) return [];
@@ -1413,11 +1450,9 @@
                 return;
             }
 
-            // 同步至預約表單欄位
             if (document.getElementById('pickup')) document.getElementById('pickup').value = pickupVal;
             if (document.getElementById('dropoff')) document.getElementById('dropoff').value = dropoffVal;
 
-            // 組合多個中途站資料
             let stopoverTexts = [];
             for (let i = 1; i <= 3; i++) {
                 const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim();
