@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -281,14 +282,14 @@
                     <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
-                <!-- 用車日期和用車時間並排顯示，尺寸與下方人數/行李一致 -->
-                <div class="grid grid-cols-2 gap-4">
+                <!-- 用車日期和用車時間直向堆疊 -->
+                <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
                         <input type="date" id="date" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></label>
+                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (最快15分鐘後)</span></label>
                         <input type="time" id="time" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                     </div>
                 </div>
@@ -407,7 +408,7 @@
     <section id="fleet-section" class="w-full px-2 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
-            <!-- 車款 1 : 豐田混能的士 -->
+            <!-- 車款 1 : 豐田混能的士（已移除原本在此處的 upgrade box） -->
             <div class="flex flex-col">
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
@@ -694,7 +695,7 @@
                 label_dropoff: "落車地點 (終點)",
                 ph_dropoff: "例：深圳灣口岸",
                 label_date: "用車日期",
-                label_time: "用車時間",
+                label_time: "用車時間 (支援即時或預約)",
                 label_passengers: "乘客人數",
                 label_luggages: "行李件數",
                 label_has_pet: "是否有寵物",
@@ -819,7 +820,7 @@
                 label_dropoff: "Drop-off Location (Destination)",
                 ph_dropoff: "e.g., Shenzhen Bay Port",
                 label_date: "Service Date",
-                label_time: "Service Time",
+                label_time: "Service Time (Instant or Advance)",
                 label_passengers: "Passengers",
                 label_luggages: "Luggages",
                 label_has_pet: "Pets on board",
