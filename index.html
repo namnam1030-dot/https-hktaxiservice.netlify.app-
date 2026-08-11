@@ -178,31 +178,31 @@
                     <div><span class="text-gray-400">目的地：</span><span id="confirm-dropoff" class="text-white font-medium">-</span></div>
                 </div>
 
+                <!-- 要求 1：系統自動偵測途經隧道資料移到客人輸入資料確認框框的下方 -->
+                <div id="detected-tunnels-container" class="hidden mt-1 mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-xs text-sky-200">
+                    <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
+                    <span id="detected-tunnels-list" class="text-white font-medium"></span>
+                </div>
+
                 <!-- 法定跳錶基本費及距離時間 -->
                 <div class="text-xs text-gray-300 space-y-1 mb-1 pb-1">
-                    <!-- 要求 1：將全程預計距離和預計行車時間改為上下 2 行獨立顯示 -->
+                    <!-- 全程預計距離和預計行車時間上下 2 行獨立顯示 -->
                     <div class="space-y-1 mb-2">
                         <div><span data-i18n="res_distance">全程預計距離：</span><span id="res-distance" class="text-white font-bold">0</span> <span data-i18n="unit_km">公里</span></div>
                         <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
                     </div>
                     <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
                     
-                    <!-- 要求 2：將預計自動偵測隧道費那一行移動到藍色框框（系統自動偵測途經隧道）的上方 -->
+                    <!-- 預計自動偵測隧道費 -->
                     <div id="res-tunnel-row" class="hidden text-sky-300">
                         <span>預計自動偵測隧道費：</span><span class="font-bold">+HK$ <span id="res-tunnel-val">0</span></span>
-                    </div>
-
-                    <!-- 系統自動偵測途經隧道資料 -->
-                    <div id="detected-tunnels-container" class="hidden mt-1 mb-1 p-2 bg-sky-900/30 border border-sky-500/50 rounded-lg text-xs text-sky-200">
-                        <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
-                        <span id="detected-tunnels-list" class="text-white font-medium"></span>
                     </div>
 
                     <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
                     <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
-                <!-- 要求 3：移除預計車費總額上方的那條淺色橫線 (border-t)，並將上下的行距與邊距收窄 -->
+                <!-- 預計車費總額 -->
                 <div class="text-xl font-extrabold text-brand-yellow my-1 flex justify-between items-end">
                     <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計車費總額：</span>
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
@@ -216,24 +216,23 @@
                     </p>
                 </div>
            
-                <!-- 重新選擇路線和選擇車款類型按鈕 -->
-                <div class="mt-2 flex justify-center gap-3">
-                    <button type="button" onclick="scrollToCalculator()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
+                <!-- 要求 2：重新選擇路線和選擇車款類型按鈕改為黃底黑字風格，並左右拉長貼齊上下方格 (w-full) -->
+                <div class="mt-2 flex flex-col gap-2">
+                    <button type="button" onclick="scrollToCalculator()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
                     </button>
-                    <!-- 修改 1：按鍵改為「選擇車款類型」，點擊後跳轉至車隊選擇區 -->
-                    <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
+                    <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
                     </button>
                 </div>
 
-                <!-- 修改 4：將 15 分鐘預約提示框移到這裡 -->
+                <!-- 15 分鐘預約提示框 -->
                 <div class="mt-3 mb-2 flex items-center justify-center gap-2 text-brand-yellow font-bold text-xs md:text-sm bg-brand-yellow/10 border border-brand-yellow px-3 py-2 rounded-xl shadow-sm">
                     <i class="fa-solid fa-bolt text-brand-yellow text-sm animate-pulse"></i>
                     <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
                 </div>
 
-                <!-- 修改 2 & 3：移除上方淺色橫線、收窄距離、改名「立即預約」、移除隨機車款字句 -->
+                <!-- 立即預約按鈕 -->
                 <div class="mt-1 flex flex-col items-center">
                     <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-xs md:text-sm">
                         <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
@@ -243,7 +242,7 @@
         </div>
     </section>
 
-    <!-- 頂部介紹 Hero Section (改為全寬貼邊，並已移除小特點介紹) -->
+    <!-- 頂部介紹 Hero Section (改為全寬貼邊) -->
     <section class="w-full px-2 py-4 md:py-6 text-center md:text-left">
         <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-2">
             <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
@@ -260,9 +259,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
-            <!-- 車款 1 : 豐田混能的士 (含升級詢問方塊) -->
+            <!-- 車款 1 : 豐田混能的士 -->
             <div class="flex flex-col">
-                <!-- 升級詢問方塊 -->
                 <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-y border-brand-yellow/60 p-4 text-xs shadow-lg">
                     <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                         <i class="fa-solid fa-gift text-brand-yellow"></i>
@@ -280,7 +278,6 @@
                     </div>
                 </div>
 
-                <!-- 車卡 -->
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
                      class="car-card bg-brand-card overflow-hidden border-y-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
@@ -469,7 +466,7 @@
                     </div>
                 </div>
 
-                <!-- 隱藏的起點、中途站、終點輸入欄位（自動與車費估算器同步，並在發送 WhatsApp 時顯示） -->
+                <!-- 隱藏的起點、中途站、終點輸入欄位 -->
                 <div id="field-pickup-container" class="hidden">
                     <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
                     <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
@@ -632,7 +629,6 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
-        // 頁面載入時自動帶入即時日期與時間
         window.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('date');
             const timeInput = document.getElementById('time');
