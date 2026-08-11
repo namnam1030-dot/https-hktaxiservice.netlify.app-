@@ -218,7 +218,7 @@
            
                 <!-- 修改需求 1：重新選擇路線和選擇車款類型按鈕改為同一行 (grid-cols-2) -->
                 <div class="mt-2 grid grid-cols-2 gap-2">
-                    <button type="button" onclick="scrollToCalculator()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                    <button type="button" onclick="scrollToTop()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
                     </button>
                     <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
@@ -242,183 +242,7 @@
         </div>
     </section>
 
-    <!-- 車隊選擇 Fleet Section (已移除紅圈部分的上方多餘標題敘述) -->
-    <section id="fleet-section" class="w-full px-2 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            
-            <!-- 車款 1 : 豐田混能的士 -->
-            <div class="flex flex-col">
-                <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-y border-brand-yellow/60 p-4 text-xs shadow-lg">
-                    <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
-                        <i class="fa-solid fa-gift text-brand-yellow"></i>
-                        <span data-i18n="upgrade_box_text">如選擇豐田混能的士，將有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
-                    </p>
-                    <div class="flex items-center gap-6">
-                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                            <input type="checkbox" name="toyota_upgrade" value="接受免費升級" id="upgrade-yes" onclick="handleUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                            <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                            <input type="checkbox" name="toyota_upgrade" value="不接受升級" id="upgrade-no" onclick="handleUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                            <span data-i18n="upgrade_no_label">不接受升級</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
-                     id="card-豐田混能的士" 
-                     class="car-card bg-brand-card overflow-hidden border-y-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
-                    <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
-                        <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
-                    </div>
-                    <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
-                        <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Taxi'">
-                    </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-lg font-bold" data-i18n="car1_name">豐田混能的士</h3>
-                                <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car1_seats">4 座位</span>
-                            </div>
-                            <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car1_type">標準混能的士</p>
-                            <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car1_cap">最多 4 位乘客</span></li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car1_lug">約 2-3 件標準行李</span></li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car1_feat">特低地台、電動趟門</span></li>
-                            </ul>
-                        </div>
-                        <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
-                            <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
-                            <span class="font-bold text-white" data-i18n="car1_fee">標準收費・無附加費</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 車款 2 : Maxus MIFA 7 -->
-            <div onclick="selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" 
-                 id="card-Maxus MIFA 7" 
-                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
-                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
-                </div>
-                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
-                    <img src="m7.jpeg" alt="Maxus MIFA 7" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Maxus'">
-                </div>
-                <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car2_name">Maxus MIFA 7</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car2_seats">6 座位</span>
-                        </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car2_type">純電動七人車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car2_cap">最多 6 位乘客</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car2_lug">可放 3-4 件大型行李</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car2_feat">純電動零排放、極度寧靜</span></li>
-                        </ul>
-                    </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
-                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
-                        <span class="font-bold text-brand-yellow" data-i18n="car2_fee">附加費 HK$50 (最低 $130)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 車款 3 : 廣汽 E9 -->
-            <div onclick="selectCar('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" 
-                 id="card-廣汽 E9" 
-                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
-                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
-                </div>
-                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
-                    <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=GAC'">
-                </div>
-                <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car3_name">廣汽 E9</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car3_seats">6 座位</span>
-                        </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car3_type">豪華航空椅專車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car3_cap">最多 6 位乘客</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car3_lug">約 3-4 件大型行李</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car3_feat">頭等航空級獨立大班椅</span></li>
-                        </ul>
-                    </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
-                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
-                        <span class="font-bold text-brand-yellow" data-i18n="car3_fee">附加費 HK$100 (最低 $180)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 車款 4 : 吉利大黃蜂 -->
-            <div onclick="selectCar('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" 
-                 id="card-吉利大黃蜂" 
-                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
-                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
-                </div>
-                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
-                    <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Geely'">
-                </div>
-                <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car4_name">吉利大黃蜂</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car4_seats">6 座位</span>
-                        </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car4_type">超大空間尊車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car4_cap">最多 6 位乘客</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car4_lug">4件以上大型行李</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car4_feat">同級最大車廂、空間極佳</span></li>
-                        </ul>
-                    </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
-                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
-                        <span class="font-bold text-brand-yellow" data-i18n="car4_fee">附加費 HK$80 (最低 $160)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 車款 5 : 豐田 Noah 輪椅的士 -->
-            <div onclick="selectCar('豐田 Noah 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota Noah Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" 
-                 id="card-豐田 Noah 輪椅的士" 
-                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col md:col-span-2 lg:col-span-1">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
-                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
-                </div>
-                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
-                    <img src="noah.jpeg" alt="豐田 Noah 輪椅的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Noah'">
-                </div>
-                <div class="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car5_name">豐田 Noah 輪椅的士</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-brand-yellow font-medium" data-i18n="car5_seats">無障礙</span>
-                        </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car5_type">無障礙福祉專車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car5_cap">1位輪椅 + 5位乘客</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car5_lug">可放 3-4 件大行李</span></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car5_feat">配備原廠金屬斜道</span></li>
-                        </ul>
-                    </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
-                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
-                        <span class="font-bold text-brand-yellow" data-i18n="car5_fee">附加費 HK$150 (最低 $230)</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 預約表單 Booking Section (改為全寬貼邊) -->
+    <!-- 預約表單 Booking Section (已移動至車費區塊下方) -->
     <section id="booking-section" class="w-full px-0 py-2 mb-12">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
@@ -595,6 +419,182 @@
                 </button>
                 <p class="text-center text-xs text-gray-500 mt-2" data-i18n="form_footer_note">點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。</p>
             </form>
+        </div>
+    </section>
+
+    <!-- 車隊選擇 Fleet Section -->
+    <section id="fleet-section" class="w-full px-2 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <!-- 車款 1 : 豐田混能的士 -->
+            <div class="flex flex-col">
+                <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-y border-brand-yellow/60 p-4 text-xs shadow-lg">
+                    <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
+                        <i class="fa-solid fa-gift text-brand-yellow"></i>
+                        <span data-i18n="upgrade_box_text">如選擇豐田混能的士，將有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
+                    </p>
+                    <div class="flex items-center gap-6">
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                            <input type="checkbox" name="toyota_upgrade" value="接受免費升級" id="upgrade-yes" onclick="handleUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
+                            <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                            <input type="checkbox" name="toyota_upgrade" value="不接受升級" id="upgrade-no" onclick="handleUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
+                            <span data-i18n="upgrade_no_label">不接受升級</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
+                     id="card-豐田混能的士" 
+                     class="car-card bg-brand-card overflow-hidden border-y-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
+                    <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                        <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                    </div>
+                    <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                        <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Taxi'">
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold" data-i18n="car1_name">豐田混能的士</h3>
+                                <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car1_seats">4 座位</span>
+                            </div>
+                            <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car1_type">標準混能的士</p>
+                            <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car1_cap">最多 4 位乘客</span></li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car1_lug">約 2-3 件標準行李</span></li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car1_feat">特低地台、電動趟門</span></li>
+                            </ul>
+                        </div>
+                        <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                            <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                            <span class="font-bold text-white" data-i18n="car1_fee">標準收費・無附加費</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 2 : Maxus MIFA 7 -->
+            <div onclick="selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" 
+                 id="card-Maxus MIFA 7" 
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="m7.jpeg" alt="Maxus MIFA 7" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Maxus'">
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car2_name">Maxus MIFA 7</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car2_seats">6 座位</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car2_type">純電動七人車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car2_cap">最多 6 位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car2_lug">可放 3-4 件大型行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car2_feat">純電動零排放、極度寧靜</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car2_fee">附加費 HK$50 (最低 $130)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 3 : 廣汽 E9 -->
+            <div onclick="selectCar('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" 
+                 id="card-廣汽 E9" 
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=GAC'">
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car3_name">廣汽 E9</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car3_seats">6 座位</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car3_type">豪華航空椅專車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car3_cap">最多 6 位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car3_lug">約 3-4 件大型行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car3_feat">頭等航空級獨立大班椅</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car3_fee">附加費 HK$100 (最低 $180)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 4 : 吉利大黃蜂 -->
+            <div onclick="selectCar('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" 
+                 id="card-吉利大黃蜂" 
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Geely'">
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car4_name">吉利大黃蜂</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car4_seats">6 座位</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car4_type">超大空間尊車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car4_cap">最多 6 位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car4_lug">4件以上大型行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car4_feat">同級最大車廂、空間極佳</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car4_fee">附加費 HK$80 (最低 $160)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 車款 5 : 豐田 Noah 輪椅的士 -->
+            <div onclick="selectCar('豐田 Noah 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota Noah Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" 
+                 id="card-豐田 Noah 輪椅的士" 
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col md:col-span-2 lg:col-span-1">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
+                </div>
+                <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
+                    <img src="noah.jpeg" alt="豐田 Noah 輪椅的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Noah'">
+                </div>
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold" data-i18n="car5_name">豐田 Noah 輪椅的士</h3>
+                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-brand-yellow font-medium" data-i18n="car5_seats">無障礙</span>
+                        </div>
+                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car5_type">無障礙福祉專車</p>
+                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car5_cap">1位輪椅 + 5位乘客</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car5_lug">可放 3-4 件大行李</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car5_feat">配備原廠金屬斜道</span></li>
+                        </ul>
+                    </div>
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
+                        <span class="font-bold text-brand-yellow" data-i18n="car5_fee">附加費 HK$150 (最低 $230)</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -1004,8 +1004,8 @@
             document.getElementById('fleet-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function scrollToCalculator() {
-            document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function scrollToBookingFromCalc() {
