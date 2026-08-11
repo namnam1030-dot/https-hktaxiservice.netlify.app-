@@ -178,7 +178,7 @@
                     <div><span class="text-gray-400">目的地：</span><span id="confirm-dropoff" class="text-white font-medium">-</span></div>
                 </div>
 
-                <!-- 要求 1：系統自動偵測途經隧道資料移到客人輸入資料確認框框的下方 -->
+                <!-- 系統自動偵測途經隧道資料 -->
                 <div id="detected-tunnels-container" class="hidden mt-1 mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-xs text-sky-200">
                     <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
                     <span id="detected-tunnels-list" class="text-white font-medium"></span>
@@ -216,8 +216,8 @@
                     </p>
                 </div>
            
-                <!-- 要求 2：重新選擇路線和選擇車款類型按鈕改為黃底黑字風格，並左右拉長貼齊上下方格 (w-full) -->
-                <div class="mt-2 flex flex-col gap-2">
+                <!-- 修改需求 1：重新選擇路線和選擇車款類型按鈕改為同一行 (grid-cols-2) -->
+                <div class="mt-2 grid grid-cols-2 gap-2">
                     <button type="button" onclick="scrollToCalculator()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
                     </button>
@@ -242,21 +242,8 @@
         </div>
     </section>
 
-    <!-- 頂部介紹 Hero Section (改為全寬貼邊) -->
-    <section class="w-full px-2 py-4 md:py-6 text-center md:text-left">
-        <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-2">
-            <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
-                <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
-            </button>
-        </div>
-    </section>
-
-    <!-- 車隊選擇 Fleet Section (改為全寬貼邊) -->
+    <!-- 車隊選擇 Fleet Section (已移除紅圈部分的上方多餘標題敘述) -->
     <section id="fleet-section" class="w-full px-2 py-12">
-        <div class="text-center mb-10">
-            <p class="text-gray-400 text-sm mt-2 hidden" data-i18n="fleet_desc"></p>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
             <!-- 車款 1 : 豐田混能的士 -->
@@ -656,7 +643,6 @@
                 btn_quick_query: "立即預約",
                 btn_view_fleet: "選擇車款類型",
                 notice_15min: "提供最快15分鐘後的預約服務（亦支援即時訂單）",
-                fleet_desc: "",
                 badge_selected: "已選擇",
                 car_cap_label: "載客容量：",
                 car_lug_label: "行李空間：",
@@ -782,7 +768,6 @@
                 btn_quick_query: "Instant Booking",
                 btn_view_fleet: "Select Vehicle Type",
                 notice_15min: "Supports 15-minute advance booking & instant orders",
-                fleet_desc: "",
                 badge_selected: "Selected",
                 car_cap_label: "Capacity: ",
                 car_lug_label: "Luggage: ",
