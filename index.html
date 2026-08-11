@@ -209,51 +209,43 @@
                 <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
                     <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
-                        以上預計車費已包含途徑的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。
+                        以上預計車費已包含自動偵測途徑隧道費；但並未包括任何停車場、行李、寵物、等候時間等其他法定收費，一切按實際情況為準。
                     </p>
                 </div>
            
-                <!-- 重新選擇路線和車款按鈕 -->
+                <!-- 重新選擇路線和選擇車款類型按鈕 -->
                 <div class="mt-2 flex justify-center gap-3">
                     <button type="button" onclick="scrollToCalculator()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
                         <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
                     </button>
+                    <!-- 修改 1：按鍵改為「選擇車款類型」，點擊後跳轉至車隊選擇區 -->
                     <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
-                        <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
+                        <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
                     </button>
                 </div>
 
-                <!-- 立即查詢車費及預約按鈕 -->
-                <div class="mt-3 pt-3 border-t border-gray-800 flex flex-col items-center">
+                <!-- 修改 4：將 15 分鐘預約提示框移到這裡 -->
+                <div class="mt-3 mb-2 flex items-center justify-center gap-2 text-brand-yellow font-bold text-xs md:text-sm bg-brand-yellow/10 border border-brand-yellow px-3 py-2 rounded-xl shadow-sm">
+                    <i class="fa-solid fa-bolt text-brand-yellow text-sm animate-pulse"></i>
+                    <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
+                </div>
+
+                <!-- 修改 2 & 3：移除上方淺色橫線、收窄距離、改名「立即預約」、移除隨機車款字句 -->
+                <div class="mt-1 flex flex-col items-center">
                     <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-xs md:text-sm">
-                        <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約*</span>
+                        <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
                     </button>
-                    <span class="text-[11px] text-gray-400 mt-1" data-i18n="note_any_car">*接受任何隨機車款</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 頂部介紹 Hero Section (改為全寬貼邊) -->
-    <section class="w-full px-2 py-8 md:py-12 text-center md:text-left">
-        <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
+    <!-- 頂部介紹 Hero Section (改為全寬貼邊，並已移除小特點介紹) -->
+    <section class="w-full px-2 py-4 md:py-6 text-center md:text-left">
+        <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-2">
             <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
                 <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
             </button>
-        </div>
-
-        <!-- 註明 -->
-        <div class="mb-8 inline-flex items-center gap-2 text-brand-yellow font-bold text-sm md:text-base bg-brand-yellow/10 border-2 border-brand-yellow px-4 py-2.5 rounded-xl shadow-md">
-            <i class="fa-solid fa-bolt text-brand-yellow text-lg animate-pulse"></i>
-            <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-xs md:text-sm text-gray-300 border-t border-gray-800/80 pt-6">
-            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-route text-brand-yellow"></i> <span data-i18n="feature_radar">智能路線導航規劃</span></div>
-            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-clock-rotate-left text-brand-yellow"></i> <span data-i18n="feature_2">24小時全天候候命</span></div>
-            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-wallet text-brand-yellow"></i> <span data-i18n="feature_3">明碼實價・無隱藏收費</span></div>
-            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-brands fa-whatsapp text-brand-yellow"></i> <span data-i18n="feature_4">WhatsApp 專人確認</span></div>
-            <div class="flex items-center justify-center md:justify-start gap-2 text-base font-bold text-brand-yellow col-span-2 md:col-span-1"><i class="fa-solid fa-credit-card text-brand-yellow"></i> <span data-i18n="feature_payment">提供多種電子支付方式</span></div>
         </div>
     </section>
 
@@ -662,15 +654,9 @@
 
         const translations = {
             zh: {
-                btn_quick_query: "立即查詢車費及預約",
-                note_any_car: "接受任何隨機車款",
+                btn_quick_query: "立即預約",
                 btn_view_fleet: "選擇車款類型",
                 notice_15min: "提供最快15分鐘後的預約服務（亦支援即時訂單）",
-                feature_radar: "智能路線導航規劃",
-                feature_2: "24小時全天候候命",
-                feature_3: "明碼實價・無隱藏收費",
-                feature_4: "WhatsApp 專人確認",
-                feature_payment: "提供多種電子支付方式",
                 fleet_desc: "",
                 badge_selected: "已選擇",
                 car_cap_label: "載客容量：",
@@ -748,7 +734,7 @@
                 res_min_note_post: ")",
                 res_total_title: "預計車費總額：",
                 res_note: "以上預計車費已包含途徑的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。",
-                btn_reselect: "重新選擇車款",
+                btn_reselect: "選擇車款類型",
                 tab_normal: "一般點對點預約",
                 tab_airport: "機場接機服務",
                 label_pickup: "上車地點 (起點)",
@@ -794,15 +780,9 @@
                 footer_copy: "© 2026 版權所有。"
             },
             en: {
-                btn_quick_query: "Quick Fare & Booking",
-                note_any_car: "Any random car accepted",
+                btn_quick_query: "Instant Booking",
                 btn_view_fleet: "Select Vehicle Type",
                 notice_15min: "Supports 15-minute advance booking & instant orders",
-                feature_radar: "Smart Route Navigation",
-                feature_2: "24/7 Availability",
-                feature_3: "Transparent & No Hidden Fees",
-                feature_4: "WhatsApp Support Confirmation",
-                feature_payment: "Multiple Electronic Payment Methods",
                 fleet_desc: "",
                 badge_selected: "Selected",
                 car_cap_label: "Capacity: ",
@@ -880,7 +860,7 @@
                 res_min_note_post: ")",
                 res_total_title: "Estimated Total Fare:",
                 res_note: "The estimated fare above includes route tunnel fees; but does not include any parking, luggage, or waiting time charges. Subject to actual conditions.",
-                btn_reselect: "Reselect Vehicle",
+                btn_reselect: "Select Vehicle Type",
                 tab_normal: "Standard Point-to-Point",
                 tab_airport: "Airport Pickup Service",
                 label_pickup: "Pickup Location (Start)",
@@ -1045,8 +1025,6 @@
         }
 
         function scrollToBookingFromCalc() {
-            selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
-            handleUpgradeCheckbox('yes');
             document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
         }
 
