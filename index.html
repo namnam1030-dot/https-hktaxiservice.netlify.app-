@@ -179,15 +179,15 @@
                 </div>
 
                 <!-- 法定跳錶基本費及距離時間 -->
-                <div class="text-xs text-gray-300 space-y-1 mb-3 pb-3 border-b border-gray-800/60">
+                <div class="text-xs text-gray-300 space-y-1 mb-2 pb-2 border-b border-gray-800/60">
                     <div class="grid grid-cols-2 gap-2 mb-2">
                         <div><span data-i18n="res_distance">全程預計距離：</span><span id="res-distance" class="text-white font-bold">0</span> <span data-i18n="unit_km">公里</span></div>
                         <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
                     </div>
                     <div><span data-i18n="res_base_fee">法定跳錶基本費：</span><span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span></div>
                     
-                    <!-- 系統自動偵測途經隧道資料 (已移至法定跳錶基本費下方) -->
-                    <div id="detected-tunnels-container" class="hidden mt-1.5 mb-1.5 p-2 bg-sky-900/30 border border-sky-500/50 rounded-lg text-xs text-sky-200">
+                    <!-- 系統自動偵測途經隧道資料 -->
+                    <div id="detected-tunnels-container" class="hidden mt-1 mb-1 p-2 bg-sky-900/30 border border-sky-500/50 rounded-lg text-xs text-sky-200">
                         <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
                         <span id="detected-tunnels-list" class="text-white font-medium"></span>
                     </div>
@@ -199,28 +199,37 @@
                     <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
-                <div class="text-xl font-extrabold text-brand-yellow mt-1 pt-1 flex justify-between items-end mb-3">
+                <!-- 預計車費總額 (要求 1：縮窄與上方隧道費的距離，將 mt-1 縮減至更緊貼) -->
+                <div class="text-xl font-extrabold text-brand-yellow mt-0 pt-0 flex justify-between items-end mb-2">
                     <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計車費總額：</span>
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
 
-                <!-- 提示語 -->
-                <div class="mb-3 p-3.5 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
+                <!-- 提示語 (要求 2：上下邊距縮窄，由 p-3.5 改為 py-2 px-3) -->
+                <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
-                    <p class="text-xs md:text-sm⁠ font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
+                    <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
                         以上預計車費已包含途徑的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。
                     </p>
                 </div>
            
-                
-            <!-- 重新選擇車款按鈕區 (移除上方幼直線，縮窄與黃色框距離) -->
-            <div class="mt-2 flex justify-center gap-3">
-                <button type="button" onclick="scrollToCalculator()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
-                    <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
-                </button>
-                <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
-                    <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
-                </button>
+                <!-- 重新選擇路線和車款按鈕 -->
+                <div class="mt-2 flex justify-center gap-3">
+                    <button type="button" onclick="scrollToCalculator()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
+                    </button>
+                    <button type="button" onclick="scrollToFleet()" class="text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-4 py-2.5 rounded-xl hover:bg-brand-yellow hover:text-black transition cursor-pointer inline-flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reselect">重新選擇車款</span>
+                    </button>
+                </div>
+
+                <!-- 要求 3：把立即查詢車費及預約的按鈕移到重新選擇路線和重新選擇車款下方 -->
+                <div class="mt-3 pt-3 border-t border-gray-800 flex flex-col items-center">
+                    <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-xs md:text-sm">
+                        <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約*</span>
+                    </button>
+                    <span class="text-[11px] text-gray-400 mt-1" data-i18n="note_any_car">*接受任何隨機車款</span>
+                </div>
             </div>
         </div>
     </section>
@@ -231,14 +240,6 @@
             <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
                 <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
             </button>
-
-            <!-- 移至選擇車款類型按鈕下方的：立即查詢車費及預約 -->
-            <div class="flex flex-col items-center md:items-start">
-                <button onclick="quickQueryAndBook()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
-                    <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約*</span>
-                </button>
-                <span class="text-xs text-gray-400 mt-1 ml-1" data-i18n="note_any_car">*接受任何隨機車款</span>
-            </div>
         </div>
 
         <!-- 註明 -->
@@ -643,13 +644,11 @@
             
             const now = new Date();
             
-            // 格式化日期：YYYY-MM-DD
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             const formattedDate = `${year}-${month}-${day}`;
             
-            // 格式化時間：HH:MM
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const formattedTime = `${hours}:${minutes}`;
@@ -657,10 +656,9 @@
             if (dateInput) dateInput.value = formattedDate;
             if (timeInput) timeInput.value = formattedTime;
 
-            // 初始化時檢查人數與車款狀態
             checkPassengerLimit();
         });
-        let currentLang = 'zh'; // 'zh' 或 'en'
+        let currentLang = 'zh';
 
         const translations = {
             zh: {
@@ -749,7 +747,7 @@
                 res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ",
                 res_min_note_post: ")",
                 res_total_title: "預計車費總額：",
-                res_note: "以上預計車費並未包含任何隧道、停車場、行李及等候時間等收費，一切按實際情況為準。",
+                res_note: "以上預計車費已包含途徑的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。",
                 btn_reselect: "重新選擇車款",
                 tab_normal: "一般點對點預約",
                 tab_airport: "機場接機服務",
@@ -881,7 +879,7 @@
                 res_min_note_pre: "*(Minimum fare threshold of HK$ ",
                 res_min_note_post: ")",
                 res_total_title: "Estimated Total Fare:",
-                res_note: "The estimated fare above does not include any tunnel, parking, luggage, or waiting time charges. Everything is subject to actual conditions.",
+                res_note: "The estimated fare above includes route tunnel fees; but does not include any parking, luggage, or waiting time charges. Subject to actual conditions.",
                 btn_reselect: "Reselect Vehicle",
                 tab_normal: "Standard Point-to-Point",
                 tab_airport: "Airport Pickup Service",
@@ -944,19 +942,17 @@
 
         let calcPickupInput, calcDropoffInput;
 
-        // 初始化 Google Places 自動預測功能
         function initAutocomplete() {
-            // 設定香港的地理範圍邊界 (Bounds)，讓搜尋結果更偏向香港本地詳細街道與大廈
             const hkBounds = new google.maps.LatLngBounds(
-                new google.maps.LatLng(22.15, 113.83), // 西南面
-                new google.maps.LatLng(22.58, 114.50)  // 東北面
+                new google.maps.LatLng(22.15, 113.83),
+                new google.maps.LatLng(22.58, 114.50)
             );
 
             const options = {
                 bounds: hkBounds,
                 componentRestrictions: { country: "hk" },
                 fields: ["formatted_address", "geometry", "name"],
-                types: ['geocode', 'establishment'] // 同時搜尋「地理位置/街道」與「商場/大廈/機構」
+                types: ['geocode', 'establishment']
             };
 
             const pickupEl = document.getElementById('calc-pickup');
@@ -972,7 +968,6 @@
             if (stop3) new google.maps.places.Autocomplete(stop3, options);
         }
 
-        // 展開中途站控制函數
         let currentStopCount = 0;
         function addStopoverField() {
             if (currentStopCount < 3) {
@@ -987,7 +982,6 @@
             }
         }
 
-        // 減少中途站控制函數
         function removeStopoverField(index) {
             const container = document.getElementById(`stopover-container-${index}`);
             const input = document.getElementById(`calc-stopover-${index}`);
@@ -998,13 +992,11 @@
             const btn = document.getElementById('add-stop-btn');
             if (btn) btn.classList.remove('hidden');
 
-            // 若下方結果已展示，則自動重新計算車費
             if (!document.getElementById('fare-result').classList.contains('hidden')) {
                 calculateFareWithGoogle();
             }
         }
 
-        // 對調起點與終點函數
         function swapLocations() {
             const pickupEl = document.getElementById('calc-pickup');
             const dropoffEl = document.getElementById('calc-dropoff');
@@ -1013,7 +1005,6 @@
                 pickupEl.value = dropoffEl.value;
                 dropoffEl.value = temp;
 
-                // 若下方結果已展示，則自動重新計算車費
                 if (!document.getElementById('fare-result').classList.contains('hidden')) {
                     calculateFareWithGoogle();
                 }
@@ -1053,10 +1044,10 @@
             document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function quickQueryAndBook() {
+        function scrollToBookingFromCalc() {
             selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
             handleUpgradeCheckbox('yes');
-            document.getElementById('calculator-section').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         function handleUpgradeCheckbox(choice) {
@@ -1207,10 +1198,8 @@
                 let pickup = "", dropoff = "", stopover = "";
                 let text = speechResult;
                 
-                // 清除冗餘對話字眼
                 text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
-                // 核心解構邏輯：支援「由/從 [起點] 經 [中途站] 去/到/至 [終點]」或直接講出「[起點] 去 [終點]」
                 let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
                 if (fromMatch && fromMatch[1]) {
                     pickup = fromMatch[1].trim();
@@ -1221,7 +1210,6 @@
                     }
                 }
 
-                // 處理中途站
                 let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
                 if (viaMatch && viaMatch[1]) {
                     let viaText = viaMatch[1].trim();
@@ -1229,7 +1217,6 @@
                     stopover = subToSplit[0].trim();
                 }
 
-                // 處理終點
                 let toMatch = text.match(/(?:去|到|至)(.+)$/);
                 if (toMatch && toMatch[1]) {
                     dropoff = toMatch[1].trim();
@@ -1284,8 +1271,6 @@
             };
         }
 
-
-        // 市區的士跳錶車費計算邏輯
         function calculateTaxiBaseFare(km) {
             if (km <= 0) return 0;
             if (km <= 2) return 29;
@@ -1330,7 +1315,6 @@
             return trimmed;
         }
 
-        // 修改後的路線方案處理邏輯（即使有中途站也能完整計算與區分最快／最短路線）
         function processRoutes(routes, isShenzhenBay) {
             if (!routes || routes.length === 0) return [];
             if (routes.length === 1) {
@@ -1414,11 +1398,9 @@
                 return;
             }
 
-            // 同步至預約表單欄位
             if (document.getElementById('pickup')) document.getElementById('pickup').value = pickupVal;
             if (document.getElementById('dropoff')) document.getElementById('dropoff').value = dropoffVal;
 
-            // 組合多個中途站資料
             let stopoverTexts = [];
             for (let i = 1; i <= 3; i++) {
                 const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim();
@@ -1428,7 +1410,6 @@
                 document.getElementById('stopover').value = stopoverTexts.join(' / ');
             }
 
-            // 更新結果區的確認資料顯示
             document.getElementById('confirm-pickup').innerText = pickupVal;
             const stopWrapper = document.getElementById('confirm-stopover-wrapper');
             if (stopoverTexts.length > 0) {
@@ -1608,7 +1589,6 @@
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-        // WhatsApp 預約訊息發送處理
         function sendWhatsApp(event) {
             event.preventDefault();
 
