@@ -239,11 +239,11 @@
                 </button>
             </div>
 
-            <!-- 修改需求 2：將升級提示框移至 Tab 下方、日期上方（對應你圖中的紅圈位置） -->
-            <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
+            <!-- 已移至此處：升級提示欄位（對應服務類型 Tab 下方、表單本體內部上方） -->
+            <div id="booking-toyota-upgrade-container" class="bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                 <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                     <i class="fa-solid fa-gift text-brand-yellow"></i>
-                    <span data-i18n="upgrade_box_text">如選擇豐田混能的士，將有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
+                    <span data-i18n="upgrade_box_text">預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
                 </p>
                 <div class="flex items-center gap-6">
                     <label class="flex items-center gap-2 cursor-pointer text-gray-200">
@@ -281,7 +281,7 @@
                     <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
-                <!-- 修改需求 1：將用車日期和用車時間改為直向堆疊 (w-full)，確保右邊和上下方框邊完全一致對齊 -->
+                <!-- 用車日期和用車時間直向堆疊 -->
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
@@ -407,25 +407,8 @@
     <section id="fleet-section" class="w-full px-2 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
-            <!-- 車款 1 : 豐田混能的士 -->
+            <!-- 車款 1 : 豐田混能的士（已移除原本在此處的 upgrade box） -->
             <div class="flex flex-col">
-                <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-y border-brand-yellow/60 p-4 text-xs shadow-lg">
-                    <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
-                        <i class="fa-solid fa-gift text-brand-yellow"></i>
-                        <span data-i18n="upgrade_box_text">預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
-                    </p>
-                    <div class="flex items-center gap-6">
-                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                            <input type="checkbox" name="toyota_upgrade" value="接受免費升級" id="upgrade-yes" onclick="handleUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                            <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                            <input type="checkbox" name="toyota_upgrade" value="不接受升級" id="upgrade-no" onclick="handleUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                            <span data-i18n="upgrade_no_label">不接受升級</span>
-                        </label>
-                    </div>
-                </div>
-
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
                      class="car-card bg-brand-card overflow-hidden border-y-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
@@ -993,19 +976,13 @@
         }
 
         function handleUpgradeCheckbox(choice) {
-            const yesBox = document.getElementById('upgrade-yes');
-            const noBox = document.getElementById('upgrade-no');
             const bookingYesBox = document.getElementById('booking-upgrade-yes');
             const bookingNoBox = document.getElementById('booking-upgrade-no');
 
             if (choice === 'yes') {
-                if (yesBox) yesBox.checked = true;
-                if (noBox) noBox.checked = false;
                 if (bookingYesBox) bookingYesBox.checked = true;
                 if (bookingNoBox) bookingNoBox.checked = false;
             } else if (choice === 'no') {
-                if (yesBox) yesBox.checked = false;
-                if (noBox) noBox.checked = true;
                 if (bookingYesBox) bookingYesBox.checked = false;
                 if (bookingNoBox) bookingNoBox.checked = true;
             }
@@ -1079,13 +1056,10 @@
             if (carTextEl) carTextEl.innerText = currentLang === 'en' ? selectedCarNameEn : selectedCarName;
             if (priceTextEl) priceTextEl.innerText = currentLang === 'en' ? selectedFeeModeEn : selectedFeeMode;
 
-            const toyotaBox = document.getElementById('toyota-upgrade-box');
             const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
             if (name === '豐田混能的士') {
-                if (toyotaBox) toyotaBox.classList.remove('hidden');
                 if (bookingToyotaBox) bookingToyotaBox.classList.remove('hidden');
             } else {
-                if (toyotaBox) toyotaBox.classList.add('hidden');
                 if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
             }
 
