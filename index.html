@@ -62,8 +62,8 @@
 <body class="antialiased">
 
     <!-- 頁首 Navbar -->
-    <header class="bg-brand-yellow text-black px-4 py-[1mm] sticky top-0 z-50 shadow-md">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
+    <header class="bg-brand-yellow text-black px-2 py-[1mm] sticky top-0 z-50 shadow-md">
+        <div class="w-full px-2 flex justify-between items-center">
             <a href="#">
                 <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
             </a>
@@ -75,15 +75,15 @@
         </div>
     </header>
 
-    <!-- 車費估算器 Section (已移至導覽列與 Hero Section 之間) -->
-    <section id="calculator-section" class="max-w-2xl mx-auto px-4" style="margin-top: 0px; margin-bottom: 30px;">
-        <div class="bg-brand-gray border border-gray-800 rounded-3xl p-6 shadow-2xl">
+    <!-- 車費估算器 Section (已移除左右邊框與限制寬度，改為全寬貼邊) -->
+    <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 30px;">
+        <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
                 <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
             </h3>
 
             <!-- 查詢教學提示框 -->
-            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-2xl text-xs text-gray-300 mb-4 shadow-inner">
+            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-xl text-xs text-gray-300 mb-4 shadow-inner">
                 <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
                 </p>
@@ -156,7 +156,7 @@
             </button>
 
             <!-- 報價結果展示區 -->
-            <div id="fare-result" class="hidden mt-5 p-5 bg-black/80 border border-brand-yellow/50 rounded-2xl">
+            <div id="fare-result" class="hidden mt-5 p-3 bg-black/80 border border-brand-yellow/50 rounded-xl">
                <!-- 路線選擇方案 -->
                 <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
@@ -199,13 +199,13 @@
                     <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
-                <!-- 預計車費總額 (要求 1：縮窄與上方隧道費的距離，將 mt-1 縮減至更緊貼) -->
+                <!-- 預計車費總額 -->
                 <div class="text-xl font-extrabold text-brand-yellow mt-0 pt-0 flex justify-between items-end mb-2">
                     <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計車費總額：</span>
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
 
-                <!-- 提示語 (要求 2：上下邊距縮窄，由 p-3.5 改為 py-2 px-3) -->
+                <!-- 提示語 -->
                 <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
                     <p class="text-xs md:text-sm font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
@@ -223,7 +223,7 @@
                     </button>
                 </div>
 
-                <!-- 要求 3：把立即查詢車費及預約的按鈕移到重新選擇路線和重新選擇車款下方 -->
+                <!-- 立即查詢車費及預約按鈕 -->
                 <div class="mt-3 pt-3 border-t border-gray-800 flex flex-col items-center">
                     <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-xs md:text-sm">
                         <i class="fa-solid fa-calculator"></i> <span data-i18n="btn_quick_query">立即查詢車費及預約*</span>
@@ -234,8 +234,8 @@
         </div>
     </section>
 
-    <!-- 頂部介紹 Hero Section -->
-    <section class="max-w-5xl mx-auto px-4 py-8 md:py-12 text-center md:text-left">
+    <!-- 頂部介紹 Hero Section (改為全寬貼邊) -->
+    <section class="w-full px-2 py-8 md:py-12 text-center md:text-left">
         <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
             <button onclick="scrollToFleet()" class="bg-brand-yellow text-black px-8 py-3.5 rounded-lg font-bold flex items-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-base">
                 <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
@@ -257,18 +257,18 @@
         </div>
     </section>
 
-    <!-- 車隊選擇 Fleet Section -->
-    <section id="fleet-section" class="max-w-5xl mx-auto px-4 py-12">
+    <!-- 車隊選擇 Fleet Section (改為全寬貼邊) -->
+    <section id="fleet-section" class="w-full px-2 py-12">
         <div class="text-center mb-10">
             <p class="text-gray-400 text-sm mt-2 hidden" data-i18n="fleet_desc"></p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
             <!-- 車款 1 : 豐田混能的士 (含升級詢問方塊) -->
             <div class="flex flex-col">
                 <!-- 升級詢問方塊 -->
-                <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg">
+                <div id="toyota-upgrade-box" class="mb-3 bg-brand-card border-y border-brand-yellow/60 p-4 text-xs shadow-lg">
                     <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                         <i class="fa-solid fa-gift text-brand-yellow"></i>
                         <span data-i18n="upgrade_box_text">如選擇豐田混能的士，將有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
@@ -288,14 +288,14 @@
                 <!-- 車卡 -->
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
-                     class="car-card bg-brand-card rounded-2xl overflow-hidden border-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
+                     class="car-card bg-brand-card overflow-hidden border-y-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
                     <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                         <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                     </div>
                     <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
                         <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Taxi'">
                     </div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div class="p-4 flex-1 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="text-lg font-bold" data-i18n="car1_name">豐田混能的士</h3>
@@ -319,14 +319,14 @@
             <!-- 車款 2 : Maxus MIFA 7 -->
             <div onclick="selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" 
                  id="card-Maxus MIFA 7" 
-                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
                 <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
                     <img src="m7.jpeg" alt="Maxus MIFA 7" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Maxus'">
                 </div>
-                <div class="p-6 flex-1 flex flex-col justify-between">
+                <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-bold" data-i18n="car2_name">Maxus MIFA 7</h3>
@@ -349,14 +349,14 @@
             <!-- 車款 3 : 廣汽 E9 -->
             <div onclick="selectCar('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" 
                  id="card-廣汽 E9" 
-                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
                 <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
                     <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=GAC'">
                 </div>
-                <div class="p-6 flex-1 flex flex-col justify-between">
+                <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-bold" data-i18n="car3_name">廣汽 E9</h3>
@@ -379,14 +379,14 @@
             <!-- 車款 4 : 吉利大黃蜂 -->
             <div onclick="selectCar('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" 
                  id="card-吉利大黃蜂" 
-                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
                 <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
                     <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Geely'">
                 </div>
-                <div class="p-6 flex-1 flex flex-col justify-between">
+                <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-bold" data-i18n="car4_name">吉利大黃蜂</h3>
@@ -409,14 +409,14 @@
             <!-- 車款 5 : 豐田 Noah 輪椅的士 -->
             <div onclick="selectCar('豐田 Noah 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota Noah Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" 
                  id="card-豐田 Noah 輪椅的士" 
-                 class="car-card bg-brand-card rounded-2xl overflow-hidden border border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col md:col-span-2 lg:col-span-1">
+                 class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col md:col-span-2 lg:col-span-1">
                 <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
                     <img src="noah.jpeg" alt="豐田 Noah 輪椅的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Noah'">
                 </div>
-                <div class="p-6 flex-1 flex flex-col justify-between">
+                <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-bold" data-i18n="car5_name">豐田 Noah 輪椅的士</h3>
@@ -439,9 +439,9 @@
         </div>
     </section>
 
-    <!-- 預約表單 Booking Section -->
-    <section id="booking-section" class="max-w-2xl mx-auto px-4 py-2 mb-12">
-        <div class="bg-brand-gray border border-gray-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+    <!-- 預約表單 Booking Section (改為全寬貼邊) -->
+    <section id="booking-section" class="w-full px-0 py-2 mb-12">
+        <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
             <!-- 服務類型切換 Tab -->
             <div class="grid grid-cols-2 gap-2 mb-8 bg-black/40 p-1.5 rounded-xl border border-gray-800/80">
@@ -457,7 +457,7 @@
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
                 
                 <!-- 條件顯示：如選擇豐田混能的士，於預約表格注明是否接受免費升級 -->
-                <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-2 border-brand-yellow/60 rounded-2xl p-4 text-xs shadow-lg mb-4">
+                <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                     <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                         <i class="fa-solid fa-gift text-brand-yellow"></i>
                         <span data-i18n="upgrade_box_text">如選擇豐田混能的士，將有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
@@ -1118,16 +1118,16 @@
             selectedFeeModeEn = feeTextEn;
 
             document.querySelectorAll('.car-card').forEach(card => {
-                card.classList.remove('border-brand-yellow', 'shadow-xl', 'shadow-brand-yellow/10');
-                card.classList.add('border-gray-800', 'opacity-75');
+                card.classList.remove('border-y-2', 'border-brand-yellow', 'shadow-xl', 'shadow-brand-yellow/10');
+                card.classList.add('border-y', 'border-gray-800', 'opacity-75');
                 const badge = card.querySelector('.badge-container');
                 if (badge) badge.classList.add('hidden');
             });
 
             const activeCard = document.getElementById('card-' + name);
             if (activeCard) {
-                activeCard.classList.remove('border-gray-800', 'opacity-75');
-                activeCard.classList.add('border-brand-yellow', 'shadow-xl', 'shadow-brand-yellow/10');
+                activeCard.classList.remove('border-y', 'border-gray-800', 'opacity-75');
+                activeCard.classList.add('border-y-2', 'border-brand-yellow', 'shadow-xl', 'shadow-brand-yellow/10');
                 const badge = activeCard.querySelector('.badge-container');
                 if (badge) badge.classList.remove('hidden');
             }
