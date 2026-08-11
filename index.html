@@ -95,7 +95,7 @@
 
             <div class="space-y-3 mb-4">
                 <!-- 廣東話語音按鈕 -->
-                <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-xs">
+                <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-[20px]">
                     <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
                     <span id="mic-text" data-i18n="voice_btn_text">：[起點] 經 [中途站] 去 [目的地]</span>
                 </button>
@@ -106,8 +106,8 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
-                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-bold">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-[17px]">起點🔃目的地</span>
+                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-xs">起點🔃目的地</span>
                             </button>
                         </div>
                         <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
