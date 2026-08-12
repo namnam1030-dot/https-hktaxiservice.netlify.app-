@@ -34,9 +34,9 @@
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
         }
-        /* 將所有小於 xs 的字體放大到 text-[17px]，但排除起點🔃目的地按鍵與增加/減少中途站按鍵 */
+        /* 將所有小於 xs 的字體放大到 text-[18px]，但排除起點🔃目的地按鍵與增加/減少中途站按鍵 */
         .text-xs, .text-\[11px\] {
-            font-size: 17px !important;
+            font-size: 18px !important;
             line-height: 1.5;
         }
         /* 排除指定按鍵使其維持原狀 */
@@ -48,7 +48,7 @@
         }
         #add-stop-btn span,
         button[onclick*="swapLocations"] span {
-            font-size: 12px !important;
+            font-size: 16px !important;
         }
 
         /* 隱藏 Google Maps 自動完成的預設 logo 避免影響 UI */
@@ -85,7 +85,7 @@
                 <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
             </a>
             <div class="flex items-center gap-2">
-                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[11.5px] hover:opacity-80 transition cursor-pointer">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[16px] hover:opacity-80 transition cursor-pointer">
                     EN
                 </button>
             </div>
@@ -260,7 +260,7 @@
             <div id="booking-toyota-upgrade-container" class="bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                 <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                     <i class="fa-solid fa-gift text-brand-yellow"></i>
-                    <span data-i18n="upgrade_box_text">預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
+                    <span data-i18n="upgrade_box_text">預設為豐田混能的士，並有機會被<br><span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，<br>請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
                 </p>
                 <div class="flex items-center gap-6">
                     <label class="flex items-center gap-2 cursor-pointer text-gray-200">
