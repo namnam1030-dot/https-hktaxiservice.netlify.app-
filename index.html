@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -35,6 +34,20 @@
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
         }
+        /* 將所有小於 17px 的字體強制放大至至少 17px (排除圖示、特定縮放及按鈕內部設定) */
+        body, p, span, a, label, li, div, input, select, button:not([class*="text-"]) {
+            font-size: max(1rem, 17px);
+        }
+        .text-xs {
+            font-size: 17px !important;
+        }
+        .text-sm {
+            font-size: 17px !important;
+        }
+        .text-\[11px\], .text-\[11\.5px\] {
+            font-size: 17px !important;
+        }
+        
         /* 隱藏 Google Maps 自動完成的預設 logo 避免影響 UI */
         .pac-container {
             background-color: #1E1E1E;
@@ -50,13 +63,14 @@
             border-top: 1px solid #333;
             padding: 8px 12px;
             cursor: pointer;
+            font-size: 17px;
         }
         .pac-item:hover {
             background-color: #333;
         }
         .pac-item-query {
             color: #FFF200;
-            font-size: 14px;
+            font-size: 17px;
         }
     </style>
 </head>
@@ -69,7 +83,7 @@
                 <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
             </a>
             <div class="flex items-center gap-2">
-                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[11.5px] hover:opacity-80 transition cursor-pointer">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[17px] hover:opacity-80 transition cursor-pointer">
                     EN
                 </button>
             </div>
@@ -79,14 +93,14 @@
     <!-- 車費估算器 Section -->
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 30px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
-            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
+            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white" style="font-size: 19px;">
                 <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
             </h3>
 
             <!-- 查詢教學提示框 -->
-            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-xl text-xs text-gray-300 mb-4 shadow-inner">
-                <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
+            <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-xl text-gray-300 mb-4 shadow-inner" style="font-size: 17px;">
+                <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5" style="font-size: 17px;">
+                    <i class="fa-solid fa-circle-info text-17px"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
                     <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「由中環去機場」</span>。</li>
@@ -97,7 +111,7 @@
             <div class="space-y-3 mb-4">
                 <!-- 廣東話語音按鈕 -->
                 <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-[20px]">
-                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
+                    <i class="fa-solid fa-microphone text-17px" id="mic-icon"></i>
                     <span id="mic-text" data-i18n="voice_btn_text">：[起點] 經 [中途站] 去 [目的地]</span>
                 </button>
 
@@ -106,42 +120,42 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
-                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-xs">起點🔃目的地</span>
+                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-17px transition cursor-pointer flex items-center gap-1" style="font-size: 17px;">
+                                <i class="fa-solid fa-arrow-up-down"></i> <span style="font-size: 17px;">起點🔃目的地</span>
                             </button>
                         </div>
-                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-17px focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
-                        <label class="block text-[15px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
-                        <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="text-xs text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-2.5 py-1 rounded-md hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1">
+                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
+                        <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 px-2.5 py-1 rounded-md hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1" style="font-size: 17px;">
                             <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
                         </button>
                     </div>
 
                     <div id="stopover-container-1" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                        <button type="button" onclick="removeStopoverField(1)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                        <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-17px focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
+                        <button type="button" onclick="removeStopoverField(1)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-17px transition cursor-pointer flex items-center justify-center shrink-0" style="font-size: 17px;">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
                     <div id="stopover-container-2" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                        <button type="button" onclick="removeStopoverField(2)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                        <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-17px focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
+                        <button type="button" onclick="removeStopoverField(2)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-17px transition cursor-pointer flex items-center justify-center shrink-0" style="font-size: 17px;">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
                     <div id="stopover-container-3" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
-                        <button type="button" onclick="removeStopoverField(3)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                        <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-17px focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
+                        <button type="button" onclick="removeStopoverField(3)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-17px transition cursor-pointer flex items-center justify-center shrink-0" style="font-size: 17px;">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
 
                     <div>
                         <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">目的地</label>
-                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-17px focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                     </div>
                 </div>
             </div>
@@ -154,7 +168,7 @@
             <!-- 報價結果展示區 -->
             <div id="fare-result" class="hidden mt-5 p-3 bg-black/80 border border-brand-yellow/50 rounded-xl">
                 <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
-                    <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
+                    <div class="text-17px font-bold text-gray-300 mb-2 flex items-center gap-1.5" style="font-size: 17px;">
                         <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
                     </div>
                     <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
@@ -162,8 +176,8 @@
 
                 <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-3 shadow-lg overflow-hidden"></div>
 
-                <div id="route-summary-text-box" class="mb-3 p-3 bg-gray-900/80 border border-gray-800 rounded-xl text-xs text-gray-300 space-y-1">
-                    <div class="font-bold text-brand-yellow mb-1 flex items-center gap-1">
+                <div id="route-summary-text-box" class="mb-3 p-3 bg-gray-900/80 border border-gray-800 rounded-xl text-gray-300 space-y-1" style="font-size: 17px;">
+                    <div class="font-bold text-brand-yellow mb-1 flex items-center gap-1" style="font-size: 17px;">
                         <i class="fa-solid fa-circle-check"></i> 請確認查詢路線：
                     </div>
                     <div><span class="text-gray-400">起點：</span><span id="confirm-pickup" class="text-white font-medium">-</span></div>
@@ -171,12 +185,12 @@
                     <div><span class="text-gray-400">目的地：</span><span id="confirm-dropoff" class="text-white font-medium">-</span></div>
                 </div>
 
-                <div id="detected-tunnels-container" class="hidden mt-1 mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-xs text-sky-200">
+                <div id="detected-tunnels-container" class="hidden mt-1 mb-3 p-2.5 bg-sky-900/30 border border-sky-500/50 rounded-xl text-sky-200" style="font-size: 17px;">
                     <span class="font-bold text-sky-400"><i class="fa-solid fa-check-circle mr-1"></i>系統自動偵測途經隧道：</span>
                     <span id="detected-tunnels-list" class="text-white font-medium"></span>
                 </div>
 
-                <div class="text-xs text-gray-300 space-y-1 mb-1 pb-1">
+                <div class="text-gray-300 space-y-1 mb-1 pb-1" style="font-size: 17px;">
                     <div class="space-y-1 mb-2">
                         <div><span data-i18n="res_distance">全程預計距離：</span><span id="res-distance" class="text-white font-bold">0</span> <span data-i18n="unit_km">公里</span></div>
                         <div><span data-i18n="res_duration">預計行車時間：</span><span id="res-duration" class="text-white font-bold">0</span> <span data-i18n="unit_min">分鐘</span></div>
@@ -188,32 +202,32 @@
                     </div>
 
                     <div id="res-surcharge-row" class="hidden text-brand-yellow"><span data-i18n="res_surcharge">車款附加費：</span><span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span></div>
-                    <div id="res-min-fare-note" class="hidden text-brand-yellow text-[11px] italic"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
+                    <div id="res-min-fare-note" class="hidden text-brand-yellow italic" style="font-size: 17px;"><span data-i18n="res_min_note_pre">*(已達該車型最低消費門檻 HK$ </span><span id="res-min-fare-val">0</span><span data-i18n="res_min_note_post">)</span></div>
                 </div>
 
                 <div class="text-xl font-extrabold text-brand-yellow my-1 flex justify-between items-end">
-                    <span class="text-sm font-bold text-gray-300" data-i18n="res_total_title">預計車費總額：</span>
+                    <span class="font-bold text-gray-300" style="font-size: 17px;" data-i18n="res_total_title">預計車費總額：</span>
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
 
                 <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
-                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
-                    <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
+                    <i class="fa-solid fa-circle-info text-brand-yellow text-17px mt-0.5"></i>
+                    <p class="font-bold text-brand-yellow leading-relaxed" style="font-size: 17px;" data-i18n="res_note">
                         以上預計車費已包含自動偵測途徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
                     </p>
                 </div>
            
                 <div class="mt-2 grid grid-cols-2 gap-2">
-                    <button type="button" onclick="scrollToTop()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                    <button type="button" onclick="scrollToTop()" class="w-full font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md" style="font-size: 17px;">
                         <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
                     </button>
-                    <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                    <button type="button" onclick="scrollToFleet()" class="w-full font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md" style="font-size: 17px;">
                         <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
                     </button>
                 </div>
 
-                <div class="mt-3 mb-2 flex items-center justify-center gap-2 text-brand-yellow font-bold text-[18px] bg-brand-yellow/10 border border-brand-yellow px-3 py-2 rounded-xl shadow-sm">
-                    <i class="fa-solid fa-bolt text-brand-yellow text-sm animate-pulse"></i>
+                <div class="mt-3 mb-2 flex items-center justify-center gap-2 text-brand-yellow font-bold bg-brand-yellow/10 border border-brand-yellow px-3 py-2 rounded-xl shadow-sm" style="font-size: 18px;">
+                    <i class="fa-solid fa-bolt text-brand-yellow text-17px animate-pulse"></i>
                     <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
                 </div>
 
@@ -232,26 +246,26 @@
 
             <!-- 服務類型切換 Tab -->
             <div class="grid grid-cols-2 gap-2 mb-4 bg-black/40 p-1.5 rounded-xl border border-gray-800/80">
-                <button type="button" id="tab-normal" onclick="switchServiceType('normal')" class="py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer">
+                <button type="button" id="tab-normal" onclick="switchServiceType('normal')" class="py-2.5 rounded-lg font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer" style="font-size: 17px;">
                     <i class="fa-solid fa-taxi mr-1.5"></i> <span data-i18n="tab_normal">一般點對點預約</span>
                 </button>
-                <button type="button" id="tab-airport" onclick="switchServiceType('airport')" class="py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer">
+                <button type="button" id="tab-airport" onclick="switchServiceType('airport')" class="py-2.5 rounded-lg font-bold transition text-gray-400 hover:text-white cursor-pointer" style="font-size: 17px;">
                     <i class="fa-solid fa-plane-arrival mr-1.5"></i> <span data-i18n="tab_airport">機場接機服務</span>
                 </button>
             </div>
 
             <!-- 已移至此處：升級提示欄位（對應服務類型 Tab 下方、表單本體內部上方） -->
-            <div id="booking-toyota-upgrade-container" class="bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
-                <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
+            <div id="booking-toyota-upgrade-container" class="bg-brand-dark border-y border-brand-yellow/60 p-4 shadow-lg mb-4" style="font-size: 17px;">
+                <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed" style="font-size: 17px;">
                     <i class="fa-solid fa-gift text-brand-yellow"></i>
                     <span data-i18n="upgrade_box_text">預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
                 </p>
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                <div class="flex items-center gap-6" style="font-size: 17px;">
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-200" style="font-size: 17px;">
                         <input type="checkbox" name="booking_toyota_upgrade" value="接受免費升級" id="booking-upgrade-yes" onclick="handleBookingUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
                         <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
                     </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-200" style="font-size: 17px;">
                         <input type="checkbox" name="booking_toyota_upgrade" value="不接受升級" id="booking-upgrade-no" onclick="handleBookingUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
                         <span data-i18n="upgrade_no_label">不接受升級</span>
                     </label>
@@ -259,45 +273,45 @@
             </div>
 
             <!-- 表單本體 -->
-            <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
+            <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4" style="font-size: 17px;">
                 
                 <!-- 隱藏的起點、中途站、終點輸入欄位 -->
                 <div id="field-pickup-container" class="hidden">
-                    <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
-                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <label id="label-pickup" class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
+                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                 </div>
 
                 <div id="field-flight-container" class="hidden">
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (例如：CX250)</span></label>
-                    <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (例如：CX250)</span></label>
+                    <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                 </div>
 
                 <div id="field-stopover-container" class="hidden">
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
-                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
+                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                 </div>
 
                 <div id="field-dropoff-container" class="hidden">
-                    <label id="label-dropoff" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span data-i18n="label_dropoff">落車地點 (終點)</span></label>
-                    <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <label id="label-dropoff" class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span data-i18n="label_dropoff">落車地點 (終點)</span></label>
+                    <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                 </div>
                 
                 <!-- 用車日期和用車時間直向堆疊 -->
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
-                        <input type="date" id="date" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
+                        <input type="date" id="date" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (最快15分鐘後)</span></label>
-                        <input type="time" id="time" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間 (最快15分鐘後)</span></label>
+                        <input type="time" id="time" required class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數</span></label>
-                        <select id="passengers" onchange="checkPassengerLimit()" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數</span></label>
+                        <select id="passengers" onchange="checkPassengerLimit()" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                             <option value="1 人" data-i18n="p1">1 人</option>
                             <option value="2 人" selected data-i18n="p2">2 人</option>
                             <option value="3 人" data-i18n="p3">3 人</option>
@@ -307,8 +321,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-suitcase text-brand-yellow mr-1.5"></i><span data-i18n="label_luggages">行李件數</span></label>
-                        <select id="luggages" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-suitcase text-brand-yellow mr-1.5"></i><span data-i18n="label_luggages">行李件數</span></label>
+                        <select id="luggages" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                             <option value="0 件" selected data-i18n="l0">0 件</option>
                             <option value="1 件" data-i18n="l1">1 件</option>
                             <option value="2 件" data-i18n="l2">2 件</option>
@@ -320,41 +334,41 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-brand-dark border border-gray-800 rounded-xl p-4">
-                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
+                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 font-bold" style="font-size: 17px;">
                         <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-                        <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span data-i18n="label_has_pet">是否有寵物</span>
+                        <i class="fa-solid fa-paw text-brand-yellow text-17px"></i> <span data-i18n="label_has_pet">是否有寵物</span>
                     </label>
-                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
+                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 font-bold" style="font-size: 17px;">
                         <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-                        <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span data-i18n="label_has_wheelchair">是否有輪椅需要放置於尾箱</span>
+                        <i class="fa-solid fa-wheelchair text-brand-yellow text-17px"></i> <span data-i18n="label_has_wheelchair">是否有輪椅需要放置於尾箱</span>
                     </label>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-2">
+                    <label class="block font-bold text-gray-300 mb-2" style="font-size: 17px;">
                         <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
                         <span data-i18n="label_payment_method">選擇付款方式 (可選多項)</span>
                     </label>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_cash">現金</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_payme">PayMe</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="微信" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_wechat">微信</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="支付寶" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_alipay">支付寶</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_octopus">八達通</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl cursor-pointer hover:border-brand-yellow transition" style="font-size: 17px;">
                             <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_credit">信用卡 (需另加手續費)</span>
                         </label>
                     </div>
@@ -362,17 +376,17 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人 (選填)</span></label>
-                        <input type="text" id="contact_surname" data-i18n-placeholder="ph_contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人 (選填)</span></label>
+                        <input type="text" id="contact_surname" data-i18n-placeholder="ph_contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂 (選填)</span></label>
-                        <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl px-4 py-3.5 text-xs text-gray-200 h-[48px]">
-                            <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂 (選填)</span></label>
+                        <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl px-4 py-3.5 text-gray-200" style="font-size: 17px; min-height: 48px;">
+                            <label class="flex items-center gap-2 cursor-pointer" style="font-size: 17px;">
                                 <input type="radio" name="contact_title" value="先生" class="text-brand-yellow focus:ring-brand-yellow">
                                 <span data-i18n="title_mr">先生</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
+                            <label class="flex items-center gap-2 cursor-pointer" style="font-size: 17px;">
                                 <input type="radio" name="contact_title" value="小姐" class="text-brand-yellow focus:ring-brand-yellow">
                                 <span data-i18n="title_ms">小姐</span>
                             </label>
@@ -381,25 +395,25 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp 接收確認)</span></label>
-                    <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <label class="block font-bold text-gray-300 mb-1.5" style="font-size: 17px;"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp 接收確認)</span></label>
+                    <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white focus:outline-none focus:border-brand-yellow transition" style="font-size: 17px;">
                 </div>
                 
                 <div class="bg-black/50 p-4 rounded-xl border border-gray-800 flex justify-between items-center mt-6">
-                    <div class="text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_car_label">目前選定車型</span>
-                        <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">豐田混能的士</span>
+                    <div>
+                        <span class="text-gray-400 block mb-0.5" style="font-size: 17px;" data-i18n="summary_car_label">目前選定車型</span>
+                        <span id="selected-car-text" class="text-brand-yellow font-bold" style="font-size: 17px;">豐田混能的士</span>
                     </div>
-                    <div class="text-right text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_fee_label">收費模式</span>
-                        <span id="selected-price-text" class="text-brand-yellow font-bold">標準收費・無附加費</span>
+                    <div class="text-right">
+                        <span class="text-gray-400 block mb-0.5" style="font-size: 17px;" data-i18n="summary_fee_label">收費模式</span>
+                        <span id="selected-price-text" class="text-brand-yellow font-bold" style="font-size: 17px;">標準收費・無附加費</span>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-brand-yellow text-black font-extrabold text-base py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="btn_submit_whatsapp">確認預約並發送 WhatsApp</span>
+                <button type="submit" class="w-full bg-brand-yellow text-black font-extrabold text-17px py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10" style="font-size: 17px;">
+                    <i class="fa-brands fa-whatsapp text-17px"></i> <span data-i18n="btn_submit_whatsapp">確認預約並發送 WhatsApp</span>
                 </button>
-                <p class="text-center text-xs text-gray-500 mt-2" data-i18n="form_footer_note">點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。</p>
+                <p class="text-center text-gray-500 mt-2" style="font-size: 17px;" data-i18n="form_footer_note">點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。</p>
             </form>
         </div>
     </section>
@@ -413,7 +427,7 @@
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
                      class="car-card bg-brand-card overflow-hidden border-y-2 border-brand-yellow relative cursor-pointer shadow-xl shadow-brand-yellow/10 flex flex-col flex-1 transition duration-300">
-                    <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                    <div class="badge-container absolute top-3 right-3 bg-brand-yellow text-black font-bold px-3 py-1 rounded-full z-10 shadow-md" style="font-size: 17px;">
                         <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                     </div>
                     <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
@@ -422,17 +436,17 @@
                     <div class="p-4 flex-1 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-lg font-bold" data-i18n="car1_name">豐田混能的士</h3>
-                                <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car1_seats">4 座位</span>
+                                <h3 class="text-lg font-bold" style="font-size: 19px;" data-i18n="car1_name">豐田混能的士</h3>
+                                <span class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" style="font-size: 17px;" data-i18n="car1_seats">4 座位</span>
                             </div>
-                            <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car1_type">標準混能的士</p>
-                            <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                            <p class="text-brand-yellow font-bold mb-4 tracking-wider" style="font-size: 17px;" data-i18n="car1_type">標準混能的士</p>
+                            <ul class="text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4" style="font-size: 17px;">
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car1_cap">最多 4 位乘客</span></li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car1_lug">約 2-3 件標準行李</span></li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car1_feat">特低地台、電動趟門</span></li>
                             </ul>
                         </div>
-                        <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                        <div class="border-t border-gray-800 pt-4 flex justify-between items-center" style="font-size: 17px;">
                             <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
                             <span class="font-bold text-white" data-i18n="car1_fee">標準收費・無附加費</span>
                         </div>
@@ -444,7 +458,7 @@
             <div onclick="selectCar('Maxus MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'Maxus MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" 
                  id="card-Maxus MIFA 7" 
                  class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black font-bold px-3 py-1 rounded-full z-10 shadow-md" style="font-size: 17px;">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
@@ -453,17 +467,17 @@
                 <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car2_name">Maxus MIFA 7</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car2_seats">6 座位</span>
+                            <h3 class="text-lg font-bold" style="font-size: 19px;" data-i18n="car2_name">Maxus MIFA 7</h3>
+                            <span class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" style="font-size: 17px;" data-i18n="car2_seats">6 座位</span>
                         </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car2_type">純電動七人車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                        <p class="text-brand-yellow font-bold mb-4 tracking-wider" style="font-size: 17px;" data-i18n="car2_type">純電動七人車</p>
+                        <ul class="text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4" style="font-size: 17px;">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car2_cap">最多 6 位乘客</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car2_lug">可放 3-4 件大型行李</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car2_feat">純電動零排放、極度寧靜</span></li>
                         </ul>
                     </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center" style="font-size: 17px;">
                         <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
                         <span class="font-bold text-brand-yellow" data-i18n="car2_fee">附加費 HK$50 (最低 $130)</span>
                     </div>
@@ -474,7 +488,7 @@
             <div onclick="selectCar('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" 
                  id="card-廣汽 E9" 
                  class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black font-bold px-3 py-1 rounded-full z-10 shadow-md" style="font-size: 17px;">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
@@ -483,17 +497,17 @@
                 <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car3_name">廣汽 E9</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car3_seats">6 座位</span>
+                            <h3 class="text-lg font-bold" style="font-size: 19px;" data-i18n="car3_name">廣汽 E9</h3>
+                            <span class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" style="font-size: 17px;" data-i18n="car3_seats">6 座位</span>
                         </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car3_type">豪華航空椅專車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                        <p class="text-brand-yellow font-bold mb-4 tracking-wider" style="font-size: 17px;" data-i18n="car3_type">豪華航空椅專車</p>
+                        <ul class="text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4" style="font-size: 17px;">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car3_cap">最多 6 位乘客</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car3_lug">約 3-4 件大型行李</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car3_feat">頭等航空級獨立大班椅</span></li>
                         </ul>
                     </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center" style="font-size: 17px;">
                         <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
                         <span class="font-bold text-brand-yellow" data-i18n="car3_fee">附加費 HK$100 (最低 $180)</span>
                     </div>
@@ -504,7 +518,7 @@
             <div onclick="selectCar('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" 
                  id="card-吉利大黃蜂" 
                  class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black font-bold px-3 py-1 rounded-full z-10 shadow-md" style="font-size: 17px;">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
@@ -513,17 +527,17 @@
                 <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car4_name">吉利大黃蜂</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" data-i18n="car4_seats">6 座位</span>
+                            <h3 class="text-lg font-bold" style="font-size: 19px;" data-i18n="car4_name">吉利大黃蜂</h3>
+                            <span class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-gray-300 font-medium" style="font-size: 17px;" data-i18n="car4_seats">6 座位</span>
                         </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car4_type">超大空間尊車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                        <p class="text-brand-yellow font-bold mb-4 tracking-wider" style="font-size: 17px;" data-i18n="car4_type">超大空間尊車</p>
+                        <ul class="text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4" style="font-size: 17px;">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car4_cap">最多 6 位乘客</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car4_lug">4件以上大型行李</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car4_feat">同級最大車廂、空間極佳</span></li>
                         </ul>
                     </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center" style="font-size: 17px;">
                         <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
                         <span class="font-bold text-brand-yellow" data-i18n="car4_fee">附加費 HK$80 (最低 $160)</span>
                     </div>
@@ -534,7 +548,7 @@
             <div onclick="selectCar('豐田 Noah 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota Noah Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" 
                  id="card-豐田 Noah 輪椅的士" 
                  class="car-card bg-brand-card overflow-hidden border-y border-gray-800 hover:border-brand-yellow transition cursor-pointer opacity-75 hover:opacity-100 relative flex flex-col md:col-span-2 lg:col-span-1">
-                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
+                <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black font-bold px-3 py-1 rounded-full z-10 shadow-md" style="font-size: 17px;">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-b border-gray-800/60">
@@ -543,17 +557,17 @@
                 <div class="p-4 flex-1 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold" data-i18n="car5_name">豐田 Noah 輪椅的士</h3>
-                            <span class="text-xs bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-brand-yellow font-medium" data-i18n="car5_seats">無障礙</span>
+                            <h3 class="text-lg font-bold" style="font-size: 19px;" data-i18n="car5_name">豐田 Noah 輪椅的士</h3>
+                            <span class="bg-gray-800 border border-gray-700 px-2.5 py-1 rounded-full text-brand-yellow font-medium" style="font-size: 17px;" data-i18n="car5_seats">無障礙</span>
                         </div>
-                        <p class="text-brand-yellow text-xs font-bold mb-4 tracking-wider" data-i18n="car5_type">無障礙福祉專車</p>
-                        <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
+                        <p class="text-brand-yellow font-bold mb-4 tracking-wider" style="font-size: 17px;" data-i18n="car5_type">無障礙福祉專車</p>
+                        <ul class="text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4" style="font-size: 17px;">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car5_cap">1位輪椅 + 5位乘客</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car5_lug">可放 3-4 件大行李</span></li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car5_feat">配備原廠金屬斜道</span></li>
                         </ul>
                     </div>
-                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center text-xs">
+                    <div class="border-t border-gray-800 pt-4 flex justify-between items-center" style="font-size: 17px;">
                         <span class="text-gray-400" data-i18n="fee_mode_label">收費模式</span>
                         <span class="font-bold text-brand-yellow" data-i18n="car5_fee">附加費 HK$150 (最低 $230)</span>
                     </div>
@@ -565,17 +579,17 @@
 
     <!-- 頁尾 Footer -->
     <footer class="border-t border-gray-800/80 mt-16 py-10 text-center px-4 bg-brand-dark">
-        <p class="text-xs text-gray-400 mb-6" data-i18n="footer_slogan">香港新一代豪華六座位的士預約服務・準時尊貴接送</p>
+        <p class="text-gray-400 mb-6" style="font-size: 17px;" data-i18n="footer_slogan">香港新一代豪華六座位的士預約服務・準時尊貴接送</p>
         
         <div class="flex justify-center gap-4 mb-8">
-            <a href="tel:57038875" class="border border-gray-800 bg-brand-gray px-6 py-2.5 rounded-full hover:bg-gray-800 transition text-xs flex items-center gap-2 text-white">
+            <a href="tel:57038875" class="border border-gray-800 bg-brand-gray px-6 py-2.5 rounded-full hover:bg-gray-800 transition flex items-center gap-2 text-white" style="font-size: 17px;">
                 <i class="fa-solid fa-phone text-brand-yellow"></i> 5703 8875
             </a>
-            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="bg-brand-yellow text-black px-6 py-2.5 rounded-full hover:opacity-90 transition font-bold text-xs flex items-center gap-2 shadow-md">
+            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="bg-brand-yellow text-black px-6 py-2.5 rounded-full hover:opacity-90 transition font-bold flex items-center gap-2 shadow-md" style="font-size: 17px;">
                 <i class="fa-brands fa-whatsapp"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
             </a>
         </div>
-        <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
+        <p class="text-gray-600" style="font-size: 17px;" data-i18n="footer_copy">© 2026 版權所有。</p>
     </footer>
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
@@ -1076,12 +1090,16 @@
             const flightContainer = document.getElementById('field-flight-container');
 
             if (type === 'airport') {
-                tabAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
-                tabNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
+                tabAirport.className = "py-2.5 rounded-lg font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
+                tabNormal.className = "py-2.5 rounded-lg font-bold transition text-gray-400 hover:text-white cursor-pointer";
+                tabAirport.style.fontSize = "17px";
+                tabNormal.style.fontSize = "17px";
                 if (flightContainer) flightContainer.classList.remove('hidden');
             } else {
-                tabNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
-                tabAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
+                tabNormal.className = "py-2.5 rounded-lg font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
+                tabAirport.className = "py-2.5 rounded-lg font-bold transition text-gray-400 hover:text-white cursor-pointer";
+                tabNormal.style.fontSize = "17px";
+                tabAirport.style.fontSize = "17px";
                 if (flightContainer) flightContainer.classList.add('hidden');
             }
         }
@@ -1103,7 +1121,7 @@
 
             micBtn.classList.add('bg-brand-yellow', 'text-black');
             micText.innerText = "聆聽中...請講出完整行程";
-            micIcon.className = "fa-solid fa-spinner fa-spin text-base";
+            micIcon.className = "fa-solid fa-spinner fa-spin text-17px";
 
             recognition.start();
 
@@ -1167,7 +1185,7 @@
                 setTimeout(() => {
                     micBtn.classList.remove('bg-brand-yellow', 'text-black');
                     micText.innerText = translations[currentLang].voice_btn_text;
-                    micIcon.className = "fa-solid fa-microphone text-base";
+                    micIcon.className = "fa-solid fa-microphone text-17px";
                     calculateFareWithGoogle();
                 }, 1000);
             };
@@ -1178,13 +1196,13 @@
                 setTimeout(() => {
                     micBtn.classList.remove('bg-brand-yellow', 'text-black');
                     micText.innerText = translations[currentLang].voice_btn_text;
-                    micIcon.className = "fa-solid fa-microphone text-base";
+                    micIcon.className = "fa-solid fa-microphone text-17px";
                 }, 2000);
             };
 
             recognition.onend = () => {
                 micBtn.classList.remove('bg-brand-yellow', 'text-black');
-                micIcon.className = "fa-solid fa-microphone text-base";
+                micIcon.className = "fa-solid fa-microphone text-17px";
             };
         }
 
@@ -1386,10 +1404,11 @@
 
                             const btn = document.createElement('button');
                             btn.type = 'button';
-                            btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
+                            btn.className = `p-2.5 rounded-lg border text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
+                            btn.style.fontSize = "17px";
                             btn.onclick = () => selectRouteOption(index, isShenzhenBay);
                             btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
-                                            <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
+                                            <div style="font-size: 17px;" class="opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
                             routeListContainer.appendChild(btn);
                         });
                     } else {
@@ -1408,9 +1427,11 @@
             const btns = document.querySelectorAll('#route-options-list button');
             btns.forEach((btn, i) => {
                 if (i === index) {
-                    btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-brand-yellow/20 border-brand-yellow text-white font-bold";
+                    btn.className = "p-2.5 rounded-lg border text-left transition cursor-pointer bg-brand-yellow/20 border-brand-yellow text-white font-bold";
+                    btn.style.fontSize = "17px";
                 } else {
-                    btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-black/40 border-gray-700 text-gray-400 hover:text-white";
+                    btn.className = "p-2.5 rounded-lg border text-left transition cursor-pointer bg-black/40 border-gray-700 text-gray-400 hover:text-white";
+                    btn.style.fontSize = "17px";
                 }
             });
 
