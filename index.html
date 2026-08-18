@@ -79,11 +79,26 @@
 <body class="antialiased">
 
     <!-- 頁首 Navbar -->
-    <header class="bg-brand-yellow text-black px-2 py-[1mm] sticky top-0 z-50 shadow-md">
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] sticky top-0 z-50 shadow-md">
         <div class="w-full px-2 flex justify-between items-center">
-            <a href="#">
-                <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
-            </a>
+            <!-- 左側：Logo -->
+            <div class="flex items-center">
+                <a href="#">
+                    <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
+                </a>
+            </div>
+
+            <!-- 中間：hotline.jpeg 與下方電話號碼 -->
+            <div class="flex flex-col items-center justify-center">
+                <a href="#">
+                    <img src="hotline.jpeg" alt="24小時的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                </a>
+                <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
+                    <i class="fa-solid fa-phone text-small"></i> 6881 5441
+                </a>
+            </div>
+
+            <!-- 右側：語言切換按鈕 -->
             <div class="flex items-center gap-2">
                 <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[16px] hover:opacity-80 transition cursor-pointer">
                     EN
@@ -256,7 +271,7 @@
                 </button>
             </div>
 
-            <!-- 已移至此處：升級提示欄位（對應服務類型 Tab 下方、表單本體內部上方） -->
+            <!-- 升級提示欄位 -->
             <div id="booking-toyota-upgrade-container" class="bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                 <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                     <i class="fa-solid fa-gift text-brand-yellow"></i>
@@ -277,7 +292,6 @@
             <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
                 
-                <!-- 隱藏的起點、中途站、終點輸入欄位 -->
                 <div id="field-pickup-container" class="hidden">
                     <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
                     <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
@@ -298,27 +312,23 @@
                     <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
-                <!-- 用車日期和用車時間直向堆疊 -->
                 <div class="grid grid-cols-1 gap-4 w-full">
-    <!-- 用車日期美化區 -->
-    <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
-        <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
-            <span><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></span>
-            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full">接受最多3日內</span>
-        </label>
-        <input type="date" id="date" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
-    </div>
+                    <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
+                        <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
+                            <span><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></span>
+                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full">接受最多3日內</span>
+                        </label>
+                        <input type="date" id="date" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
+                    </div>
 
-    <!-- 用車時間美化區 -->
-    <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
-        <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
-            <span><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></span>
-            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full">如沒指定，最快15分鐘後</span>
-        </label>
-        <input type="time" id="time" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
-    </div>
-</div>
-
+                    <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
+                        <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
+                            <span><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></span>
+                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full">如沒指定，最快15分鐘後</span>
+                        </label>
+                        <input type="time" id="time" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -434,7 +444,7 @@
     <section id="fleet-section" class="w-full px-2 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
-            <!-- 車款 1 : 豐田混能的士（已移除原本在此處的 upgrade box） -->
+            <!-- 車款 1 : 豐田混能的士 -->
             <div class="flex flex-col">
                 <div onclick="selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" 
                      id="card-豐田混能的士" 
@@ -1648,8 +1658,8 @@
                 msgLines.push(`🛣️ 途經隧道：${detectedTunnelsText} (+$${tunnelValText})`);
             }
 
-            const totalFare = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            msgLines.push(`💰預計車費總額：HK$${totalFare} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
+            const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
 
             msgLines.push(`--------------------`);
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
