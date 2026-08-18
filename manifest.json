@@ -1,7 +1,7 @@
 {
   "name": "24小時的士預約服務",
   "short_name": "TAXI的士",
-  "start_url": "./index.html",
+  "start_url": "https://hktaxiservice.netlify.app/",
   "display": "standalone",
   "background_color": "#0B0B0B",
   "theme_color": "#FFF200",
