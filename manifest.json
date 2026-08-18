@@ -1,6 +1,6 @@
 {
   "name": "24小時的士預約服務",
-  "short_name": "的士預約",
+  "short_name": "TAXI的士",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0B0B0B",
