@@ -81,7 +81,7 @@
 <body class="antialiased">
 
     <!-- 頁首 Navbar -->
-    <header class="bg-brand-yellow text-black px-0 py-[1mm] sticky top-0 z-50 shadow-md">
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-2 flex justify-between items-center">
             <!-- 左側：Logo -->
             <div class="flex items-center">
@@ -108,6 +108,9 @@
             </div>
         </div>
     </header>
+
+    <!-- 為了避免 fixed/sticky 頁首延遲或遮蓋下方內容，在此預留頁首高度空間 -->
+    <div class="h-[92px] w-full"></div>
 
     <!-- 車費估算器 Section -->
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 30px;">
