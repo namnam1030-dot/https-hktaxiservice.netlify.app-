@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>24小時的士預約服務</title>
+    <title>的士預約服務</title>
     <!-- 引入 Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 FontAwesome 圖示庫 -->
@@ -100,14 +100,40 @@
                 </a>
             </div>
 
-            <!-- 右側：語言切換按鈕 -->
-            <div class="flex items-center gap-2">
-                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[16px] hover:opacity-80 transition cursor-pointer">
+            <!-- 右側：語言切換按鈕與加到主畫面按鍵 -->
+            <div class="flex flex-col items-end gap-1.5">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
                     EN
+                </button>
+                <!-- 突出閃爍的加到主畫面按鍵 -->
+                <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
                 </button>
             </div>
         </div>
     </header>
+
+    <!-- 加入主畫面引導 Modal (預設隱藏) -->
+    <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-brand-yellow text-3xl mb-3">
+                <i class="fa-solid fa-circle-down animate-bounce"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
+                為了方便下次叫車，您可以將本服務加到手機主畫面：
+            </p>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
+                <!-- 動態填入說明 -->
+            </div>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90">
+                了解，關閉
+            </button>
+        </div>
+    </div>
 
     <!-- 為了避免 fixed/sticky 頁首延遲或遮蓋下方內容，在此預留頁首高度空間 -->
     <div class="h-[92px] w-full"></div>
@@ -146,7 +172,12 @@
                                 <i class="fa-solid fa-arrow-up-down"></i> <span class="text-xs">起點🔃目的地</span>
                             </button>
                         </div>
-                        <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <div class="relative flex items-center">
+                            <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
+                            <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
@@ -157,19 +188,34 @@
                     </div>
 
                     <div id="stopover-container-1" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <div class="relative flex items-center w-full">
+                            <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
+                            <button type="button" id="clear-stop-1-btn" onclick="clearInput('calc-stopover-1', 'clear-stop-1-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                         <button type="button" onclick="removeStopoverField(1)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
                     <div id="stopover-container-2" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <div class="relative flex items-center w-full">
+                            <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
+                            <button type="button" id="clear-stop-2-btn" onclick="clearInput('calc-stopover-2', 'clear-stop-2-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                         <button type="button" onclick="removeStopoverField(2)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
                     <div id="stopover-container-3" class="hidden flex items-center gap-2">
-                        <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <div class="relative flex items-center w-full">
+                            <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
+                            <button type="button" id="clear-stop-3-btn" onclick="clearInput('calc-stopover-3', 'clear-stop-3-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                         <button type="button" onclick="removeStopoverField(3)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-minus"></i>
                         </button>
@@ -177,7 +223,12 @@
 
                     <div>
                         <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">目的地</label>
-                        <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-brand-yellow transition">
+                        <div class="relative flex items-center">
+                            <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
+                            <button type="button" id="clear-dropoff-btn" onclick="clearInput('calc-dropoff', 'clear-dropoff-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -235,7 +286,7 @@
                 <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
                     <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
                     <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
-                        以上預計車費已包含自動偵測途徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
+                        以上預計車費已包含自動偵測途徑徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
                     </p>
                 </div>
            
@@ -645,6 +696,9 @@
 
         const translations = {
             zh: {
+                btn_add_home: "加到主畫面",
+                modal_title: "一鍵加入主畫面",
+                modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
                 btn_quick_query: "立即預約",
                 btn_view_fleet: "選擇車款類型",
                 notice_15min: "提供最快15分鐘後的預約服務（亦支援即時訂單）",
@@ -770,6 +824,9 @@
                 footer_copy: "© 2026 版權所有。"
             },
             en: {
+                btn_add_home: "Add to Home",
+                modal_title: "Add to Home Screen",
+                modal_desc: "For quick booking next time, add this service to your phone's home screen:",
                 btn_quick_query: "Instant Booking",
                 btn_view_fleet: "Select Vehicle Type",
                 notice_15min: "Supports 15-minute advance booking & instant orders",
@@ -911,6 +968,49 @@
 
         let calcPickupInput, calcDropoffInput;
 
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function showInstallGuide() {
+            const modal = document.getElementById('install-modal');
+            const content = document.getElementById('install-guide-content');
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('用戶接受了安裝');
+                    }
+                    deferredPrompt = null;
+                });
+                return;
+            }
+
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isIOS) {
+                content.innerHTML = `
+                    <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
+                    <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
+                    <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
+                `;
+            } else {
+                content.innerHTML = `
+                    <p><strong>1.</strong> 點擊瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
+                    <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 「安裝應用程式」。</p>
+                    <p class="mt-1"><strong>3.</strong> 確認新增即可快速開啟！</p>
+                `;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeInstallGuide() {
+            document.getElementById('install-modal').classList.add('hidden');
+        }
+
         function initAutocomplete() {
             const hkBounds = new google.maps.LatLngBounds(
                 new google.maps.LatLng(22.15, 113.83),
@@ -955,6 +1055,7 @@
             const container = document.getElementById(`stopover-container-${index}`);
             const input = document.getElementById(`calc-stopover-${index}`);
             if (input) input.value = '';
+            toggleClearBtn(`calc-stopover-${index}`, `clear-stop-${index}-btn`);
             if (container) container.classList.add('hidden');
 
             currentStopCount = Math.max(0, currentStopCount - 1);
@@ -966,6 +1067,34 @@
             }
         }
 
+        // 控制 ❌ 按鈕的顯示與隱藏
+        function toggleClearBtn(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (input && btn) {
+                if (input.value.trim().length > 0) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+        }
+
+        // 清空輸入格內容並隱藏 ❌ 按鈕
+        function clearInput(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = '';
+                toggleClearBtn(inputId, btnId);
+                input.focus();
+
+                // 如果是中途站，移除時順便更新車費
+                if (inputId.includes('stopover') && !document.getElementById('fare-result').classList.contains('hidden')) {
+                    calculateFareWithGoogle();
+                }
+            }
+        }
+
         function swapLocations() {
             const pickupEl = document.getElementById('calc-pickup');
             const dropoffEl = document.getElementById('calc-dropoff');
@@ -973,6 +1102,9 @@
                 const temp = pickupEl.value;
                 pickupEl.value = dropoffEl.value;
                 dropoffEl.value = temp;
+
+                toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+                toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
 
                 if (!document.getElementById('fare-result').classList.contains('hidden')) {
                     calculateFareWithGoogle();
@@ -1194,16 +1326,23 @@
                     }
                 }
 
-                if (pickup) document.getElementById('calc-pickup').value = pickup;
+                if (pickup) {
+                    document.getElementById('calc-pickup').value = pickup;
+                    toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+                }
                 
                 if (stopover) {
                     if (currentStopCount === 0) {
                         addStopoverField();
                     }
                     document.getElementById('calc-stopover-1').value = stopover;
+                    toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
                 }
                 
-                if (dropoff) document.getElementById('calc-dropoff').value = dropoff;
+                if (dropoff) {
+                    document.getElementById('calc-dropoff').value = dropoff;
+                    toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+                }
 
                 setTimeout(() => {
                     micBtn.classList.remove('bg-brand-yellow', 'text-black');
