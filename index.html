@@ -1002,14 +1002,12 @@
         };
 
         let selectedCarName = '豐田混能的士';
-let selectedCarNameEn = 'Toyota Hybrid Taxi';
-let selectedSurcharge = 0;
-let selectedMinFare = 0;
-let selectedFeeMode = '標準收費・無附加費';
-let selectedFeeModeEn = 'Standard Fare · No Surcharge';
-let serviceType = 'normal';
-let currentTunnelFee = 0; // <--- 新增：記錄當前計算出的隧道費
-
+        let selectedCarNameEn = 'Toyota Hybrid Taxi';
+        let selectedSurcharge = 0;
+        let selectedMinFare = 0;
+        let selectedFeeMode = '標準收費・無附加費';
+        let selectedFeeModeEn = 'Standard Fare · No Surcharge';
+        let serviceType = 'normal';
 
         let map = null;
         let directionsService = null;
@@ -1732,10 +1730,6 @@ let currentTunnelFee = 0; // <--- 新增：記錄當前計算出的隧道費
             let tunnelResult = checkTunnelsForRoute(selectedRoute);
             let tunnelFee = tunnelResult.totalTunnelFee;
 
-// 在這裡加上這行：
-currentTunnelFee = tunnelFee; // <--- 更新全域隧道費
-
-
             const detectedContainer = document.getElementById('detected-tunnels-container');
             const detectedList = document.getElementById('detected-tunnels-list');
             if (tunnelResult.matchedTunnels.length > 0) {
@@ -1900,6 +1894,12 @@ function sendWhatsApp(event) {
                 msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);
             }
             msgLines.push(`📞 電話：${phone}`);
+
+            const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
+            const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
+            if (detectedTunnelsText) {
+                ;
+            }
 
             const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
             msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
