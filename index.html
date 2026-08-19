@@ -1002,12 +1002,14 @@
         };
 
         let selectedCarName = '豐田混能的士';
-        let selectedCarNameEn = 'Toyota Hybrid Taxi';
-        let selectedSurcharge = 0;
-        let selectedMinFare = 0;
-        let selectedFeeMode = '標準收費・無附加費';
-        let selectedFeeModeEn = 'Standard Fare · No Surcharge';
-        let serviceType = 'normal';
+let selectedCarNameEn = 'Toyota Hybrid Taxi';
+let selectedSurcharge = 0;
+let selectedMinFare = 0;
+let selectedFeeMode = '標準收費・無附加費';
+let selectedFeeModeEn = 'Standard Fare · No Surcharge';
+let serviceType = 'normal';
+let currentTunnelFee = 0; // <--- 新增：記錄當前計算出的隧道費
+
 
         let map = null;
         let directionsService = null;
@@ -1729,6 +1731,10 @@
 
             let tunnelResult = checkTunnelsForRoute(selectedRoute);
             let tunnelFee = tunnelResult.totalTunnelFee;
+
+// 在這裡加上這行：
+currentTunnelFee = tunnelFee; // <--- 更新全域隧道費
+
 
             const detectedContainer = document.getElementById('detected-tunnels-container');
             const detectedList = document.getElementById('detected-tunnels-list');
