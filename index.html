@@ -1115,6 +1115,23 @@
             }
         }
 
+// 確保計算前，所有舊的數據被清空
+function resetCalculationResults() {
+    // 1. 隱藏隧道提示區
+    document.getElementById('detected-tunnels-container').classList.add('hidden');
+    document.getElementById('detected-tunnels-list').innerText = '';
+    
+    // 2. 隱藏隧道費用行
+    document.getElementById('res-tunnel-row').classList.add('hidden');
+    document.getElementById('res-tunnel-val').innerText = '0';
+    
+    // 3. 重置基本費用顯示
+    document.getElementById('res-base-fare').innerText = '0';
+    
+    // 4. 如果您有全域變數儲存隧道費，也必須清空
+    window.lastCalculatedTunnelFee = 0; 
+}
+
         // 控制 ❌ 按鈕的顯示與隱藏
         function toggleClearBtn(inputId, btnId) {
             const input = document.getElementById(inputId);
@@ -1776,6 +1793,18 @@
 
 function sendWhatsApp(event) {
             event.preventDefault();
+    
+    // ❌ 不要這樣做（讀取全域舊變數）
+    // let tunnelFee = window.lastCalculatedTunnelFee; 
+    
+    // ✅ 應該這樣做（即時讀取 DOM 上的值）
+    let tunnelDisplay = document.getElementById('res-tunnel-val').innerText;
+    let tunnelFee = parseFloat(tunnelDisplay) || 0;
+    
+    // 接下來再組合成字串發送
+    // ...
+}
+
 
             // 檢查用戶是否選擇了豐田混能的士的免費升級項目
             if (selectedCarName === '豐田混能的士') {
