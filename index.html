@@ -1511,32 +1511,48 @@
         }
 
         const tunnelDatabase = [
-            { name: "紅隧 (連回程)", fee: 50, lat: 22.2896118, lng: 114.1823943, radius: 300 },
-            { name: "東隧 (連回程)", fee: 50, lat: 22.294889, lng: 114.22223, radius: 300 },
-            { name: "西隧 (連回程)", fee: 50, lat: 22.2940599, lng: 114.150204, radius: 300 },
+            { name: "紅隧 (連回程)", fee: 50, lat: 22.2896118, lng: 114.1823943, radius: 400 },
+            { name: "東隧 (連回程)", fee: 50, lat: 22.294889, lng: 114.22223, radius: 400 },
+            { name: "西隧 (連回程)", fee: 50, lat: 22.2940599, lng: 114.150204, radius: 400 },
             { name: "大欖隧道", fee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500 },
-            { name: "城門隧道", fee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300 },
-            { name: "香港仔隧道", fee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
+            { name: "城門隧道", fee: 8, lat: 22.3764988, lng: 114.1487468, radius: 400 },
+            { name: "香港仔隧道", fee: 8, lat: 22.2614503, lng: 114.1799975, radius: 400 },
             { name: "大老山隧道", fee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
-            { name: "獅子山隧道", fee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
-            { name: "尖山隧道", fee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
+            { name: "獅子山隧道", fee: 8, lat: 22.3527046, lng: 114.1764997, radius: 400 },
+            { name: "尖山隧道", fee: 8, lat: 22.3523498, lng: 114.159581, radius: 300 }
         ];
 
         function checkTunnelsForRoute(route) {
             let matchedTunnels = [];
             let totalTunnelFee = 0;
-            const pathPoints = route.overview_path;
 
             if (!window.google || !google.maps.geometry) {
                 return { matchedTunnels, totalTunnelFee };
+            }
+
+            // 收集路線中所有的座標點（涵蓋 overview_path 以及各 leg 中的 steps 點，確保多中途站時不會漏掉）
+            let allPoints = [];
+            if (route.overview_path) {
+                allPoints = allPoints.concat(route.overview_path);
+            }
+            if (route.legs) {
+                route.legs.forEach(leg => {
+                    if (leg.steps) {
+                        leg.steps.forEach(step => {
+                            if (step.path) {
+                                allPoints = allPoints.concat(step.path);
+                            }
+                        });
+                    }
+                });
             }
 
             tunnelDatabase.forEach(tunnel => {
                 let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
                 let triggered = false;
 
-                for (let i = 0; i < pathPoints.length; i++) {
-                    let distance = google.maps.geometry.spherical.computeDistanceBetween(pathPoints[i], tunnelLatLng);
+                for (let i = 0; i < allPoints.length; i++) {
+                    let distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], tunnelLatLng);
                     if (distance <= tunnel.radius) {
                         triggered = true;
                         break;
@@ -1755,7 +1771,7 @@
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-                function sendWhatsApp(event) {
+        function sendWhatsApp(event) {
             event.preventDefault();
 
             const pickup = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : '';
@@ -1806,79 +1822,63 @@
                 }
             }
 
-            const payEls = document.getElementsByName('payment_method');
-            let payments = [];
-            for (let el of payEls) {
-                if (el.checked) payments.push(el.value);
-            }
-            const paymentStr = payments.join(' / ');
+            let paymentMethods = [];
+            document.querySelectorAll('input[name="payment_method"]:checked').forEach(el => {
+                paymentMethods.push(el.value);
+            });
 
-            let timeStringFormatted = time;
-            if (date && time) {
-                const now = new Date();
-                const [targetYear, targetMonth, targetDay] = date.split('-').map(Number);
-                const [targetHour, targetMinute] = time.split(':').map(Number);
-                const targetDateTime = new Date(targetYear, targetMonth - 1, targetDay, targetHour, targetMinute);
-                
-                const diffMinutes = (targetDateTime - now) / (1000 * 60);
-                
-                if (diffMinutes <= 15) {
-                    timeStringFormatted = `${time} ‼️即時用車‼️`;
-                }
+            let upgradeChoice = '';
+            const upYes = document.getElementById('booking-upgrade-yes');
+            const upNo = document.getElementById('booking-upgrade-no');
+            if (upYes && upYes.checked) upgradeChoice = "接受免費升級";
+            else if (upNo && upNo.checked) upgradeChoice = "不接受升級";
+
+            if (selectedCarName === '豐田混能的士' && !upgradeChoice) {
+                alert(currentLang === 'en' ? "Please select whether you accept a free vehicle upgrade." : "選擇豐田混能的士時，請必須勾選是否接受免費升級！");
+                document.getElementById('booking-toyota-upgrade-container')?.scrollIntoView({ behavior: 'smooth' });
+                return;
             }
 
-            let msgLines = [];
-            msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
-            msgLines.push(`🚘 預約車款：${selectedCarName}`);
+            let totalFareText = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            let distanceText = document.getElementById('res-distance') ? document.getElementById('res-distance').innerText : '0';
+            let durationText = document.getElementById('res-duration') ? document.getElementById('res-duration').innerText : '0';
 
-            if (selectedCarName === '豐田混能的士') {
-                const isAccepted = document.getElementById('booking-upgrade-yes')?.checked;
-                msgLines.push(`🎁 免費升級車款：${isAccepted ? '✅ 接受' : '❌ 不接受'}`);
+            let message = `*【${serviceType === 'airport' ? '機場接機預約訂單' : '的士點對點預約訂單'}】*\n`;
+            message += `--------------------------------\n`;
+            message += `📍 *起點：* ${pickup}\n`;
+            if (stopoverTexts.length > 0) {
+                stopoverTexts.forEach(s => message += `📌 *${s}*\n`);
             }
-
             if (serviceType === 'airport' && flightNo) {
-                msgLines.push(`✈️ 航班編號：${flightNo}`);
+                message += `✈️ *航班編號：* ${flightNo}\n`;
             }
-
-            msgLines.push(`📍 起點：${pickup}`);
-            stopoverTexts.forEach(s => msgLines.push(`🛑 ${s}`));
-            msgLines.push(`🏁 終點：${dropoff}`);
-            msgLines.push(`📅 日期：${date}`);
-            msgLines.push(`⏰ 時間：${timeStringFormatted}`);
-            msgLines.push(`👥 人數：${passengers}`);
-            
-            if (luggages && luggages !== '0 件') {
-                msgLines.push(`🧳 *行李件數：* ${luggages}`);
+            message += `🏁 *終點：* ${dropoff}\n`;
+            message += `--------------------------------\n`;
+            message += `📅 *用車日期：* ${date}\n`;
+            message += `⏰ *用車時間：* ${time}\n`;
+            message += `👥 *乘客人數：* ${passengers}\n`;
+            message += `🧳 *行李件數：* ${luggages}\n`;
+            if (hasPet) message += `🐾 *攜帶寵物：* 是\n`;
+            if (hasWheelchair) message += `♿ *放置輪椅：* 是\n`;
+            message += `--------------------------------\n`;
+            message += `🚗 *預約車型：* ${selectedCarName} (${selectedFeeMode})\n`;
+            if (selectedCarName === '豐田混能的士') {
+                message += `🎁 *免費升級意願：* ${upgradeChoice}\n`;
             }
-
-            if (hasPet) {
-                msgLines.push(`🐶寵物：✅`);
+            if (distanceText !== '0') {
+                message += `📏 *預計距離：*約 ${distanceText} 公里 (約 ${durationText} 分鐘)\n`;
+                message += `💰 *預計車費總額：* HK$ ${totalFareText} (含自動偵測隧道費)\n`;
             }
+            message += `💳 *付款方式：* ${paymentMethods.length > 0 ? paymentMethods.join(', ') : '未指定'}\n`;
+            let contactNameStr = surname ? (surname + (title || '')) : '未填寫';
+            message += `👤 *聯絡人：* ${contactNameStr}\n`;
+            message += `📞 *聯絡電話：* ${phone}\n`;
+            message += `--------------------------------\n`;
+            message += `請司機確認接單，謝謝！`;
 
-            if (hasWheelchair) {
-                msgLines.push(`♿️輪椅放置尾箱：✅`);
-            }
-            if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
-            
-            if (surname) {
-                msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);
-            }
-            msgLines.push(`📞 電話：${phone}`);
-
-            const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
-            const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
-            if (detectedTunnelsText) {
-                msgLines.push(`🛣️ 途經隧道：${detectedTunnelsText} (+$${tunnelValText})`);
-            }
-
-            const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
-
-            msgLines.push(`--------------------`);
-            msgLines.push(`請回覆訊息確認預約，謝謝！`);
-
-            const encodedMessage = encodeURIComponent(msgLines.join('\n'));
-            window.open(`https://wa.me/85257038875?text=${encodedMessage}`, '_blank');
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/85268815441?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
         }
     </script>
 </body>
