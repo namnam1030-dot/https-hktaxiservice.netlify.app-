@@ -1363,7 +1363,7 @@
                 if (fromMatch && fromMatch[1]) {
                     pickup = fromMatch[1].trim();
                 } else {
-                    let firstSplit = text.split(/經|途經|去|到|至/)[0];
+                    let firstSplit = text.split(/經|途經|去|導|至/)[0];
                     if (firstSplit) {
                         pickup = firstSplit.trim();
                     }
@@ -1530,14 +1530,12 @@
                 return { matchedTunnels, totalTunnelFee };
             }
 
-            // 收集路線中所有的座標點（涵蓋 overview_path 以及各 leg 中的 steps 點，確保多中途站時不會漏掉）
             let allPoints = [];
             if (route.overview_path) {
                 allPoints = allPoints.concat(route.overview_path);
             }
             if (route.legs) {
                 route.legs.forEach(leg => {
-                    // 同時把 waypoints_achieved 或經過的中途站點也納入，並確保 steps 完整遍歷
                     if (leg.start_location) allPoints.push(leg.start_location);
                     if (leg.end_location) allPoints.push(leg.end_location);
                     if (leg.steps) {
@@ -1774,7 +1772,7 @@
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-function sendWhatsApp(event) {
+        function sendWhatsApp(event) {
             event.preventDefault();
 
             // 檢查用戶是否選擇了豐田混能的士的免費升級項目
@@ -1898,7 +1896,7 @@ function sendWhatsApp(event) {
             const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
             const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
             if (detectedTunnelsText) {
-                ;
+                msgLines.push(`🛣️ 途經隧道：${detectedTunnelsText} (+$${tunnelValText})`);
             }
 
             const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
