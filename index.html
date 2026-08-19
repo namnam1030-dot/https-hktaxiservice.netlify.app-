@@ -1755,14 +1755,14 @@
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
 
-        function sendWhatsApp(event) {
+                function sendWhatsApp(event) {
             event.preventDefault();
 
             const pickup = document.getElementById('calc-pickup') ? document.getElementById('calc-pickup').value.trim() : '';
             const dropoff = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : '';
             
             if (!pickup || !dropoff) {
-                alert(currentLang === 'en' ? "Please fill in both Pickup and Destination locations before sending WhatsApp!" : "請必須必須完整填寫「起點」和「終點」才可發送 WhatsApp 預約訊息！");
+                alert(currentLang === 'en' ? "Please fill in both Pickup and Destination locations before sending WhatsApp!" : "請必須完整填寫「起點」和「終點」才可發送 WhatsApp 預約訊息！");
                 if (!pickup) document.getElementById('calc-pickup')?.focus();
                 else document.getElementById('calc-dropoff')?.focus();
                 return;
@@ -1814,62 +1814,71 @@
             const paymentStr = payments.join(' / ');
 
             let timeStringFormatted = time;
-            if (date) {
-                timeStringFormatted = `${date} ${time}`;
+            if (date && time) {
+                const now = new Date();
+                const [targetYear, targetMonth, targetDay] = date.split('-').map(Number);
+                const [targetHour, targetMinute] = time.split(':').map(Number);
+                const targetDateTime = new Date(targetYear, targetMonth - 1, targetDay, targetHour, targetMinute);
+                
+                const diffMinutes = (targetDateTime - now) / (1000 * 60);
+                
+                if (diffMinutes <= 15) {
+                    timeStringFormatted = `${time} ‼️即時用車‼️`;
+                }
             }
 
-            let upgradeStatusText = "不接受免費升級";
-            const upgradeYesBox = document.getElementById('booking-upgrade-yes');
-            if (upgradeYesBox && upgradeYesBox.checked) {
-                upgradeStatusText = "接受免費升級";
+            let msgLines = [];
+            msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
+            msgLines.push(`🚘 預約車款：${selectedCarName}`);
+
+            if (selectedCarName === '豐田混能的士') {
+                const isAccepted = document.getElementById('booking-upgrade-yes')?.checked;
+                msgLines.push(`🎁 免費升級車款：${isAccepted ? '✅ 接受' : '❌ 不接受'}`);
             }
 
-            let message = "";
-            if (currentLang === 'en') {
-                message = `*Taxi Booking Order*\n` +
-                          `------------------\n` +
-                          `*Service Type:* ${serviceType === 'airport' ? 'Airport Pickup' : 'Point-to-Point'}\n` +
-                          (flightNo ? `*Flight No:* ${flightNo}\n` : '') +
-                          `*Pickup:* ${pickup}\n` +
-                          (stopoverTexts.length > 0 ? `*Stopovers:* ${stopoverTexts.join(', ')}\n` : '') +
-                          `*Destination:* ${dropoff}\n` +
-                          `*Date & Time:* ${timeStringFormatted}\n` +
-                          `*Passengers:* ${passengers}\n` +
-                          `*Luggages:* ${luggages}\n` +
-                          `*Pets:* ${hasPet ? 'Yes' : 'No'}\n` +
-                          `*Wheelchair:* ${hasWheelchair ? 'Yes' : 'No'}\n` +
-                          `*Payment:* ${paymentStr}\n` +
-                          `*Contact:* ${surname ? surname + ' ' + title : 'Not provided'}\n` +
-                          `*Phone:* ${phone}\n` +
-                          `*Vehicle Model:* ${selectedCarNameEn} (${selectedFeeModeEn})\n` +
-                          (selectedCarName === '豐田混能的士' ? `*Upgrade Option:* ${upgradeStatusText}\n` : '') +
-                          `------------------\n` +
-                          `Please confirm availability, thank you!`;
-            } else {
-                message = `*【的士預約訂單】*\n` +
-                          `------------------\n` +
-                          `*服務類型：* ${serviceType === 'airport' ? '機場接機服務' : '一般點對點預約'}\n` +
-                          (flightNo ? `*航班編號：* ${flightNo}\n` : '') +
-                          `*上車起點：* ${pickup}\n` +
-                          (stopoverTexts.length > 0 ? `*中途站：* ${stopoverTexts.join(' / ')}\n` : '') +
-                          `*落車終點：* ${dropoff}\n` +
-                          `*用車時間：* ${timeStringFormatted}\n` +
-                          `*乘客人數：* ${passengers}\n` +
-                          `*行李件數：* ${luggages}\n` +
-                          `*攜帶寵物：* ${hasPet ? '有' : '無'}\n` +
-                          `*放置輪椅：* ${hasWheelchair ? '有' : '無'}\n` +
-                          `*付款方式：* ${paymentStr}\n` +
-                          `*聯絡人：* ${surname ? surname + ' ' + title : '未填寫'}\n` +
-                          `*聯絡電話：* ${phone}\n` +
-                          `*指定車型：* ${selectedCarName} (${selectedFeeMode})\n` +
-                          (selectedCarName === '豐田混能的士' ? `*免費升級意願：* ${upgradeStatusText}\n` : '') +
-                          `------------------\n` +
-                          `請幫忙確認派車，謝謝！`;
+            if (serviceType === 'airport' && flightNo) {
+                msgLines.push(`✈️ 航班編號：${flightNo}`);
             }
 
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/85268815441?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
+            msgLines.push(`📍 起點：${pickup}`);
+            stopoverTexts.forEach(s => msgLines.push(`🛑 ${s}`));
+            msgLines.push(`🏁 終點：${dropoff}`);
+            msgLines.push(`📅 日期：${date}`);
+            msgLines.push(`⏰ 時間：${timeStringFormatted}`);
+            msgLines.push(`👥 人數：${passengers}`);
+            
+            if (luggages && luggages !== '0 件') {
+                msgLines.push(`🧳 *行李件數：* ${luggages}`);
+            }
+
+            if (hasPet) {
+                msgLines.push(`🐶寵物：✅`);
+            }
+
+            if (hasWheelchair) {
+                msgLines.push(`♿️輪椅放置尾箱：✅`);
+            }
+            if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
+            
+            if (surname) {
+                msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);
+            }
+            msgLines.push(`📞 電話：${phone}`);
+
+            const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
+            const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
+            if (detectedTunnelsText) {
+                msgLines.push(`🛣️ 途經隧道：${detectedTunnelsText} (+$${tunnelValText})`);
+            }
+
+            const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
+
+            msgLines.push(`--------------------`);
+            msgLines.push(`請回覆訊息確認預約，謝謝！`);
+
+            const encodedMessage = encodeURIComponent(msgLines.join('\n'));
+            window.open(`https://wa.me/85257038875?text=${encodedMessage}`, '_blank');
         }
     </script>
 </body>
