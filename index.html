@@ -1853,7 +1853,7 @@ function sendWhatsApp(event) {
                 const diffMinutes = (targetDateTime - now) / (1000 * 60);
                 
                 if (diffMinutes <= 15) {
-                    timeStringFormatted = `${time} ‼️即時用車‼️`;
+                    timeStringFormatted = `${time} 🚨即時用車🚨`;
                 }
             }
 
@@ -1878,7 +1878,7 @@ function sendWhatsApp(event) {
             msgLines.push(`👥 人數：${passengers}`);
             
             if (luggages && luggages !== '0 件') {
-                msgLines.push(`🧳 *行李件數：* ${luggages}`);
+                msgLines.push(`🧳 行李件數： ${luggages}`);
             }
 
             if (hasPet) {
@@ -1891,7 +1891,7 @@ function sendWhatsApp(event) {
             if (paymentStr) msgLines.push(`💳 付款方式：${paymentStr}`);
             
             if (surname) {
-                msgLines.push(`👤 *聯絡人：* ${surname} ${title}`);
+                msgLines.push(`👤 聯絡人： ${surname} ${title}`);
             }
             msgLines.push(`📞 電話：${phone}`);
 
