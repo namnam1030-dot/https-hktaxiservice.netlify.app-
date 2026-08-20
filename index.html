@@ -322,16 +322,6 @@
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
-            <!-- 服務類型切換 Tab -->
-            <div class="grid grid-cols-2 gap-2 mb-4 bg-black/40 p-1.5 rounded-xl border border-gray-800/80">
-                <button type="button" id="tab-normal" onclick="switchServiceType('normal')" class="py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer">
-                    <i class="fa-solid fa-taxi mr-1.5"></i> <span data-i18n="tab_normal">一般點對點預約</span>
-                </button>
-                <button type="button" id="tab-airport" onclick="switchServiceType('airport')" class="py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer">
-                    <i class="fa-solid fa-plane-arrival mr-1.5"></i> <span data-i18n="tab_airport">機場接機服務</span>
-                </button>
-            </div>
-
             <!-- 升級提示欄位 -->
             <div id="booking-toyota-upgrade-container" class="bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                 <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
@@ -358,8 +348,8 @@
                     <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
-                <div id="field-flight-container" class="hidden">
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (例如：CX250)</span></label>
+                <div id="field-flight-container">
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
@@ -501,8 +491,8 @@
         </div>
     </section>
 
-    <!-- 車隊選擇 Fleet Section (已將上方外邊距設為 0) -->
-    <section id="fleet-section" class="w-full px-2 pt-0 pb-12 mt-0">
+    <!-- 車隊選擇 Fleet Section (已移除底部空隙) -->
+    <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0 mb-0">
         <div class="text-center mb-6 pt-4">
             <h3 class="text-xl font-bold text-white flex items-center justify-center gap-2">
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> 選擇車款類型
@@ -703,16 +693,14 @@
         </div>
     </section>
 
-    <!-- 頁尾 Footer -->
-    <footer class="border-t border-gray-800/80 mt-16 py-10 text-center px-4 bg-brand-dark">
-        <p class="text-xs text-gray-400 mb-6" data-i18n="footer_slogan">香港新一代豪華六座位的士預約服務・準時尊貴接送</p>
-        
-        <div class="flex justify-center gap-4 mb-8">
-            <a href="tel:57038875" class="border border-gray-800 bg-brand-gray px-6 py-2.5 rounded-full hover:bg-gray-800 transition text-xs flex items-center gap-2 text-white">
-                <i class="fa-solid fa-phone text-brand-yellow"></i> 5703 8875
+    <!-- 頁尾 Footer (已優化頂部邊距，並將 WeChat 和 WhatsApp 按鈕改為同等大小與風格) -->
+    <footer class="border-t border-gray-800/80 mt-6 py-8 text-center px-4 bg-brand-dark">
+        <div class="flex justify-center items-center gap-3 mb-6">
+            <a href="https://weixin.qq.com" class="w-44 py-3 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+                <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
             </a>
-            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="bg-brand-yellow text-black px-6 py-2.5 rounded-full hover:opacity-90 transition font-bold text-xs flex items-center gap-2 shadow-md">
-                <i class="fa-brands fa-whatsapp"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
+            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-3 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+                <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
             </a>
         </div>
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
@@ -827,11 +815,9 @@
                 res_total_title: "預計車費總額：",
                 res_note: "以上預計車費已包含途徑的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。",
                 btn_reselect: "選擇車款類型",
-                tab_normal: "一般點對點預約",
-                tab_airport: "機場接機服務",
                 label_pickup: "上車地點 (起點)",
                 ph_pickup: "例：觀塘 APM",
-                label_flight: "航班編號 (例如：CX250)",
+                label_flight: "航班編號 (選填，如適用)",
                 ph_flight: "例：CX250 (司機會自動監察航班時間)",
                 label_stopover: "中途停靠點 (如沒有可留空)",
                 ph_stopover: "例：旺角朗豪坊",
@@ -867,7 +853,6 @@
                 summary_fee_label: "收費模式",
                 btn_submit_whatsapp: "確認預約並發送 WhatsApp",
                 form_footer_note: "點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。",
-                footer_slogan: "香港新一代豪華六座位的士預約服務・準時尊貴接送",
                 whatsapp_inquiry: "WhatsApp 查詢",
                 footer_copy: "© 2026 版權所有。"
             },
@@ -955,11 +940,9 @@
                 res_total_title: "Estimated Total Fare:",
                 res_note: "The estimated fare above includes route tunnel fees; but does not include any parking, luggage, or waiting time charges. Subject to actual conditions.",
                 btn_reselect: "Select Vehicle Type",
-                tab_normal: "Standard Point-to-Point",
-                tab_airport: "Airport Pickup Service",
                 label_pickup: "Pickup Location (Start)",
                 ph_pickup: "e.g., Kwun Tong APM",
-                label_flight: "Flight Number (e.g., CX250)",
+                label_flight: "Flight Number (Optional, if applicable)",
                 ph_flight: "e.g., CX250 (Driver monitors flight time)",
                 label_stopover: "Mid-way Stop (Optional)",
                 ph_stopover: "e.g., Mong Kok Langham Place",
@@ -995,7 +978,6 @@
                 summary_fee_label: "Pricing Mode",
                 btn_submit_whatsapp: "Confirm Booking & Send WhatsApp",
                 form_footer_note: "Clicking will open WhatsApp to send your order details. A driver will reply shortly.",
-                footer_slogan: "HK Next-Gen Luxury 6-Seater Taxi Booking Service · Punctual & Prestigious",
                 whatsapp_inquiry: "WhatsApp Inquiry",
                 footer_copy: "© 2026 All Rights Reserved."
             }
@@ -1007,7 +989,6 @@
         let selectedMinFare = 0;
         let selectedFeeMode = '標準收費・無附加費';
         let selectedFeeModeEn = 'Standard Fare · No Surcharge';
-        let serviceType = 'normal';
 
         let map = null;
         let directionsService = null;
@@ -1311,23 +1292,6 @@
             scrollToBookingFromCalc();
         }
 
-        function switchServiceType(type) {
-            serviceType = type;
-            const tabNormal = document.getElementById('tab-normal');
-            const tabAirport = document.getElementById('tab-airport');
-            const flightContainer = document.getElementById('field-flight-container');
-
-            if (type === 'airport') {
-                tabAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
-                tabNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
-                if (flightContainer) flightContainer.classList.remove('hidden');
-            } else {
-                tabNormal.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition bg-brand-yellow text-black shadow-md cursor-pointer";
-                tabAirport.className = "py-2.5 rounded-lg text-xs md:text-sm font-bold transition text-gray-400 hover:text-white cursor-pointer";
-                if (flightContainer) flightContainer.classList.add('hidden');
-            }
-        }
-
         function startVoiceRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -1530,14 +1494,12 @@
                 return { matchedTunnels, totalTunnelFee };
             }
 
-            // 收集路線中所有的座標點（涵蓋 overview_path 以及各 leg 中的 steps 點，確保多中途站時不會漏掉）
             let allPoints = [];
             if (route.overview_path) {
                 allPoints = allPoints.concat(route.overview_path);
             }
             if (route.legs) {
                 route.legs.forEach(leg => {
-                    // 同時把 waypoints_achieved 或經過的中途站點也納入，並確保 steps 完整遍歷
                     if (leg.start_location) allPoints.push(leg.start_location);
                     if (leg.end_location) allPoints.push(leg.end_location);
                     if (leg.steps) {
@@ -1740,19 +1702,11 @@
                 detectedContainer.classList.add('hidden');
             }
 
-            let calculatedTotal = baseMeterFare + selectedSurcharge + tunnelFee;
+            document.getElementById('res-distance').innerText = finalKm.toFixed(1);
+            document.getElementById('res-duration').innerText = durationMinutes;
+            document.getElementById('res-base-fare').innerText = baseMeterFare;
 
-            const minNoteRow = document.getElementById('res-min-fare-note');
-            const surchargeRow = document.getElementById('res-surcharge-row');
             const tunnelRow = document.getElementById('res-tunnel-row');
-
-            if (selectedSurcharge > 0) {
-                surchargeRow.classList.remove('hidden');
-                document.getElementById('res-surcharge-val').innerText = selectedSurcharge;
-            } else {
-                surchargeRow.classList.add('hidden');
-            }
-
             if (tunnelFee > 0) {
                 tunnelRow.classList.remove('hidden');
                 document.getElementById('res-tunnel-val').innerText = tunnelFee;
@@ -1760,18 +1714,27 @@
                 tunnelRow.classList.add('hidden');
             }
 
-            if (selectedMinFare > 0 && calculatedTotal < selectedMinFare) {
-                calculatedTotal = selectedMinFare;
-                minNoteRow.classList.remove('hidden');
-                document.getElementById('res-min-fare-val').innerText = selectedMinFare;
+            const surchargeRow = document.getElementById('res-surcharge-row');
+            if (selectedSurcharge > 0) {
+                surchargeRow.classList.remove('hidden');
+                document.getElementById('res-surcharge-val').innerText = selectedSurcharge;
             } else {
-                minNoteRow.classList.add('hidden');
+                surchargeRow.classList.add('hidden');
             }
 
-            document.getElementById('res-distance').innerText = finalKm.toFixed(1);
-            document.getElementById('res-duration').innerText = durationMinutes;
-            document.getElementById('res-base-fare').innerText = baseMeterFare;
-            document.getElementById('res-total-fare').innerText = calculatedTotal;
+            let computedFare = baseMeterFare + tunnelFee + selectedSurcharge;
+            let finalTotalFare = computedFare;
+
+            const minNoteEl = document.getElementById('res-min-fare-note');
+            if (selectedMinFare > 0 && computedFare < selectedMinFare) {
+                finalTotalFare = selectedMinFare;
+                minNoteEl.classList.remove('hidden');
+                document.getElementById('res-min-fare-val').innerText = selectedMinFare;
+            } else {
+                minNoteEl.classList.add('hidden');
+            }
+
+            document.getElementById('res-total-fare').innerText = finalTotalFare;
         }
 
 function sendWhatsApp(event) {
