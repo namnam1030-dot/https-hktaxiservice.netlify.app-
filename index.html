@@ -1897,9 +1897,7 @@ function sendWhatsApp(event) {
 
             const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
             const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
-            if (detectedTunnelsText) {
-                msgLines.push(`🛣️ 途經隧道：${detectedTunnelsText} (+$${tunnelValText})`);
-            }
+
 
             const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
             msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
