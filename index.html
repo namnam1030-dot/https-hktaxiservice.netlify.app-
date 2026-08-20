@@ -708,6 +708,17 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
+
+// 註冊 Service Worker (PWA 必備)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('SW Registered!', reg);
+        }).catch(err => {
+            console.log('SW Registration Failed!', err);
+        });
+    });
+}
         window.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('date');
             const timeInput = document.getElementById('time');
@@ -1010,38 +1021,41 @@
             deferredPrompt = e;
         });
 
-        function showInstallGuide() {
-            const modal = document.getElementById('install-modal');
-            const content = document.getElementById('install-guide-content');
-            
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('用戶接受了安裝');
-                    }
-                    deferredPrompt = null;
-                });
-                return;
+function showInstallGuide() {
+    const modal = document.getElementById('install-modal');
+    const content = document.getElementById('install-guide-content');
+    
+    // 如果系統已補捉到安裝事件，直接觸發 Android 原生安裝提示
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('用戶接受安裝');
             }
+            deferredPrompt = null;
+        });
+        return;
+    }
 
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            
-            if (isIOS) {
-                content.innerHTML = `
-                    <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
-                    <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
-                    <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
-                `;
-            } else {
-                content.innerHTML = `
-                    <p><strong>1.</strong> 點擊瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
-                    <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 「安裝應用程式」。</p>
-                    <p class="mt-1"><strong>3.</strong> 確認新增即可快速開啟！</p>
-                `;
-            }
-            modal.classList.remove('hidden');
-        }
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+        content.innerHTML = `
+            <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
+        `;
+    } else {
+        // Android / Chrome 指引
+        content.innerHTML = `
+            <p><strong>1.</strong> 點擊 Chrome 瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 <span class="text-brand-yellow font-bold">「安裝應用程式」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 確認新增即可完成安裝！</p>
+        `;
+    }
+    modal.classList.remove('hidden');
+}
+
 
         function closeInstallGuide() {
             document.getElementById('install-modal').classList.add('hidden');

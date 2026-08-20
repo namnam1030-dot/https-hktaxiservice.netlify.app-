@@ -7,12 +7,12 @@
   "theme_color": "#FFF200",
   "icons": [
     {
-      "src": "icon.jpeg",
+      "src": "icon192.jpeg",
       "sizes": "192x192",
       "type": "image/jpeg"
     },
     {
-      "src": "icon.jpeg",
+      "src": "icon512.jpeg",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
