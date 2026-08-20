@@ -533,7 +533,7 @@
     </section>
 
     <!-- 車隊選擇 Fleet Section (已將上方外邊距設為 0) -->
-    <section id="fleet-section" class="w-full px-2 pt-0 pb-12 mt-0">
+    <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
         <div class="text-center mb-6 pt-4">
             <h3 class="text-xl font-bold text-white flex items-center justify-center gap-2">
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> 選擇車款類型
@@ -558,8 +558,8 @@
                         <i id="icon-toggle-豐田混能的士" class="fa-solid fa-chevron-up text-brand-yellow transition duration-300"></i>
                     </div>
 
-                    <!-- 內文詳細介紹容器 (預設展開) -->
-                    <div id="detail-豐田混能的士" class="flex flex-col flex-1">
+                    <!-- 內文詳細介紹容器 (已改為預設收合 hidden) -->
+                    <div id="detail-豐田混能的士" class="hidden flex flex-col flex-1">
                         <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-t border-b border-gray-800/60">
                             <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Taxi'">
                         </div>
@@ -605,7 +605,7 @@
                             <div>
                                 <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car2_cap">最多 6 位乘客</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car2_lug">可放 3-4 件大型行李</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car2_lug">可放 4-5 件大型行李</span></li>
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car2_feat">純電動零排放、極度寧靜</span></li>
                                 </ul>
                             </div>
@@ -642,7 +642,7 @@
                             <div>
                                 <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car3_cap">最多 6 位乘客</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car3_lug">約 3-4 件大型行李</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car3_lug">可放 4-5 件大型行李</span></li>
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car3_feat">頭等航空級獨立大班椅</span></li>
                                 </ul>
                             </div>
@@ -666,7 +666,7 @@
                     <div onclick="toggleCarDetail('吉利大黃蜂')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car4_name">吉利大黃蜂</h3>
-                            <span class="text-xs text-brand-yellow">6 座位 · 超大空間尊車</span>
+                            <span class="text-xs text-brand-yellow">6 座位 · 超大行李空間</span>
                         </div>
                         <i id="icon-toggle-吉利大黃蜂" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -679,7 +679,7 @@
                             <div>
                                 <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car4_cap">最多 6 位乘客</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car4_lug">4件以上大型行李</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car4_lug">6件以上大型行李</span></li>
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car4_feat">同級最大車廂、空間極佳</span></li>
                                 </ul>
                             </div>
@@ -716,8 +716,8 @@
                             <div>
                                 <ul class="text-xs text-gray-300 space-y-2 mb-6 border-t border-gray-800 pt-4">
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-user-group text-brand-yellow w-4"></i> <strong data-i18n="car_cap_label">載客容量：</strong><span data-i18n="car5_cap">1位輪椅 + 5位乘客</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car5_lug">可放 3-4 件大行李</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car5_feat">配備原廠金屬斜道</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-4"></i> <strong data-i18n="car_lug_label">行李空間：</strong><span data-i18n="car5_lug">可放 4-5 件大型行李</span></li>
+                                    <li class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-yellow w-4"></i> <strong data-i18n="car_feat_label">車型特點：</strong><span data-i18n="car5_feat">配備原廠金屬斜道，輪椅直上</span></li>
                                 </ul>
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
@@ -735,12 +735,12 @@
     </section>
 
     <!-- 頁尾 Footer (已優化頂部邊距，並將 WeChat 和 WhatsApp 按鈕改為同等大小與風格) -->
-    <footer class="border-t border-gray-800/80 mt-6 py-8 text-center px-4 bg-brand-dark">
+    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
-            <a href="https://weixin.qq.com" class="w-44 py-3 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+            <a href="https://weixin.qq.com" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
             </a>
-            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-3 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+            <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A2%84%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
             </a>
         </div>
