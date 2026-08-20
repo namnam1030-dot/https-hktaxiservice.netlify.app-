@@ -1900,7 +1900,7 @@ function sendWhatsApp(event) {
 
 
             const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
+            msgLines.push(`💰預計車費總額：HK$${totalFooter} (含跳錶${selectedSurcharge > 0 ? '+附加費' : ''}${tunnelValText > 0 ? '+隧道費(如有)' : ''})`);
 
             msgLines.push(`--------------------`);
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
