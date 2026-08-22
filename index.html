@@ -183,8 +183,8 @@
     </div>
 
 <!-- 移除原本的固定高度 div，改用 main 包裝並加上 padding-top -->
-<main class="pt-[100px] md:pt-[110px]">
-    <!-- 車費估算器 Section -->
+<main class="pt-0">
+  <!-- 車費估算器 Section -->
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
@@ -782,16 +782,16 @@ window.addEventListener('DOMContentLoaded', () => {
     if (dateInput) dateInput.value = formattedDate;
     if (timeInput) timeInput.value = formattedTime;
 
-    // 動態調整 main 的 padding-top 以適應 header 高度
-    function adjustMainPadding() {
-        const header = document.querySelector('header');
-        const main = document.querySelector('main');
-        if (header && main) {
-            const headerHeight = header.offsetHeight;
-            main.style.paddingTop = headerHeight + 'px';
-        }
+// 動態調整 main 的 padding-top 以適應 header 高度
+function adjustMainPadding() {
+    const header = document.querySelector('header');
+    const main = document.querySelector('main');
+    if (header && main) {
+        const headerHeight = header.offsetHeight;
+        // 不需要額外的 padding，因為 header 是 sticky，會佔據文檔流
+        main.style.paddingTop = '0px';
     }
-    
+}
     // 頁面載入時調整
     adjustMainPadding();
     
