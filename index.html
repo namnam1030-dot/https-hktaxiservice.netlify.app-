@@ -5,8 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preload" as="image" href="logo.jpeg">
-<link rel="preload" as="image" href="hotline.jpeg">
 <link rel="manifest" href="manifest.json">
 <!-- iOS 主畫面圖示設定 -->
 <link rel="apple-touch-icon" href="icon.jpeg">
@@ -129,38 +127,37 @@
 <body class="antialiased">
 
     <!-- 頁首 Navbar -->
-<!-- 將 header 改為 sticky 定位，並加上動態高度 -->
-<header class="bg-brand-yellow text-black px-0 py-[1mm] sticky top-0 left-0 w-full z-50 shadow-md">
-    <div class="w-full px-2 flex justify-between items-center">
-        <!-- 左側：Logo -->
-        <div class="flex items-center">
-            <a href="#">
-                <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
-            </a>
-        </div>
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
+        <div class="w-full px-2 flex justify-between items-center">
+            <!-- 左側：Logo -->
+            <div class="flex items-center">
+                <a href="#">
+                    <img src="logo.jpeg" alt="TAXI SERVICE" class="h-[80px] object-contain" onerror="this.style.display='none'">
+                </a>
+            </div>
 
-        <!-- 中間：hotline.jpeg 與下方電話號碼 -->
-        <div class="flex flex-col items-center justify-center">
-            <a href="#">
-                <img src="hotline.jpeg" alt="24小時的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
-            </a>
-            <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
-                <i class="fa-solid fa-phone text-small"></i> 6881 5441
-            </a>
-        </div>
+            <!-- 中間：hotline.jpeg 與下方電話號碼 -->
+            <div class="flex flex-col items-center justify-center">
+                <a href="#">
+                    <img src="hotline.jpeg" alt="24小時的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                </a>
+                <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
+                    <i class="fa-solid fa-phone text-small"></i> 6881 5441
+                </a>
+            </div>
 
-        <!-- 右側：語言切換按鈕與加到主畫面按鍵 -->
-        <div class="flex flex-col items-end gap-1.5">
-            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
-                EN
-            </button>
-            <!-- 突出閃爍的加到主畫面按鍵 -->
-            <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
-                <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
-            </button>
+            <!-- 右側：語言切換按鈕與加到主畫面按鍵 -->
+            <div class="flex flex-col items-end gap-1.5">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
+                    EN
+                </button>
+                <!-- 突出閃爍的加到主畫面按鍵 -->
+                <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
+                </button>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
     <!-- 加入主畫面引導 Modal (預設隱藏) -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
@@ -184,9 +181,10 @@
         </div>
     </div>
 
-<!-- 移除原本的固定高度 div，改用 main 包裝並加上 padding-top -->
-<main class="pt-0">
-  <!-- 車費估算器 Section -->
+    <!-- 為了避免 fixed/sticky 頁首延遲或遮蓋下方內容，在此預留頁首高度空間 -->
+    <div class="h-[92px] w-full"></div>
+
+    <!-- 車費估算器 Section (已將下方外邊距設為 0) -->
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
@@ -361,7 +359,7 @@
         </div>
     </section>
 
-      <!-- 預約表單 Booking Section -->
+    <!-- 預約表單 Booking Section (已將上下內外邊距設為 0) -->
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
@@ -534,7 +532,7 @@
         </div>
     </section>
 
-      <!-- 車隊選擇 Fleet Section -->
+    <!-- 車隊選擇 Fleet Section (已將上方外邊距設為 0) -->
     <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
         <div class="text-center mb-6 pt-4">
             <h3 class="text-xl font-bold text-white flex items-center justify-center gap-2">
@@ -736,7 +734,6 @@
 
         </div>
     </section>
-</main>
 
     <!-- 頁尾 Footer (已優化頂部邊距，並將 WeChat 和 WhatsApp 按鈕改為同等大小與風格) -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
@@ -783,23 +780,6 @@ window.addEventListener('DOMContentLoaded', () => {
     
     if (dateInput) dateInput.value = formattedDate;
     if (timeInput) timeInput.value = formattedTime;
-
-// 動態調整 main 的 padding-top 以適應 header 高度
-function adjustMainPadding() {
-    const header = document.querySelector('header');
-    const main = document.querySelector('main');
-    if (header && main) {
-        const headerHeight = header.offsetHeight;
-        // 不需要額外的 padding，因為 header 是 sticky，會佔據文檔流
-        main.style.paddingTop = '0px';
-    }
-}
-    // 頁面載入時調整
-    adjustMainPadding();
-    
-    // 視窗大小改變時重新調整
-    window.addEventListener('resize', adjustMainPadding);
-});
 
     // 隱藏豐田升級提示框
     const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
