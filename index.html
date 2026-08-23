@@ -75,7 +75,7 @@
     <style>
 
 #booking-section {
-    scroll-margin-top: 112px; /* 頁首高度 92px + 20px 緩衝 */
+    scroll-margin-top: 82px; /* 頁首高度 92px + 20px 緩衝 */
 }
         /* 全局字體按比例放大 30% */
         html { 
@@ -1483,9 +1483,27 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
 
 // 點擊「立即預約」按鈕時：自動選擇該車款並捲動至預約表單
 function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
-    selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn);
-    document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
+    // 使用 skipRecalculate = true 避免觸發重新計算
+    selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, true);
+    
+    // 使用 setTimeout 確保 DOM 更新完成後再捲動
+    setTimeout(() => {
+        const bookingSection = document.getElementById('booking-section');
+        if (bookingSection) {
+            bookingSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            // 高亮預約表單提示
+            bookingSection.classList.add('ring-2', 'ring-brand-yellow');
+            setTimeout(() => {
+                bookingSection.classList.remove('ring-2', 'ring-brand-yellow');
+            }, 2000);
+        }
+    }, 100); // 延遲 100ms 確保所有 DOM 更新完成
 }
+
         function switchServiceType(type) {
             serviceType = type;
             const tabNormal = document.getElementById('tab-normal');
