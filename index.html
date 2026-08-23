@@ -1327,27 +1327,6 @@ function scrollToBookingFromCalc() {
     }, 2000);
 }
 
-// 6. 平滑捲動至預約表單（多重保障）
-const bookingSection = document.getElementById('booking-section');
-if (bookingSection) {
-    // 方法1：使用 scrollIntoView
-    bookingSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-    });
-    
-    // 方法2：後備方案（如果 scrollIntoView 冇效果）
-    setTimeout(() => {
-        const rect = bookingSection.getBoundingClientRect();
-        const absoluteTop = rect.top + window.pageYOffset;
-        const offset = 100; // 預留 fixed header 高度
-        window.scrollTo({
-            top: absoluteTop - offset,
-            behavior: 'smooth'
-        });
-    }, 50);
-}
-
         function handleUpgradeCheckbox(choice) {
             const bookingYesBox = document.getElementById('booking-upgrade-yes');
             const bookingNoBox = document.getElementById('booking-upgrade-no');
