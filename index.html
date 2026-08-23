@@ -1575,12 +1575,48 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
     if (!skipRecalculate && !document.getElementById('fare-result').classList.contains('hidden')) {
         calculateFareWithGoogle();
     }
+    
+    // 如果有計算結果，更新車款卡片顯示
+    if (currentBaseFare > 0) {
+        updateCarCardFees();
+    }
 }
 
 // 點擊「立即預約」按鈕時：自動選擇該車款並捲動至預約表單
 function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
     // 使用 skipRecalculate = true 避免觸發重新計算
     selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, true);
+    
+    // 如果有計算結果，立即更新總車費顯示
+    if (currentBaseFare > 0) {
+        let calculatedTotal = currentBaseFare + currentTunnelFee + surcharge;
+        
+        // 檢查最低消費
+        if (minFare > 0 && calculatedTotal < minFare) {
+            calculatedTotal = minFare;
+        }
+        
+        // 更新結果區域的顯示
+        document.getElementById('res-total-fare').innerText = calculatedTotal;
+        
+        // 更新附加費顯示
+        const surchargeRow = document.getElementById('res-surcharge-row');
+        const minNoteRow = document.getElementById('res-min-fare-note');
+        
+        if (surcharge > 0) {
+            surchargeRow.classList.remove('hidden');
+            document.getElementById('res-surcharge-val').innerText = surcharge;
+        } else {
+            surchargeRow.classList.add('hidden');
+        }
+        
+        if (minFare > 0 && calculatedTotal < minFare) {
+            minNoteRow.classList.remove('hidden');
+            document.getElementById('res-min-fare-val').innerText = minFare;
+        } else {
+            minNoteRow.classList.add('hidden');
+        }
+    }
     
     // 使用 setTimeout 確保 DOM 更新完成後再捲動
     setTimeout(() => {
@@ -2153,6 +2189,17 @@ function sendWhatsApp(event) {
                 }
             }
 
+            // 重新計算當前選擇車款的總費用
+            let totalFareForWhatsApp = 0;
+            if (currentBaseFare > 0) {
+                totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
+                if (selectedMinFare > 0 && totalFareForWhatsApp < selectedMinFare) {
+                    totalFareForWhatsApp = selectedMinFare;
+                }
+            } else {
+                totalFareForWhatsApp = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
+            }
+
             let msgLines = [];
             msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
             msgLines.push(`🚘 預約車款：${selectedCarName}`);
@@ -2191,12 +2238,7 @@ function sendWhatsApp(event) {
             }
             msgLines.push(`📞 電話：${phone}`);
 
-            const tunnelValText = document.getElementById('res-tunnel-val') ? document.getElementById('res-tunnel-val').innerText : '0';
-            const detectedTunnelsText = document.getElementById('detected-tunnels-list') ? document.getElementById('detected-tunnels-list').innerText : '';
-
-
-            const totalFooter = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            msgLines.push(`💰預計車費總額：HK$${totalFooter} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${tunnelValText > 0 ? '+隧道費' : ''})`);
+            msgLines.push(`💰預計車費總額：HK$${totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
             msgLines.push(`--------------------`);
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
