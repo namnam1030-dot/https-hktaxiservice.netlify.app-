@@ -1271,9 +1271,9 @@ function scrollToBookingFromCalc() {
         return;
     }
 
-    // 2. 自動選擇豐田混能的士（如果未選擇）
+    // 2. 自動選擇豐田混能的士（如果未選擇），跳過重新計算
     if (!selectedCarName) {
-        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
+        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
     } else {
         // 如果已經選擇咗車款，確保顯示正確
         renderCarCardsVisual(selectedCarName);
@@ -1313,13 +1313,11 @@ function scrollToBookingFromCalc() {
         document.getElementById('field-stopover-container').classList.remove('hidden');
     }
 
-    // 6. 平滑捲動至預約表單
-    setTimeout(() => {
-        document.getElementById('booking-section').scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }, 100);
+    // 6. 立即平滑捲動至預約表單（唔需要 setTimeout）
+    document.getElementById('booking-section').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+    });
 
     // 7. 高亮預約表單提示
     const bookingSection = document.getElementById('booking-section');
@@ -1327,6 +1325,27 @@ function scrollToBookingFromCalc() {
     setTimeout(() => {
         bookingSection.classList.remove('ring-2', 'ring-brand-yellow');
     }, 2000);
+}
+
+// 6. 平滑捲動至預約表單（多重保障）
+const bookingSection = document.getElementById('booking-section');
+if (bookingSection) {
+    // 方法1：使用 scrollIntoView
+    bookingSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+    });
+    
+    // 方法2：後備方案（如果 scrollIntoView 冇效果）
+    setTimeout(() => {
+        const rect = bookingSection.getBoundingClientRect();
+        const absoluteTop = rect.top + window.pageYOffset;
+        const offset = 100; // 預留 fixed header 高度
+        window.scrollTo({
+            top: absoluteTop - offset,
+            behavior: 'smooth'
+        });
+    }, 50);
 }
 
         function handleUpgradeCheckbox(choice) {
@@ -1442,8 +1461,8 @@ function renderCarCardsVisual(activeName) {
     }
 }
 
-// 修正 selectCar 函數
-function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
+// 修正 selectCar 函數 - 增加一個參數控制是否重新計算
+function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRecalculate = false) {
     if (!validatePassengerAndCar(name)) {
         return;
     }
@@ -1473,8 +1492,8 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
         if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
     }
 
-    // 如果車費結果已經顯示，重新計算車費
-    if (!document.getElementById('fare-result').classList.contains('hidden')) {
+    // 如果車費結果已經顯示，且唔係跳過重新計算，先重新計算車費
+    if (!skipRecalculate && !document.getElementById('fare-result').classList.contains('hidden')) {
         calculateFareWithGoogle();
     }
 }
