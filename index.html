@@ -383,15 +383,15 @@
 
             <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
-                
-                <div id="field-pickup-container" class="hidden">
-                    <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
-                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
 
     <div id="field-flight-container">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+                
+                <div id="field-pickup-container" class="hidden">
+                    <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
+                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
                 <div id="field-stopover-container" class="hidden">
