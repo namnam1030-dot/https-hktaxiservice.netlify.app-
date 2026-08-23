@@ -351,16 +351,8 @@
                 </div>
 
                 <div class="mt-1 flex flex-col items-center">
-<!-- 將原本嘅按鈕改為更明顯嘅樣式 -->
-<button 
-    type="button"
-    onclick="scrollToBookingFromCalc()" 
-    id="btn-scroll-to-booking"
-    class="w-full bg-brand-yellow text-black px-6 py-4 rounded-xl font-extrabold flex items-center justify-center gap-3 hover:opacity-95 hover:scale-[1.02] transition-all duration-300 shadow-2xl shadow-brand-yellow/20 cursor-pointer text-[22px] mt-2 relative overflow-hidden group"
->
-    <i class="fa-solid fa-calendar-check text-xl group-hover:scale-110 transition-transform"></i> 
-    <span data-i18n="btn_quick_query">立即預約</span>
-    <i class="fa-solid fa-arrow-down absolute right-4 animate-bounce"></i>
+                    <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-[20px]">
+    <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
 </button>
                 </div>
             </div>
@@ -1268,7 +1260,7 @@ function toggleLanguage() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 修正 scrollToBookingFromCalc 函數
+// 修正 scrollToBookingFromCalc 函數
 function scrollToBookingFromCalc() {
     // 1. 先檢查是否有計算結果
     const fareResult = document.getElementById('fare-result');
@@ -1336,6 +1328,7 @@ function scrollToBookingFromCalc() {
         bookingSection.classList.remove('ring-2', 'ring-brand-yellow');
     }, 2000);
 }
+
         function handleUpgradeCheckbox(choice) {
             const bookingYesBox = document.getElementById('booking-upgrade-yes');
             const bookingNoBox = document.getElementById('booking-upgrade-no');
@@ -1449,8 +1442,8 @@ function renderCarCardsVisual(activeName) {
     }
 }
 
+// 修正 selectCar 函數
 function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
-    // 修正呢度：將 name 傳入 validatePassengerAndCar
     if (!validatePassengerAndCar(name)) {
         return;
     }
@@ -1953,13 +1946,6 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             document.getElementById('res-base-fare').innerText = baseMeterFare;
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
-
-    // 喺最後加入，確保「立即預約」按鈕可見
-    const bookingBtn = document.querySelector('#fare-result button[onclick="scrollToBookingFromCalc()"]');
-    if (bookingBtn) {
-        bookingBtn.classList.add('animate-pulse');
-    }
-}
 
 function sendWhatsApp(event) {
             event.preventDefault();
