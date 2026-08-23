@@ -349,10 +349,72 @@
                     </button>
                 </div>
 
-                <div class="mt-3 mb-2 flex items-center justify-center gap-2 text-brand-yellow font-bold text-[18px] bg-brand-yellow/10 border border-brand-yellow px-3 py-2 rounded-xl shadow-sm">
-                    <i class="fa-solid fa-bolt text-brand-yellow text-sm animate-pulse"></i>
-                    <span data-i18n="notice_15min">提供最快15分鐘後的預約服務</span>
+<!-- 將原本的 15 分鐘提示框替換為以下內容 -->
+<div class="mt-3 mb-2 p-4 bg-brand-dark border-2 border-brand-yellow rounded-xl shadow-lg">
+    <!-- 最低消費提示 -->
+    <div class="text-center mb-3">
+        <p class="text-brand-yellow font-bold text-[18px] flex items-center justify-center gap-2">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>為提升預約成功率，所有行程最低消費 $100</span>
+        </p>
+    </div>
+
+    <!-- 兩個必選的收費選項 -->
+    <div class="space-y-3">
+        <!-- 選項一：正價按錶收費 -->
+        <label class="flex items-start gap-3 p-3 bg-gray-900/80 border border-gray-700 rounded-xl cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" 
+                   id="fare-option-1" 
+                   name="fare-option" 
+                   value="正價按錶收費" 
+                   class="mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" 
+                   onchange="handleFareOptionChange()" 
+                   required>
+            <div class="flex-1">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-white text-[16px]">正價按錶收費</span>
+                    <span id="fare-option-1-price" class="font-bold text-brand-yellow text-[16px]">
+                        HK$ <span id="fare-option-1-amount">0</span>
+                    </span>
                 </div>
+                <p class="text-xs text-gray-400 mt-1" id="fare-option-1-note">
+                    已包含隧道費或最低消費
+                </p>
+            </div>
+        </label>
+
+        <!-- 選項二：八五折優惠 -->
+        <label class="flex items-start gap-3 p-3 bg-gray-900/80 border border-gray-700 rounded-xl cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" 
+                   id="fare-option-2" 
+                   name="fare-option" 
+                   value="八五折優惠" 
+                   class="mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" 
+                   onchange="handleFareOptionChange()" 
+                   required>
+            <div class="flex-1">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-white text-[16px]">八五折優惠</span>
+                    <span id="fare-option-2-price" class="font-bold text-brand-yellow text-[16px]">
+                        HK$ <span id="fare-option-2-amount">0</span>
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1" id="fare-option-2-note">
+                    八五折後預計收費（已包含隧道費或最低消費）
+                </p>
+                <p class="text-xs text-gray-500 mt-0.5" id="fare-option-2-detail">
+                    *八五折優惠以基本跳錶價錢計算，隧道費不設折扣
+                </p>
+            </div>
+        </label>
+    </div>
+
+    <!-- 錯誤提示 -->
+    <p id="fare-option-error" class="hidden text-red-400 text-xs font-bold mt-2 text-center">
+        <i class="fa-solid fa-exclamation-triangle mr-1"></i>
+        請選擇其中一個收費選項（必選）
+    </p>
+</div>
 
                 <div class="mt-1 flex flex-col items-center">
                     <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-[20px]">
@@ -770,6 +832,97 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
+
+// 新增：處理收費選項變更
+let selectedFareOption = ''; // 存儲當前選擇的收費選項
+
+function handleFareOptionChange() {
+    const option1 = document.getElementById('fare-option-1');
+    const option2 = document.getElementById('fare-option-2');
+    const errorMsg = document.getElementById('fare-option-error');
+    
+    // 確保只能選擇一個選項
+    if (option1.checked && option2.checked) {
+        // 如果兩個都被選中，取消另一個
+        if (event.target === option1) {
+            option2.checked = false;
+        } else {
+            option1.checked = false;
+        }
+    }
+    
+    // 更新當前選擇
+    if (option1.checked) {
+        selectedFareOption = '正價按錶收費';
+        errorMsg.classList.add('hidden');
+    } else if (option2.checked) {
+        selectedFareOption = '八五折優惠';
+        errorMsg.classList.add('hidden');
+    } else {
+        selectedFareOption = '';
+        errorMsg.classList.remove('hidden');
+    }
+    
+    // 更新顯示的價格
+    updateFareOptionPrices();
+}
+
+// 更新收費選項的價格顯示
+function updateFareOptionPrices() {
+    if (currentBaseFare <= 0) {
+        document.getElementById('fare-option-1-amount').innerText = '0';
+        document.getElementById('fare-option-2-amount').innerText = '0';
+        return;
+    }
+    
+    // 計算正價收費
+    let regularPrice = currentBaseFare + currentTunnelFee + selectedSurcharge;
+    if (selectedMinFare > 0 && regularPrice < selectedMinFare) {
+        regularPrice = selectedMinFare;
+    }
+    if (regularPrice < 100) {
+        regularPrice = 100; // 最低消費 $100
+    }
+    document.getElementById('fare-option-1-amount').innerText = regularPrice;
+    
+    // 計算八五折優惠
+    // 八五折只應用於基本跳錶價錢，隧道費不設折扣
+    let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+    let discountedPrice = discountedBaseFare + currentTunnelFee + selectedSurcharge;
+    
+    // 檢查最低消費
+    if (selectedMinFare > 0 && discountedPrice < selectedMinFare) {
+        discountedPrice = selectedMinFare;
+    }
+    if (discountedPrice < 100) {
+        discountedPrice = 100; // 最低消費 $100
+    }
+    
+    document.getElementById('fare-option-2-amount').innerText = discountedPrice;
+    
+    // 更新備注
+    document.getElementById('fare-option-1-note').innerText = 
+        `已包含隧道費${currentTunnelFee > 0 ? `（HK$${currentTunnelFee}）` : ''}或最低消費`;
+    
+    document.getElementById('fare-option-2-note').innerText = 
+        `八五折後預計收費（已包含隧道費${currentTunnelFee > 0 ? ` HK$${currentTunnelFee}` : ''}或最低消費）`;
+    
+    document.getElementById('fare-option-2-detail').innerText = 
+        `*八五折優惠以基本跳錶價錢（HK$${currentBaseFare}）計算，隧道費不設折扣${currentTunnelFee > 0 ? `；過海隧道只收單程$25` : ''}`;
+}
+
+// 修改原有的 displaySelectedRoute 函數，在末尾添加調用
+// 在 displaySelectedRoute 函數的最後添加：
+// updateFareOptionPrices();
+
+// 修改 sendWhatsApp 函數，在發送前檢查收費選項
+// 在 sendWhatsApp 函數的開頭添加：
+if (!selectedFareOption) {
+    alert(currentLang === 'en' ? "Please select a fare option!" : "請選擇收費選項（正價或八五折優惠）！");
+    document.getElementById('fare-option-error').classList.remove('hidden');
+    document.getElementById('fare-option-error').scrollIntoView({ behavior: 'smooth' });
+    return;
+}
 
 // 註冊 Service Worker (PWA 必備)
 if ('serviceWorker' in navigator) {
@@ -2351,6 +2504,20 @@ function sendWhatsApp(event) {
                 msgLines.push(`👤 聯絡人： ${surname} ${title}`);
             }
             msgLines.push(`📞 電話：${phone}`);
+
+// 在 msgLines 中添加收費選項信息
+if (selectedFareOption) {
+    msgLines.push(`💰 收費方式：${selectedFareOption}`);
+    
+    // 計算實際收費
+    let finalFare = 0;
+    if (selectedFareOption === '正價按錶收費') {
+        finalFare = parseInt(document.getElementById('fare-option-1-amount').innerText);
+    } else {
+        finalFare = parseInt(document.getElementById('fare-option-2-amount').innerText);
+    }
+    msgLines.push(`💰 預計收費：HK$${finalFare}`);
+}
 
             msgLines.push(`💰預計車費總額：HK$${totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
             msgLines.push(`--------------------`);
