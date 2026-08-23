@@ -351,8 +351,16 @@
                 </div>
 
                 <div class="mt-1 flex flex-col items-center">
-                    <button onclick="scrollToBookingFromCalc()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-[20px]">
-    <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
+<!-- 將原本嘅按鈕改為更明顯嘅樣式 -->
+<button 
+    type="button"
+    onclick="scrollToBookingFromCalc()" 
+    id="btn-scroll-to-booking"
+    class="w-full bg-brand-yellow text-black px-6 py-4 rounded-xl font-extrabold flex items-center justify-center gap-3 hover:opacity-95 hover:scale-[1.02] transition-all duration-300 shadow-2xl shadow-brand-yellow/20 cursor-pointer text-[22px] mt-2 relative overflow-hidden group"
+>
+    <i class="fa-solid fa-calendar-check text-xl group-hover:scale-110 transition-transform"></i> 
+    <span data-i18n="btn_quick_query">立即預約</span>
+    <i class="fa-solid fa-arrow-down absolute right-4 animate-bounce"></i>
 </button>
                 </div>
             </div>
@@ -1260,14 +1268,74 @@ function toggleLanguage() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 從車費估算器點擊「立即預約」時，自動選擇豐田混能的士
+        // 修正 scrollToBookingFromCalc 函數
 function scrollToBookingFromCalc() {
-    // 自動選擇豐田混能的士
-    selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
-    // 捲動至預約表單
-    document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
-}
+    // 1. 先檢查是否有計算結果
+    const fareResult = document.getElementById('fare-result');
+    if (fareResult.classList.contains('hidden')) {
+        alert(currentLang === 'en' ? 
+            "Please calculate the fare first!" : 
+            "請先計算車費！");
+        return;
+    }
 
+    // 2. 自動選擇豐田混能的士（如果未選擇）
+    if (!selectedCarName) {
+        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge');
+    } else {
+        // 如果已經選擇咗車款，確保顯示正確
+        renderCarCardsVisual(selectedCarName);
+    }
+
+    // 3. 將計算結果嘅起點終點自動填入預約表單
+    const calcPickup = document.getElementById('calc-pickup');
+    const calcDropoff = document.getElementById('calc-dropoff');
+    const bookingPickup = document.getElementById('pickup');
+    const bookingDropoff = document.getElementById('dropoff');
+    
+    if (calcPickup && bookingPickup) {
+        bookingPickup.value = calcPickup.value;
+    }
+    if (calcDropoff && bookingDropoff) {
+        bookingDropoff.value = calcDropoff.value;
+    }
+
+    // 4. 自動填入中途站（如有）
+    let stopoverTexts = [];
+    for (let i = 1; i <= 3; i++) {
+        const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim();
+        if (stopVal) stopoverTexts.push(stopVal);
+    }
+    if (stopoverTexts.length > 0 && document.getElementById('stopover')) {
+        document.getElementById('stopover').value = stopoverTexts.join(' / ');
+    }
+
+    // 5. 顯示對應嘅表單欄位
+    if (bookingPickup) {
+        document.getElementById('field-pickup-container').classList.remove('hidden');
+    }
+    if (bookingDropoff) {
+        document.getElementById('field-dropoff-container').classList.remove('hidden');
+    }
+    if (stopoverTexts.length > 0) {
+        document.getElementById('field-stopover-container').classList.remove('hidden');
+    }
+
+    // 6. 平滑捲動至預約表單
+    setTimeout(() => {
+        document.getElementById('booking-section').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }, 100);
+
+    // 7. 高亮預約表單提示
+    const bookingSection = document.getElementById('booking-section');
+    bookingSection.classList.add('ring-2', 'ring-brand-yellow');
+    setTimeout(() => {
+        bookingSection.classList.remove('ring-2', 'ring-brand-yellow');
+    }, 2000);
+}
         function handleUpgradeCheckbox(choice) {
             const bookingYesBox = document.getElementById('booking-upgrade-yes');
             const bookingNoBox = document.getElementById('booking-upgrade-no');
@@ -1381,8 +1449,8 @@ function renderCarCardsVisual(activeName) {
     }
 }
 
-// 修正 selectCar 函數
 function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
+    // 修正呢度：將 name 傳入 validatePassengerAndCar
     if (!validatePassengerAndCar(name)) {
         return;
     }
@@ -1885,6 +1953,13 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             document.getElementById('res-base-fare').innerText = baseMeterFare;
             document.getElementById('res-total-fare').innerText = calculatedTotal;
         }
+
+    // 喺最後加入，確保「立即預約」按鈕可見
+    const bookingBtn = document.querySelector('#fare-result button[onclick="scrollToBookingFromCalc()"]');
+    if (bookingBtn) {
+        bookingBtn.classList.add('animate-pulse');
+    }
+}
 
 function sendWhatsApp(event) {
             event.preventDefault();
