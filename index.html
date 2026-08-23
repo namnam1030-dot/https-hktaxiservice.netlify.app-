@@ -517,16 +517,17 @@
                     <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
-                <div class="bg-black/50 p-4 rounded-xl border border-gray-800 flex justify-between items-center mt-6">
-                    <div class="text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_car_label">目前選定車型</span>
-                       <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">請選擇車款</span>
-                    </div>
-                    <div class="text-right text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_fee_label">收費模式</span>
-                        <span id="selected-price-text" class="text-brand-yellow font-bold">請選擇</span>
-                    </div>
-                </div>
+<div class="bg-black/50 p-4 rounded-xl border border-gray-800 flex justify-between items-center mt-6">
+    <div class="text-xs">
+        <span class="text-gray-400 block mb-0.5" data-i18n="summary_car_label">目前選定車型</span>
+       <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">請選擇車款</span>
+    </div>
+    <div class="text-right text-xs">
+        <span class="text-gray-400 block mb-0.5">預計車費</span>
+        <span id="selected-price-text" class="text-brand-yellow font-bold text-sm">有待計算</span>
+        <div id="selected-price-note" class="hidden text-[11px] text-brand-yellow font-medium mt-1"></div>
+    </div>
+</div>
 
                 <button type="submit" class="w-full bg-brand-yellow text-black font-extrabold text-base py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
                     <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="btn_submit_whatsapp">確認預約並發送 WhatsApp</span>
@@ -577,9 +578,9 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-                                    <span id="car1-fee-display" class="text-gray-400" data-i18n="car1_fee">標準收費・無附加費</span>
-                                    <div id="car1-fee-note" class="hidden text-[11px] text-brand-yellow font-bold mt-1"></div>
-                                </div>
+    <span id="car1-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car1_fee">標準收費・無附加費</span>
+    <div id="car1-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
+</div>
                                 <!-- 改為突出閃動的「立即預約」按鈕，按下後選擇該車並捲動至表單 -->
                                 <button type="button" onclick="selectCarAndBook('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
                                     <i class="fa-solid fa-bolt"></i> 立即預約
@@ -619,9 +620,9 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-                                    <span id="car2-fee-display" class="text-gray-400 font-bold" data-i18n="car2_fee">附加費 HK$50 (最低 $130)</span>
-                                    <div id="car2-fee-note" class="hidden text-[11px] text-brand-yellow font-bold mt-1"></div>
-                                </div>
+    <span id="car2-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car2_fee"><p>附加費 HK$50<br>(最低消費 $130)</p></span>
+    <div id="car2-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
+</div>
                                 <button type="button" onclick="selectCarAndBook('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
                                     <i class="fa-solid fa-bolt"></i> 立即預約
                                 </button>
@@ -659,9 +660,9 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-                                    <span id="car3-fee-display" class="text-gray-400 font-bold" data-i18n="car3_fee">附加費 HK$100 (最低 $180)</span>
-                                    <div id="car3-fee-note" class="hidden text-[11px] text-brand-yellow font-bold mt-1"></div>
-                                </div>
+    <span id="car3-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car3_fee"><p>附加費 HK$100<br>(最低消費 $180)</p></span>
+    <div id="car3-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
+</div>
                                 <button type="button" onclick="selectCarAndBook('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
                                     <i class="fa-solid fa-bolt"></i> 立即預約
                                 </button>
@@ -699,9 +700,9 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-                                    <span id="car4-fee-display" class="text-gray-400 font-bold" data-i18n="car4_fee">附加費 HK$80 (最低 $160)</span>
-                                    <div id="car4-fee-note" class="hidden text-[11px] text-brand-yellow font-bold mt-1"></div>
-                                </div>
+    <span id="car4-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car4_fee"><p>附加費 HK$80<br>(最低消費 $160)</p></span>
+    <div id="car4-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
+</div>
                                 <button type="button" onclick="selectCarAndBook('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
                                     <i class="fa-solid fa-bolt"></i> 立即預約
                                 </button>
@@ -739,9 +740,9 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-                                    <span id="car5-fee-display" class="text-gray-400 font-bold" data-i18n="car5_fee">附加費 HK$150 (最低 $230)</span>
-                                    <div id="car5-fee-note" class="hidden text-[11px] text-brand-yellow font-bold mt-1"></div>
-                                </div>
+    <span id="car5-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car5_fee"><p>附加費 HK$150<br>(最低消費 $230)</p></span>
+    <div id="car5-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
+</div>
                                 <button type="button" onclick="selectCarAndBook('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
                                     <i class="fa-solid fa-bolt"></i> 立即預約
                                 </button>
@@ -1264,11 +1265,48 @@ function toggleLanguage() {
             carTextEl.innerText = currentLang === 'en' ? 'Please Select Vehicle' : '請選擇車款';
         }
     }
-    if (priceTextEl) {
-        if (selectedFeeMode) {
+
+if (priceTextEl) {
+        if (currentBaseFare > 0 && selectedCarName) {
+            let totalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
+            if (selectedMinFare > 0 && totalFare < selectedMinFare) {
+                totalFare = selectedMinFare;
+            }
+            priceTextEl.innerText = `HK$ ${totalFare}`;
+        } else if (selectedFeeMode) {
             priceTextEl.innerText = currentLang === 'en' ? selectedFeeModeEn : selectedFeeMode;
         } else {
             priceTextEl.innerText = currentLang === 'en' ? 'Please Select' : '請選擇';
+        }
+    }
+    
+    // 更新備注
+    const priceNoteEl = document.getElementById('selected-price-note');
+    if (priceNoteEl && currentBaseFare > 0 && selectedCarName) {
+        let totalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
+        let noteText = '';
+        
+        if (selectedMinFare > 0 && totalFare < selectedMinFare) {
+            if (selectedSurcharge > 0) {
+                noteText = currentLang === 'en' ? 
+                    '*Includes surcharge & min. fare' : 
+                    '*已包含車款附加費及最低消費';
+            } else {
+                noteText = currentLang === 'en' ? 
+                    '*Includes min. fare' : 
+                    '*已包含最低消費';
+            }
+        } else if (selectedSurcharge > 0) {
+            noteText = currentLang === 'en' ? 
+                `*Includes surcharge HK$${selectedSurcharge}` : 
+                `*已包含車款附加費 HK$${selectedSurcharge}`;
+        }
+        
+        if (noteText) {
+            priceNoteEl.innerText = noteText;
+            priceNoteEl.classList.remove('hidden');
+        } else {
+            priceNoteEl.classList.add('hidden');
         }
     }
     
@@ -1504,11 +1542,15 @@ function updateCarCardFees() {
                 `*已包含車款附加費 HK$${config.surcharge}`;
         }
         
+        // 設置預計車費的樣式 - 加粗、放大
+        displayEl.className = 'text-gray-400 font-bold text-sm';
         displayEl.innerHTML = currentLang === 'en' ? 
             `Estimated Fare: HK$ ${totalFare}` : 
             `預計車費：HK$ ${totalFare}`;
         
+        // 設置備注的樣式 - 較小、中等粗幼
         if (noteText) {
+            noteEl.className = 'text-xs text-brand-yellow font-medium mt-1';
             noteEl.innerText = noteText;
             noteEl.classList.remove('hidden');
         } else {
@@ -1532,9 +1574,11 @@ function resetCarCardFees() {
         const noteEl = document.getElementById(config.noteId);
         
         if (displayEl) {
+            displayEl.className = 'text-gray-400 font-bold text-sm';
             displayEl.innerHTML = currentLang === 'en' ? config.originalTextEn : config.originalText;
         }
         if (noteEl) {
+            noteEl.className = 'text-xs text-brand-yellow font-medium mt-1';
             noteEl.classList.add('hidden');
         }
     });
@@ -1557,11 +1601,49 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
     // 更新車款卡片視覺效果（選中的高亮，其他的變暗）
     renderCarCardsVisual(selectedCarName);
 
-    // 更新表單中的顯示文字
+// 更新表單中的顯示文字
     const carTextEl = document.getElementById('selected-car-text');
     const priceTextEl = document.getElementById('selected-price-text');
+    const priceNoteEl = document.getElementById('selected-price-note');
+    
     if (carTextEl) carTextEl.innerText = currentLang === 'en' ? selectedCarNameEn : selectedCarName;
-    if (priceTextEl) priceTextEl.innerText = currentLang === 'en' ? selectedFeeModeEn : selectedFeeMode;
+    
+    // 更新預計車費顯示
+    if (priceTextEl) {
+        if (currentBaseFare > 0) {
+            let totalFare = currentBaseFare + currentTunnelFee + surcharge;
+            let noteText = '';
+            
+            if (minFare > 0 && totalFare < minFare) {
+                totalFare = minFare;
+                if (surcharge > 0) {
+                    noteText = currentLang === 'en' ? 
+                        '*Includes surcharge & min. fare' : 
+                        '*已包含車款附加費及最低消費';
+                } else {
+                    noteText = currentLang === 'en' ? 
+                        '*Includes min. fare' : 
+                        '*已包含最低消費';
+                }
+            } else if (surcharge > 0) {
+                noteText = currentLang === 'en' ? 
+                    `*Includes surcharge HK$${surcharge}` : 
+                    `*已包含車款附加費 HK$${surcharge}`;
+            }
+            
+            priceTextEl.innerText = `HK$ ${totalFare}`;
+            
+            if (priceNoteEl && noteText) {
+                priceNoteEl.innerText = noteText;
+                priceNoteEl.classList.remove('hidden');
+            } else if (priceNoteEl) {
+                priceNoteEl.classList.add('hidden');
+            }
+        } else {
+            priceTextEl.innerText = currentLang === 'en' ? 'Please Select' : '請選擇';
+            if (priceNoteEl) priceNoteEl.classList.add('hidden');
+        }
+    }
 
     // 顯示或隱藏豐田混能的士的升級提示
     const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
@@ -1587,7 +1669,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
     // 使用 skipRecalculate = true 避免觸發重新計算
     selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, true);
     
-    // 如果有計算結果，立即更新總車費顯示
+// 如果有計算結果，立即更新總車費顯示
     if (currentBaseFare > 0) {
         let calculatedTotal = currentBaseFare + currentTunnelFee + surcharge;
         
@@ -1616,8 +1698,40 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
         } else {
             minNoteRow.classList.add('hidden');
         }
+        
+        // 更新預約表單中的預計車費顯示
+        const priceTextEl = document.getElementById('selected-price-text');
+        const priceNoteEl = document.getElementById('selected-price-note');
+        
+        if (priceTextEl) {
+            priceTextEl.innerText = `HK$ ${calculatedTotal}`;
+        }
+        
+        if (priceNoteEl) {
+            let noteText = '';
+            if (minFare > 0 && calculatedTotal === minFare && surcharge > 0) {
+                noteText = currentLang === 'en' ? 
+                    '*Includes surcharge & min. fare' : 
+                    '*已包含車款附加費及最低消費';
+            } else if (minFare > 0 && calculatedTotal === minFare && surcharge === 0) {
+                noteText = currentLang === 'en' ? 
+                    '*Includes min. fare' : 
+                    '*已包含最低消費';
+            } else if (surcharge > 0) {
+                noteText = currentLang === 'en' ? 
+                    `*Includes surcharge HK$${surcharge}` : 
+                    `*已包含車款附加費 HK$${surcharge}`;
+            }
+            
+            if (noteText) {
+                priceNoteEl.innerText = noteText;
+                priceNoteEl.classList.remove('hidden');
+            } else {
+                priceNoteEl.classList.add('hidden');
+            }
+        }
     }
-    
+
     // 使用 setTimeout 確保 DOM 更新完成後再捲動
     setTimeout(() => {
         const bookingSection = document.getElementById('booking-section');
