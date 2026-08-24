@@ -355,7 +355,7 @@
 <!-- 6: 提示框（以上預計車費已包含...） -->
     <div class="mt-4 py-2.5 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
         <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
-        <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
+        <p class="text-[16px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
             以上預計車費已包含自動偵測途徑徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
         </p>
     </div>
@@ -2353,8 +2353,8 @@ function updateFareModeDisplay() {
         
         if (discountFareNote) {
             discountFareNote.innerText = currentLang === 'en' ? 
-                '15% discount applied' : 
-                '已享八五折優惠';
+                'One-way tunnel fee, free baggage and pet fees' : 
+                '單程隧道費、免行李及寵物費';
         }
     } else {
         // 八五折後不超過 $100，不提供八五折優惠
@@ -2617,9 +2617,9 @@ if (currentBaseFare > 0) {
 
             // 添加收費模式資訊
             if (selectedFareMode === 'discount') {
-                msgLines.push(`💰收費模式：八五折優惠`);
+                msgLines.push(`💎收費模式：🔨八五折優惠🔨`);
             } else {
-                msgLines.push(`💰收費模式：正價按錶收費`);
+                msgLines.push(`💰收費模式：💯 *正價按錶收費* 💯`);
             }
 
             msgLines.push(`💰預計車費總額：HK$${totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
