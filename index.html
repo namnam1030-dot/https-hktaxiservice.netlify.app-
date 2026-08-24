@@ -201,8 +201,8 @@
                     <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
-                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。</li>
-                    <li data-i18n="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。</li>
+                    <li data-i18n-html="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。</li>
+                    <li data-i18n-html="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。</li>
                 </ul>
             </div>
 
@@ -421,12 +421,12 @@
 <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                 <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                     <i class="fa-solid fa-gift text-brand-yellow"></i>
-                    <span data-i18n="upgrade_box_text">預設為豐田混能的士，並有機會被<br><span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，<br>請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
+                    <span data-i18n-html="upgrade_box_text">預設為豐田混能的士，並有機會被<br><span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，<br>請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
                 </p>
                 <div class="flex items-center gap-6">
                     <label class="flex items-center gap-2 cursor-pointer text-gray-200">
                         <input type="checkbox" name="booking_toyota_upgrade" value="接受免費升級" id="booking-upgrade-yes" onclick="handleBookingUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
+                        <span data-i18n-html="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer text-gray-200">
                         <input type="checkbox" name="booking_toyota_upgrade" value="不接受升級" id="booking-upgrade-no" onclick="handleBookingUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
@@ -1339,13 +1339,23 @@ function toggleLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
 
+    // 處理純文字翻譯
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+        }
+    });
+
+    // 處理包含 HTML 的翻譯
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
         if (translations[currentLang] && translations[currentLang][key]) {
             el.innerHTML = translations[currentLang][key];
         }
     });
 
+    // 處理 placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         if (translations[currentLang] && translations[currentLang][key]) {
