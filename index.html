@@ -1713,6 +1713,13 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
         updateCarCardFees();
     }
     
+// 如果選擇的不是豐田混能的士，自動剔選正價收費
+    if (name !== '豐田混能的士') {
+        selectedFareMode = 'normal';
+        document.getElementById('fare-mode-normal').checked = true;
+        document.getElementById('fare-mode-discount').checked = false;
+    }
+    
     // 更新收費模式選項的可用性
     updateFareModeAvailability();
     updateFareModeDisplay();
