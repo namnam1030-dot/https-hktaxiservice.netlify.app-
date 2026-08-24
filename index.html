@@ -179,7 +179,7 @@
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
                 <!-- 動態填入說明 -->
             </div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90">
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
         </div>
@@ -210,7 +210,7 @@
                 <!-- 廣東話語音按鈕 -->
                 <button type="button" id="voice-btn" onclick="startVoiceRecognition()" class="w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow py-3 rounded-xl font-bold hover:bg-brand-yellow hover:text-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md text-[20px]">
                     <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
-                    <span id="mic-text" data-i18n="voice_btn_text">：[起點] 經 [中途站] 去 [目的地]</span>
+                    <span id="mic-text" data-i18n="voice_btn_text">[起點] 經 [中途站] 去 [目的地]</span>
                 </button>
 
                 <!-- 起點、中途站、終點輸入結構 -->
@@ -356,24 +356,23 @@
     <div class="mt-4 py-2.5 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
         <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
         <p class="text-[16px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
-            以上預計車費已包含自動偵測途徑徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
+            以上預計車費已包含自動偵測途經隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
         </p>
     </div>
 
     <!-- 7: 收費模式框 -->
     <div class="mt-4 p-3 bg-gray-900/90 border border-gray-800 rounded-xl">
-        <p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
-            <i class="fa-solid fa-tag text-brand-yellow"></i> 收費模式 <span class="text-brand-yellow text-xs">* (必須選擇)</span>
-        </p>
-        <p class="text-xs text-gray-400 mb-3">所有行程最低消費$100</p>
-        
+<p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
+    <i class="fa-solid fa-tag text-brand-yellow"></i> <span data-i18n="fee_mode_title">收費模式</span> <span class="text-brand-yellow text-xs" data-i18n="required_mark">* (必須選擇)</span>
+</p>
+<p class="text-xs text-gray-400 mb-3" data-i18n="min_fare_note">所有行程最低消費$100</p>
         <div class="space-y-3">
             <!-- 正價按錶收費選項 -->
             <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition">
                 <input type="checkbox" id="fare-mode-normal" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('normal')">
                 <div class="flex-1">
                     <div class="flex justify-between items-center">
-                        <span class="text-white font-bold text-sm">正價按錶收費</span>
+<span class="text-white font-bold text-sm" data-i18n="fare_normal_label">正價按錶收費</span>
                         <span class="text-brand-yellow font-bold text-sm" id="normal-fare-display">HK$ <span id="normal-fare-val">0</span></span>
                     </div>
                     <p class="text-xs text-gray-400 mt-1" id="normal-fare-note">已包含隧道費或最低消費</p>
@@ -385,7 +384,7 @@
                 <input type="checkbox" id="fare-mode-discount" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('discount')">
                 <div class="flex-1">
                     <div class="flex justify-between items-center">
-                        <span class="text-white font-bold text-sm">八五折優惠<br> <span class="text-xs text-gray-400">(只限豐田混能的士)</span></span>
+<span class="text-white font-bold text-sm" data-i18n="fare_discount_label">八五折優惠</span><br> <span class="text-xs text-gray-400" data-i18n="fare_discount_note">(只限豐田混能的士)</span>
                         <span class="text-brand-yellow font-bold text-sm" id="discount-fare-display">HK$ <span id="discount-fare-val">0</span></span>
                     </div>
                     <p class="text-xs text-gray-400 mt-1" id="discount-fare-note">已包含隧道費或最低消費</p>
@@ -397,8 +396,8 @@
 <!-- 8: 重新選擇路線和選擇車款類型按鍵 -->
     <div class="mt-4 grid grid-cols-2 gap-3">
         <button type="button" onclick="scrollToTop()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-            <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
-        </button>
+    <i class="fa-solid fa-route"></i> <span data-i18n="btn_reselect_route">重新選擇路線</span>
+</button>
         <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
             <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
         </button>
@@ -463,7 +462,7 @@
                     <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
                         <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
                             <span><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></span>
-                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full">接受最多3日內</span>
+                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full" data-i18n="date_note">接受最多3日內</span>
                         </label>
                         <input type="date" id="date" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
                     </div>
@@ -471,7 +470,7 @@
                     <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
                         <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
                             <span><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></span>
-                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full">如沒指定，最快15分鐘後</span>
+ <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full" data-i18n="time_note">如沒指定，最快15分鐘後</span>
                         </label>
                         <input type="time" id="time" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
                     </div>
@@ -592,9 +591,9 @@
     <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
         <div class="text-center mb-6 pt-4">
             <h3 class="text-xl font-bold text-white flex items-center justify-center gap-2">
-                <i class="fa-solid fa-taxi text-brand-yellow"></i> 選擇車款類型
+                <i class="fa-solid fa-taxi text-brand-yellow"></i>  <span data-i18n="fleet_title">選擇車款類型</span>
             </h3>
-            <p class="text-xs text-gray-400 mt-1">點擊車型名稱可展開/收合詳細介紹與規格</p>
+            <p class="text-xs text-gray-400 mt-1" data-i18n="fleet_subtitle">點擊車型名稱可展開/收合詳細介紹與規格</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -609,7 +608,7 @@
                     <div onclick="toggleCarDetail('豐田混能的士')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car1_name">豐田混能的士</h3>
-                            <span class="text-xs text-brand-yellow">4 座位 · 標準混能的士</span>
+<span class="text-xs text-brand-yellow" data-i18n="car1_seats_desc">4 座位 · 標準混能的士</span>
                         </div>
                         <i id="icon-toggle-豐田混能的士" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -634,7 +633,7 @@
 </div>
                                 <!-- 改為突出閃動的「立即預約」按鈕，按下後選擇該車並捲動至表單 -->
                                 <button type="button" onclick="selectCarAndBook('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
-                                    <i class="fa-solid fa-bolt"></i> 立即預約
+                                    <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_book_now">立即預約</span>
                                 </button>
                             </div>
                         </div>
@@ -652,7 +651,7 @@
                     <div onclick="toggleCarDetail('MAXUS MIFA 7')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car2_name">MAXUS MIFA 7</h3>
-                            <span class="text-xs text-brand-yellow">6 座位 · 純電動七人車</span>
+                           <span class="text-xs text-brand-yellow" data-i18n="car2_seats_desc">6 座位 · 純電動七人車</span>
                         </div>
                         <i id="icon-toggle-MAXUS MIFA 7" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -675,7 +674,7 @@
     <div id="car2-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
-                                    <i class="fa-solid fa-bolt"></i> 立即預約
+                                    <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_book_now">立即預約</span>
                                 </button>
                             </div>
                         </div>
@@ -692,7 +691,7 @@
                     <div onclick="toggleCarDetail('廣汽 E9')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car3_name">廣汽 E9</h3>
-                            <span class="text-xs text-brand-yellow">6 座位 · 豪華航空椅專車</span>
+                           <span class="text-xs text-brand-yellow" data-i18n="car3_seats_desc">6 座位 · 豪華航空椅專車</span>
                         </div>
                         <i id="icon-toggle-廣汽 E9" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -715,7 +714,7 @@
     <div id="car3-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
-                                    <i class="fa-solid fa-bolt"></i> 立即預約
+                                    <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_book_now">立即預約</span>
                                 </button>
                             </div>
                         </div>
@@ -732,7 +731,7 @@
                     <div onclick="toggleCarDetail('吉利大黃蜂')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car4_name">吉利大黃蜂</h3>
-                            <span class="text-xs text-brand-yellow">6 座位 · 超大行李空間</span>
+                            <span class="text-xs text-brand-yellow" data-i18n="car4_seats_desc">6 座位 · 超大行李空間</span>
                         </div>
                         <i id="icon-toggle-吉利大黃蜂" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -755,7 +754,7 @@
     <div id="car4-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
-                                    <i class="fa-solid fa-bolt"></i> 立即預約
+                                    <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_book_now">立即預約</span>
                                 </button>
                             </div>
                         </div>
@@ -772,7 +771,7 @@
                     <div onclick="toggleCarDetail('豐田 NOAH 輪椅的士')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car5_name">豐田 NOAH 輪椅的士</h3>
-                            <span class="text-xs text-brand-yellow">無障礙 · 無障礙福祉專車</span>
+                          <span class="text-xs text-brand-yellow" data-i18n="car5_seats_desc">無障礙 · 無障礙福祉專車</span>
                         </div>
                         <i id="icon-toggle-豐田 NOAH 輪椅的士" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -795,7 +794,7 @@
     <div id="car5-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
-                                    <i class="fa-solid fa-bolt"></i> 立即預約
+                                    <i class="fa-solid fa-bolt"></i> <span data-i18n="btn_book_now">立即預約</span>
                                 </button>
                             </div>
                         </div>
@@ -865,18 +864,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
         const translations = {
             zh: {
-                btn_add_home: "加到主畫面",
+
+
+btn_book_now: "立即預約",
+fleet_title: "選擇車款類型",
+fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
+car1_seats_desc: "4 座位 · 標準混能的士",
+car2_seats_desc: "6 座位 · 純電動七人車",
+car3_seats_desc: "6 座位 · 豪華航空椅專車",
+car4_seats_desc: "6 座位 · 超大行李空間",
+car5_seats_desc: "無障礙 · 無障礙福祉專車",
+                btn_close_guide: "了解，關閉",
+                date_note: "接受最多3日內",
+                time_note: "如沒指定，最快15分鐘後",
+                fare_normal_label: "正價按錶收費",
+                fare_discount_label: "八五折優惠",
+                fare_discount_note: "(只限豐田混能的士)",
+                btn_add_home: "APPS",
                 modal_title: "一鍵加入主畫面",
                 modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
                 btn_quick_query: "立即預約",
                 btn_view_fleet: "選擇車款類型",
-                notice_15min: "提供最快15分鐘後的預約服務（亦支援即時訂單）",
+                notice_15min: "提供最快15分鐘後的即時訂單",
                 badge_selected: "已選擇",
+                btn_reselect_route: "重新選擇路線",
                 car_cap_label: "載客容量：",
                 car_lug_label: "行李空間：",
                 car_feat_label: "車型特點：",
                 fee_mode_label: "收費模式",
-                
+
+                fee_mode_title: "收費模式",
+                required_mark: "* (必須選擇)",
+                min_fare_note: "所有行程最低消費$100",
                 upgrade_box_text: '預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>',
                 upgrade_yes_label: '接受<span class="text-brand-yellow font-bold">免費</span>升級',
                 upgrade_no_label: '不接受升級',
@@ -923,7 +942,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 calc_title: "智能規劃路線與預計車費",
                 calc_tip_title: "預計車費使用說明：",
-                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「由觀塘經旺角去尖沙咀」</span>。',
+                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>。',
                 calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
                 calc_tip_3: '系統將自動規劃最佳行車路線並預計基本車費。',
                 calc_label_pickup: "起點 (出發地)",
@@ -934,7 +953,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 ph_stopover_opt: "輸入中途站...",
                 ph_dropoff_opt: "輸入終點...",
 
-                voice_btn_text: "：[起點] 經 [中途站] 去 [目的地]",
+                voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
                 btn_calc_fare: "立即預計車費",
                 route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
                 res_distance: "全程預計距離：",
@@ -946,7 +965,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ",
                 res_min_note_post: ")",
                 res_total_title: "預計車費總額：",
-                res_note: "以上預計車費已包含途徑的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。",
+                res_note: "以上預計車費已包含途經的隧道費；但尚未包含任何停車場、行李及等候時間等收費，一切按實際情況為準。",
                 btn_reselect: "選擇車款類型",
                 tab_normal: "一般點對點預約",
                 tab_airport: "機場接機服務",
@@ -992,18 +1011,38 @@ window.addEventListener('DOMContentLoaded', () => {
                 whatsapp_inquiry: "WhatsApp 查詢",
                 footer_copy: "© 2026 版權所有。"
             },
+
             en: {
-                btn_add_home: "Add to Home",
+
+btn_book_now: "Book Now",
+fleet_title: "Select Vehicle Type",
+fleet_subtitle: "Click vehicle name to expand/collapse details",
+car1_seats_desc: "4 Seats · Standard Hybrid Taxi",
+car2_seats_desc: "6 Seats · Pure Electric MPV",
+car3_seats_desc: "6 Seats · Luxury Aviation Seat MPV",
+car4_seats_desc: "6 Seats · Extra Large Luggage Space",
+car5_seats_desc: "Accessible · Welfare Vehicle",
+                btn_close_guide: "Got it, Close",
+                date_note: "Accepts bookings up to 3 days in advance",
+                time_note: "If not specified, fastest in 15 minutes",
+                fare_discount_label: "15% Discount Offer",
+                fare_discount_note: "(Toyota Hybrid Taxi only)",
+                fare_normal_label: "Standard Metered Fare",
+                btn_add_home: "APPS",
                 modal_title: "Add to Home Screen",
                 modal_desc: "For quick booking next time, add this service to your phone's home screen:",
-                btn_quick_query: "Instant Booking",
+                btn_quick_query: "BOOK NOW",
                 btn_view_fleet: "Select Vehicle Type",
                 notice_15min: "Supports 15-minute advance booking & instant orders",
                 badge_selected: "Selected",
+                btn_reselect_route: "Re-select Route",
                 car_cap_label: "Capacity: ",
                 car_lug_label: "Luggage: ",
                 car_feat_label: "Features: ",
                 fee_mode_label: "Pricing Mode",
+                fee_mode_title: "Pricing Mode",
+                required_mark: "* (Required)",
+                min_fare_note: "Minimum fare $100 for all trips",
 
                 upgrade_box_text: 'If choosing Toyota Hybrid Taxi, you may have the opportunity for a <span class="text-brand-yellow font-bold">free</span> upgrade to a higher-tier vehicle. Do you accept? <span class="text-brand-yellow font-extrabold">* (Required)</span>',
                 upgrade_yes_label: 'Accept <span class="text-brand-yellow font-bold">Free</span> Upgrade',
@@ -1051,25 +1090,25 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 calc_title: "Smart Route & Fare Estimator",
                 calc_tip_title: "Fare Estimation Instructions:",
-                calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak the full trip, e.g., <span class="text-brand-yellow font-medium">"From Kwun Tong via Mong Kok to Tsim Sha Tsui"</span>.',
+                calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Mong Kok to Tsim Sha Tsui"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
                 calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below (with auto-complete dropdown), then click calculate.',
                 calc_tip_3: 'The system will automatically plan the best route and calculate estimated basic fare.',
-                calc_label_pickup: "Pickup (Start)",
+                calc_label_pickup: "Pickup Location",
                 calc_label_stopover: "Stopovers (Max 3)",
-                calc_label_dropoff: "Destination",
+                calc_label_dropoff: "Drop-off Location",
                 btn_add_stop: "Add Stopover",
                 ph_pickup_box: "Enter pickup...",
                 ph_stopover_opt: "Enter stopover...",
                 ph_dropoff_opt: "Enter destination...",
 
-                voice_btn_text: "Click to speak trip: \"[Start] via [Stop] to [Destination]\"",
+                voice_btn_text: "Speak: [Start] via [Stopover] to [Destination]",
                 btn_calc_fare: "Calculate Estimated Fare",
                 route_select_title: "Select Route Option (Fastest / Shortest):",
                 res_distance: "Estimated Distance: ",
                 res_duration: "Estimated Duration: ",
                 unit_km: "km",
                 unit_min: "mins",
-                res_base_fee: "Meter Base Fare: ",
+                res_base_fee: "Metered Base Fare: ",
                 res_surcharge: "Vehicle Surcharge: ",
                 res_min_note_pre: "*(Minimum fare threshold of HK$ ",
                 res_min_note_post: ")",
@@ -1090,8 +1129,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 label_time: "Service Time (Instant or Advance)",
                 label_passengers: "Passengers",
                 label_luggages: "Luggages",
-                label_has_pet: "Pets on board",
-                label_has_wheelchair: "Wheelchair in trunk",
+                label_has_pet: "Pets on board?",
+                label_has_wheelchair: "Wheelchair to be placed in trunk?",
                 opt_select: "Please select",
                 opt_yes: "Yes",
                 opt_no: "No",
@@ -1162,17 +1201,24 @@ function showInstallGuide() {
         return;
     }
 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     
     if (isIOS) {
-        content.innerHTML = `
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the Share button <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i> at the bottom of Safari.</p>
+            <p class="mt-1"><strong>2.</strong> Scroll down and tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Tap "Add" in the top right corner to complete!</p>
+        ` : `
             <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
             <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
             <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
         `;
     } else {
-        // Android / Chrome 指引
-        content.innerHTML = `
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the menu button <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i> in the top right corner of Chrome.</p>
+            <p class="mt-1"><strong>2.</strong> Tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span> or <span class="text-brand-yellow font-bold">"Install App"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Confirm to complete installation!</p>
+        ` : `
             <p><strong>1.</strong> 點擊 Chrome 瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
             <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 <span class="text-brand-yellow font-bold">「安裝應用程式」</span>。</p>
             <p class="mt-1"><strong>3.</strong> 確認新增即可完成安裝！</p>
@@ -2619,7 +2665,7 @@ if (currentBaseFare > 0) {
             if (selectedFareMode === 'discount') {
                 msgLines.push(`💎收費模式：🔨八五折優惠🔨`);
             } else {
-                msgLines.push(`💰收費模式：💯 *正價按錶收費* 💯`);
+                msgLines.push(`💎收費模式：💯 *正價按錶收費* 💯`);
             }
 
             msgLines.push(`💰預計車費總額：HK$${totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
