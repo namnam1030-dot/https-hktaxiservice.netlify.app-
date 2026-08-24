@@ -365,7 +365,7 @@
         <p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
             <i class="fa-solid fa-tag text-brand-yellow"></i> 收費模式 <span class="text-brand-yellow text-xs">* (必須選擇)</span>
         </p>
-        <p class="text-xs text-gray-400 mb-3">所有行程最低消費$130</p>
+        <p class="text-xs text-gray-400 mb-3">所有行程最低消費$100</p>
         
         <div class="space-y-3">
             <!-- 正價按錶收費選項 -->
@@ -2304,16 +2304,16 @@ function updateFareModeDisplay() {
     let baseFareForNormal = currentBaseFare;
     let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
     
-    // 如果基本費 ≤ $130，正價顯示為 $130
-    if (baseFareForNormal <= 130) {
-        normalFare = 130 + currentTunnelFee + selectedSurcharge;
+    // 如果基本費 ≤ $100，正價顯示為 $100
+    if (baseFareForNormal <= 100) {
+        normalFare = 100 + currentTunnelFee + selectedSurcharge;
     }
     
     // 計算八五折收費
     let discountedBaseFare = Math.round(currentBaseFare * 0.85);
     
-    // 檢查八五折後是否超過 $130
-    let discountEligible = discountedBaseFare > 130;
+    // 檢查八五折後是否超過 $100
+    let discountEligible = discountedBaseFare > 100;
     
     // 計算八五折的隧道費
     let discountTunnelFee = 0;
@@ -2330,10 +2330,10 @@ function updateFareModeDisplay() {
     
     // 更新正價備注
     if (normalFareNote) {
-        if (baseFareForNormal <= 130) {
+        if (baseFareForNormal <= 100) {
             normalFareNote.innerText = currentLang === 'en' ? 
-                'Minimum fare HK$130 applied' : 
-                '已包含最低消費 HK$130';
+                'Minimum fare HK$100 applied' : 
+                '已包含最低消費 HK$100';
         } else {
             normalFareNote.innerText = currentLang === 'en' ? 
                 'Includes tunnel fee or minimum fare' : 
@@ -2343,7 +2343,7 @@ function updateFareModeDisplay() {
     
     // 處理八五折選項
     if (discountEligible) {
-        // 八五折後超過 $130，提供八五折優惠
+        // 八五折後超過 $100，提供八五折優惠
         if (discountContainer) {
             discountContainer.style.opacity = '1';
             discountContainer.style.pointerEvents = 'auto';
@@ -2357,7 +2357,7 @@ function updateFareModeDisplay() {
                 '已享八五折優惠';
         }
     } else {
-        // 八五折後不超過 $130，不提供八五折優惠
+        // 八五折後不超過 $100，不提供八五折優惠
         if (discountContainer) {
             discountContainer.style.opacity = '0.5';
             discountContainer.style.pointerEvents = 'none';
@@ -2367,8 +2367,8 @@ function updateFareModeDisplay() {
         
         if (discountFareNote) {
             discountFareNote.innerText = currentLang === 'en' ? 
-                'Not applicable (below HK$130 after discount)' : 
-                '不適用（八五折後低於HK$130）';
+                'Not applicable (below HK$100 after discount)' : 
+                '不適用（八五折後低於HK$100）';
         }
         
         // 如果之前選擇了八五折，自動取消
@@ -2412,10 +2412,10 @@ function updateFareModeDisplay() {
                 '*15% discount applied' : 
                 '*已享八五折優惠';
             selectedPriceNote.classList.remove('hidden');
-        } else if (baseFareForNormal <= 130) {
+        } else if (baseFareForNormal <= 100) {
             selectedPriceNote.innerText = currentLang === 'en' ? 
-                '*Includes minimum fare HK$130' : 
-                '*已包含最低消費 HK$130';
+                '*Includes minimum fare HK$100' : 
+                '*已包含最低消費 HK$100';
             selectedPriceNote.classList.remove('hidden');
         } else {
             selectedPriceNote.classList.add('hidden');
@@ -2432,8 +2432,8 @@ function updateFareModeAvailability() {
     // 計算八五折後的基本費
     let discountedBaseFare = Math.round(currentBaseFare * 0.85);
     
-    // 八五折後超過 $130 才提供優惠
-    if (discountedBaseFare > 130) {
+    // 八五折後超過 $100 才提供優惠
+    if (discountedBaseFare > 100) {
         if (discountContainer) {
             discountContainer.style.opacity = '1';
             discountContainer.style.pointerEvents = 'auto';
@@ -2570,9 +2570,9 @@ if (currentBaseFare > 0) {
         // 正價計算
         totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
         
-        // 如果基本費 ≤ $130，最低消費 $130
-        if (currentBaseFare <= 130) {
-            totalFareForWhatsApp = 130 + currentTunnelFee + selectedSurcharge;
+        // 如果基本費 ≤ $100，最低消費 $100
+        if (currentBaseFare <= 100) {
+            totalFareForWhatsApp = 100 + currentTunnelFee + selectedSurcharge;
         }
     }
 }
