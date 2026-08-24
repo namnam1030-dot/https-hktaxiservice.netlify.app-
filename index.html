@@ -1569,11 +1569,11 @@ function updateCarCardFees() {
     if (currentBaseFare <= 0) return;
     
     const carConfigs = [
-        { id: 'car1-fee-display', noteId: 'car1-fee-note', surcharge: 0, minFare: 0, originalText: '標準收費・無附加費', originalTextEn: 'Standard Fare · No Surcharge' },
-        { id: 'car2-fee-display', noteId: 'car2-fee-note', surcharge: 50, minFare: 130, originalText: '附加費 HK$50 (最低 $130)', originalTextEn: 'Surcharge HK$50 (Min. $130)' },
-        { id: 'car3-fee-display', noteId: 'car3-fee-note', surcharge: 100, minFare: 180, originalText: '附加費 HK$100 (最低 $180)', originalTextEn: 'Surcharge HK$100 (Min. $180)' },
-        { id: 'car4-fee-display', noteId: 'car4-fee-note', surcharge: 80, minFare: 160, originalText: '附加費 HK$80 (最低 $160)', originalTextEn: 'Surcharge HK$80 (Min. $160)' },
-        { id: 'car5-fee-display', noteId: 'car5-fee-note', surcharge: 150, minFare: 230, originalText: '附加費 HK$150 (最低 $230)', originalTextEn: 'Surcharge HK$150 (Min. $230)' }
+        { id: 'car1-fee-display', noteId: 'car1-fee-note', surcharge: 0 },
+        { id: 'car2-fee-display', noteId: 'car2-fee-note', surcharge: 50 },
+        { id: 'car3-fee-display', noteId: 'car3-fee-note', surcharge: 100 },
+        { id: 'car4-fee-display', noteId: 'car4-fee-note', surcharge: 80 },
+        { id: 'car5-fee-display', noteId: 'car5-fee-note', surcharge: 150 }
     ];
     
     carConfigs.forEach(config => {
@@ -1582,21 +1582,11 @@ function updateCarCardFees() {
         
         if (!displayEl || !noteEl) return;
         
+        // 直接計算總車費，不設最低消費限制
         let totalFare = currentBaseFare + currentTunnelFee + config.surcharge;
         let noteText = '';
         
-        if (totalFare < config.minFare) {
-            totalFare = config.minFare;
-            if (config.surcharge > 0) {
-                noteText = currentLang === 'en' ? 
-                    `*Includes surcharge & min. fare` : 
-                    `*已包含車款附加費及最低消費`;
-            } else {
-                noteText = currentLang === 'en' ? 
-                    `*Includes min. fare` : 
-                    `*已包含最低消費`;
-            }
-        } else if (config.surcharge > 0) {
+        if (config.surcharge > 0) {
             noteText = currentLang === 'en' ? 
                 `*Includes surcharge HK$${config.surcharge}` : 
                 `*已包含車款附加費 HK$${config.surcharge}`;
@@ -1735,12 +1725,8 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
     
 // 如果有計算結果，立即更新總車費顯示
     if (currentBaseFare > 0) {
+        // 直接計算總車費，不設最低消費限制
         let calculatedTotal = currentBaseFare + currentTunnelFee + surcharge;
-        
-        // 檢查最低消費
-        if (minFare > 0 && calculatedTotal < minFare) {
-            calculatedTotal = minFare;
-        }
         
         // 更新結果區域的顯示
         document.getElementById('res-total-fare').innerText = calculatedTotal;
@@ -1756,12 +1742,8 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             surchargeRow.classList.add('hidden');
         }
         
-        if (minFare > 0 && calculatedTotal < minFare) {
-            minNoteRow.classList.remove('hidden');
-            document.getElementById('res-min-fare-val').innerText = minFare;
-        } else {
-            minNoteRow.classList.add('hidden');
-        }
+        // 不顯示最低消費提示
+        minNoteRow.classList.add('hidden');
         
         // 更新預約表單中的預計車費顯示
         const priceTextEl = document.getElementById('selected-price-text');
@@ -1772,27 +1754,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
         }
         
         if (priceNoteEl) {
-            let noteText = '';
-            if (minFare > 0 && calculatedTotal === minFare && surcharge > 0) {
-                noteText = currentLang === 'en' ? 
-                    '*Includes surcharge & min. fare' : 
-                    '*已包含車款附加費及最低消費';
-            } else if (minFare > 0 && calculatedTotal === minFare && surcharge === 0) {
-                noteText = currentLang === 'en' ? 
-                    '*Includes min. fare' : 
-                    '*已包含最低消費';
-            } else if (surcharge > 0) {
-                noteText = currentLang === 'en' ? 
-                    `*Includes surcharge HK$${surcharge}` : 
-                    `*已包含車款附加費 HK$${surcharge}`;
-            }
-            
-            if (noteText) {
-                priceNoteEl.innerText = noteText;
-                priceNoteEl.classList.remove('hidden');
-            } else {
-                priceNoteEl.classList.add('hidden');
-            }
+            priceNoteEl.classList.add('hidden');
         }
     }
 
@@ -2014,18 +1976,18 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
         }
 
         const tunnelDatabase = [
-            { name: "紅隧 (連回程)", fee: 50, lat: 22.2896118, lng: 114.1823943, radius: 300 },
-            { name: "東隧 (連回程)", fee: 50, lat: 22.294889, lng: 114.22223, radius: 300 },
-            { name: "西隧 (連回程)", fee: 50, lat: 22.2940599, lng: 114.150204, radius: 300 },
-            { name: "大欖隧道", fee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500 },
-            { name: "城門隧道", fee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300 },
-            { name: "香港仔隧道", fee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
-            { name: "大老山隧道", fee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
-            { name: "獅子山隧道", fee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
-            { name: "尖山隧道", fee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
+            { name: "紅隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300 },
+            { name: "東隧 (連回程)", fee: 50, discountFee: 25, lat: 22.294889, lng: 114.22223, radius: 300 },
+            { name: "西隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2940599, lng: 114.150204, radius: 300 },
+            { name: "大欖隧道", fee: 28, discountFee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500 },
+            { name: "城門隧道", fee: 8, discountFee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300 },
+            { name: "香港仔隧道", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
+            { name: "大老山隧道", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
+            { name: "獅子山隧道", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
+            { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
         ];
 
-        function checkTunnelsForRoute(route) {
+        function checkTunnelsForRoute(route, isDiscount = false) {
             let matchedTunnels = [];
             let totalTunnelFee = 0;
 
@@ -2067,7 +2029,8 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
 
                 if (triggered) {
                     matchedTunnels.push(tunnel);
-                    totalTunnelFee += tunnel.fee;
+                    // 如果是八五折模式，使用折扣價
+                    totalTunnelFee += isDiscount ? (tunnel.discountFee || tunnel.fee) : tunnel.fee;
                 }
             });
 
@@ -2230,24 +2193,36 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
 
             let baseMeterFare = calculateTaxiBaseFare(finalKm);
 
-            let tunnelResult = checkTunnelsForRoute(selectedRoute);
-            let tunnelFee = tunnelResult.totalTunnelFee;
+            // 檢查是否為八五折模式
+            const isDiscountMode = selectedFareMode === 'discount' && selectedCarName === '豐田混能的士';
+            
+            // 分別計算正價和八五折的隧道費
+            let tunnelResultNormal = checkTunnelsForRoute(selectedRoute, false);
+            let tunnelResultDiscount = checkTunnelsForRoute(selectedRoute, true);
+            
+            let tunnelFeeNormal = tunnelResultNormal.totalTunnelFee;
+            let tunnelFeeDiscount = tunnelResultDiscount.totalTunnelFee;
 
-            // 儲存當前基本車費和隧道費，供車款卡片更新使用
+            // 儲存當前基本車費和隧道費
             currentBaseFare = baseMeterFare;
-            currentTunnelFee = tunnelFee;
+            currentTunnelFee = isDiscountMode ? tunnelFeeDiscount : tunnelFeeNormal;
 
+            // 顯示偵測到的隧道
             const detectedContainer = document.getElementById('detected-tunnels-container');
             const detectedList = document.getElementById('detected-tunnels-list');
-            if (tunnelResult.matchedTunnels.length > 0) {
+            if (tunnelResultNormal.matchedTunnels.length > 0) {
                 detectedContainer.classList.remove('hidden');
-                let tunnelNames = tunnelResult.matchedTunnels.map(t => `${t.name} ($${t.fee})`).join('、');
+                let tunnelNames = tunnelResultNormal.matchedTunnels.map(t => {
+                    const feeToShow = isDiscountMode ? (t.discountFee || t.fee) : t.fee;
+                    return `${t.name} ($${feeToShow})`;
+                }).join('、');
                 detectedList.innerText = tunnelNames;
             } else {
                 detectedContainer.classList.add('hidden');
             }
 
-            let calculatedTotal = baseMeterFare + selectedSurcharge + tunnelFee;
+            // 計算總車費（不設最低消費限制）
+            let calculatedTotal = baseMeterFare + selectedSurcharge + currentTunnelFee;
 
             const minNoteRow = document.getElementById('res-min-fare-note');
             const surchargeRow = document.getElementById('res-surcharge-row');
@@ -2260,20 +2235,15 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 surchargeRow.classList.add('hidden');
             }
 
-            if (tunnelFee > 0) {
+            if (currentTunnelFee > 0) {
                 tunnelRow.classList.remove('hidden');
-                document.getElementById('res-tunnel-val').innerText = tunnelFee;
+                document.getElementById('res-tunnel-val').innerText = currentTunnelFee;
             } else {
                 tunnelRow.classList.add('hidden');
             }
 
-            if (selectedMinFare > 0 && calculatedTotal < selectedMinFare) {
-                calculatedTotal = selectedMinFare;
-                minNoteRow.classList.remove('hidden');
-                document.getElementById('res-min-fare-val').innerText = selectedMinFare;
-            } else {
-                minNoteRow.classList.add('hidden');
-            }
+            // 不再強制最低消費，顯示正常價錢
+            minNoteRow.classList.add('hidden');
 
             // 確保所有價錢都基於最後一次計算
             document.getElementById('res-distance').innerText = finalKm.toFixed(1);
@@ -2291,7 +2261,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             updateFareModeAvailability();
         }
 
-        // 處理收費模式選擇
+// 處理收費模式選擇
         function handleFareModeSelection(mode) {
             const normalCheckbox = document.getElementById('fare-mode-normal');
             const discountCheckbox = document.getElementById('fare-mode-discount');
@@ -2305,10 +2275,9 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 }
             } else if (mode === 'discount') {
                 if (discountCheckbox.checked) {
-                    // 檢查是否為豐田混能的士 - 修改：任何車款都可以選擇八五折，但只有豐田混能的士適用
+                    // 自動選擇豐田混能的士
                     if (selectedCarName !== '豐田混能的士') {
-                        // 如果不是豐田混能的士，提示但允許選擇
-                        console.log('八五折優惠只適用於豐田混能的士');
+                        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
                     }
                     normalCheckbox.checked = false;
                     selectedFareMode = 'discount';
@@ -2321,7 +2290,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             updateFareModeDisplay();
         }
         
-        // 更新收費模式選項的顯示
+// 更新收費模式選項的顯示
         function updateFareModeDisplay() {
             if (currentBaseFare <= 0) return;
             
@@ -2329,29 +2298,24 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             const discountFareVal = document.getElementById('discount-fare-val');
             const resTotalFare = document.getElementById('res-total-fare');
             
-            // 計算正價收費
+            // 計算正價收費（不設最低消費）
             let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
-            if (selectedMinFare > 0 && normalFare < selectedMinFare) {
-                normalFare = selectedMinFare;
-            }
-            // 確保最低消費$100
-            if (normalFare < 100) {
-                normalFare = 100;
-            }
             
-            // 計算八五折收費
+            // 計算八五折收費（只適用於豐田混能的士）
             let discountFare = 0;
             if (selectedCarName === '豐田混能的士') {
-                // 八五折以基本跳錶價錢計算，隧道費不打折
+                // 八五折以基本跳錶價錢計算
                 let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-                discountFare = discountedBaseFare + currentTunnelFee;
                 
-                // 確保最低消費$100（以八五折後計算）
-                if (discountFare < 100) {
-                    discountFare = 100;
+                // 重新計算八五折的隧道費（3條過海隧道$25）
+                let discountTunnelFee = 0;
+                if (currentTunnelFee > 0) {
+                    // 使用折扣隧道費
+                    discountTunnelFee = Math.round(currentTunnelFee * 0.5); // $50變$25
                 }
+                
+                discountFare = discountedBaseFare + discountTunnelFee;
             } else {
-                // 如果不是豐田混能的士，八五折不適用，顯示為正價
                 discountFare = normalFare;
             }
             
@@ -2365,15 +2329,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 displayFare = normalFare;
             } else if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
                 displayFare = discountFare;
-            } else if (selectedFareMode === 'discount' && selectedCarName !== '豐田混能的士') {
-                // 如果選擇了八五折但不是豐田混能的士，仍顯示正價
-                displayFare = normalFare;
-                // 取消八五折選擇
-                selectedFareMode = '';
-                document.getElementById('fare-mode-discount').checked = false;
-                document.getElementById('fare-mode-normal').checked = false;
             } else {
-                // 未選擇時顯示正價
                 displayFare = normalFare;
             }
             
@@ -2386,8 +2342,8 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             if (selectedPriceText) {
                 selectedPriceText.innerText = `HK$ ${displayFare}`;
             }
-        }
-        
+        }        
+
         // 更新收費模式選項的可用性 - 修改：不再禁用八五折選項
         function updateFareModeAvailability() {
             const discountContainer = document.getElementById('discount-option-container');
@@ -2496,25 +2452,17 @@ function sendWhatsApp(event) {
                 }
             }
 
-            // 重新計算當前選擇車款的總費用
+// 重新計算當前選擇車款的總費用（不設最低消費）
             let totalFareForWhatsApp = 0;
             if (currentBaseFare > 0) {
                 if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
                     // 八五折計算
                     let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-                    totalFareForWhatsApp = discountedBaseFare + currentTunnelFee;
-                    if (totalFareForWhatsApp < 100) {
-                        totalFareForWhatsApp = 100;
-                    }
+                    let discountTunnelFee = Math.round(currentTunnelFee * 0.5); // 過海隧道$50變$25
+                    totalFareForWhatsApp = discountedBaseFare + discountTunnelFee;
                 } else {
                     // 正價計算
                     totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
-                    if (selectedMinFare > 0 && totalFareForWhatsApp < selectedMinFare) {
-                        totalFareForWhatsApp = selectedMinFare;
-                    }
-                    if (totalFareForWhatsApp < 100) {
-                        totalFareForWhatsApp = 100;
-                    }
                 }
             } else {
                 totalFareForWhatsApp = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
