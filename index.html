@@ -201,7 +201,7 @@
                     <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
-                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「由中環去機場」</span>。</li>
+                    <li data-i18n="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。</li>
                     <li data-i18n="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。</li>
                 </ul>
             </div>
@@ -325,7 +325,7 @@
                 <span class="text-white font-bold"><span id="res-duration">0</span> <span data-i18n="unit_min">分鐘</span></span>
             </div>
             <div class="flex justify-between items-center">
-                <span data-i18n="res_base_fee">法定跳錶基本費：</span>
+                <span data-i18n="res_base_fee">跳錶基本收費：</span>
                 <span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span>
             </div>
             
@@ -365,7 +365,7 @@
         <p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
             <i class="fa-solid fa-tag text-brand-yellow"></i> 收費模式 <span class="text-brand-yellow text-xs">* (必須選擇)</span>
         </p>
-        <p class="text-xs text-gray-400 mb-3">為提升預約成功率，所有行程最低消費$100</p>
+        <p class="text-xs text-gray-400 mb-3">所有行程最低消費$130</p>
         
         <div class="space-y-3">
             <!-- 正價按錶收費選項 -->
@@ -385,7 +385,7 @@
                 <input type="checkbox" id="fare-mode-discount" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('discount')">
                 <div class="flex-1">
                     <div class="flex justify-between items-center">
-                        <span class="text-white font-bold text-sm">八五折優惠 <span class="text-xs text-gray-400">(只限豐田混能的士)</span></span>
+                        <span class="text-white font-bold text-sm">八五折優惠<br> <span class="text-xs text-gray-400">(只限豐田混能的士)</span></span>
                         <span class="text-brand-yellow font-bold text-sm" id="discount-fare-display">HK$ <span id="discount-fare-val">0</span></span>
                     </div>
                     <p class="text-xs text-gray-400 mt-1" id="discount-fare-note">已包含隧道費或最低消費</p>
@@ -538,7 +538,7 @@
                             <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
                         </label>
                         <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_credit">信用卡 (需另加手續費)</span>
+                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_credit">信用卡<br>(需另加手續費)</span>
                         </label>
                     </div>
                 </div>
@@ -2290,82 +2290,175 @@ function checkTunnelsForRoute(route, isDiscount = false) {
         
 // 更新收費模式選項的顯示
 function updateFareModeDisplay() {
-            if (currentBaseFare <= 0) return;
-            
-            const normalFareVal = document.getElementById('normal-fare-val');
-            const discountFareVal = document.getElementById('discount-fare-val');
-            const resTotalFare = document.getElementById('res-total-fare');
-            
-            // 計算正價收費
-            // 正價 = 基本跳錶費 + 隧道費(來回$50) + 車款附加費
-            let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
-            
-            // 計算八五折收費
-            // 八五折 = 基本跳錶費 × 0.85 + 隧道費(單程$25) + 車款附加費($0)
-            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-            
-            // 計算八五折的隧道費
-            // 使用 checkTunnelsForRoute 重新計算八五折隧道費
-            // 但這裡我們需要用已經儲存的 tunnelResult 來計算
-            // 由於 currentTunnelFee 儲存的是正價隧道費
-            // 我們需要重新計算八五折的隧道費
-            let discountTunnelFee = 0;
-            
-            // 從 tunnelDatabase 中檢查哪些是過海隧道
-            // 過海隧道：紅隧、東隧、西隧（fee=50, discountFee=25）
-            // 其他隧道：fee 和 discountFee 相同
-            if (currentTunnelFee > 0) {
-                // 如果 currentTunnelFee 是 $50 的倍數，表示包含過海隧道
-                // 將過海隧道部分改為單程$25
-                const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                const otherTunnelFee = currentTunnelFee % 50;
-                discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
-            }
-            
-            let discountFare = discountedBaseFare + discountTunnelFee + selectedSurcharge;
-            
-            // 更新顯示 - 直接顯示兩個價格
-            if (normalFareVal) normalFareVal.innerText = normalFare;
-            if (discountFareVal) discountFareVal.innerText = discountFare;
-            
-            // 更新總車費顯示
-            let displayFare = 0;
-            if (selectedFareMode === 'normal') {
-                displayFare = normalFare;
-            } else if (selectedFareMode === 'discount') {
-                displayFare = discountFare;
-            } else {
-                // 未選擇時顯示正價
-                displayFare = normalFare;
-            }
-            
-            if (resTotalFare) {
-                resTotalFare.innerText = displayFare;
-            }
-            
-            // 更新預約表單中的預計車費
-            const selectedPriceText = document.getElementById('selected-price-text');
-            if (selectedPriceText) {
-                selectedPriceText.innerText = `HK$ ${displayFare}`;
-            }
+    if (currentBaseFare <= 0) return;
+    
+    const normalFareVal = document.getElementById('normal-fare-val');
+    const discountFareVal = document.getElementById('discount-fare-val');
+    const resTotalFare = document.getElementById('res-total-fare');
+    const normalFareNote = document.getElementById('normal-fare-note');
+    const discountFareNote = document.getElementById('discount-fare-note');
+    const discountContainer = document.getElementById('discount-option-container');
+    
+    // 計算正價收費
+    // 正價 = 基本跳錶費 + 隧道費(來回$50) + 車款附加費
+    let baseFareForNormal = currentBaseFare;
+    let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
+    
+    // 如果基本費 ≤ $130，正價顯示為 $130
+    if (baseFareForNormal <= 130) {
+        normalFare = 130 + currentTunnelFee + selectedSurcharge;
+    }
+    
+    // 計算八五折收費
+    let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+    
+    // 檢查八五折後是否超過 $130
+    let discountEligible = discountedBaseFare > 130;
+    
+    // 計算八五折的隧道費
+    let discountTunnelFee = 0;
+    if (currentTunnelFee > 0) {
+        const harborTunnelCount = Math.floor(currentTunnelFee / 50);
+        const otherTunnelFee = currentTunnelFee % 50;
+        discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
+    }
+    
+    let discountFare = discountedBaseFare + discountTunnelFee + selectedSurcharge;
+    
+    // 更新顯示
+    if (normalFareVal) normalFareVal.innerText = normalFare;
+    
+    // 更新正價備注
+    if (normalFareNote) {
+        if (baseFareForNormal <= 130) {
+            normalFareNote.innerText = currentLang === 'en' ? 
+                'Minimum fare HK$130 applied' : 
+                '已包含最低消費 HK$130';
+        } else {
+            normalFareNote.innerText = currentLang === 'en' ? 
+                'Includes tunnel fee or minimum fare' : 
+                '已包含隧道費或最低消費';
         }
-        // 更新收費模式選項的可用性 - 修改：不再禁用八五折選項
-        function updateFareModeAvailability() {
-            const discountContainer = document.getElementById('discount-option-container');
-            
-            // 修改：始終保持八五折選項可用
-            if (discountContainer) {
-                discountContainer.style.opacity = '1';
-                discountContainer.style.pointerEvents = 'auto';
-            }
-            
-            // 如果已選擇八五折但更換了非豐田混能的士的車款，自動取消八五折選擇
-            if (selectedFareMode === 'discount' && selectedCarName !== '豐田混能的士') {
-                selectedFareMode = '';
-                document.getElementById('fare-mode-discount').checked = false;
-                document.getElementById('fare-mode-normal').checked = false;
-            }
+    }
+    
+    // 處理八五折選項
+    if (discountEligible) {
+        // 八五折後超過 $130，提供八五折優惠
+        if (discountContainer) {
+            discountContainer.style.opacity = '1';
+            discountContainer.style.pointerEvents = 'auto';
         }
+        
+        if (discountFareVal) discountFareVal.innerText = discountFare;
+        
+        if (discountFareNote) {
+            discountFareNote.innerText = currentLang === 'en' ? 
+                '15% discount applied' : 
+                '已享八五折優惠';
+        }
+    } else {
+        // 八五折後不超過 $130，不提供八五折優惠
+        if (discountContainer) {
+            discountContainer.style.opacity = '0.5';
+            discountContainer.style.pointerEvents = 'none';
+        }
+        
+        if (discountFareVal) discountFareVal.innerText = '-';
+        
+        if (discountFareNote) {
+            discountFareNote.innerText = currentLang === 'en' ? 
+                'Not applicable (below HK$130 after discount)' : 
+                '不適用（八五折後低於HK$130）';
+        }
+        
+        // 如果之前選擇了八五折，自動取消
+        if (selectedFareMode === 'discount') {
+            selectedFareMode = 'normal';
+            document.getElementById('fare-mode-discount').checked = false;
+            document.getElementById('fare-mode-normal').checked = true;
+        }
+    }
+    
+    // 更新總車費顯示
+    let displayFare = 0;
+    if (selectedFareMode === 'normal') {
+        displayFare = normalFare;
+    } else if (selectedFareMode === 'discount' && discountEligible) {
+        displayFare = discountFare;
+    } else {
+        // 預設顯示正價
+        displayFare = normalFare;
+        if (selectedFareMode !== 'normal') {
+            selectedFareMode = 'normal';
+            document.getElementById('fare-mode-normal').checked = true;
+        }
+    }
+    
+    if (resTotalFare) {
+        resTotalFare.innerText = displayFare;
+    }
+    
+    // 更新預約表單中的預計車費
+    const selectedPriceText = document.getElementById('selected-price-text');
+    if (selectedPriceText) {
+        selectedPriceText.innerText = `HK$ ${displayFare}`;
+    }
+    
+    // 更新預約表單中的備注
+    const selectedPriceNote = document.getElementById('selected-price-note');
+    if (selectedPriceNote) {
+        if (selectedFareMode === 'discount') {
+            selectedPriceNote.innerText = currentLang === 'en' ? 
+                '*15% discount applied' : 
+                '*已享八五折優惠';
+            selectedPriceNote.classList.remove('hidden');
+        } else if (baseFareForNormal <= 130) {
+            selectedPriceNote.innerText = currentLang === 'en' ? 
+                '*Includes minimum fare HK$130' : 
+                '*已包含最低消費 HK$130';
+            selectedPriceNote.classList.remove('hidden');
+        } else {
+            selectedPriceNote.classList.add('hidden');
+        }
+    }
+}
+
+// 更新收費模式選項的可用性
+function updateFareModeAvailability() {
+    const discountContainer = document.getElementById('discount-option-container');
+    
+    if (currentBaseFare <= 0) return;
+    
+    // 計算八五折後的基本費
+    let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+    
+    // 八五折後超過 $130 才提供優惠
+    if (discountedBaseFare > 130) {
+        if (discountContainer) {
+            discountContainer.style.opacity = '1';
+            discountContainer.style.pointerEvents = 'auto';
+        }
+    } else {
+        if (discountContainer) {
+            discountContainer.style.opacity = '0.5';
+            discountContainer.style.pointerEvents = 'none';
+        }
+        
+        // 如果已選擇八五折，自動取消
+        if (selectedFareMode === 'discount') {
+            selectedFareMode = 'normal';
+            document.getElementById('fare-mode-discount').checked = false;
+            document.getElementById('fare-mode-normal').checked = true;
+        }
+    }
+    
+    // 如果已選擇八五折但更換了非豐田混能的士的車款，自動取消八五折選擇
+    if (selectedFareMode === 'discount' && selectedCarName !== '豐田混能的士') {
+        selectedFareMode = '';
+        document.getElementById('fare-mode-discount').checked = false;
+        document.getElementById('fare-mode-normal').checked = false;
+    }
+}
 
 function sendWhatsApp(event) {
             event.preventDefault();
@@ -2457,29 +2550,32 @@ function sendWhatsApp(event) {
                 }
             }
 
-// 重新計算當前選擇車款的總費用（不設最低消費）
+// 重新計算當前選擇車款的總費用
 let totalFareForWhatsApp = 0;
-            if (currentBaseFare > 0) {
-                if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
-                    // 八五折計算：基本跳錶費 × 0.85 + 隧道費(單程$25) + 車款附加費($0)
-                    let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-                    
-                    // 計算八五折的隧道費：過海隧道單程$25，其他隧道原價
-                    let discountTunnelFee = 0;
-                    if (currentTunnelFee > 0) {
-                        const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                        const otherTunnelFee = currentTunnelFee % 50;
-                        discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
-                    }
-                    
-                    totalFareForWhatsApp = discountedBaseFare + discountTunnelFee + selectedSurcharge;
-                } else {
-                    // 正價計算
-                    totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
-                }
-            } else {
-                totalFareForWhatsApp = document.getElementById('res-total-fare') ? document.getElementById('res-total-fare').innerText : '0';
-            }
+if (currentBaseFare > 0) {
+    if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
+        // 八五折計算
+        let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+        
+        // 計算八五折的隧道費
+        let discountTunnelFee = 0;
+        if (currentTunnelFee > 0) {
+            const harborTunnelCount = Math.floor(currentTunnelFee / 50);
+            const otherTunnelFee = currentTunnelFee % 50;
+            discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
+        }
+        
+        totalFareForWhatsApp = discountedBaseFare + discountTunnelFee + selectedSurcharge;
+    } else {
+        // 正價計算
+        totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
+        
+        // 如果基本費 ≤ $130，最低消費 $130
+        if (currentBaseFare <= 130) {
+            totalFareForWhatsApp = 130 + currentTunnelFee + selectedSurcharge;
+        }
+    }
+}
 
             let msgLines = [];
             msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
