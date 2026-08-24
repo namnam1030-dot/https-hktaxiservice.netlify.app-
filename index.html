@@ -360,38 +360,53 @@
         </p>
     </div>
 
-    <!-- 7: 收費模式框 -->
-    <div class="mt-4 p-3 bg-gray-900/90 border border-gray-800 rounded-xl">
-<p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
-    <i class="fa-solid fa-tag text-brand-yellow"></i> <span data-i18n="fee_mode_title">收費模式</span> <span class="text-brand-yellow text-xs" data-i18n="required_mark">* (必須選擇)</span>
-</p>
-<p class="text-xs text-gray-400 mb-3" data-i18n="min_fare_note">所有行程最低消費$100</p>
-        <div class="space-y-3">
-            <!-- 正價按錶收費選項 -->
-            <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition">
-                <input type="checkbox" id="fare-mode-normal" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('normal')">
-                <div class="flex-1">
-                    <div class="flex justify-between items-center">
-<span class="text-white font-bold text-sm" data-i18n="fare_normal_label">正價按錶收費</span>
-                        <span class="text-brand-yellow font-bold text-sm" id="normal-fare-display">HK$ <span id="normal-fare-val">0</span></span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1" id="normal-fare-note">已包含隧道費或最低消費</p>
+    <!-- 7: 收費模式框 (優化版) -->
+<div class="mt-4 p-3 bg-gray-900/90 border border-gray-800 rounded-xl">
+    <p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-tag text-brand-yellow"></i> 
+        <span data-i18n="fee_mode_title">收費模式</span> 
+        <span class="text-brand-yellow text-xs" data-i18n="required_mark">* (必須選擇)</span>
+    </p>
+    <p class="text-xs text-gray-400 mb-3" data-i18n="min_fare_note">所有行程最低消費$100</p>
+    
+    <div class="space-y-3">
+        <!-- 正價按錶收費選項 -->
+        <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition relative">
+            <input type="checkbox" id="fare-mode-normal" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('normal')">
+            <div class="flex-1">
+                <div class="flex justify-between items-center">
+                    <span class="text-white font-bold text-sm" data-i18n="fare_normal_label">正價按錶收費</span>
+                    <span class="text-brand-yellow font-bold text-base" id="normal-fare-display">HK$ <span id="normal-fare-val">0</span></span>
                 </div>
-            </label>
+                <p class="text-xs text-gray-400 mt-1" id="normal-fare-note">已包含隧道費或最低消費</p>
+            </div>
+        </label>
 
-            <!-- 八五折優惠選項 -->
-            <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition" id="discount-option-container">
-                <input type="checkbox" id="fare-mode-discount" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('discount')">
-                <div class="flex-1">
-                    <div class="flex justify-between items-center">
-<span class="text-white font-bold text-sm" data-i18n-html="fare_discount_label">八五折優惠</span><br> <span class="text-xs text-gray-400" data-i18n-html="fare_discount_note">(只限豐田混能的士)</span>
-                        <span class="text-brand-yellow font-bold text-sm" id="discount-fare-display">HK$ <span id="discount-fare-val">0</span></span>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1" id="discount-fare-note">已包含隧道費或最低消費</p>
+            <!-- 八五折優惠選項 (優化版) -->
+        <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition relative" id="discount-option-container">
+            <input type="checkbox" id="fare-mode-discount" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('discount')">
+            <div class="flex-1">
+                <!-- 第一行：優惠名稱 + 價格 -->
+                <div class="flex justify-between items-center">
+                    <span class="text-white font-bold text-sm" data-i18n="fare_discount_label">八五折優惠</span>
+                    <!-- 價格顯示區：動態顯示價格或「不適用」 -->
+                    <span class="text-brand-yellow font-bold text-base" id="discount-fare-display">
+                        <span id="discount-fare-val">HK$ 0</span>
+                    </span>
                 </div>
-            </label>
-        </div>
+                
+                <!-- 第二行：限制條件說明（獨立成行） -->
+                <div class="mt-1.5 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-gray-500 text-xs"></i>
+                    <span class="text-xs text-gray-400" data-i18n="fare_discount_note">(只限豐田混能的士)</span>
+                </div>
+                
+                <!-- 第三行：備注說明 -->
+                <p class="text-xs text-gray-400 mt-1" id="discount-fare-note">已包含隧道費或最低消費</p>
+            </div>
+        </label>
     </div>
+</div>
 
 <!-- 8: 重新選擇路線和選擇車款類型按鍵 -->
     <div class="mt-4 grid grid-cols-2 gap-3">
@@ -2347,11 +2362,12 @@ function checkTunnelsForRoute(route, isDiscount = false) {
             updateFareModeDisplay();
         }
         
-// 更新收費模式選項的顯示
+// 更新收費模式選項的顯示 (優化版)
 function updateFareModeDisplay() {
     if (currentBaseFare <= 0) return;
     
     const normalFareVal = document.getElementById('normal-fare-val');
+    const discountFareDisplay = document.getElementById('discount-fare-display');
     const discountFareVal = document.getElementById('discount-fare-val');
     const resTotalFare = document.getElementById('res-total-fare');
     const normalFareNote = document.getElementById('normal-fare-note');
@@ -2359,12 +2375,10 @@ function updateFareModeDisplay() {
     const discountContainer = document.getElementById('discount-option-container');
     
     // 計算正價收費
-    // 正價 = 基本跳錶費 + 隧道費(來回$50) + 車款附加費
-    let baseFareForNormal = currentBaseFare;
     let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
     
     // 如果基本費 ≤ $100，正價顯示為 $100
-    if (baseFareForNormal <= 100) {
+    if (currentBaseFare <= 100) {
         normalFare = 100 + currentTunnelFee + selectedSurcharge;
     }
     
@@ -2384,12 +2398,12 @@ function updateFareModeDisplay() {
     
     let discountFare = discountedBaseFare + discountTunnelFee + selectedSurcharge;
     
-    // 更新顯示
+    // 更新正價顯示
     if (normalFareVal) normalFareVal.innerText = normalFare;
     
     // 更新正價備注
     if (normalFareNote) {
-        if (baseFareForNormal <= 100) {
+        if (currentBaseFare <= 100) {
             normalFareNote.innerText = currentLang === 'en' ? 
                 'Minimum fare HK$100 applied' : 
                 '已包含最低消費 HK$100';
@@ -2401,14 +2415,17 @@ function updateFareModeDisplay() {
     }
     
     // 處理八五折選項
-    if (discountEligible) {
-        // 八五折後超過 $100，提供八五折優惠
+    if (discountEligible && selectedCarName === '豐田混能的士') {
+        // 八五折適用：顯示價格
         if (discountContainer) {
             discountContainer.style.opacity = '1';
             discountContainer.style.pointerEvents = 'auto';
         }
         
-        if (discountFareVal) discountFareVal.innerText = discountFare;
+        if (discountFareVal) {
+            discountFareVal.innerText = `HK$ ${discountFare}`;
+            discountFareVal.className = 'text-brand-yellow font-bold text-base';
+        }
         
         if (discountFareNote) {
             discountFareNote.innerText = currentLang === 'en' ? 
@@ -2416,18 +2433,27 @@ function updateFareModeDisplay() {
                 '單程隧道費、免行李及寵物費';
         }
     } else {
-        // 八五折後不超過 $100，不提供八五折優惠
+        // 八五折不適用：顯示「不適用」
         if (discountContainer) {
             discountContainer.style.opacity = '0.5';
             discountContainer.style.pointerEvents = 'none';
         }
         
-        if (discountFareVal) discountFareVal.innerText = '-';
+        if (discountFareVal) {
+            discountFareVal.innerText = '不適用';
+            discountFareVal.className = 'text-gray-400 font-bold text-sm';
+        }
         
         if (discountFareNote) {
-            discountFareNote.innerText = currentLang === 'en' ? 
-                'Not applicable' : 
-                '不適用';
+            if (selectedCarName !== '豐田混能的士') {
+                discountFareNote.innerText = currentLang === 'en' ? 
+                    'Only available for Toyota Hybrid Taxi' : 
+                    '只適用於豐田混能的士';
+            } else {
+                discountFareNote.innerText = currentLang === 'en' ? 
+                    'Minimum fare not reached' : 
+                    '未達到最低消費要求';
+            }
         }
         
         // 如果之前選擇了八五折，自動取消
@@ -2442,7 +2468,7 @@ function updateFareModeDisplay() {
     let displayFare = 0;
     if (selectedFareMode === 'normal') {
         displayFare = normalFare;
-    } else if (selectedFareMode === 'discount' && discountEligible) {
+    } else if (selectedFareMode === 'discount' && discountEligible && selectedCarName === '豐田混能的士') {
         displayFare = discountFare;
     } else {
         // 預設顯示正價
@@ -2462,6 +2488,7 @@ function updateFareModeDisplay() {
     if (selectedPriceText) {
         selectedPriceText.innerText = `HK$ ${displayFare}`;
     }
+}
     
     // 更新預約表單中的備注
     const selectedPriceNote = document.getElementById('selected-price-note');
