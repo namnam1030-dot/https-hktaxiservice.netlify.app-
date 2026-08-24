@@ -537,7 +537,7 @@
                             <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
                         </label>
                         <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_credit">信用卡<br>(需另加手續費)</span>
+                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n-html="pay_credit">信用卡<br>(需另加手續費)</span>
                         </label>
                     </div>
                 </div>
@@ -670,7 +670,7 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-    <span id="car2-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car2_fee"><p>附加費 HK$50<br>(最低消費 $130)</p></span>
+    <span id="car2-fee-display" class="text-gray-400 font-bold text-sm" data-i18n-html="car2_fee"><p>附加費 HK$50<br>(最低消費 $130)</p></span>
     <div id="car2-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
@@ -710,7 +710,7 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-    <span id="car3-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car3_fee"><p>附加費 HK$100<br>(最低消費 $180)</p></span>
+    <span id="car3-fee-display" class="text-gray-400 font-bold text-sm" data-i18n-html="car3_fee"><p>附加費 HK$100<br>(最低消費 $180)</p></span>
     <div id="car3-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
@@ -750,7 +750,7 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-    <span id="car4-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car4_fee"><p>附加費 HK$80<br>(最低消費 $160)</p></span>
+    <span id="car4-fee-display" class="text-gray-400 font-bold text-sm" data-i18n-html="car4_fee"><p>附加費 HK$80<br>(最低消費 $160)</p></span>
     <div id="car4-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
@@ -790,7 +790,7 @@
                             </div>
                             <div class="border-t border-gray-800 pt-4 flex items-center justify-between text-xs gap-2">
                                 <div>
-    <span id="car5-fee-display" class="text-gray-400 font-bold text-sm" data-i18n="car5_fee"><p>附加費 HK$150<br>(最低消費 $230)</p></span>
+    <span id="car5-fee-display" class="text-gray-400 font-bold text-sm" data-i18n-html="car5_fee"><p>附加費 HK$150<br>(最低消費 $230)</p></span>
     <div id="car5-fee-note" class="hidden text-xs text-brand-yellow font-medium mt-1"></div>
 </div>
                                 <button type="button" onclick="selectCarAndBook('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg animate-pulse hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0">
@@ -942,8 +942,8 @@ car5_seats_desc: "無障礙 · 無障礙福祉專車",
 
                 calc_title: "智能規劃路線與預計車費",
                 calc_tip_title: "預計車費使用說明：",
-                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出完整行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>。',
-                calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點（支援自動預測下拉選單），再按計算按鈕。',
+                calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
+calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
                 calc_tip_3: '系統將自動規劃最佳行車路線並預計基本車費。',
                 calc_label_pickup: "起點 (出發地)",
                 calc_label_stopover: "中途站 (最多3個)",
@@ -1091,7 +1091,7 @@ car5_seats_desc: "Accessible · Welfare Vehicle",
                 calc_title: "Smart Route & Fare Estimator",
                 calc_tip_title: "Fare Estimation Instructions:",
                 calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Mong Kok to Tsim Sha Tsui"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
-                calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below (with auto-complete dropdown), then click calculate.',
+calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below, then click calculate fare.',
                 calc_tip_3: 'The system will automatically plan the best route and calculate estimated basic fare.',
                 calc_label_pickup: "Pickup Location",
                 calc_label_stopover: "Stopovers (Max 3)",
