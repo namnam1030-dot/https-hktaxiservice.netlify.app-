@@ -367,13 +367,6 @@
                     <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
                 </div>
 
-                <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
-                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
-                    <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
-                        以上預計車費已包含自動偵測途徑徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
-                    </p>
-                </div>
-           
                 <div class="mt-2 grid grid-cols-2 gap-2">
                     <button type="button" onclick="scrollToTop()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
@@ -381,6 +374,14 @@
                     <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
                     </button>
+                </div>
+
+                <!-- 修改：將收費模式說明移到重新選擇路線和選擇車款按鈕之間 -->
+                <div class="mb-3 py-2 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
+                    <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
+                        以上預計車費已包含自動偵測途徑徑隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
+                    </p>
                 </div>
 
                 <div class="mt-1 flex flex-col items-center">
@@ -1567,16 +1568,16 @@ function updateCarCardFees() {
             totalFare = config.minFare;
             if (config.surcharge > 0) {
                 noteText = currentLang === 'en' ? 
-                    `*已包含附加費及最低消費` : 
+                    `*Includes surcharge & min. fare` : 
                     `*已包含車款附加費及最低消費`;
             } else {
                 noteText = currentLang === 'en' ? 
-                    `*已包含最低消費` : 
+                    `*Includes min. fare` : 
                     `*已包含最低消費`;
             }
         } else if (config.surcharge > 0) {
             noteText = currentLang === 'en' ? 
-                `*已包含車款附加費 HK$${config.surcharge}` : 
+                `*Includes surcharge HK$${config.surcharge}` : 
                 `*已包含車款附加費 HK$${config.surcharge}`;
         }
         
@@ -1703,6 +1704,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
     
     // 更新收費模式選項的可用性
     updateFareModeAvailability();
+    updateFareModeDisplay();
 }
 
 // 點擊「立即預約」按鈕時：自動選擇該車款並捲動至預約表單
@@ -2252,6 +2254,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 minNoteRow.classList.add('hidden');
             }
 
+            // 確保所有價錢都基於最後一次計算
             document.getElementById('res-distance').innerText = finalKm.toFixed(1);
             document.getElementById('res-duration').innerText = durationMinutes;
             document.getElementById('res-base-fare').innerText = baseMeterFare;
@@ -2281,13 +2284,10 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 }
             } else if (mode === 'discount') {
                 if (discountCheckbox.checked) {
-                    // 檢查是否為豐田混能的士
+                    // 檢查是否為豐田混能的士 - 修改：任何車款都可以選擇八五折，但只有豐田混能的士適用
                     if (selectedCarName !== '豐田混能的士') {
-                        alert(currentLang === 'en' ? 
-                            "15% discount is only available for Toyota Hybrid Taxi. Please select Toyota Hybrid Taxi first." : 
-                            "八五折優惠只適用於豐田混能的士，請先選擇豐田混能的士。");
-                        discountCheckbox.checked = false;
-                        return;
+                        // 如果不是豐田混能的士，提示但允許選擇
+                        console.log('八五折優惠只適用於豐田混能的士');
                     }
                     normalCheckbox.checked = false;
                     selectedFareMode = 'discount';
@@ -2318,7 +2318,7 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 normalFare = 100;
             }
             
-            // 計算八五折收費（只適用於豐田混能的士）
+            // 計算八五折收費
             let discountFare = 0;
             if (selectedCarName === '豐田混能的士') {
                 // 八五折以基本跳錶價錢計算，隧道費不打折
@@ -2329,6 +2329,9 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 if (discountFare < 100) {
                     discountFare = 100;
                 }
+            } else {
+                // 如果不是豐田混能的士，八五折不適用，顯示為正價
+                discountFare = normalFare;
             }
             
             // 更新顯示
@@ -2341,6 +2344,13 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
                 displayFare = normalFare;
             } else if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
                 displayFare = discountFare;
+            } else if (selectedFareMode === 'discount' && selectedCarName !== '豐田混能的士') {
+                // 如果選擇了八五折但不是豐田混能的士，仍顯示正價
+                displayFare = normalFare;
+                // 取消八五折選擇
+                selectedFareMode = '';
+                document.getElementById('fare-mode-discount').checked = false;
+                document.getElementById('fare-mode-normal').checked = false;
             } else {
                 // 未選擇時顯示正價
                 displayFare = normalFare;
@@ -2357,29 +2367,21 @@ function selectCarAndBook(name, feeText, surcharge, minFare, nameEn, feeTextEn) 
             }
         }
         
-        // 更新收費模式選項的可用性
+        // 更新收費模式選項的可用性 - 修改：不再禁用八五折選項
         function updateFareModeAvailability() {
             const discountContainer = document.getElementById('discount-option-container');
             
-            if (selectedCarName === '豐田混能的士') {
-                // 豐田混能的士可以使用八五折
-                if (discountContainer) {
-                    discountContainer.style.opacity = '1';
-                    discountContainer.style.pointerEvents = 'auto';
-                }
-            } else {
-                // 其他車款不能使用八五折
-                if (discountContainer) {
-                    discountContainer.style.opacity = '0.5';
-                    discountContainer.style.pointerEvents = 'none';
-                }
-                
-                // 如果已選擇八五折但更換了車款，取消八五折選擇
-                if (selectedFareMode === 'discount') {
-                    selectedFareMode = '';
-                    document.getElementById('fare-mode-discount').checked = false;
-                    document.getElementById('fare-mode-normal').checked = false;
-                }
+            // 修改：始終保持八五折選項可用
+            if (discountContainer) {
+                discountContainer.style.opacity = '1';
+                discountContainer.style.pointerEvents = 'auto';
+            }
+            
+            // 如果已選擇八五折但更換了非豐田混能的士的車款，自動取消八五折選擇
+            if (selectedFareMode === 'discount' && selectedCarName !== '豐田混能的士') {
+                selectedFareMode = '';
+                document.getElementById('fare-mode-discount').checked = false;
+                document.getElementById('fare-mode-normal').checked = false;
             }
         }
 
