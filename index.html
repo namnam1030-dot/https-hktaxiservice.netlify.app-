@@ -201,7 +201,7 @@
                     <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
-                    <li data-i18n-html="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。</li>
+                    <li data-i18n-html="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經旺角去尖沙咀」</span><br>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。</li>
                     <li data-i18n-html="calc_tip_2"><strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。</li>
                 </ul>
             </div>
@@ -219,8 +219,8 @@
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
                             <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-xs">起點🔃目的地</span>
-                            </button>
+                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-xs"data-i18n="swap_locations">起點🔃目的地</span>
+</button>
                         </div>
                         <div class="relative flex items-center">
                             <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
@@ -573,7 +573,7 @@
        <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">請選擇車款</span>
     </div>
     <div class="text-right text-xs">
-        <span class="text-gray-400 block mb-0.5">預計車費</span>
+        <span class="text-gray-400 block mb-0.5" data-i18n="estimated_fare_label">預計車費</span>
         <span id="selected-price-text" class="text-brand-yellow font-bold text-sm">有待計算</span>
         <div id="selected-price-note" class="hidden text-[11px] text-brand-yellow font-medium mt-1"></div>
     </div>
@@ -809,10 +809,10 @@
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <a href="https://weixin.qq.com" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
-                <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
+                <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </a>
             <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
-                <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp 查詢</span>
+                <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。</p>
@@ -865,7 +865,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const translations = {
             zh: {
 
-
+swap_locations: "起點🔃目的地",
+estimated_fare_label: "預計車費",
 btn_book_now: "立即預約",
 fleet_title: "選擇車款類型",
 fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
@@ -978,7 +979,7 @@ calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方�
                 label_dropoff: "落車地點 (終點)",
                 ph_dropoff: "例：深圳灣口岸",
                 label_date: "用車日期",
-                label_time: "用車時間 (支援即時或預約)",
+                label_time: "用車時間間",
                 label_passengers: "乘客人數",
                 label_luggages: "行李件數",
                 label_has_pet: "是否有寵物",
@@ -993,7 +994,7 @@ calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方�
                 title_ms: "小姐",
                 label_payment_method: "選擇付款方式 (可選多項)",
                 pay_cash: "現金",
-                pay_credit: "信用卡 (需另加手續費)",
+pay_credit: "信用卡<br>(需另加手續費)",
                 pay_wechat: "微信",
                 pay_alipay: "支付寶",
                 pay_octopus: "八達通",
@@ -1008,12 +1009,14 @@ calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方�
                 btn_submit_whatsapp: "確認預約並發送 WhatsApp",
                 form_footer_note: "點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。",
                 footer_slogan: "香港新一代豪華六座位的士預約服務・準時尊貴接送",
-                whatsapp_inquiry: "WhatsApp 查詢",
+                whatsapp_inquiry: "WhatsApp",
                 footer_copy: "© 2026 版權所有。"
             },
 
             en: {
 
+swap_locations: "Swap Pickup🔃Destination",
+estimated_fare_label: "Estimated Fare",
 btn_book_now: "Book Now",
 fleet_title: "Select Vehicle Type",
 fleet_subtitle: "Click vehicle name to expand/collapse details",
@@ -1023,8 +1026,8 @@ car3_seats_desc: "6 Seats · Luxury Aviation Seat MPV",
 car4_seats_desc: "6 Seats · Extra Large Luggage Space",
 car5_seats_desc: "Accessible · Welfare Vehicle",
                 btn_close_guide: "Got it, Close",
-                date_note: "Accepts bookings up to 3 days in advance",
-                time_note: "If not specified, fastest in 15 minutes",
+date_note: "Up to 3 days",
+time_note: "Fastest 15 mins",
                 fare_discount_label: "15% Discount Offer",
                 fare_discount_note: "(Toyota Hybrid Taxi only)",
                 fare_normal_label: "Standard Metered Fare",
@@ -1101,7 +1104,7 @@ calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup
                 ph_stopover_opt: "Enter stopover...",
                 ph_dropoff_opt: "Enter destination...",
 
-                voice_btn_text: "Speak: [Start] via [Stopover] to [Destination]",
+                voice_btn_text: "Speak your trip...",
                 btn_calc_fare: "Calculate Estimated Fare",
                 route_select_title: "Select Route Option (Fastest / Shortest):",
                 res_distance: "Estimated Distance: ",
@@ -1126,7 +1129,7 @@ calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup
                 label_dropoff: "Drop-off Location (Destination)",
                 ph_dropoff: "e.g., Shenzhen Bay Port",
                 label_date: "Service Date",
-                label_time: "Service Time (Instant or Advance)",
+                label_time: "Service Time",
                 label_passengers: "Passengers",
                 label_luggages: "Luggages",
                 label_has_pet: "Pets on board?",
@@ -1141,7 +1144,7 @@ calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup
                 title_ms: "Ms.",
                 label_payment_method: "Payment Method (Multiple Choice)",
                 pay_cash: "Cash",
-                pay_credit: "Credit Card (Surcharge applies)",
+               pay_credit: "Credit Card<br>(Surcharge applies)",
                 pay_wechat: "WeChat Pay",
                 pay_alipay: "Alipay",
                 pay_octopus: "Octopus",
@@ -1153,10 +1156,10 @@ calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup
                 l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
                 summary_car_label: "Selected Vehicle",
                 summary_fee_label: "Pricing Mode",
-                btn_submit_whatsapp: "Confirm Booking & Send WhatsApp",
+                btn_submit_whatsapp: "Send via WhatsApp",
                 form_footer_note: "Clicking will open WhatsApp to send your order details. A driver will reply shortly.",
                 footer_slogan: "HK Next-Gen Luxury 6-Seater Taxi Booking Service · Punctual & Prestigious",
-                whatsapp_inquiry: "WhatsApp Inquiry",
+                whatsapp_inquiry: "WhatsApp",
                 footer_copy: "© 2026 All Rights Reserved."
             }
         };
@@ -1375,18 +1378,18 @@ function toggleLanguage() {
     }
 
 if (priceTextEl) {
-        if (currentBaseFare > 0 && selectedCarName) {
-            let totalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
-            if (selectedMinFare > 0 && totalFare < selectedMinFare) {
-                totalFare = selectedMinFare;
-            }
-            priceTextEl.innerText = `HK$ ${totalFare}`;
-        } else if (selectedFeeMode) {
-            priceTextEl.innerText = currentLang === 'en' ? selectedFeeModeEn : selectedFeeMode;
-        } else {
-            priceTextEl.innerText = currentLang === 'en' ? 'Please Select' : '請選擇';
+    if (currentBaseFare > 0 && selectedCarName) {
+        let totalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
+        if (selectedMinFare > 0 && totalFare < selectedMinFare) {
+            totalFare = selectedMinFare;
         }
+        priceTextEl.innerText = `HK$ ${totalFare}`;
+    } else if (selectedFeeMode) {
+        priceTextEl.innerText = currentLang === 'en' ? selectedFeeModeEn : selectedFeeMode;
+    } else {
+        priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
     }
+}
     
     // 更新備注
     const priceNoteEl = document.getElementById('selected-price-note');
@@ -1746,7 +1749,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
                 priceNoteEl.classList.add('hidden');
             }
         } else {
-            priceTextEl.innerText = currentLang === 'en' ? 'Please Select' : '請選擇';
+         priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
             if (priceNoteEl) priceNoteEl.classList.add('hidden');
         }
     }
