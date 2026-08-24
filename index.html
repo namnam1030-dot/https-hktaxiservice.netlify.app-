@@ -352,17 +352,7 @@
         <div>HK$ <span id="res-total-fare" class="text-3xl font-extrabold">0</span></div>
     </div>
 
-    <!-- 6: 重新選擇路線和選擇車款類型按鍵 -->
-    <div class="mt-4 grid grid-cols-2 gap-3">
-        <button type="button" onclick="scrollToTop()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-            <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
-        </button>
-        <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-            <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
-        </button>
-    </div>
-
-    <!-- 7: 提示框（以上預計車費已包含...） -->
+<!-- 6: 提示框（以上預計車費已包含...） -->
     <div class="mt-4 py-2.5 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
         <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
         <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="res_note">
@@ -370,7 +360,7 @@
         </p>
     </div>
 
-    <!-- 8: 收費模式框 -->
+    <!-- 7: 收費模式框 -->
     <div class="mt-4 p-3 bg-gray-900/90 border border-gray-800 rounded-xl">
         <p class="text-sm font-bold text-white mb-2 flex items-center gap-1.5">
             <i class="fa-solid fa-tag text-brand-yellow"></i> 收費模式 <span class="text-brand-yellow text-xs">* (必須選擇)</span>
@@ -402,6 +392,16 @@
                 </div>
             </label>
         </div>
+    </div>
+
+<!-- 8: 重新選擇路線和選擇車款類型按鍵 -->
+    <div class="mt-4 grid grid-cols-2 gap-3">
+        <button type="button" onclick="scrollToTop()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-route"></i> <span>重新選擇路線</span>
+        </button>
+        <button type="button" onclick="scrollToFleet()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
+        </button>
     </div>
 
     <!-- 9: 立即預約按鍵 -->
