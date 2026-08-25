@@ -2362,7 +2362,7 @@ function checkTunnelsForRoute(route, isDiscount = false) {
             updateFareModeDisplay();
         }
         
-// 更新收費模式選項的顯示 (修正版)
+// 更新收費模式選項的顯示 (最終修正版)
 function updateFareModeDisplay() {
     if (currentBaseFare <= 0) return;
     
@@ -2381,22 +2381,6 @@ function updateFareModeDisplay() {
         normalFare = 100 + currentTunnelFee + selectedSurcharge;
     }
     
-    // 計算八五折收費
-    let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-    
-    // 檢查八五折後是否超過 $100
-    let discountEligible = discountedBaseFare > 100;
-    
-    // 計算八五折的隧道費
-    let discountTunnelFee = 0;
-    if (currentTunnelFee > 0) {
-        const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-        const otherTunnelFee = currentTunnelFee % 50;
-        discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
-    }
-    
-    let discountFare = discountedBaseFare + discountTunnelFee + selectedSurcharge;
-    
     // 更新正價顯示
     if (normalFareVal) normalFareVal.innerText = normalFare;
     
@@ -2413,8 +2397,29 @@ function updateFareModeDisplay() {
         }
     }
     
+    // 計算八五折收費（以豐田混能的士為基準）
+    let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+    
+    // 檢查八五折後是否超過 $100
+    let discountEligible = discountedBaseFare > 100;
+    
+    // 計算八五折的隧道費
+    let discountTunnelFee = 0;
+    if (currentTunnelFee > 0) {
+        const harborTunnelCount = Math.floor(currentTunnelFee / 50);
+        const otherTunnelFee = currentTunnelFee % 50;
+        discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
+    }
+    
+    let discountFare = discountedBaseFare + discountTunnelFee;
+    
     // 處理八五折選項
-    if (discountEligible && selectedCarName === '豐田混能的士') {
+    if (discountContainer) {
+        // 八五折選項永遠顯示
+        discountContainer.style.display = '';
+    }
+    
+    if (discountEligible) {
         // 八五折適用：顯示價格
         if (discountContainer) {
             discountContainer.style.opacity = '1';
@@ -2432,7 +2437,7 @@ function updateFareModeDisplay() {
                 '單程隧道費、免行李及寵物費';
         }
     } else {
-        // 八五折不適用：顯示「不適用」
+        // 八五折不適用：未達到最低消費要求
         if (discountContainer) {
             discountContainer.style.opacity = '0.5';
             discountContainer.style.pointerEvents = 'none';
@@ -2444,19 +2449,9 @@ function updateFareModeDisplay() {
         }
         
         if (discountFareNote) {
-            if (selectedCarName !== '豐田混能的士' && selectedCarName !== '') {
-                discountFareNote.innerText = currentLang === 'en' ? 
-                    'Only available for Toyota Hybrid Taxi' : 
-                    '只適用於豐田混能的士';
-            } else if (selectedCarName === '') {
-                discountFareNote.innerText = currentLang === 'en' ? 
-                    'Please select vehicle first' : 
-                    '請先選擇車款';
-            } else {
-                discountFareNote.innerText = currentLang === 'en' ? 
-                    'Minimum fare not reached' : 
-                    '未達到最低消費要求';
-            }
+            discountFareNote.innerText = currentLang === 'en' ? 
+                'Minimum fare not reached' : 
+                '未達到最低消費要求';
         }
         
         // 如果之前選擇了八五折，自動取消
@@ -2468,18 +2463,10 @@ function updateFareModeDisplay() {
     }
     
     // 更新總車費顯示
-    let displayFare = 0;
-    if (selectedFareMode === 'normal') {
-        displayFare = normalFare;
-    } else if (selectedFareMode === 'discount' && discountEligible && selectedCarName === '豐田混能的士') {
+    let displayFare = normalFare;
+    
+    if (selectedFareMode === 'discount' && discountEligible) {
         displayFare = discountFare;
-    } else {
-        // 預設顯示正價
-        displayFare = normalFare;
-        if (selectedFareMode !== 'normal') {
-            selectedFareMode = 'normal';
-            document.getElementById('fare-mode-normal').checked = true;
-        }
     }
     
     if (resTotalFare) {
@@ -2511,6 +2498,47 @@ function updateFareModeDisplay() {
     }
 }
 
+// 處理收費模式選擇 (修正版)
+function handleFareModeSelection(mode) {
+    const normalCheckbox = document.getElementById('fare-mode-normal');
+    const discountCheckbox = document.getElementById('fare-mode-discount');
+    
+    if (mode === 'normal') {
+        if (normalCheckbox.checked) {
+            discountCheckbox.checked = false;
+            selectedFareMode = 'normal';
+        } else {
+            selectedFareMode = '';
+        }
+    } else if (mode === 'discount') {
+        if (discountCheckbox.checked) {
+            // 檢查八五折是否適用
+            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+            if (discountedBaseFare <= 100) {
+                // 八五折不適用，不允許選擇
+                alert(currentLang === 'en' ? 
+                    "15% discount is not applicable for this trip (minimum fare not reached)" : 
+                    "此行程未達到八五折優惠的最低消費要求");
+                discountCheckbox.checked = false;
+                return;
+            }
+            
+            // 自動選擇豐田混能的士
+            if (selectedCarName !== '豐田混能的士') {
+                selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+            }
+            
+            normalCheckbox.checked = false;
+            selectedFareMode = 'discount';
+        } else {
+            selectedFareMode = '';
+        }
+    }
+    
+    // 更新總車費顯示
+    updateFareModeDisplay();
+}
+
 // 更新收費模式選項的可用性 (修正版)
 function updateFareModeAvailability() {
     const discountContainer = document.getElementById('discount-option-container');
@@ -2518,11 +2546,16 @@ function updateFareModeAvailability() {
     
     if (currentBaseFare <= 0) return;
     
+    // 八五折選項永遠顯示
+    if (discountContainer) {
+        discountContainer.style.display = '';
+    }
+    
     // 計算八五折後的基本費
     let discountedBaseFare = Math.round(currentBaseFare * 0.85);
     
-    // 八五折後超過 $100 且是豐田混能的士才提供優惠
-    if (discountedBaseFare > 100 && selectedCarName === '豐田混能的士') {
+    // 八五折後超過 $100 才可選擇
+    if (discountedBaseFare > 100) {
         if (discountContainer) {
             discountContainer.style.opacity = '1';
             discountContainer.style.pointerEvents = 'auto';
@@ -2537,15 +2570,17 @@ function updateFareModeAvailability() {
         
         // 如果已選擇八五折，自動取消
         if (selectedFareMode === 'discount') {
-            selectedFareMode = '';
+            selectedFareMode = 'normal';
             document.getElementById('fare-mode-discount').checked = false;
-            document.getElementById('fare-mode-normal').checked = false;
+            document.getElementById('fare-mode-normal').checked = true;
         }
     }
     
     // 更新顯示
     updateFareModeDisplay();
 }
+
+
 function sendWhatsApp(event) {
             event.preventDefault();
 
