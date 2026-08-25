@@ -823,9 +823,31 @@
     <!-- 頁尾 Footer (已優化頂部邊距，並將 WeChat 和 WhatsApp 按鈕改為同等大小與風格) -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
-            <a href="https://weixin.qq.com" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
-                <i class="fa-brands fa-weixin text-lg"></i> WeChat
-            </a>
+<!-- WeCom 按鈕 -->
+<button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+    <i class="fa-brands fa-weixin text-lg"></i> WeChat
+</button>
+
+<!-- WeCom 二維碼彈窗 -->
+<div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+        <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="text-green-500 text-3xl mb-3">
+            <i class="fa-brands fa-weixin"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
+        <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
+        <div class="bg-white p-3 rounded-xl mb-4 inline-block">
+            <!-- 替換為您的 WeCom 二維碼圖片 -->
+            <img src="wecom-qr-code.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+        </div>
+        <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+            關閉
+        </button>
+    </div>
+</div>
             <a href="https://wa.me/85257038875?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
@@ -835,6 +857,14 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
+
+function showWeComQR() {
+    document.getElementById('wecom-modal').classList.remove('hidden');
+}
+
+function closeWeComQR() {
+    document.getElementById('wecom-modal').classList.add('hidden');
+}
 
 // 註冊 Service Worker (PWA 必備)
 if ('serviceWorker' in navigator) {
@@ -880,6 +910,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const translations = {
             zh: {
 
+wecom_modal_title: "掃描二維碼添加企業微信",
+wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
 swap_locations: "起點🔃目的地",
 estimated_fare_label: "預計車費",
 btn_book_now: "立即預約",
@@ -1030,6 +1062,8 @@ pay_credit: "信用卡<br>(需另加手續費)",
 
             en: {
 
+wecom_modal_title: "Scan QR Code to Add WeCom",
+wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
 swap_locations: "Swap Pickup🔃Destination",
 estimated_fare_label: "Estimated Fare",
 btn_book_now: "Book Now",
