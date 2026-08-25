@@ -824,9 +824,24 @@
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
 <!-- WeCom 按鈕 -->
-<button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
-    <i class="fa-brands fa-weixin text-lg"></i> WeChat
+<!-- WeChat 按鈕 - 改為長按開啟 -->
+<button 
+    id="wechat-btn"
+    oncontextmenu="openWeChatDirect(event)"
+    ontouchstart="startLongPress(event)"
+    ontouchend="cancelLongPress(event)"
+    ontouchmove="cancelLongPress(event)"
+    class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md cursor-pointer select-none"
+    style="user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;"
+>
+    <i class="fa-brands fa-weixin text-lg"></i> 
+    <span data-i18n="wechat_btn_text">WeChat (長按)</span>
 </button>
+
+<!-- 提示文字 -->
+<div id="wechat-tip" class="hidden text-[11px] text-green-400 mt-1">
+    <span data-i18n="wechat_tip">長按 1 秒直接開啟微信加好友</span>
+</div>
 
 <!-- WeCom 二維碼彈窗 -->
 <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
@@ -857,6 +872,84 @@
 
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
+
+// WeChat 長按開啟功能
+let longPressTimer = null;
+let isLongPress = false;
+
+function startLongPress(event) {
+    event.preventDefault();
+    isLongPress = false;
+    
+    longPressTimer = setTimeout(() => {
+        isLongPress = true;
+        openWeChatDirect();
+    }, 1000); // 長按 1 秒觸發
+}
+
+function cancelLongPress(event) {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+    
+    if (isLongPress) {
+        event.preventDefault();
+        isLongPress = false;
+    }
+}
+
+function openWeChatDirect(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    // 清除計時器
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+    
+    // 嘗試開啟微信
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const wechatScheme = 'weixin://';
+    
+    // 創建隱藏的 iframe 來觸發微信開啟
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = wechatScheme;
+    document.body.appendChild(iframe);
+    
+    // 設置超時檢測
+    setTimeout(() => {
+        document.body.removeChild(iframe);
+        
+        // 如果無法開啟微信，顯示 QR Code 備用方案
+        if (document.hidden) {
+            // 微信成功開啟
+            console.log('微信已開啟');
+        } else {
+            // 微信未開啟，顯示 QR Code
+            showWeComQR();
+        }
+    }, 1000);
+    
+    // 觸發震動反饋（如果設備支持）
+    if (navigator.vibrate) {
+        navigator.vibrate(100);
+    }
+}
+
+// 防止長按時出現上下文菜單
+document.addEventListener('DOMContentLoaded', () => {
+    const wechatBtn = document.getElementById('wechat-btn');
+    if (wechatBtn) {
+        wechatBtn.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            openWeChatDirect(e);
+        });
+    }
+});
 
 function showWeComQR() {
     document.getElementById('wecom-modal').classList.remove('hidden');
@@ -910,6 +1003,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const translations = {
             zh: {
 
+    wechat_btn_text: "WeChat (長按)",
+    wechat_tip: "長按 1 秒直接開啟微信加好友",
 wecom_modal_title: "掃描二維碼添加企業微信",
 wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
 swap_locations: "起點🔃目的地",
@@ -1062,6 +1157,8 @@ pay_credit: "信用卡<br>(需另加手續費)",
 
             en: {
 
+    wechat_btn_text: "WeChat (Hold)",
+    wechat_tip: "Hold 1 seconds to open WeChat",
 wecom_modal_title: "Scan QR Code to Add WeCom",
 wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
 swap_locations: "Swap Pickup🔃Destination",
@@ -2772,9 +2869,9 @@ if (currentBaseFare > 0) {
 
             // 添加收費模式資訊
             if (selectedFareMode === 'discount') {
-                msgLines.push(`💎收費模式：🔨八五折優惠🔨`);
+                msgLines.push(`💎收費模式：8️⃣5️⃣🈹八五折優惠`);
             } else {
-                msgLines.push(`💎收費模式：💯 *正價按錶收費* 💯`);
+                msgLines.push(`💎收費模式：💯💯🈵 *正價按錶收費* `);
             }
 
             msgLines.push(`💰預計車費總額：HK$${totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
