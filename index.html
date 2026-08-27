@@ -1797,7 +1797,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
     // 更新車款卡片視覺效果（選中的高亮，其他的變暗）
     renderCarCardsVisual(selectedCarName);
 
-// 更新表單中的顯示文字
+    // 更新表單中的顯示文字
     const carTextEl = document.getElementById('selected-car-text');
     const priceTextEl = document.getElementById('selected-price-text');
     const priceNoteEl = document.getElementById('selected-price-note');
@@ -1836,7 +1836,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
                 priceNoteEl.classList.add('hidden');
             }
         } else {
-         priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
+            priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
             if (priceNoteEl) priceNoteEl.classList.add('hidden');
         }
     }
@@ -1847,6 +1847,11 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
         if (bookingToyotaBox) bookingToyotaBox.classList.remove('hidden');
     } else {
         if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
+        // 隱藏時清除勾選狀態
+        const toyotaYes = document.getElementById('booking-upgrade-yes');
+        const toyotaNo = document.getElementById('booking-upgrade-no');
+        if (toyotaYes) toyotaYes.checked = false;
+        if (toyotaNo) toyotaNo.checked = false;
     }
 
     // 顯示或隱藏 MIFA 7 的升級提示
@@ -1858,7 +1863,14 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
             updateMifa7UpgradeText();
         }
     } else {
-        if (bookingMifa7Box) bookingMifa7Box.classList.add('hidden');
+        if (bookingMifa7Box) {
+            bookingMifa7Box.classList.add('hidden');
+            // 隱藏時清除勾選狀態
+            const mifa7Yes = document.getElementById('booking-mifa7-upgrade-yes');
+            const mifa7No = document.getElementById('booking-mifa7-upgrade-no');
+            if (mifa7Yes) mifa7Yes.checked = false;
+            if (mifa7No) mifa7No.checked = false;
+        }
     }
 
     // 如果車費結果已經顯示，且唔係跳過重新計算，先重新計算車費
@@ -1871,7 +1883,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
         updateCarCardFees();
     }
     
-// 如果選擇的不是豐田混能的士，自動剔選正價收費
+    // 如果選擇的不是豐田混能的士，自動剔選正價收費
     if (name !== '豐田混能的士') {
         selectedFareMode = 'normal';
         document.getElementById('fare-mode-normal').checked = true;
@@ -2440,34 +2452,57 @@ function checkTunnelsForRoute(route, isDiscount = false) {
             updateFareModeAvailability();
         }
 
-// 處理收費模式選擇
-        function handleFareModeSelection(mode) {
-            const normalCheckbox = document.getElementById('fare-mode-normal');
-            const discountCheckbox = document.getElementById('fare-mode-discount');
-            
-            if (mode === 'normal') {
-                if (normalCheckbox.checked) {
-                    discountCheckbox.checked = false;
-                    selectedFareMode = 'normal';
-                } else {
-                    selectedFareMode = '';
-                }
-            } else if (mode === 'discount') {
-                if (discountCheckbox.checked) {
-                    // 自動選擇豐田混能的士
-                    if (selectedCarName !== '豐田混能的士') {
-                        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
-                    }
-                    normalCheckbox.checked = false;
-                    selectedFareMode = 'discount';
-                } else {
-                    selectedFareMode = '';
-                }
+// 處理收費模式選擇 (修正版)
+function handleFareModeSelection(mode) {
+    const normalCheckbox = document.getElementById('fare-mode-normal');
+    const discountCheckbox = document.getElementById('fare-mode-discount');
+    
+    if (mode === 'normal') {
+        if (normalCheckbox.checked) {
+            discountCheckbox.checked = false;
+            selectedFareMode = 'normal';
+        } else {
+            selectedFareMode = '';
+        }
+    } else if (mode === 'discount') {
+        if (discountCheckbox.checked) {
+            // 檢查八五折是否適用
+            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+            if (discountedBaseFare <= 100) {
+                // 八五折不適用，不允許選擇
+                alert(currentLang === 'en' ? 
+                    "15% discount is not applicable for this trip (minimum fare not reached)" : 
+                    "此行程未達到八五折優惠的最低消費要求");
+                discountCheckbox.checked = false;
+                return;
             }
             
-            // 更新總車費顯示
-            updateFareModeDisplay();
+            // 檢查乘客人數是否超過4人
+            const passengersSelect = document.getElementById('passengers');
+            const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
+            if (passengerVal > 4) {
+                alert(currentLang === 'en' ? 
+                    "15% discount is only applicable for Toyota Hybrid Taxi (max 4 passengers). Please select a 6-seater vehicle with standard fare." : 
+                    "八五折優惠只適用於豐田混能的士（最多4位乘客）。請選擇其他六座位車款並使用正價收費。");
+                discountCheckbox.checked = false;
+                return;
+            }
+            
+            // 自動選擇豐田混能的士
+            if (selectedCarName !== '豐田混能的士') {
+                selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+            }
+            
+            normalCheckbox.checked = false;
+            selectedFareMode = 'discount';
+        } else {
+            selectedFareMode = '';
         }
+    }
+    
+    // 更新總車費顯示
+    updateFareModeDisplay();
+}
         
 // 更新收費模式選項的顯示 (最終修正版)
 function updateFareModeDisplay() {
