@@ -432,7 +432,7 @@
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
-            <!-- 豐田混能的士升級提示欄位 -->
+            <!-- 升級提示欄位 -->
 <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
                 <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
                     <i class="fa-solid fa-gift text-brand-yellow"></i>
@@ -445,24 +445,6 @@
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer text-gray-200">
                         <input type="checkbox" name="booking_toyota_upgrade" value="不接受升級" id="booking-upgrade-no" onclick="handleBookingUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n="upgrade_no_label">不接受升級</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- MIFA 7 升級提示欄位 (新增) -->
-            <div id="booking-mifa7-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
-                <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
-                    <i class="fa-solid fa-gift text-brand-yellow"></i>
-                    <span id="mifa7-upgrade-text" data-i18n-html="mifa7_upgrade_box_text">已選擇 MIFA 7，有機會被<br><span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，<br>請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
-                </p>
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                        <input type="checkbox" name="booking_mifa7_upgrade" value="接受免費升級" id="booking-mifa7-upgrade-yes" onclick="handleMifa7UpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n-html="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                        <input type="checkbox" name="booking_mifa7_upgrade" value="不接受升級" id="booking-mifa7-upgrade-no" onclick="handleMifa7UpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
                         <span data-i18n="upgrade_no_label">不接受升級</span>
                     </label>
                 </div>
@@ -918,10 +900,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
     if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
 
-    // 隱藏 MIFA 7 升級提示框
-    const bookingMifa7Box = document.getElementById('booking-mifa7-upgrade-container');
-    if (bookingMifa7Box) bookingMifa7Box.classList.add('hidden');
-
     // 初始化車款卡片視覺效果
     renderCarCardsVisual('');
     
@@ -969,7 +947,6 @@ car5_seats_desc: "無障礙 · 無障礙福祉專車",
                 upgrade_box_text: '預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>',
                 upgrade_yes_label: '接受<span class="text-brand-yellow font-bold">免費</span>升級',
                 upgrade_no_label: '不接受升級',
-                mifa7_upgrade_box_text: '已選擇 MAXUS MIFA 7，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階六座位車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>',
 
                 car1_name: "豐田混能的士",
                 car1_seats: "4 座位",
@@ -1122,7 +1099,6 @@ time_note: "Fastest 15 mins",
                 upgrade_box_text: 'If choosing Toyota Hybrid Taxi, you may have the opportunity for a <span class="text-brand-yellow font-bold">free</span> upgrade to a higher-tier vehicle. Do you accept? <span class="text-brand-yellow font-extrabold">* (Required)</span>',
                 upgrade_yes_label: 'Accept <span class="text-brand-yellow font-bold">Free</span> Upgrade',
                 upgrade_no_label: 'Decline Upgrade',
-                mifa7_upgrade_box_text: 'If choosing MAXUS MIFA 7, you may have the opportunity for a <span class="text-brand-yellow font-bold">free</span> upgrade to a higher-tier 6-seater vehicle. Do you accept? <span class="text-brand-yellow font-extrabold">* (Required)</span>',
 
                 car1_name: "Toyota Hybrid Taxi",
                 car1_seats: "4 Seats",
@@ -1600,20 +1576,6 @@ function scrollToBookingFromCalc() {
             handleUpgradeCheckbox(choice);
         }
 
-        // MIFA 7 升級選項處理
-        function handleMifa7UpgradeCheckbox(choice) {
-            const bookingYesBox = document.getElementById('booking-mifa7-upgrade-yes');
-            const bookingNoBox = document.getElementById('booking-mifa7-upgrade-no');
-
-            if (choice === 'yes') {
-                if (bookingYesBox) bookingYesBox.checked = true;
-                if (bookingNoBox) bookingNoBox.checked = false;
-            } else if (choice === 'no') {
-                if (bookingYesBox) bookingYesBox.checked = false;
-                if (bookingNoBox) bookingNoBox.checked = true;
-            }
-        }
-
         function validatePassengerAndCar(carName) {
             const passengersSelect = document.getElementById('passengers');
             const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
@@ -1797,7 +1759,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
     // 更新車款卡片視覺效果（選中的高亮，其他的變暗）
     renderCarCardsVisual(selectedCarName);
 
-    // 更新表單中的顯示文字
+// 更新表單中的顯示文字
     const carTextEl = document.getElementById('selected-car-text');
     const priceTextEl = document.getElementById('selected-price-text');
     const priceNoteEl = document.getElementById('selected-price-note');
@@ -1836,7 +1798,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
                 priceNoteEl.classList.add('hidden');
             }
         } else {
-            priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
+         priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
             if (priceNoteEl) priceNoteEl.classList.add('hidden');
         }
     }
@@ -1847,30 +1809,6 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
         if (bookingToyotaBox) bookingToyotaBox.classList.remove('hidden');
     } else {
         if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
-        // 隱藏時清除勾選狀態
-        const toyotaYes = document.getElementById('booking-upgrade-yes');
-        const toyotaNo = document.getElementById('booking-upgrade-no');
-        if (toyotaYes) toyotaYes.checked = false;
-        if (toyotaNo) toyotaNo.checked = false;
-    }
-
-    // 顯示或隱藏 MIFA 7 的升級提示
-    const bookingMifa7Box = document.getElementById('booking-mifa7-upgrade-container');
-    if (name === 'MAXUS MIFA 7') {
-        if (bookingMifa7Box) {
-            bookingMifa7Box.classList.remove('hidden');
-            // 根據乘客人數更新提示文字
-            updateMifa7UpgradeText();
-        }
-    } else {
-        if (bookingMifa7Box) {
-            bookingMifa7Box.classList.add('hidden');
-            // 隱藏時清除勾選狀態
-            const mifa7Yes = document.getElementById('booking-mifa7-upgrade-yes');
-            const mifa7No = document.getElementById('booking-mifa7-upgrade-no');
-            if (mifa7Yes) mifa7Yes.checked = false;
-            if (mifa7No) mifa7No.checked = false;
-        }
     }
 
     // 如果車費結果已經顯示，且唔係跳過重新計算，先重新計算車費
@@ -1883,7 +1821,7 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
         updateCarCardFees();
     }
     
-    // 如果選擇的不是豐田混能的士，自動剔選正價收費
+// 如果選擇的不是豐田混能的士，自動剔選正價收費
     if (name !== '豐田混能的士') {
         selectedFareMode = 'normal';
         document.getElementById('fare-mode-normal').checked = true;
@@ -1893,29 +1831,6 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
     // 更新收費模式選項的可用性
     updateFareModeAvailability();
     updateFareModeDisplay();
-}
-
-// 更新 MIFA 7 升級提示文字
-function updateMifa7UpgradeText() {
-    const passengersSelect = document.getElementById('passengers');
-    const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 1;
-    const mifa7UpgradeText = document.getElementById('mifa7-upgrade-text');
-    
-    if (!mifa7UpgradeText) return;
-    
-    if (passengerVal === 5) {
-        mifa7UpgradeText.innerHTML = currentLang === 'en' ? 
-            'You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold">free</span>. Do you accept? <span class="text-brand-yellow">* (Required)</span>' : 
-            '您有 5 位乘客，有機會被<span class="text-brand-yellow font-bold">免費</span>升級至其他五 / 六人車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>';
-    } else if (passengerVal === 6) {
-        mifa7UpgradeText.innerHTML = currentLang === 'en' ? 
-            'You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold">free</span>. Do you accept? <span class="text-brand-yellow">* (Required)</span>' : 
-            '您有 6 位乘客，有機會被<span class="text-brand-yellow font-bold">免費</span>升級至其他六人車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>';
-    } else {
-        mifa7UpgradeText.innerHTML = currentLang === 'en' ? 
-            'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold">free</span>. Do you accept? <span class="text-brand-yellow">* (Required)</span>' : 
-            '有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>';
-    }
 }
 
 // 點擊「立即預約」按鈕時：自動選擇該車款並捲動至預約表單
@@ -2452,57 +2367,34 @@ function checkTunnelsForRoute(route, isDiscount = false) {
             updateFareModeAvailability();
         }
 
-// 處理收費模式選擇 (修正版)
-function handleFareModeSelection(mode) {
-    const normalCheckbox = document.getElementById('fare-mode-normal');
-    const discountCheckbox = document.getElementById('fare-mode-discount');
-    
-    if (mode === 'normal') {
-        if (normalCheckbox.checked) {
-            discountCheckbox.checked = false;
-            selectedFareMode = 'normal';
-        } else {
-            selectedFareMode = '';
+// 處理收費模式選擇
+        function handleFareModeSelection(mode) {
+            const normalCheckbox = document.getElementById('fare-mode-normal');
+            const discountCheckbox = document.getElementById('fare-mode-discount');
+            
+            if (mode === 'normal') {
+                if (normalCheckbox.checked) {
+                    discountCheckbox.checked = false;
+                    selectedFareMode = 'normal';
+                } else {
+                    selectedFareMode = '';
+                }
+            } else if (mode === 'discount') {
+                if (discountCheckbox.checked) {
+                    // 自動選擇豐田混能的士
+                    if (selectedCarName !== '豐田混能的士') {
+                        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+                    }
+                    normalCheckbox.checked = false;
+                    selectedFareMode = 'discount';
+                } else {
+                    selectedFareMode = '';
+                }
+            }
+            
+            // 更新總車費顯示
+            updateFareModeDisplay();
         }
-    } else if (mode === 'discount') {
-        if (discountCheckbox.checked) {
-            // 檢查八五折是否適用
-            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-            if (discountedBaseFare <= 100) {
-                // 八五折不適用，不允許選擇
-                alert(currentLang === 'en' ? 
-                    "15% discount is not applicable for this trip (minimum fare not reached)" : 
-                    "此行程未達到八五折優惠的最低消費要求");
-                discountCheckbox.checked = false;
-                return;
-            }
-            
-            // 檢查乘客人數是否超過4人
-            const passengersSelect = document.getElementById('passengers');
-            const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
-            if (passengerVal > 4) {
-                alert(currentLang === 'en' ? 
-                    "15% discount is only applicable for Toyota Hybrid Taxi (max 4 passengers). Please select a 6-seater vehicle with standard fare." : 
-                    "八五折優惠只適用於豐田混能的士（最多4位乘客）。請選擇其他六座位車款並使用正價收費。");
-                discountCheckbox.checked = false;
-                return;
-            }
-            
-            // 自動選擇豐田混能的士
-            if (selectedCarName !== '豐田混能的士') {
-                selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
-            }
-            
-            normalCheckbox.checked = false;
-            selectedFareMode = 'discount';
-        } else {
-            selectedFareMode = '';
-        }
-    }
-    
-    // 更新總車費顯示
-    updateFareModeDisplay();
-}
         
 // 更新收費模式選項的顯示 (最終修正版)
 function updateFareModeDisplay() {
@@ -2514,12 +2406,6 @@ function updateFareModeDisplay() {
     const normalFareNote = document.getElementById('normal-fare-note');
     const discountFareNote = document.getElementById('discount-fare-note');
     const discountContainer = document.getElementById('discount-option-container');
-    const discountCheckbox = document.getElementById('fare-mode-discount');
-    
-    // 檢查乘客人數是否超過4人
-    const passengersSelect = document.getElementById('passengers');
-    const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
-    const passengerExceedsLimit = passengerVal > 4;
     
     // 計算正價收費
     let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
@@ -2548,8 +2434,8 @@ function updateFareModeDisplay() {
     // 計算八五折收費（以豐田混能的士為基準）
     let discountedBaseFare = Math.round(currentBaseFare * 0.85);
     
-    // 檢查八五折後是否超過 $100 且乘客人數不超過4人
-    let discountEligible = discountedBaseFare > 100 && !passengerExceedsLimit;
+    // 檢查八五折後是否超過 $100
+    let discountEligible = discountedBaseFare > 100;
     
     // 計算八五折的隧道費
     let discountTunnelFee = 0;
@@ -2573,7 +2459,6 @@ function updateFareModeDisplay() {
             discountContainer.style.opacity = '1';
             discountContainer.style.pointerEvents = 'auto';
         }
-        if (discountCheckbox) discountCheckbox.disabled = false;
         
         if (discountFareVal) {
             discountFareVal.innerText = `HK$ ${discountFare}`;
@@ -2586,38 +2471,27 @@ function updateFareModeDisplay() {
                 '單程隧道費、免行李及寵物費';
         }
     } else {
-        // 八五折不適用
+        // 八五折不適用：未達到最低消費要求
         if (discountContainer) {
             discountContainer.style.opacity = '0.5';
             discountContainer.style.pointerEvents = 'none';
         }
-        if (discountCheckbox) discountCheckbox.disabled = true;
         
         if (discountFareVal) {
-            if (passengerExceedsLimit) {
-                discountFareVal.innerText = currentLang === 'en' ? 'Max 4 passengers' : '最多4位乘客';
-            } else {
-                discountFareVal.innerText = currentLang === 'en' ? 'Not Applicable' : '不適用';
-            }
+            discountFareVal.innerText = currentLang === 'en' ? 'Not Applicable' : '不適用';
             discountFareVal.className = 'text-gray-400 font-bold text-sm';
         }
         
         if (discountFareNote) {
-            if (passengerExceedsLimit) {
-                discountFareNote.innerText = currentLang === 'en' ? 
-                    'Only for Toyota Hybrid Taxi (max 4 pax)' : 
-                    '只限豐田混能的士（最多4人）';
-            } else {
-                discountFareNote.innerText = currentLang === 'en' ? 
-                    'Minimum fare not reached' : 
-                    '未達到最低消費要求';
-            }
+            discountFareNote.innerText = currentLang === 'en' ? 
+                'Minimum fare not reached' : 
+                '未達到最低消費要求';
         }
         
         // 如果之前選擇了八五折，自動取消
         if (selectedFareMode === 'discount') {
             selectedFareMode = 'normal';
-            if (discountCheckbox) discountCheckbox.checked = false;
+            document.getElementById('fare-mode-discount').checked = false;
             document.getElementById('fare-mode-normal').checked = true;
         }
     }
@@ -2642,7 +2516,7 @@ function updateFareModeDisplay() {
     // 更新預約表單中的備注
     const selectedPriceNote = document.getElementById('selected-price-note');
     if (selectedPriceNote) {
-        if (selectedFareMode === 'discount' && discountEligible && selectedCarName === '豐田混能的士') {
+        if (selectedFareMode === 'discount' && discountEligible) {
             selectedPriceNote.innerText = currentLang === 'en' ? 
                 '*15% discount applied' : 
                 '*已享八五折優惠';
@@ -2657,6 +2531,48 @@ function updateFareModeDisplay() {
         }
     }
 }
+
+// 處理收費模式選擇 (修正版)
+function handleFareModeSelection(mode) {
+    const normalCheckbox = document.getElementById('fare-mode-normal');
+    const discountCheckbox = document.getElementById('fare-mode-discount');
+    
+    if (mode === 'normal') {
+        if (normalCheckbox.checked) {
+            discountCheckbox.checked = false;
+            selectedFareMode = 'normal';
+        } else {
+            selectedFareMode = '';
+        }
+    } else if (mode === 'discount') {
+        if (discountCheckbox.checked) {
+            // 檢查八五折是否適用
+            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+            if (discountedBaseFare <= 100) {
+                // 八五折不適用，不允許選擇
+                alert(currentLang === 'en' ? 
+                    "15% discount is not applicable for this trip (minimum fare not reached)" : 
+                    "此行程未達到八五折優惠的最低消費要求");
+                discountCheckbox.checked = false;
+                return;
+            }
+            
+            // 自動選擇豐田混能的士
+            if (selectedCarName !== '豐田混能的士') {
+                selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+            }
+            
+            normalCheckbox.checked = false;
+            selectedFareMode = 'discount';
+        } else {
+            selectedFareMode = '';
+        }
+    }
+    
+    // 更新總車費顯示
+    updateFareModeDisplay();
+}
+
 // 更新收費模式選項的可用性 (修正版)
 function updateFareModeAvailability() {
     const discountContainer = document.getElementById('discount-option-container');
@@ -2713,17 +2629,6 @@ function sendWhatsApp(event) {
                 }
             }
 
-            // 檢查用戶是否選擇了 MIFA 7 的免費升級項目
-            if (selectedCarName === 'MAXUS MIFA 7') {
-                const mifa7UpgradeYes = document.getElementById('booking-mifa7-upgrade-yes').checked;
-                const mifa7UpgradeNo = document.getElementById('booking-mifa7-upgrade-no').checked;
-                if (!mifa7UpgradeYes && !mifa7UpgradeNo) {
-                    alert(currentLang === 'en' ? "Please select whether you accept the free vehicle upgrade!" : "請先選擇是否接受免費升級車款！");
-                    document.getElementById('booking-mifa7-upgrade-container').scrollIntoView({ behavior: 'smooth' });
-                    return;
-                }
-            }
-
             // 檢查是否已選擇收費模式
             if (!selectedFareMode) {
                 alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
@@ -2764,9 +2669,6 @@ function sendWhatsApp(event) {
             const date = document.getElementById('date') ? document.getElementById('date').value : '';
             const time = document.getElementById('time') ? document.getElementById('time').value : '';
             const passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
-
-const passengerCount = parseInt(passengers);
-
             const luggages = document.getElementById('luggages') ? document.getElementById('luggages').value : '';
 
             const hasPet = document.getElementById('has_pet') && document.getElementById('has_pet').checked;
@@ -2832,35 +2734,12 @@ if (currentBaseFare > 0) {
 
             let msgLines = [];
             msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
-            
-            // 根據車款和升級選項顯示不同的車款文字
-            let carDisplayText = '';
-            
+            msgLines.push(`🚘 預約車款：${selectedCarName}`);
+
             if (selectedCarName === '豐田混能的士') {
                 const isAccepted = document.getElementById('booking-upgrade-yes')?.checked;
-                if (isAccepted) {
-                    carDisplayText = '接受混能以上任何車款';
-                } else {
-                    carDisplayText = '‼️只接受豐田混能的士‼️';
-                }
-            } else if (selectedCarName === 'MAXUS MIFA 7') {
-                const isAccepted = document.getElementById('booking-mifa7-upgrade-yes')?.checked;
-                if (isAccepted) {
-                    if (passengerCount === 5) {
-                        carDisplayText = '接受任何五 / 六人車款';
-                    } else if (passengerCount === 6) {
-                        carDisplayText = '接受任何六人車款';
-                    } else {
-                        carDisplayText = '接受免費升級至更高階車款';
-                    }
-                } else {
-                    carDisplayText = '‼️只接受MIFA 7‼️';
-                }
-            } else {
-                carDisplayText = selectedCarName;
+                msgLines.push(`🎁 免費升級車款：${isAccepted ? '✅ 接受' : '❌ 不接受'}`);
             }
-            
-            msgLines.push(`🚘 預約車款：${carDisplayText}`);
 
             if (serviceType === 'airport' && flightNo) {
                 msgLines.push(`✈️ 航班編號：${flightNo}`);
