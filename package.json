@@ -1,0 +1,12 @@
+{
+  "name": "hktaxiservice",
+  "version": "1.0.0",
+  "description": "24小時的士預約服務",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "googleapis": "^128.0.0"
+  }
+}
