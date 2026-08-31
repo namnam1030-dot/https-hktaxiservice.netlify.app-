@@ -2892,6 +2892,47 @@ let msgLines = [];
             msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
             const encodedMessage = encodeURIComponent(msgLines.join('\n'));
+
+// 自動提交到後端（Google Calendar）
+try {
+    const bookingData = {
+        pickup: pickup,
+        stopover: stopoverTexts.join(' / '),
+        dropoff: dropoff,
+        date: date,
+        time: time,
+        passengers: passengers,
+        luggages: luggages,
+        hasPet: hasPet,
+        hasWheelchair: hasWheelchair,
+        surname: surname,
+        title: title,
+        phone: phone,
+        paymentMethod: paymentStr,
+        carType: carDisplayText,
+        totalFare: totalFareForWhatsApp,
+        flightNo: flightNo,
+        upgradeOption: carDisplayText
+    };
+    
+    // 異步發送到 Netlify Function
+    fetch('/.netlify/functions/booking', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+    }).then(response => response.json())
+      .then(data => {
+          console.log('Booking saved to calendar:', data);
+      })
+      .catch(error => {
+          console.error('Error saving booking:', error);
+      });
+} catch (error) {
+    console.error('Error preparing booking data:', error);
+}
+
             window.open(`https://wa.me/85268815441?text=${encodedMessage}`, '_blank');
         }
     </script>
