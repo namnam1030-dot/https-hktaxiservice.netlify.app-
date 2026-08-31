@@ -1,0 +1,104 @@
+const { google } = require('googleapis');
+
+exports.handler = async (event) => {
+  // 處理 CORS
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      }
+    };
+  }
+
+  try {
+    const bookingData = JSON.parse(event.body);
+    
+    console.log('收到訂單：', bookingData);
+    
+    // 寫入 Google Calendar
+    await addToGoogleCalendar(bookingData);
+    
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ 
+        success: true, 
+        message: '預約成功，已加入日曆' 
+      })
+    };
+  } catch (error) {
+    console.error('處理訂單時出錯：', error);
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        stack: error.stack
+      })
+    };
+  }
+};
+
+// Google Calendar 整合
+async function addToGoogleCalendar(data) {
+  try {
+    // 檢查環境變數
+    if (!process.env.GOOGLE_SERVICE_ACCOUNT) {
+      throw new Error('缺少 GOOGLE_SERVICE_ACCOUNT 環境變數');
+    }
+    if (!process.env.GOOGLE_CALENDAR_ID) {
+      throw new Error('缺少 GOOGLE_CALENDAR_ID 環境變數');
+    }
+
+    const auth = new google.auth.GoogleAuth({
+      credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT),
+      scopes: ['https://www.googleapis.com/auth/calendar']
+    });
+
+    const calendar = google.calendar({ version: 'v3', auth });
+    
+    // 計算開始時間
+    const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 假設車程 1 小時
+
+    const event = {
+      summary: `🚕 ${data.carType || '的士預約'} - ${data.pickup} → ${data.dropoff}`,
+      description: `📞 電話：${data.phone}
+👤 聯絡人：${data.surname || ''} ${data.title || ''}
+👥 人數：${data.passengers}
+🧳 行李：${data.luggages || '0 件'}
+💳 付款：${data.paymentMethod || '未指定'}
+💰 車費：HK$${data.totalFare || 0}
+${data.flightNo ? `✈️ 航班：${data.flightNo}\n` : ''}${data.stopover ? `🛑 中途站：${data.stopover}\n` : ''}${data.hasPet ? '🐶 有寵物\n' : ''}${data.hasWheelchair ? '♿ 有輪椅\n' : ''}📝 備註：${data.upgradeOption || ''}`,
+      start: {
+        dateTime: startTime.toISOString(),
+        timeZone: 'Asia/Hong_Kong'
+      },
+      end: {
+        dateTime: endTime.toISOString(),
+        timeZone: 'Asia/Hong_Kong'
+      },
+      colorId: '10'
+    };
+
+    const result = await calendar.events.insert({
+      calendarId: process.env.GOOGLE_CALENDAR_ID,
+      resource: event,
+      sendUpdates: 'all'
+    });
+
+    console.log('成功加入日曆：', result.data.htmlLink);
+    return result.data;
+  } catch (error) {
+    console.error('Google Calendar 錯誤：', error);
+    throw error;
+  }
+}
