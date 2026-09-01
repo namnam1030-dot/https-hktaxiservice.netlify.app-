@@ -2933,10 +2933,7 @@ try {
     console.error('Error preparing booking data:', error);
 }
 
-            // 延遲打開 WhatsApp，確保日曆先更新
-setTimeout(() => {
-    window.open(`https://wa.me/85268815441?text=${encodedMessage}`, '_blank');
-}, 1000);
+            window.open(`https://wa.me/85268815441?text=${encodedMessage}`, '_blank');
         }
     </script>
 </body>
