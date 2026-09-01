@@ -2925,17 +2925,6 @@ try {
     }).then(response => response.json())
       .then(data => {
           console.log('Booking saved to calendar:', data);
-
-// 喺打開 WhatsApp 之前顯示成功訊息
-const successMessage = document.createElement('div');
-successMessage.innerHTML = '✅ 預約已記錄，發送WhatsApp後我們會盡快回覆確認';
-successMessage.style.cssText = 'position:fixed;top:20px;right:20px;background:#4CAF50;color:white;padding:15px;border-radius:10px;z-index:9999;';
-document.body.appendChild(successMessage);
-
-setTimeout(() => {
-    successMessage.remove();
-}, 3000); 
-
       })
       .catch(error => {
           console.error('Error saving booking:', error);
@@ -2944,7 +2933,10 @@ setTimeout(() => {
     console.error('Error preparing booking data:', error);
 }
 
-            window.open(`https://wa.me/85268815441?text=${encodedMessage}`, '_blank');
+            // 延遲打開 WhatsApp，確保日曆先更新
+setTimeout(() => {
+    window.open(`https://wa.me/85268815441?text=${encodedMessage}`, '_blank');
+}, 1000);
         }
     </script>
 </body>
