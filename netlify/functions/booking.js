@@ -40,8 +40,7 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({ 
         success: false, 
-        error: error.message,
-        stack: error.stack
+        error: error.message 
       })
     };
   }
@@ -70,14 +69,8 @@ async function addToGoogleCalendar(data) {
     const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 假設車程 1 小時
 
     const event = {
-      summary: `🚕 ${data.carType || '的士預約'} - ${data.pickup} → ${data.dropoff}`,
-      description: `📞 電話：${data.phone}
-👤 聯絡人：${data.surname || ''} ${data.title || ''}
-👥 人數：${data.passengers}
-🧳 行李：${data.luggages || '0 件'}
-💳 付款：${data.paymentMethod || '未指定'}
-💰 車費：HK$${data.totalFare || 0}
-${data.flightNo ? `✈️ 航班：${data.flightNo}\n` : ''}${data.stopover ? `🛑 中途站：${data.stopover}\n` : ''}${data.hasPet ? '🐶 有寵物\n' : ''}${data.hasWheelchair ? '♿ 有輪椅\n' : ''}📝 備註：${data.upgradeOption || ''}`,
+      summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
+      description: data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`,
       start: {
         dateTime: startTime.toISOString(),
         timeZone: 'Asia/Hong_Kong'
