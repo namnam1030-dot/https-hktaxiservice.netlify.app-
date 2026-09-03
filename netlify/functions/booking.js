@@ -1,52 +1,3 @@
-const { google } = require('googleapis');
-
-exports.handler = async (event) => {
-  // 處理 CORS
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      }
-    };
-  }
-
-  try {
-    const bookingData = JSON.parse(event.body);
-    
-    console.log('收到訂單：', bookingData);
-    
-    // 寫入 Google Calendar
-    await addToGoogleCalendar(bookingData);
-    
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ 
-        success: true, 
-        message: '預約成功，已加入日曆' 
-      })
-    };
-  } catch (error) {
-    console.error('處理訂單時出錯：', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ 
-        success: false, 
-        error: error.message 
-      })
-    };
-  }
-};
-
-// Google Calendar 整合
 async function addToGoogleCalendar(data) {
   try {
     // 檢查環境變數
@@ -64,7 +15,7 @@ async function addToGoogleCalendar(data) {
 
     const calendar = google.calendar({ version: 'v3', auth });
     
-// 計算開始時間
+    // 計算開始時間
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     // 結束時間 = 開始時間（同一時間）
     const endTime = new Date(startTime);
@@ -89,6 +40,7 @@ async function addToGoogleCalendar(data) {
         ]
       }
     };
+
     const result = await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       resource: event,
