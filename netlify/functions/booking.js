@@ -64,9 +64,10 @@ async function addToGoogleCalendar(data) {
 
     const calendar = google.calendar({ version: 'v3', auth });
     
-    // 計算開始時間
+// 計算開始時間
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
-    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 假設車程 1 小時
+    // 結束時間 = 開始時間（同一時間）
+    const endTime = new Date(startTime);
 
     const event = {
       summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
@@ -79,9 +80,15 @@ async function addToGoogleCalendar(data) {
         dateTime: endTime.toISOString(),
         timeZone: 'Asia/Hong_Kong'
       },
-      colorId: '10'
+      colorId: '10',
+      // 提前 20 分鐘通知
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: 'popup', minutes: 20 }
+        ]
+      }
     };
-
     const result = await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       resource: event,
