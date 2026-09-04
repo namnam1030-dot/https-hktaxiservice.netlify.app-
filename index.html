@@ -978,6 +978,33 @@ const formattedTime = `${hours}:${minutes}`;
 if (dateInput) dateInput.value = formattedDate;
 if (timeInput) timeInput.value = formattedTime;
 
+// 加入日期變更監聽，即時提示用戶
+if (dateInput) {
+    dateInput.addEventListener('change', function() {
+        if (!this.value) return;
+        
+        const selectedDate = new Date(this.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const maxAllowedDate = new Date(today);
+        maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+        
+        if (selectedDate < today) {
+            alert(currentLang === 'en' ? 
+                "⚠️ Booking date cannot be in the past!\n\nPlease select today or a future date." : 
+                "⚠️ 預約日期不能係過去！\n\n請選擇今天或未來嘅日期。");
+            this.value = '';
+            this.focus();
+        } else if (selectedDate > maxAllowedDate) {
+            alert(currentLang === 'en' ? 
+                `⚠️ Booking date cannot exceed 3 days!\n\nPlease select a date no later than ${maxAllowedDate.getMonth() + 1}/${maxAllowedDate.getDate()}/${maxAllowedDate.getFullYear()}.` : 
+                `⚠️ 預約日期不能超過三日！\n\n請選擇不遲於 ${maxAllowedDate.getFullYear()}年${maxAllowedDate.getMonth() + 1}月${maxAllowedDate.getDate()}日 嘅日期。`);
+            this.value = '';
+            this.focus();
+        }
+    });
+}
+
     // 隱藏豐田升級提示框
     const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
     if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
@@ -991,6 +1018,7 @@ if (timeInput) timeInput.value = formattedTime;
     
     checkPassengerLimit();
 });
+
         let currentLang = 'zh';
 
         const translations = {
@@ -1574,8 +1602,37 @@ if (priceTextEl) {
 
 // 修正 scrollToBookingFromCalc 函數
 function scrollToBookingFromCalc() {
+    // 0. 先檢查預約日期是否在三天內
+    const bookingDateInput = document.getElementById('date');
+    if (bookingDateInput && bookingDateInput.value) {
+        const selectedDate = new Date(bookingDateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const maxAllowedDate = new Date(today);
+        maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+        
+        if (selectedDate < today || selectedDate > maxAllowedDate) {
+            alert(currentLang === 'en' ? 
+                "⚠️ Booking date must be within the next 3 days!\n\nPlease select a date between today and 3 days from now." : 
+                "⚠️ 預約日期必須在未來三日內！\n\n請選擇今天至三天內嘅日期。");
+            bookingDateInput.focus();
+            bookingDateInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+    } else {
+        alert(currentLang === 'en' ? 
+            "⚠️ Please select a booking date first!" : 
+            "⚠️ 請先選擇預約日期！");
+        if (bookingDateInput) {
+            bookingDateInput.focus();
+            bookingDateInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    }
+    
     // 1. 先檢查是否有計算結果
     const fareResult = document.getElementById('fare-result');
+
     if (fareResult.classList.contains('hidden')) {
         alert(currentLang === 'en' ? 
             "Please calculate the fare first!" : 
@@ -2813,22 +2870,41 @@ const phone = document.getElementById('phone') ? document.getElementById('phone'
         if (sVal) stopoverTexts.push(`中途站${i}: ${sVal}`);
     }
 
-    const flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
+const flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
     const date = document.getElementById('date') ? document.getElementById('date').value : '';
     const time = document.getElementById('time') ? document.getElementById('time').value : '';
     
     // 檢查日期是否在三天內
+    if (!date) {
+        alert(currentLang === 'en' ? 
+            "⚠️ Please select a booking date!" : 
+            "⚠️ 請選擇預約日期！");
+        document.getElementById('date')?.focus();
+        document.getElementById('date')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    
     const selectedDate = new Date(date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const maxAllowedDate = new Date(today);
     maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
     
-    if (selectedDate < today || selectedDate > maxAllowedDate) {
+    if (selectedDate < today) {
         alert(currentLang === 'en' ? 
-            "Booking date must be within the next 3 days!" : 
-            "預約日期必須在未來三日內！");
+            "⚠️ Booking date cannot be in the past!\n\nPlease select today or a future date within 3 days." : 
+            "⚠️ 預約日期不能係過去！\n\n請選擇今天或未來三日內嘅日期。");
         document.getElementById('date')?.focus();
+        document.getElementById('date')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    
+    if (selectedDate > maxAllowedDate) {
+        alert(currentLang === 'en' ? 
+            `⚠️ Booking date is too far ahead!\n\nPlease select a date no later than ${maxAllowedDate.getMonth() + 1}/${maxAllowedDate.getDate()}/${maxAllowedDate.getFullYear()}.` : 
+            `⚠️ 預約日期超出限制！\n\n請選擇不遲於 ${maxAllowedDate.getFullYear()}年${maxAllowedDate.getMonth() + 1}月${maxAllowedDate.getDate()}日 嘅日期。`);
+        document.getElementById('date')?.focus();
+        document.getElementById('date')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
     }
 
