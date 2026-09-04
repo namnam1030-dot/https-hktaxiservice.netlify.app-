@@ -964,7 +964,7 @@ dateInput.min = formattedDate;  // 不能選擇今天之前
 
 // 設定日期輸入框的最大值為三天後
 const maxDate = new Date(now);
-maxDate.setDate(maxDate.getDate() + 3);
+maxDate.setDate(maxDate.getDate() + 4);
 const maxYear = maxDate.getFullYear();
 const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
 const maxDay = String(maxDate.getDate()).padStart(2, '0');
@@ -987,7 +987,7 @@ if (dateInput) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const maxAllowedDate = new Date(today);
-        maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+        maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
         
         if (selectedDate < today) {
             alert(currentLang === 'en' ? 
@@ -1609,7 +1609,7 @@ function scrollToBookingFromCalc() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const maxAllowedDate = new Date(today);
-        maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+        maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
         
         if (selectedDate < today || selectedDate > maxAllowedDate) {
             alert(currentLang === 'en' ? 
@@ -2888,7 +2888,7 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const maxAllowedDate = new Date(today);
-    maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+    maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
     
     if (selectedDate < today) {
         alert(currentLang === 'en' ? 
