@@ -3188,21 +3188,6 @@ if (submitBtn) {
         }
     });
 }
-// 記錄表單載入時間
-let formLoadTime = Date.now();
-
-// 喺 sendWhatsApp 函數開頭加：
-const submitTime = Date.now();
-const timeDiff = submitTime - formLoadTime;
-
-// 如果提交太快（少於3秒），好可能係機械人
-if (timeDiff < 3000) {
-    alert(currentLang === 'en' ? 
-        "Please wait a few seconds before submitting." : 
-        "請稍候幾秒再提交，謝謝！");
-    return;
-}
-
     </script>
 </body>
 </html>
