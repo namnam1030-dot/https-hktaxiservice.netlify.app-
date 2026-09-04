@@ -2794,26 +2794,11 @@ function sendWhatsApp(event) {
         return;
     }
 
-    const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length < 8) {
         alert(currentLang === 'en' ? "Contact phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字，請重新輸入！");
         document.getElementById('phone')?.focus();
-        return;
-    }
-
-// 檢查日期是否在三天內
-    const selectedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const maxAllowedDate = new Date(today);
-    maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
-    
-    if (selectedDate < today || selectedDate > maxAllowedDate) {
-        alert(currentLang === 'en' ? 
-            "Booking date must be within the next 3 days!" : 
-            "預約日期必須在未來三日內！");
-        document.getElementById('date')?.focus();
         return;
     }
 
@@ -2831,6 +2816,22 @@ function sendWhatsApp(event) {
     const flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
     const date = document.getElementById('date') ? document.getElementById('date').value : '';
     const time = document.getElementById('time') ? document.getElementById('time').value : '';
+    
+    // 檢查日期是否在三天內
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const maxAllowedDate = new Date(today);
+    maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+    
+    if (selectedDate < today || selectedDate > maxAllowedDate) {
+        alert(currentLang === 'en' ? 
+            "Booking date must be within the next 3 days!" : 
+            "預約日期必須在未來三日內！");
+        document.getElementById('date')?.focus();
+        return;
+    }
+
     const passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
 
     const passengerCount = parseInt(passengers);
