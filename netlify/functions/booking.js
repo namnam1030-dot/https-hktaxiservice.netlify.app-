@@ -18,8 +18,11 @@ exports.handler = async (event) => {
     
     console.log('收到訂單：', bookingData);
     
-    // 寫入 Google Calendar
+    // 1. 寫入 Google Calendar
     await addToGoogleCalendar(bookingData);
+    
+    // 2. 發送 Telegram 通知（新事件）
+    await sendTelegramNotification(bookingData);
     
     return {
       statusCode: 200,
@@ -64,9 +67,9 @@ async function addToGoogleCalendar(data) {
 
     const calendar = google.calendar({ version: 'v3', auth });
     
-// 計算開始時間
+    // 計算開始時間
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
-    // 結束時間 = 開始時間（同一時間）
+    // 結束時間 = 開始時間
     const endTime = new Date(startTime);
 
     const event = {
@@ -81,7 +84,7 @@ async function addToGoogleCalendar(data) {
         timeZone: 'Asia/Hong_Kong'
       },
       colorId: '10',
-      // 提前 20 分鐘通知
+      // 日曆本身嘅 20 分鐘前 popup 通知
       reminders: {
         useDefault: false,
         overrides: [
@@ -101,5 +104,34 @@ async function addToGoogleCalendar(data) {
   } catch (error) {
     console.error('Google Calendar 錯誤：', error);
     throw error;
+  }
+}
+
+// Telegram 通知（新事件）
+async function sendTelegramNotification(data) {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  
+  if (!botToken || !chatId) {
+    console.log('Telegram 未設定，跳過通知');
+    return;
+  }
+
+  // 使用同 Google Calendar 一樣嘅 fullMessage
+  const message = data.fullMessage || data.description || '收到新訂單';
+
+  try {
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+    console.log('Telegram 通知已發送');
+  } catch (error) {
+    console.error('Telegram 通知失敗：', error);
   }
 }
