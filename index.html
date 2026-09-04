@@ -7,22 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- ============ SEO 基礎優化 ============ -->
-<!-- 1. 優化標題（加入地區關鍵字） -->
 <title>24小時的士預約服務 | 機場口岸關口 | 豪華六座位的士 | 香港九龍新界即時叫車</title>
-
-<!-- 2. Meta Description（搜尋結果顯示） -->
 <meta name="description" content="香港24小時的士預約服務，提供即時叫車、機場接送、輪椅的士、豪華六座位的士。覆蓋全港九龍新界，WhatsApp一鍵預約，支援現金、PayMe、八達通等多種付款方式。">
-
-<!-- 3. 關鍵字（雖然Google已不太重視，但仍有參考價值） -->
 <meta name="keywords" content="香港的士,24小時的士,的士預約,機場接送,輪椅的士,豪華六座位的士,九龍的士,新界的士,香港島的士,即時叫車,WhatsApp叫車,深宵的士,跨境口岸的士,深圳灣的士,港珠澳大橋的士,商務的士,結婚的士,包車服務,觀塘的士,旺角的士,尖沙咀的士,中環的士,銅鑼灣的士,沙田的士,屯門的士,元朗的士,將軍澳的士">
 
-<!-- 4. 地理標籤（GEO 優化核心） -->
+<!-- GEO 地理標籤 -->
 <meta name="geo.region" content="HK">
 <meta name="geo.placename" content="Hong Kong">
 <meta name="geo.position" content="22.3193;114.1694">
 <meta name="ICBM" content="22.3193, 114.1694">
 
-<!-- 5. Open Graph 標籤（社交媒體分享優化） -->
+<!-- Open Graph -->
 <meta property="og:title" content="24小時的士預約服務 | 香港即時叫車">
 <meta property="og:description" content="香港24小時的士預約，支援機場接送、輪椅的士、豪華六座位的士。WhatsApp一鍵預約，全港九龍新界覆蓋。">
 <meta property="og:type" content="website">
@@ -30,38 +25,49 @@
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
 
+<!-- 結構化資料（修正版：冇註解） -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "TaxiService",
   "name": "24小時的士預約服務",
-  "telephone": "+85268815441",
-  "areaServed": "Hong Kong",
   "description": "香港24小時的士預約服務，提供即時叫車、機場接送、輪椅的士、豪華六座位的士",
   "url": "https://hktaxiservice.netlify.app/",
+  "telephone": "+85268815441",
   "image": "https://hktaxiservice.netlify.app/logo.jpeg",
   "priceRange": "HK$29起",
+  "areaServed": {
+    "@type": "City",
+    "name": "Hong Kong"
+  },
   "availableChannel": {
     "@type": "ServiceChannel",
     "servicePhone": "+85268815441",
-    "availableLanguage": ["zh-HK", "en"]
+    "availableLanguage": ["zh-HK", "en"],
+    "serviceUrl": "https://wa.me/85268815441"
+  },
+  "hoursAvailable": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    "opens": "00:00",
+    "closes": "23:59"
   }
 }
 </script>
 
-<!-- 6. Twitter Card -->
+<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="24小時的士預約服務 | 香港即時叫車">
 <meta name="twitter:description" content="香港24小時的士預約，支援機場接送、輪椅的士、豪華六座位的士。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 
-<!-- 多語言標記 -->
+<!-- Canonical URL -->
+<link rel="canonical" href="https://hktaxiservice.netlify.app/">
+
+<!-- Hreflang 多語言標記 -->
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/">
-
-<!-- 7. Canonical URL（避免重複內容） -->
-<link rel="canonical" href="https://hktaxiservice.netlify.app/">
 
 <link rel="manifest" href="manifest.json">
 <!-- iOS 主畫面圖示設定 -->
