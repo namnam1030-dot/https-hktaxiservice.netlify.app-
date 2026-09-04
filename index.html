@@ -687,7 +687,11 @@
         </button>
     </div>
 </div>
-
+<!-- 加入喺 <form> 標籤入面，任何位置都得 -->
+<div style="position: absolute; left: -9999px; top: -9999px;" aria-hidden="true">
+    <label for="website">Website</label>
+    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+</div>
             </form>
         </div>
     </section>
@@ -2864,6 +2868,12 @@ function updateFareModeAvailability() {
 function sendWhatsApp(event) {
     event.preventDefault();
 
+// 檢查蜜罐欄位
+const honeypot = document.getElementById('website');
+if (honeypot && honeypot.value.trim() !== '') {
+    console.log('Spam detected - honeypot filled');
+    return; // 靜默拒絕，唔顯示任何錯誤
+}
     // 檢查用戶是否選擇了豐田混能的士的免費升級項目
     if (selectedCarName === '豐田混能的士') {
         const upgradeYes = document.getElementById('booking-upgrade-yes').checked;
@@ -3189,6 +3199,21 @@ if (submitBtn) {
         }
     });
 }
+// 記錄表單載入時間
+let formLoadTime = Date.now();
+
+// 喺 sendWhatsApp 函數開頭加：
+const submitTime = Date.now();
+const timeDiff = submitTime - formLoadTime;
+
+// 如果提交太快（少於3秒），好可能係機械人
+if (timeDiff < 3000) {
+    alert(currentLang === 'en' ? 
+        "Please wait a few seconds before submitting." : 
+        "請稍候幾秒再提交，謝謝！");
+    return;
+}
+
     </script>
 </body>
 </html>
