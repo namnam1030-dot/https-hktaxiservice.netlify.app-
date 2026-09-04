@@ -612,33 +612,42 @@
     </div>
 </div>
 
-<button type="submit" class="w-full bg-brand-yellow text-black font-extrabold text-base py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
-    <i class="fa-solid fa-calendar-check text-lg"></i> <span>確認預約</span>
+<button type="submit" id="booking-submit-btn" class="w-full bg-brand-yellow text-black font-extrabold text-base py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
+    <i class="fa-solid fa-calendar-check text-lg"></i> <span data-i18n="btn_confirm_booking">確認預約</span>
 </button>
 
 <!-- 成功訊息顯示區 -->
 <div id="booking-success-message" class="hidden mt-4 p-4 bg-green-600/20 border-2 border-green-500 rounded-xl text-center">
     <i class="fa-solid fa-check-circle text-green-400 text-3xl mb-2"></i>
-    <p class="text-green-300 font-bold text-base">✅ 預約訂單已成功送出！</p>
-    <p class="text-gray-300 text-xs mt-2 mb-4">我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認</p>
+    <p class="text-green-300 font-bold text-base">
+        <span data-i18n="success_title">✅ 預約訂單已成功送出！</span>
+    </p>
+    <p class="text-gray-300 text-xs mt-2 mb-4">
+        <span data-i18n="success_desc">我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認</span>
+    </p>
     
     <!-- 聯絡我們按鈕 -->
     <div class="flex flex-col gap-2 mt-3">
-        <p class="text-gray-400 text-xs font-bold mb-1">如有急需，可以直接聯絡我哋：</p>
+        <p class="text-gray-400 text-xs font-bold mb-1">
+            <span data-i18n="success_contact_prompt">如有急需，可以直接聯絡我哋：</span>
+        </p>
         
         <!-- 打電話按鈕 -->
         <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-            <i class="fa-solid fa-phone"></i> 致電 6881 5441
+            <i class="fa-solid fa-phone"></i> 
+            <span data-i18n="btn_call_now">致電 6881 5441</span>
         </a>
         
         <!-- WhatsApp 按鈕 -->
         <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-            <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp 查詢
+            <i class="fa-brands fa-whatsapp text-lg"></i> 
+            <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
         </a>
         
         <!-- WeChat 按鈕 -->
         <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-            <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
+            <i class="fa-brands fa-weixin text-lg"></i> 
+            <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
         </button>
     </div>
 </div>
@@ -646,29 +655,39 @@
 <!-- 失敗訊息顯示區 -->
 <div id="booking-error-message" class="hidden mt-4 p-4 bg-red-600/20 border-2 border-red-500 rounded-xl text-center">
     <i class="fa-solid fa-times-circle text-red-400 text-3xl mb-2"></i>
-    <p class="text-red-300 font-bold text-base">❌ 預約送出失敗</p>
-    <p class="text-gray-300 text-xs mt-2 mb-4">請直接透過以下方式聯絡我哋預約：</p>
+    <p class="text-red-300 font-bold text-base">
+        <span data-i18n="error_title">❌ 預約送出失敗</span>
+    </p>
+    <p class="text-gray-300 text-xs mt-2 mb-4">
+        <span data-i18n="error_desc">請直接透過以下方式聯絡我哋預約：</span>
+    </p>
     
     <!-- 聯絡我們按鈕 -->
     <div class="flex flex-col gap-2 mt-3">
-        <p class="text-gray-400 text-xs font-bold mb-1">立即聯絡我哋：</p>
+        <p class="text-gray-400 text-xs font-bold mb-1">
+            <span data-i18n="error_contact_prompt">立即聯絡我哋：</span>
+        </p>
         
         <!-- 打電話按鈕 -->
         <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-            <i class="fa-solid fa-phone"></i> 致電 6881 5441
+            <i class="fa-solid fa-phone"></i> 
+            <span data-i18n="btn_call_now">致電 6881 5441</span>
         </a>
         
         <!-- WhatsApp 按鈕 -->
         <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-            <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp 預約
+            <i class="fa-brands fa-whatsapp text-lg"></i> 
+            <span data-i18n="btn_whatsapp_book">WhatsApp 預約</span>
         </a>
         
         <!-- WeChat 按鈕 -->
         <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-            <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
+            <i class="fa-brands fa-weixin text-lg"></i> 
+            <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
         </button>
     </div>
 </div>
+
             </form>
         </div>
     </section>
@@ -1024,6 +1043,19 @@ if (dateInput) {
         const translations = {
             zh: {
 
+btn_confirm_booking: "確認預約",
+btn_sending_booking: "正在送出預約...",
+// 成功/失敗訊息翻譯
+success_title: "✅ 預約訂單已成功送出！",
+success_desc: "我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認",
+success_contact_prompt: "如有急需，可以直接聯絡我哋：",
+error_title: "❌ 預約送出失敗",
+error_desc: "請直接透過以下方式聯絡我哋預約：",
+error_contact_prompt: "立即聯絡我哋：",
+btn_call_now: "致電 6881 5441",
+btn_whatsapp_inquiry: "WhatsApp 查詢",
+btn_whatsapp_book: "WhatsApp 預約",
+btn_wechat_inquiry: "WeChat 查詢",
 wecom_modal_title: "掃描二維碼添加企業微信",
 wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
 swap_locations: "起點🔃目的地",
@@ -1177,6 +1209,19 @@ pay_credit: "信用卡<br>(需另加手續費)",
 
             en: {
 
+btn_confirm_booking: "Confirm Booking",
+btn_sending_booking: "Sending Booking...",
+// 成功/失敗訊息翻譯
+success_title: "✅ Booking Submitted Successfully!",
+success_desc: "We will confirm via WhatsApp or phone within 5-10 minutes",
+success_contact_prompt: "For urgent matters, contact us directly:",
+error_title: "❌ Booking Submission Failed",
+error_desc: "Please contact us directly to make a booking:",
+error_contact_prompt: "Contact us now:",
+btn_call_now: "Call 6881 5441",
+btn_whatsapp_inquiry: "WhatsApp Enquiry",
+btn_whatsapp_book: "WhatsApp Booking",
+btn_wechat_inquiry: "WeChat Enquiry",
 wecom_modal_title: "Scan QR Code to Add WeCom",
 wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
 swap_locations: "Swap Pickup🔃Destination",
@@ -1507,7 +1552,13 @@ function toggleLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
 
-    // 處理純文字翻譯
+    // 檢查提交按鈕狀態
+const submitBtn = document.getElementById('booking-submit-btn');
+if (submitBtn && !submitBtn.disabled) {
+    submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
+}
+
+// 處理純文字翻譯
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (translations[currentLang] && translations[currentLang][key]) {
@@ -3082,12 +3133,12 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
     if (successMsg) successMsg.classList.add('hidden');
     if (errorMsg) errorMsg.classList.add('hidden');
 
-    // 顯示處理中狀態
-    const submitBtn = document.querySelector('#booking-form button[type="submit"]');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-lg"></i> 正在送出預約...';
-    }
+// 顯示處理中狀態
+const submitBtn = document.getElementById('booking-submit-btn');
+if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ${translations[currentLang].btn_sending_booking}`;
+}
 
     // 發送到 Netlify Function
     fetch('/.netlify/functions/booking', {
@@ -3101,11 +3152,11 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
     .then(data => {
         console.log('Booking saved to calendar:', data);
         
-        // 恢復按鈕
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-calendar-check text-lg"></i> 確認預約';
-        }
+// 恢復按鈕
+if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
+}
         
         if (data.success) {
             // 顯示成功訊息
@@ -3124,11 +3175,11 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
     .catch(error => {
         console.error('Error saving booking:', error);
         
-        // 恢復按鈕
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-calendar-check text-lg"></i> 確認預約';
-        }
+// 恢復按鈕
+if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
+}
         
         // 顯示失敗訊息
         if (errorMsg) {
