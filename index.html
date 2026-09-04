@@ -1637,9 +1637,10 @@ if (priceTextEl) {
         }
     }
     
-    // 重新更新車款卡片顯示（如有計算結果）
+// 重新更新車款卡片顯示（如有計算結果）
     if (currentBaseFare > 0) {
         updateCarCardFees();
+        updateFareModeDisplay();  // ← 加呢一行
     }
 }
 
