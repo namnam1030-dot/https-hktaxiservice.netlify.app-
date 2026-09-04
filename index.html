@@ -953,19 +953,30 @@ window.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('date');
     const timeInput = document.getElementById('time');
     
-    const now = new Date();
-    
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const formattedTime = `${hours}:${minutes}`;
-    
-    if (dateInput) dateInput.value = formattedDate;
-    if (timeInput) timeInput.value = formattedTime;
+const now = new Date();
+
+// 設定日期輸入框的最小值為今天
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const day = String(now.getDate()).padStart(2, '0');
+const formattedDate = `${year}-${month}-${day}`;
+dateInput.min = formattedDate;  // 不能選擇今天之前
+
+// 設定日期輸入框的最大值為三天後
+const maxDate = new Date(now);
+maxDate.setDate(maxDate.getDate() + 3);
+const maxYear = maxDate.getFullYear();
+const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
+const maxDay = String(maxDate.getDate()).padStart(2, '0');
+const maxFormattedDate = `${maxYear}-${maxMonth}-${maxDay}`;
+dateInput.max = maxFormattedDate;  // 不能選擇三天後
+
+const hours = String(now.getHours()).padStart(2, '0');
+const minutes = String(now.getMinutes()).padStart(2, '0');
+const formattedTime = `${hours}:${minutes}`;
+
+if (dateInput) dateInput.value = formattedDate;
+if (timeInput) timeInput.value = formattedTime;
 
     // 隱藏豐田升級提示框
     const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
@@ -2788,6 +2799,21 @@ function sendWhatsApp(event) {
     if (cleanPhone.length < 8) {
         alert(currentLang === 'en' ? "Contact phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字，請重新輸入！");
         document.getElementById('phone')?.focus();
+        return;
+    }
+
+// 檢查日期是否在三天內
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const maxAllowedDate = new Date(today);
+    maxAllowedDate.setDate(maxAllowedDate.getDate() + 3);
+    
+    if (selectedDate < today || selectedDate > maxAllowedDate) {
+        alert(currentLang === 'en' ? 
+            "Booking date must be within the next 3 days!" : 
+            "預約日期必須在未來三日內！");
+        document.getElementById('date')?.focus();
         return;
     }
 
