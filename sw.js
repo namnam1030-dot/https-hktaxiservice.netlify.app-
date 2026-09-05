@@ -1,5 +1,5 @@
-// ✅ 完整版（有緩存、離線功能、更新機制）
-const CACHE_NAME = 'taxi-service-v1';
+// ✅ 完整版（網路優先，離線可用）
+const CACHE_NAME = 'taxi-service-v2'; // 更新版本號，強制更新快取
 const urlsToCache = [
   '/',
   '/index.html',
@@ -44,26 +44,48 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 攔截請求，優先使用緩存（離線可用）
+// 攔截請求：HTML 使用網路優先，其他檔案使用緩存優先
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  
+  // 如果是 HTML 頁面（導航請求），使用網路優先策略
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // 更新緩存
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          return response;
+        })
+        .catch(() => {
+          // 網路失敗時，回傳緩存
+          return caches.match(event.request)
+            .then(response => {
+              return response || caches.match('/index.html');
+            });
+        })
+    );
+    return;
+  }
+  
+  // 其他檔案（圖片、CSS、JS）使用緩存優先
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // 如果緩存有，直接回傳緩存
         if (response) {
           return response;
         }
         
-        // 如果緩存冇，去網路請求
         return fetch(event.request).then(response => {
-          // 檢查是否有效回應
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
           
-          // 複製回應（因為緩存同瀏覽器共用）
           const responseToCache = response.clone();
-          
           caches.open(CACHE_NAME)
             .then(cache => {
               cache.put(event.request, responseToCache);
@@ -73,11 +95,16 @@ self.addEventListener('fetch', event => {
         });
       })
       .catch(() => {
-        // 如果網路都失敗，回傳離線頁面（如有）
-        // 或者回傳一個簡單嘅離線提示
         if (event.request.mode === 'navigate') {
           return caches.match('/index.html');
         }
       })
   );
+});
+
+// 監聽訊息，允許手動更新
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
