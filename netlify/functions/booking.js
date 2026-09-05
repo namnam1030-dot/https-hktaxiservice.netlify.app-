@@ -69,9 +69,10 @@ async function addToGoogleCalendar(data) {
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     const endTime = new Date(startTime);
 
-    const event = {
-      summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
-      description: data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`,
+const event = {
+  summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
+  description: (data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`) + '\n\n[新事件已通知]',
+
       start: {
         dateTime: startTime.toISOString(),
         timeZone: 'Asia/Hong_Kong'
