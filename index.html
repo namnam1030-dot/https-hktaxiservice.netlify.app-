@@ -1082,7 +1082,7 @@ if (dateInput) {
         } else if (selectedDate > maxAllowedDate) {
             alert(currentLang === 'en' ? 
                 `⚠️ Booking date cannot exceed 3 days!\n\nPlease select a date no later than ${maxAllowedDate.getMonth() + 1}/${maxAllowedDate.getDate()}/${maxAllowedDate.getFullYear()}.` : 
-                `⚠️ 預約日期不能超過三日！\n\n請選擇不遲於 ${maxAllowedDate.getFullYear()}年${maxAllowedDate.getMonth() + 1}月${maxAllowedDate.getDate()}日 嘅日期。`);
+                `⚠️ 預約日期不能超過三日！\n\n請選擇 ${maxAllowedDate.getFullYear()}年${maxAllowedDate.getMonth() + 1}月${maxAllowedDate.getDate()}日 之前嘅日期。`);
             this.value = '';
             this.focus();
         }
@@ -3093,7 +3093,6 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
     }
 
     let msgLines = [];
-    msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
     
     // 根據車款和升級選項顯示不同的車款文字
     let carDisplayText = '';
