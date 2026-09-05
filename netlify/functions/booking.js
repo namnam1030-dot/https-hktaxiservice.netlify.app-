@@ -21,8 +21,8 @@ exports.handler = async (event) => {
     // 1. 寫入 Google Calendar
     await addToGoogleCalendar(bookingData);
     
-    // 2. 發送 Telegram 通知（新事件）
-    await sendTelegramNotification(bookingData);
+    // 2. 發送 Discord 通知（新事件）
+    await sendDiscordNotification(bookingData);
     
     return {
       statusCode: 200,
@@ -52,7 +52,6 @@ exports.handler = async (event) => {
 // Google Calendar 整合
 async function addToGoogleCalendar(data) {
   try {
-    // 檢查環境變數
     if (!process.env.GOOGLE_SERVICE_ACCOUNT) {
       throw new Error('缺少 GOOGLE_SERVICE_ACCOUNT 環境變數');
     }
@@ -67,9 +66,7 @@ async function addToGoogleCalendar(data) {
 
     const calendar = google.calendar({ version: 'v3', auth });
     
-    // 計算開始時間
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
-    // 結束時間 = 開始時間
     const endTime = new Date(startTime);
 
     const event = {
@@ -84,7 +81,6 @@ async function addToGoogleCalendar(data) {
         timeZone: 'Asia/Hong_Kong'
       },
       colorId: '10',
-      // 日曆本身嘅 20 分鐘前 popup 通知
       reminders: {
         useDefault: false,
         overrides: [
@@ -107,31 +103,29 @@ async function addToGoogleCalendar(data) {
   }
 }
 
-// Telegram 通知（新事件）
-async function sendTelegramNotification(data) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+// Discord 通知（新事件）
+async function sendDiscordNotification(data) {
+  const discordWebhook = process.env.DISCORD_WEBHOOK_URL;
   
-  if (!botToken || !chatId) {
-    console.log('Telegram 未設定，跳過通知');
+  if (!discordWebhook) {
+    console.log('Discord 未設定，跳過通知');
     return;
   }
 
-  // 使用同 Google Calendar 一樣嘅 fullMessage
   const message = data.fullMessage || data.description || '收到新訂單';
 
   try {
-    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    await fetch(discordWebhook, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'Markdown'
+        content: `🆕 **新訂單通知**\n\n${message}`
       })
     });
-    console.log('Telegram 通知已發送');
+    console.log('Discord 通知已發送');
   } catch (error) {
-    console.error('Telegram 通知失敗：', error);
+    console.error('Discord 通知失敗：', error);
   }
 }
