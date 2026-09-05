@@ -3092,7 +3092,8 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
         }
     }
 
-    let msgLines = [];
+let msgLines = [];
+            // msgLines.push(`🚕 *${currentLang === 'en' ? '24-Hour Taxi Booking Service' : '24小時的士預約服務'}*`);
     
     // 根據車款和升級選項顯示不同的車款文字
     let carDisplayText = '';
@@ -3160,8 +3161,8 @@ const flightNo = document.getElementById('flight_no') ? document.getElementById(
     }
 
     msgLines.push(`💰預計車費總額：HK$${totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
-    msgLines.push(`--------------------`);
-    msgLines.push(`請回覆訊息確認預約，謝謝！`);
+        // msgLines.push(`--------------------`);
+      // msgLines.push(`請回覆訊息確認預約，謝謝！`);
 
     // 完整訊息（用於日曆描述）
     const fullMessage = msgLines.join('\n');
