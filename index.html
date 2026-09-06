@@ -530,25 +530,22 @@
             <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
 
-                <div id="field-flight-container">
+                <div id="field-flight-container"style="display:none;">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
-                <div id="field-pickup-container" class="hidden">
-                    <label id="label-pickup" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-location-dot text-brand-yellow mr-1.5"></i><span data-i18n="label_pickup">上車地點 (起點)</span></label>
-                    <input type="text" id="pickup" data-i18n-placeholder="ph_pickup" placeholder="例：觀塘 APM" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
+<div id="field-pickup-container" style="display:none;">
+    <input type="text" id="pickup">
+</div>
 
-                <div id="field-stopover-container" class="hidden">
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-map-pin text-brand-yellow mr-1.5"></i><span data-i18n="label_stopover">中途停靠點 (如沒有可留空)</span></label>
-                    <input type="text" id="stopover" data-i18n-placeholder="ph_stopover" placeholder="例：旺角朗豪坊" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
+<div id="field-stopover-container" style="display:none;">
+    <input type="text" id="stopover">
+</div>
 
-                <div id="field-dropoff-container" class="hidden">
-                    <label id="label-dropoff" class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-flag-checkered text-brand-yellow mr-1.5"></i><span data-i18n="label_dropoff">落車地點 (終點)</span></label>
-                    <input type="text" id="dropoff" data-i18n-placeholder="ph_dropoff" placeholder="例：深圳灣口岸" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
+<div id="field-dropoff-container" style="display:none;">
+    <input type="text" id="dropoff">
+</div>
                 
                 <div class="grid grid-cols-1 gap-4 w-full">
                     <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
@@ -593,16 +590,16 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-brand-dark border border-gray-800 rounded-xl p-4">
-                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
-                        <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-                        <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span data-i18n="label_has_pet">是否有寵物</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer text-gray-200 text-xs font-bold">
-                        <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-                        <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span data-i18n="label_has_wheelchair">是否有輪椅需要放置於尾箱</span>
-                    </label>
-                </div>
+<div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl p-4">
+    <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
+        <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+        <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span>有寵物</span>
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
+        <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+        <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span>輪椅放尾箱</span>
+    </label>
+</div>
 
 <div>
     <label class="block text-xs font-bold text-gray-300 mb-2">
@@ -945,7 +942,7 @@
                     <div onclick="toggleCarDetail('豐田 NOAH 輪椅的士')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car5_name">豐田 NOAH 輪椅的士</h3>
-                            <span class="text-xs text-brand-yellow" data-i18n="car5_seats_desc">無障礙 · 無障礙福祉專車</span>
+                            <span class="text-xs text-brand-yellow" data-i18n="car5_seats_desc">1+5 座位 ·無障礙福祉專車</span>
                         </div>
                         <i id="icon-toggle-豐田 NOAH 輪椅的士" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
@@ -1153,7 +1150,7 @@ alert_verify_required: "請先完成電話驗證！",
                 car2_seats_desc: "6 座位 · 純電動七人車",
                 car3_seats_desc: "6 座位 · 豪華航空椅專車",
                 car4_seats_desc: "6 座位 · 超大行李空間",
-                car5_seats_desc: "無障礙 · 無障礙福祉專車",
+                car5_seats_desc: "1+5 座位 · 無障礙福祉專車",
                 btn_close_guide: "了解，關閉",
                 date_note: "接受最多3日內",
                 time_note: "如沒指定，最快15分鐘後",
@@ -1208,7 +1205,7 @@ alert_verify_required: "請先完成電話驗證！",
                 car4_feat: "同級最大車廂、空間極佳",
                 car4_fee: "附加費 HK$80 (最低 $160)",
                 car5_name: "豐田 NOAH 輪椅的士",
-                car5_seats: "無障礙",
+                car5_seats: "1+5 座位",
                 car5_type: "無障礙福祉專車",
                 car5_cap: "1位輪椅 + 5位乘客",
                 car5_lug: "可放 3-4 件大行李",
@@ -1322,7 +1319,7 @@ alert_verify_fail: "❌ Invalid verification code. Please try again.",
                 car2_seats_desc: "6 Seats · Pure Electric MPV",
                 car3_seats_desc: "6 Seats · Luxury Aviation Seat MPV",
                 car4_seats_desc: "6 Seats · Extra Large Luggage Space",
-                car5_seats_desc: "Accessible · Welfare Vehicle",
+                car5_seats_desc: "1+5 Seats · Welfare Vehicle",
                 btn_close_guide: "Got it, Close",
                 date_note: "Up to 3 days",
                 time_note: "Fastest 15 mins",
@@ -1377,7 +1374,7 @@ alert_verify_fail: "❌ Invalid verification code. Please try again.",
                 car4_feat: "Class-leading spacious cabin",
                 car4_fee: "Surcharge HK$80 (Min. $160)",
                 car5_name: "Toyota NOAH Wheelchair Taxi",
-                car5_seats: "Accessible",
+                car5_seats: "6 Seats",
                 car5_type: "Accessible Welfare Vehicle",
                 car5_cap: "1 wheelchair + 5 passengers",
                 car5_lug: "Fits 3-4 large luggages",
@@ -2947,6 +2944,33 @@ function sendVerificationCode() {
 
 function sendWhatsApp(event) {
     event.preventDefault();
+
+// 監聽起點輸入，決定係咪顯示航班編號
+function checkShowFlightField() {
+    const pickupInput = document.getElementById('calc-pickup');
+    const flightContainer = document.getElementById('field-flight-container');
+    
+    if (pickupInput && flightContainer) {
+        const pickupValue = pickupInput.value.trim();
+        
+        if (pickupValue.includes('機場') || pickupValue.includes('Airport') || pickupValue.includes('airport')) {
+            flightContainer.style.display = 'block';
+        } else {
+            flightContainer.style.display = 'none';
+        }
+    }
+}
+
+// 監聽起點輸入
+document.getElementById('calc-pickup')?.addEventListener('input', checkShowFlightField);
+
+// 初始化時隱藏
+document.addEventListener('DOMContentLoaded', function() {
+    const flightContainer = document.getElementById('field-flight-container');
+    if (flightContainer) {
+        flightContainer.style.display = 'none';
+    }
+});
 
     // 檢查是否已選擇收費模式
     if (!selectedFareMode) {
