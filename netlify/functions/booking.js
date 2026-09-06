@@ -138,7 +138,7 @@ async function sendDiscordNotification(data) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        content: bookingSource + cleanMessage + '\n\n━━━━━━━━━━━━━━━━━━━━━━━'
+        content: bookingSource + cleanMessage + '\n\n✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦'
       })
     });
     console.log('Discord 通知已發送');
