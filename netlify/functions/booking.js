@@ -114,6 +114,9 @@ async function sendDiscordNotification(data) {
   }
 
   const message = data.fullMessage || data.description || '收到新訂單';
+  
+  // ✅ 隱藏 [網站預約] 標記
+  const cleanMessage = message.replace('[網站預約]', '').replace('[新事件已通知]', '').trim();
 
   try {
     await fetch(discordWebhook, {
@@ -122,7 +125,7 @@ async function sendDiscordNotification(data) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        content: `🆕 **新訂單通知**\n\n${message}`
+        content: `🆕 **新訂單通知**\n\n${cleanMessage}\n\n ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ `
       })
     });
     console.log('Discord 通知已發送');
