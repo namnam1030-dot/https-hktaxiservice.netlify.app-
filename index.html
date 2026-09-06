@@ -604,55 +604,55 @@
                     </label>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-2">
-                        <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
-                        <span data-i18n="label_payment_method">選擇付款方式 (可選多項)</span>
-                    </label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_cash">現金</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_payme">PayMe</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="微信" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_wechat">微信</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="支付寶" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_alipay">支付寶</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_octopus">八達通</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n-html="pay_credit">信用卡<br>(需另加手續費)</span>
-                        </label>
-                    </div>
-                </div>
+<div>
+    <label class="block text-xs font-bold text-gray-300 mb-2">
+        <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
+        <span data-i18n="label_payment_method">選擇付款方式</span>
+    </label>
+    <div class="flex items-center gap-2">
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer">
+            <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow"> <span data-i18n="pay_cash">現金</span>
+        </label>
+        <button type="button" onclick="togglePaymentOptions()" class="text-brand-yellow text-sm underline">
+            <span data-i18n="btn_more_payment">更多付款方式</span>
+        </button>
+    </div>
+    <div id="more-payment-options" class="hidden grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-2">
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_payme">PayMe</span>
+        </label>
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" name="payment_method" value="微信" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_wechat">微信</span>
+        </label>
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" name="payment_method" value="支付寶" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_alipay">支付寶</span>
+        </label>
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_octopus">八達通</span>
+        </label>
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
+        </label>
+        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 p-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n-html="pay_credit">信用卡<br>(需另加手續費)</span>
+        </label>
+    </div>
+</div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人 (選填)</span></label>
-                        <input type="text" id="contact_surname" data-i18n-placeholder="ph_contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂 (選填)</span></label>
-                        <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl px-4 py-3.5 text-xs text-gray-200 h-[48px]">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="contact_title" value="先生" class="text-brand-yellow focus:ring-brand-yellow">
-                                <span data-i18n="title_mr">先生</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="contact_title" value="小姐" class="text-brand-yellow focus:ring-brand-yellow">
-                                <span data-i18n="title_ms">小姐</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+<div class="grid grid-cols-3 gap-3">
+    <div class="col-span-1">
+        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂</span></label>
+        <select id="contact_title" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+            <option value="">-</option>
+            <option value="先生" data-i18n="title_mr">先生</option>
+            <option value="小姐" data-i18n="title_ms">小姐</option>
+        </select>
+    </div>
+    <div class="col-span-2">
+        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人</span></label>
+        <input type="text" id="contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+    </div>
+</div>
 
 <div>
     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp 接收確認)</span></label>
@@ -1017,6 +1017,10 @@
     <!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
 
+function togglePaymentOptions() {
+    document.getElementById('more-payment-options').classList.toggle('hidden');
+}
+
         function showWeComQR() {
             document.getElementById('wecom-modal').classList.remove('hidden');
         }
@@ -1112,6 +1116,7 @@
         const translations = {
             zh: {
 
+btn_more_payment: "更多付款方式",
 // 電話驗證翻譯
 label_verification: "電話驗證",
 btn_get_code: "獲取驗證碼",
@@ -1281,6 +1286,7 @@ alert_verify_required: "請先完成電話驗證！",
             },
             en: {
 
+btn_more_payment: "More Options",
 // Phone verification translations
 label_verification: "Phone Verification",
 btn_get_code: "Get Code",
@@ -3093,14 +3099,8 @@ function sendVerificationCode() {
             const hasWheelchair = document.getElementById('has_wheelchair') && document.getElementById('has_wheelchair').checked;
 
             const surname = document.getElementById('contact_surname') ? document.getElementById('contact_surname').value.trim() : '';
-            const titleEls = document.getElementsByName('contact_title');
-            let title = '';
-            for (let el of titleEls) {
-                if (el.checked) {
-                    title = el.value;
-                    break;
-                }
-            }
+const titleSelect = document.getElementById('contact_title');
+let title = titleSelect ? titleSelect.value : '';
 
             const payEls = document.getElementsByName('payment_method');
             let payments = [];
