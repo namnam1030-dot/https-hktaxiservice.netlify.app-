@@ -3227,30 +3227,31 @@ function verifyCode() {
             const fullMessage = msgLines.join('\n');
 
             // 準備訂單資料
-            const bookingData = {
-                pickup: pickup,
-                stopover: stopoverTexts.join(' / '),
-                dropoff: dropoff,
-                date: date,
-                time: time,
-                timeFormatted: timeStringFormatted,
-                passengers: passengers,
-                luggages: luggages,
-                hasPet: hasPet,
-                hasWheelchair: hasWheelchair,
-                surname: surname,
-                title: title,
-                phone: phone,
-                paymentMethod: paymentStr,
-                carType: carDisplayText,
-                totalFare: totalFareForWhatsApp,
-                flightNo: flightNo,
-                upgradeOption: carDisplayText,
-                feeMode: selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費',
-                surcharge: selectedSurcharge,
-                tunnelFee: currentTunnelFee,
-                fullMessage: fullMessage
-            };
+const bookingData = {
+    pickup: pickup,
+    stopover: stopoverTexts.join(' / '),
+    dropoff: dropoff,
+    date: date,
+    time: time,
+    timeFormatted: timeStringFormatted,
+    passengers: passengers,
+    luggages: luggages,
+    hasPet: hasPet,
+    hasWheelchair: hasWheelchair,
+    surname: surname,
+    title: title,
+    phone: phone,
+    paymentMethod: paymentStr,
+    carType: carDisplayText,
+    totalFare: totalFareForWhatsApp,
+    flightNo: flightNo,
+    upgradeOption: carDisplayText,
+    feeMode: selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費',
+    surcharge: selectedSurcharge,
+    tunnelFee: currentTunnelFee,
+    fullMessage: fullMessage,
+    isInternalBooking: isInternalUser  // ✅ 確保有呢行
+};
 
             // 隱藏之前嘅訊息
             const successMsg = document.getElementById('booking-success-message');
