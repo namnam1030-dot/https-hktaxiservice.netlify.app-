@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>預約成功 | 24小時的士預約服務</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-yellow': '#FFF200',
+                        'brand-dark': '#0B0B0B',
+                        'brand-gray': '#161616',
+                        'brand-card': '#1E1E1E'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #0B0B0B; 
+            color: #ffffff; 
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-2xl">
+        <!-- 成功訊息區 -->
+        <div class="bg-green-600/20 border-2 border-green-500 rounded-2xl p-6">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-check-circle text-green-400 text-5xl mb-3"></i>
+                <h1 class="text-green-300 font-bold text-2xl mb-2">✅ 預約訂單已成功送出！</h1>
+                <p class="text-gray-300 text-sm mt-2">我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認</p>
+            </div>
+            
+            <!-- 訂單內容 -->
+            <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
+                <pre id="booking-details" class="text-white text-xs whitespace-pre-wrap font-mono"></pre>
+            </div>
+            
+            <!-- 聯絡按鈕 -->
+            <div class="flex flex-col gap-2 mb-4">
+                <p class="text-gray-400 text-xs font-bold text-center mb-1">如有急需，可以直接聯絡我哋：</p>
+                
+                <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                    <i class="fa-solid fa-phone"></i> 致電 6881 5441
+                </a>
+                
+                <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp 查詢
+                </a>
+                
+                <button onclick="window.location.href='https://hktaxiservice.netlify.app/#wecom-modal'" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                    <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
+                </button>
+            </div>
+            
+            <!-- 返回主頁 -->
+            <a href="https://hktaxiservice.netlify.app/" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                <i class="fa-solid fa-arrow-left"></i> 返回主頁
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 從 URL 參數讀取訂單內容
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingData = urlParams.get('data');
+        
+        if (bookingData) {
+            const decodedData = decodeURIComponent(bookingData);
+            document.getElementById('booking-details').textContent = decodedData;
+        } else {
+            document.getElementById('booking-details').textContent = '冇訂單資料';
+        }
+    </script>
+</body>
+</html>

@@ -3264,23 +3264,16 @@ const bookingData = {
                 }
                 
 if (data.success) {
-    // ✅ 將訂單內容填入成功頁面
-    const bookingContent = document.getElementById('success-booking-content');
-    if (bookingContent) {
-        // 隱藏標記
-        const cleanMessage = fullMessage
-            .replace('[網站預約]', '')
-            .replace('[新事件已通知]', '')
-            .replace('👤 工作人員落單', '')
-            .trim();
-        bookingContent.textContent = cleanMessage;
-    }
+    // ✅ 隱藏標記
+    const cleanMessage = fullMessage
+        .replace('[網站預約]', '')
+        .replace('[新事件已通知]', '')
+        .replace('👤 工作人員落單', '')
+        .trim();
     
-    // 顯示成功訊息
-    if (successMsg) {
-        successMsg.classList.remove('hidden');
-        successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    // ✅ 跳轉到獨立成功頁面
+    const encodedData = encodeURIComponent(cleanMessage);
+    window.location.href = `booking-success.html?data=${encodedData}`;
 } else {
                     // 顯示失敗訊息
                     if (errorMsg) {
