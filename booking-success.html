@@ -41,7 +41,7 @@
             
             <!-- 訂單內容 -->
             <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
-                <pre id="booking-details" class="text-white text-2xl whitespace-pre-wrap font-mono"></pre>
+                <pre id="booking-details" class="text-white text-xl whitespace-pre-wrap font-mono"></pre>
             </div>
             
             <!-- 聯絡按鈕 -->
@@ -56,7 +56,8 @@
                     <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp 查詢
                 </a>
                 
-                <button onclick="window.location.href='https://hktaxiservice.netlify.app/#wecom-modal'" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                <!-- ✅ 修正：改為直接顯示 WeChat Modal -->
+                <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
                     <i class="fa-brands fa-weixin text-lg"></i> WeChat 查詢
                 </button>
             </div>
@@ -65,6 +66,26 @@
             <a href="https://hktaxiservice.netlify.app/" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
                 <i class="fa-solid fa-arrow-left"></i> 返回主頁
             </a>
+        </div>
+    </div>
+
+    <!-- ✅ WeChat Modal -->
+    <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border-2 border-green-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
+            <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-green-500 text-4xl mb-3">
+                <i class="fa-brands fa-weixin"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">掃描二維碼添加企業微信</h3>
+            <p class="text-xl text-gray-300 mb-4">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
+            <div class="bg-white p-3 rounded-xl mb-4 inline-block">
+                <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+            </div>
+            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl hover:opacity-90">
+                關閉
+            </button>
         </div>
     </div>
 
@@ -79,6 +100,15 @@
         } else {
             document.getElementById('booking-details').textContent = '冇訂單資料';
         }
+        
+        // ✅ WeChat Modal 函數
+        function showWeComQR() {
+            document.getElementById('wecom-modal').classList.remove('hidden');
+        }
+        
+        function closeWeComQR() {
+            document.getElementById('wecom-modal').classList.add('hidden');
+        }
     </script>
 </body>
-</html>
+</html> 
