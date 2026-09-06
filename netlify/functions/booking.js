@@ -71,7 +71,7 @@ async function addToGoogleCalendar(data) {
 
 const event = {
   summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
-  description: (data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`) + '\n\n[新事件已通知]',
+  description: (data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`) + '\n\n[網站預約]',
 
       start: {
         dateTime: startTime.toISOString(),
