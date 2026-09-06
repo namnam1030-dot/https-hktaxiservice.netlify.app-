@@ -668,15 +668,28 @@
     <div class="flex gap-2">
         <input type="text" id="verification_code" placeholder="輸入6位數驗證碼" 
                class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition"
-               maxlength="6" inputmode="numeric" pattern="[0-9]*">
+               maxlength="6" inputmode="numeric" pattern="[0-9]*" readonly>
         <button type="button" onclick="sendVerificationCode()" 
                 class="bg-brand-yellow text-black font-bold px-4 rounded-xl text-sm whitespace-nowrap hover:opacity-90 transition">
             <span data-i18n="btn_get_code">獲取驗證碼</span>
         </button>
     </div>
-    <p class="text-xs text-gray-500 mt-2">
-        <span data-i18n="verification_hint">點擊「獲取驗證碼」，透過 WhatsApp 接收驗證碼</span>
-    </p>
+    
+    <!-- 驗證碼顯示區 -->
+    <div id="verification-code-display" class="hidden mt-3 p-4 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl text-center">
+        <p class="text-xs text-gray-300 mb-2">
+            <span data-i18n="verification_code_label">你嘅驗證碼係：</span>
+        </p>
+        <p id="verification-code-value" class="text-3xl font-extrabold text-brand-yellow tracking-widest mb-3">------</p>
+        <a id="whatsapp-verify-link" href="#" target="_blank" 
+           class="inline-block bg-green-500 text-white font-bold px-6 py-3 rounded-xl text-sm hover:opacity-90 transition shadow-md">
+            <i class="fa-brands fa-whatsapp text-lg"></i> 
+            <span data-i18n="btn_send_verify_whatsapp">發送驗證碼到 WhatsApp</span>
+        </a>
+        <p class="text-xs text-gray-400 mt-3">
+            <span data-i18n="verification_whatsapp_hint">請先發送 WhatsApp 確認訊息，再提交預約</span>
+        </p>
+    </div>
 </div>
                 
                 <div class="bg-black/50 p-4 rounded-xl border border-gray-800 flex justify-between items-center mt-6">
@@ -1102,9 +1115,11 @@
 // 電話驗證翻譯
 label_verification: "電話驗證",
 btn_get_code: "獲取驗證碼",
-verification_hint: "點擊「獲取驗證碼」，透過 WhatsApp 接收驗證碼",
+verification_code_label: "你嘅驗證碼係：",
+btn_send_verify_whatsapp: "發送驗證碼到 WhatsApp",
+verification_whatsapp_hint: "請先發送 WhatsApp 確認訊息，再提交預約",
 alert_enter_phone: "請先輸入正確嘅電話號碼！",
-alert_code_sent: "驗證碼已透過 WhatsApp 發送，請檢查你嘅 WhatsApp",
+alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
 alert_internal_success: "✅ 內部人員驗證成功！可以直接提交。",
 alert_verify_success: "✅ 電話驗證成功！",
 alert_verify_fail: "❌ 驗證碼錯誤，請重新輸入",
@@ -1269,13 +1284,15 @@ alert_verify_required: "請先完成電話驗證！",
 // Phone verification translations
 label_verification: "Phone Verification",
 btn_get_code: "Get Code",
-verification_hint: "Click \"Get Code\" to receive verification code via WhatsApp",
+verification_code_label: "Your verification code:",
+btn_send_verify_whatsapp: "Send Code via WhatsApp",
+verification_whatsapp_hint: "Please send WhatsApp confirmation before submitting",
 alert_enter_phone: "Please enter a valid phone number first!",
-alert_code_sent: "Verification code sent via WhatsApp. Please check your WhatsApp.",
+alert_verify_required: "Please complete phone verification first!",
+alert_need_whatsapp: "Please send WhatsApp confirmation first!",
 alert_internal_success: "✅ Internal verification successful!",
 alert_verify_success: "✅ Phone verification successful!",
 alert_verify_fail: "❌ Invalid verification code. Please try again.",
-alert_verify_required: "Please complete phone verification first!",
                 btn_confirm_booking: "Confirm Booking",
                 btn_sending_booking: "Sending Booking...",
                 success_title: "✅ Booking Submitted Successfully!",
@@ -2889,7 +2906,7 @@ alert_verify_required: "Please complete phone verification first!",
         }
 
 // ============================================
-// 電話驗證系統
+// 電話驗證系統（免費版）
 // ============================================
 
 // 內部驗證碼（你同同事用）
@@ -2897,8 +2914,9 @@ const INTERNAL_CODE = '888888';
 
 let currentVerificationCode = '';
 let isInternalUser = false;
+let whatsappSent = false;  // ✅ 檢查有冇點擊 WhatsApp 連結
 
-// 發送驗證碼到客人 WhatsApp
+// 發送驗證碼
 function sendVerificationCode() {
     const phone = document.getElementById('phone').value.trim();
     const cleanPhone = phone.replace(/\D/g, '');
@@ -2912,42 +2930,33 @@ function sendVerificationCode() {
     // 生成 6 位數驗證碼
     currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // 用 WhatsApp 發送驗證碼
-    const message = `你嘅驗證碼係：${currentVerificationCode}\n\n請喺網頁輸入呢個驗證碼完成驗證。`;
+    // 自動填入驗證碼
+    const codeInput = document.getElementById('verification_code');
+    codeInput.value = currentVerificationCode;
+    
+    // 重置 WhatsApp 發送標記
+    whatsappSent = false;
+    
+    // 顯示驗證碼
+    const displayContainer = document.getElementById('verification-code-display');
+    const displayValue = document.getElementById('verification-code-value');
+    const whatsappLink = document.getElementById('whatsapp-verify-link');
+    
+    displayContainer.classList.remove('hidden');
+    displayValue.textContent = currentVerificationCode;
+    
+    // 設定 WhatsApp 連結
+    const message = `我嘅預約驗證碼係：${currentVerificationCode}\n\n電話號碼：${phone}`;
     const encodedMessage = encodeURIComponent(message);
+    whatsappLink.href = `https://wa.me/85268815441?text=${encodedMessage}`;
     
-    let customerPhone = cleanPhone;
-    if (customerPhone.length === 8) {
-        customerPhone = '852' + customerPhone;
-    } else if (customerPhone.length === 9 && customerPhone.startsWith('9')) {
-        customerPhone = '852' + customerPhone;
-    }
+    // ✅ 加入點擊監聽
+    whatsappLink.onclick = function() {
+        whatsappSent = true;
+    };
     
-    window.open(`https://wa.me/${customerPhone}?text=${encodedMessage}`, '_blank');
-    
-    alert(translations[currentLang].alert_code_sent);
-}
-
-// 驗證輸入嘅驗證碼
-function verifyCode() {
-    const inputCode = document.getElementById('verification_code').value.trim();
-    
-    // 檢查係咪內部驗證碼
-    if (inputCode === INTERNAL_CODE) {
-        isInternalUser = true;
-        alert(translations[currentLang].alert_internal_success);
-        return true;
-    }
-    
-    // 檢查係咪一般驗證碼
-    if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
-        isInternalUser = false;
-        alert(translations[currentLang].alert_verify_success);
-        return true;
-    }
-    
-    alert(translations[currentLang].alert_verify_fail);
-    return false;
+    // 滾動到顯示區
+    displayContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
         function sendWhatsApp(event) {
@@ -3011,13 +3020,21 @@ function verifyCode() {
     if (inputCode === INTERNAL_CODE) {
         // 內部人員，跳過驗證
         isInternalUser = true;
-        console.log('內部人員提交，跳過電話驗證');
+        console.log('內部人員提交');
     } else if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
-        // 一般客人，驗證成功
+        // 一般客人，驗證碼正確
         isInternalUser = false;
-        console.log('客人電話驗證成功');
+        
+        // ✅ 檢查有冇點擊 WhatsApp 連結
+        if (!whatsappSent) {
+            alert(translations[currentLang].alert_need_whatsapp || '請先發送 WhatsApp 確認訊息！');
+            document.getElementById('verification-code-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        
+        console.log('客人驗證成功');
     } else {
-        alert(translations[currentLang].alert_verify_required);
+        alert(translations[currentLang].alert_verify_required || '請先完成電話驗證！');
         document.getElementById('verification_code').focus();
         document.getElementById('verification_code').scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
