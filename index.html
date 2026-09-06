@@ -1251,8 +1251,8 @@ alert_verify_required: "請先完成電話驗證！",
                 label_time: "用車時間間",
                 label_passengers: "乘客人數",
                 label_luggages: "行李件數",
-                label_has_pet: "是否有寵物",
-                label_has_wheelchair: "是否有輪椅需要放置於尾箱",
+                label_has_pet: "有寵物",
+                label_has_wheelchair: "輪椅放尾箱",
                 opt_select: "請選擇",
                 opt_yes: "是",
                 opt_no: "否",
@@ -3327,11 +3327,11 @@ function submitBookingAfterUpgrade() {
     }
 
     if (data.hasPet) {
-        msgLines.push(`🐶寵物：✅（$5/隻）`);
+        msgLines.push(`🐶寵物：✅`);
     }
 
     if (data.hasWheelchair) {
-        msgLines.push(`♿️輪椅放置尾箱：✅（免費）`);
+        msgLines.push(`♿️輪椅放置尾箱：✅`);
     }
     if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
     
