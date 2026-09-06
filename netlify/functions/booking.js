@@ -69,10 +69,14 @@ async function addToGoogleCalendar(data) {
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     const endTime = new Date(startTime);
 
-const event = {
-  summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
-  description: (data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`) + '\n\n[網站預約]',
+    // ✅ 判斷係咪內部人員落單
+    const bookingSourceMark = data.isInternalBooking === true 
+      ? '\n\n[網站預約] 👤 工作人員落單' 
+      : '\n\n[網站預約]';
 
+    const event = {
+      summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
+      description: (data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`) + bookingSourceMark,
       start: {
         dateTime: startTime.toISOString(),
         timeZone: 'Asia/Hong_Kong'
@@ -115,8 +119,17 @@ async function sendDiscordNotification(data) {
 
   const message = data.fullMessage || data.description || '收到新訂單';
   
-  // ✅ 隱藏 [網站預約] 標記
-  const cleanMessage = message.replace('[網站預約]', '').replace('[新事件已通知]', '').trim();
+  // ✅ 隱藏標記
+  const cleanMessage = message
+    .replace('[網站預約]', '')
+    .replace('[新事件已通知]', '')
+    .replace('👤 工作人員落單', '')
+    .trim();
+  
+  // ✅ 判斷係咪內部人員落單
+  const bookingSource = data.isInternalBooking === true 
+    ? '🆕 **新訂單通知** 👤 *工作人員落單*\n\n' 
+    : '🆕 **新訂單通知**\n\n';
 
   try {
     await fetch(discordWebhook, {
@@ -125,7 +138,7 @@ async function sendDiscordNotification(data) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        content: `🆕 **新訂單通知**\n\n${cleanMessage}\n\n ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ `
+        content: bookingSource + cleanMessage + '\n\n━━━━━━━━━━━━━━━━━━━━━━━'
       })
     });
     console.log('Discord 通知已發送');
