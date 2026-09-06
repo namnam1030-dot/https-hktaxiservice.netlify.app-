@@ -695,77 +695,56 @@
                     <i class="fa-solid fa-calendar-check text-lg"></i> <span data-i18n="btn_confirm_booking">確認預約</span>
                 </button>
 
-                <!-- 成功訊息顯示區 -->
-                <div id="booking-success-message" class="hidden mt-4 p-4 bg-green-600/20 border-2 border-green-500 rounded-xl text-center">
-                    <i class="fa-solid fa-check-circle text-green-400 text-3xl mb-2"></i>
-                    <p class="text-green-300 font-bold text-base">
-                        <span data-i18n="success_title">✅ 預約訂單已成功送出！</span>
-                    </p>
-                    <p class="text-gray-300 text-xs mt-2 mb-4">
-                        <span data-i18n="success_desc">我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認</span>
-                    </p>
-                    
-                    <!-- 聯絡我們按鈕 -->
-                    <div class="flex flex-col gap-2 mt-3">
-                        <p class="text-gray-400 text-xs font-bold mb-1">
-                            <span data-i18n="success_contact_prompt">如有急需，可以直接聯絡我哋：</span>
-                        </p>
-                        
-                        <!-- 打電話按鈕 -->
-                        <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-solid fa-phone"></i> 
-                            <span data-i18n="btn_call_now">致電 6881 5441</span>
-                        </a>
-                        
-                        <!-- WhatsApp 按鈕 -->
-                        <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-brands fa-whatsapp text-lg"></i> 
-                            <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
-                        </a>
-                        
-                        <!-- WeChat 按鈕 -->
-                        <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-brands fa-weixin text-lg"></i> 
-                            <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 失敗訊息顯示區 -->
-                <div id="booking-error-message" class="hidden mt-4 p-4 bg-red-600/20 border-2 border-red-500 rounded-xl text-center">
-                    <i class="fa-solid fa-times-circle text-red-400 text-3xl mb-2"></i>
-                    <p class="text-red-300 font-bold text-base">
-                        <span data-i18n="error_title">❌ 預約送出失敗</span>
-                    </p>
-                    <p class="text-gray-300 text-xs mt-2 mb-4">
-                        <span data-i18n="error_desc">請直接透過以下方式聯絡我哋預約：</span>
-                    </p>
-                    
-                    <!-- 聯絡我們按鈕 -->
-                    <div class="flex flex-col gap-2 mt-3">
-                        <p class="text-gray-400 text-xs font-bold mb-1">
-                            <span data-i18n="error_contact_prompt">立即聯絡我哋：</span>
-                        </p>
-                        
-                        <!-- 打電話按鈕 -->
-                        <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-solid fa-phone"></i> 
-                            <span data-i18n="btn_call_now">致電 6881 5441</span>
-                        </a>
-                        
-                        <!-- WhatsApp 按鈕 -->
-                        <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-brands fa-whatsapp text-lg"></i> 
-                            <span data-i18n="btn_whatsapp_book">WhatsApp 預約</span>
-                        </a>
-                        
-                        <!-- WeChat 按鈕 -->
-                        <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-brands fa-weixin text-lg"></i> 
-                            <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
-                        </button>
-                    </div>
-                </div>
+<!-- 成功訊息顯示區（完整訂單頁面） -->
+<div id="booking-success-message" class="hidden mt-4 p-4 bg-green-600/20 border-2 border-green-500 rounded-xl">
+    <div class="text-center mb-4">
+        <i class="fa-solid fa-check-circle text-green-400 text-4xl mb-2"></i>
+        <p class="text-green-300 font-bold text-lg">
+            <span data-i18n="success_title">✅ 預約訂單已成功送出！</span>
+        </p>
+        <p class="text-gray-300 text-xs mt-2">
+            <span data-i18n="success_desc">我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認</span>
+        </p>
+    </div>
+    
+    <!-- 訂單內容（同 Discord 訊息一樣） -->
+    <div id="success-booking-details" class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-4 text-left">
+        <pre id="success-booking-content" class="text-white text-xs whitespace-pre-wrap font-mono"></pre>
+    </div>
+    
+    <!-- 聯絡我們按鈕 -->
+    <div class="flex flex-col gap-2 mt-3">
+        <p class="text-gray-400 text-xs font-bold mb-1">
+            <span data-i18n="success_contact_prompt">如有急需，可以直接聯絡我哋：</span>
+        </p>
+        
+        <!-- 打電話按鈕 -->
+        <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+            <i class="fa-solid fa-phone"></i> 
+            <span data-i18n="btn_call_now">致電 6881 5441</span>
+        </a>
+        
+        <!-- WhatsApp 按鈕 -->
+        <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+            <i class="fa-brands fa-whatsapp text-lg"></i> 
+            <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
+        </a>
+        
+        <!-- WeChat 按鈕 -->
+        <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+            <i class="fa-brands fa-weixin text-lg"></i> 
+            <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
+        </button>
+    </div>
+    
+    <!-- 返回主頁按鈕 -->
+    <div class="mt-4">
+        <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+            <i class="fa-solid fa-arrow-left"></i> 
+            <span data-i18n="btn_back_home">返回主頁</span>
+        </button>
+    </div>
+</div>
             </form>
         </div>
     </section>
@@ -3284,13 +3263,25 @@ const bookingData = {
                     submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
                 }
                 
-                if (data.success) {
-                    // 顯示成功訊息
-                    if (successMsg) {
-                        successMsg.classList.remove('hidden');
-                        successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                } else {
+if (data.success) {
+    // ✅ 將訂單內容填入成功頁面
+    const bookingContent = document.getElementById('success-booking-content');
+    if (bookingContent) {
+        // 隱藏標記
+        const cleanMessage = fullMessage
+            .replace('[網站預約]', '')
+            .replace('[新事件已通知]', '')
+            .replace('👤 工作人員落單', '')
+            .trim();
+        bookingContent.textContent = cleanMessage;
+    }
+    
+    // 顯示成功訊息
+    if (successMsg) {
+        successMsg.classList.remove('hidden');
+        successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+} else {
                     // 顯示失敗訊息
                     if (errorMsg) {
                         errorMsg.classList.remove('hidden');
@@ -3314,6 +3305,21 @@ const bookingData = {
                 }
             });
         }
+
+function goBackToHome() {
+    // 隱藏成功訊息
+    const successMsg = document.getElementById('booking-success-message');
+    if (successMsg) {
+        successMsg.classList.add('hidden');
+    }
+    
+    // 捲動到頂部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // 可選：重設表單
+    document.getElementById('booking-form').reset();
+}
+
     </script>
 </body>
 </html>
