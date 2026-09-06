@@ -654,10 +654,25 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp 接收確認)</span></label>
-                    <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
+<!-- 電話驗證欄位 -->
+<div>
+    <label class="block text-xs font-bold text-gray-300 mb-1.5">
+        <i class="fa-solid fa-shield-check text-brand-yellow mr-1.5"></i>
+        <span data-i18n="label_verification">電話驗證</span>
+    </label>
+    <div class="flex gap-2">
+        <input type="text" id="verification_code" placeholder="輸入6位數驗證碼" 
+               class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition"
+               maxlength="6" inputmode="numeric" pattern="[0-9]*">
+        <button type="button" onclick="sendVerificationCode()" 
+                class="bg-brand-yellow text-black font-bold px-4 rounded-xl text-sm whitespace-nowrap hover:opacity-90 transition">
+            <span data-i18n="btn_get_code">獲取驗證碼</span>
+        </button>
+    </div>
+    <p class="text-xs text-gray-500 mt-2">
+        <span data-i18n="verification_hint">點擊「獲取驗證碼」，透過 WhatsApp 接收驗證碼</span>
+    </p>
+</div>
                 
                 <div class="bg-black/50 p-4 rounded-xl border border-gray-800 flex justify-between items-center mt-6">
                     <div class="text-xs">
@@ -1099,6 +1114,17 @@
 
         const translations = {
             zh: {
+
+// 電話驗證翻譯
+label_verification: "電話驗證",
+btn_get_code: "獲取驗證碼",
+verification_hint: "點擊「獲取驗證碼」，透過 WhatsApp 接收驗證碼",
+alert_enter_phone: "請先輸入正確嘅電話號碼！",
+alert_code_sent: "驗證碼已透過 WhatsApp 發送，請檢查你嘅 WhatsApp",
+alert_internal_success: "✅ 內部人員驗證成功！可以直接提交。",
+alert_verify_success: "✅ 電話驗證成功！",
+alert_verify_fail: "❌ 驗證碼錯誤，請重新輸入",
+alert_verify_required: "請先完成電話驗證！",
                 btn_confirm_booking: "確認預約",
                 btn_sending_booking: "正在送出預約...",
                 // 成功/失敗訊息翻譯
@@ -1255,6 +1281,17 @@
                 footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
             },
             en: {
+
+// Phone verification translations
+label_verification: "Phone Verification",
+btn_get_code: "Get Code",
+verification_hint: "Click \"Get Code\" to receive verification code via WhatsApp",
+alert_enter_phone: "Please enter a valid phone number first!",
+alert_code_sent: "Verification code sent via WhatsApp. Please check your WhatsApp.",
+alert_internal_success: "✅ Internal verification successful!",
+alert_verify_success: "✅ Phone verification successful!",
+alert_verify_fail: "❌ Invalid verification code. Please try again.",
+alert_verify_required: "Please complete phone verification first!",
                 btn_confirm_booking: "Confirm Booking",
                 btn_sending_booking: "Sending Booking...",
                 success_title: "✅ Booking Submitted Successfully!",
@@ -2867,6 +2904,68 @@
             updateFareModeDisplay();
         }
 
+// ============================================
+// 電話驗證系統
+// ============================================
+
+// 內部驗證碼（你同同事用）
+const INTERNAL_CODE = '888888';
+
+let currentVerificationCode = '';
+let isInternalUser = false;
+
+// 發送驗證碼到客人 WhatsApp
+function sendVerificationCode() {
+    const phone = document.getElementById('phone').value.trim();
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    if (cleanPhone.length < 8) {
+        alert(translations[currentLang].alert_enter_phone);
+        document.getElementById('phone').focus();
+        return;
+    }
+    
+    // 生成 6 位數驗證碼
+    currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // 用 WhatsApp 發送驗證碼
+    const message = `你嘅驗證碼係：${currentVerificationCode}\n\n請喺網頁輸入呢個驗證碼完成驗證。`;
+    const encodedMessage = encodeURIComponent(message);
+    
+    let customerPhone = cleanPhone;
+    if (customerPhone.length === 8) {
+        customerPhone = '852' + customerPhone;
+    } else if (customerPhone.length === 9 && customerPhone.startsWith('9')) {
+        customerPhone = '852' + customerPhone;
+    }
+    
+    window.open(`https://wa.me/${customerPhone}?text=${encodedMessage}`, '_blank');
+    
+    alert(translations[currentLang].alert_code_sent);
+}
+
+// 驗證輸入嘅驗證碼
+function verifyCode() {
+    const inputCode = document.getElementById('verification_code').value.trim();
+    
+    // 檢查係咪內部驗證碼
+    if (inputCode === INTERNAL_CODE) {
+        isInternalUser = true;
+        alert(translations[currentLang].alert_internal_success);
+        return true;
+    }
+    
+    // 檢查係咪一般驗證碼
+    if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
+        isInternalUser = false;
+        alert(translations[currentLang].alert_verify_success);
+        return true;
+    }
+    
+    alert(translations[currentLang].alert_verify_fail);
+    return false;
+}
+
         function sendWhatsApp(event) {
             event.preventDefault();
 
@@ -2921,6 +3020,24 @@
                 scrollToFleet();
                 return;
             }
+
+// ✅ 檢查電話驗證
+    const inputCode = document.getElementById('verification_code').value.trim();
+    
+    if (inputCode === INTERNAL_CODE) {
+        // 內部人員，跳過驗證
+        isInternalUser = true;
+        console.log('內部人員提交，跳過電話驗證');
+    } else if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
+        // 一般客人，驗證成功
+        isInternalUser = false;
+        console.log('客人電話驗證成功');
+    } else {
+        alert(translations[currentLang].alert_verify_required);
+        document.getElementById('verification_code').focus();
+        document.getElementById('verification_code').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
 
             let stopoverTexts = [];
             for (let i = 1; i <= 3; i++) {
