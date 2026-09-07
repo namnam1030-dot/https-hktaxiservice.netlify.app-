@@ -2933,16 +2933,13 @@ function sendVerificationCode() {
     const encodedMessage = encodeURIComponent(message);
     whatsappLink.href = `https://wa.me/85268815441?text=${encodedMessage}`;
     
-    // ✅ 加入點擊監聽
-    whatsappLink.onclick = function() {
+whatsappLink.onclick = function() {
         whatsappSent = true;
     };
     
-    // 滾動到顯示區
     displayContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// 監聽起點輸入，決定係咪顯示航班編號
 function checkShowFlightField() {
     const pickupInput = document.getElementById('calc-pickup');
     const flightContainer = document.getElementById('field-flight-container');
@@ -2958,17 +2955,18 @@ function checkShowFlightField() {
     }
 }
 
-// 監聽起點輸入
-document.getElementById('calc-pickup')?.addEventListener('input', checkShowFlightField);
-
-// 初始化時隱藏
 document.addEventListener('DOMContentLoaded', function() {
     const flightContainer = document.getElementById('field-flight-container');
     if (flightContainer) {
         flightContainer.style.display = 'none';
     }
+    
+    const pickupInput = document.getElementById('calc-pickup');
+    if (pickupInput) {
+        pickupInput.addEventListener('input', checkShowFlightField);
+        pickupInput.addEventListener('change', checkShowFlightField);
+    }
 });
-
 function sendWhatsApp(event) {
     event.preventDefault();
 
@@ -3266,8 +3264,8 @@ text.innerHTML = currentLang === 'zh' ?
                 
         } else {
             text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
-                '有機會被 <span class="text-brand-yellow font-bold text-lg">免費升級</span> 至更高階車款，<br><br>請問是否接受？' :
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
+                '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款，<br>請問是否接受？' :
                 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
                 'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
         }
