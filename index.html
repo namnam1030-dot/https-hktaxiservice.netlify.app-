@@ -547,24 +547,23 @@
     <input type="text" id="dropoff">
 </div>
                 
-                <div class="grid grid-cols-1 gap-4 w-full">
-                    <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
-                        <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
-                            <span><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></span>
-                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full" data-i18n="date_note">接受最多3日內</span>
-                        </label>
-                        <input type="date" id="date" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
-                    </div>
+<div class="grid grid-cols-1 gap-3 w-full">
+    <div class="bg-brand-dark border border-gray-800 rounded-xl p-2.5 transition hover:border-brand-yellow/50">
+        <label class="block text-xs font-bold text-gray-400 mb-1 flex items-center justify-between">
+            <span><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></span>
+            <span class="text-brand-yellow text-[14px] bg-brand-yellow/10 px-2 py-0.5 rounded-full" data-i18n="date_note">接受最多3日內</span>
+        </label>
+        <input type="date" id="date" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
+    </div>
 
-                    <div class="bg-brand-dark border border-gray-800 rounded-2xl p-4 transition hover:border-brand-yellow/50">
-                        <label class="block text-xs font-bold text-gray-400 mb-2 flex items-center justify-between">
-                            <span><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></span>
-                            <span class="text-brand-yellow text-[16px] bg-brand-yellow/10 px-2 py-0.5 rounded-full" data-i18n="time_note">如沒指定，最快15分鐘後</span>
-                        </label>
-                        <input type="time" id="time" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
-                    </div>
-                </div>
-
+    <div class="bg-brand-dark border border-gray-800 rounded-xl p-2.5 transition hover:border-brand-yellow/50">
+        <label class="block text-xs font-bold text-gray-400 mb-1 flex items-center justify-between">
+            <span><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></span>
+            <span class="text-brand-yellow text-[14px] bg-brand-yellow/10 px-2 py-0.5 rounded-full" data-i18n="time_note">如沒指定，最快15分鐘後</span>
+        </label>
+        <input type="time" id="time" required class="w-full bg-transparent text-white text-base font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
+    </div>
+</div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數</span></label>
@@ -591,14 +590,14 @@
                 </div>
 
 <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl p-4">
-    <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
-        <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-        <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span>有寵物</span>
-    </label>
-    <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
-        <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-        <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span>輪椅放尾箱</span>
-    </label>
+<label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
+    <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+    <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span data-i18n="label_has_pet">有寵物</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
+    <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+    <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span data-i18n="label_has_wheelchair">輪椅放尾箱</span>
+</label>
 </div>
 
 <div>
@@ -636,18 +635,18 @@
     </div>
 </div>
 
-<div class="grid grid-cols-3 gap-3">
-    <div class="col-span-1">
-        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂</span></label>
+<div class="grid grid-cols-5 gap-3">
+    <div class="col-span-2">
+        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂（選填）</span></label>
         <select id="contact_title" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
             <option value="">-</option>
             <option value="先生" data-i18n="title_mr">先生</option>
             <option value="小姐" data-i18n="title_ms">小姐</option>
         </select>
     </div>
-    <div class="col-span-2">
-        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人</span></label>
-        <input type="text" id="contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+    <div class="col-span-3">
+        <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人（選填）</span></label>
+        <input type="text" id="contact_surname" data-i18n-placeholder="ph_contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
     </div>
 </div>
 
@@ -663,9 +662,9 @@
         <span data-i18n="label_verification">電話驗證</span>
     </label>
     <div class="flex gap-2">
-        <input type="text" id="verification_code" placeholder="輸入6位數驗證碼" 
-               class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition"
-               maxlength="6" inputmode="numeric" pattern="[0-9]*">
+<input type="text" id="verification_code" data-i18n-placeholder="ph_verification_code" placeholder="請點擊右方獲取驗證碼" 
+       class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition"
+       maxlength="6" inputmode="numeric" pattern="[0-9]*">
         <button type="button" onclick="sendVerificationCode()" 
                 class="bg-brand-yellow text-black font-bold px-4 rounded-xl text-sm whitespace-nowrap hover:opacity-90 transition">
             <span data-i18n="btn_get_code">獲取驗證碼</span>
@@ -1128,6 +1127,8 @@ let currentLang = 'zh';
 
 const translations = {
     zh: {
+
+ph_verification_code: "請點擊右方獲取驗證碼",
         btn_more_payment: "更多付款方式",
         // 電話驗證翻譯
         label_verification: "電話驗證",
@@ -1297,6 +1298,8 @@ const translations = {
         footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
     },
     en: {
+
+ph_verification_code: "Tap the get code button",
         btn_more_payment: "More Options",
         // Phone verification translations
         label_verification: "Phone Verification",
@@ -1439,9 +1442,9 @@ const translations = {
         opt_select: "Please select",
         opt_yes: "Yes",
         opt_no: "No",
-        label_contact_surname: "Contact",
+        label_contact_surname: "Contact(Optional)",
         ph_contact_surname: "e.g., Chan",
-        label_contact_title: "Title (Optional)",
+        label_contact_title: "Title ",
         title_mr: "Mr.",
         title_ms: "Ms.",
         label_payment_method: "Payment Method (Multiple Choice)",
@@ -1949,7 +1952,6 @@ function checkPassengerLimit() {
         }
     }
 }
-
 // 車款介紹展開/收合控制
 function toggleCarDetail(carName) {
     const detailEl = document.getElementById('detail-' + carName);
@@ -3240,7 +3242,7 @@ function submitBookingAfterUpgrade() {
                 ✅ 接受免費升級
             </button>
             <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition">
-                不用，謝謝
+                ❌不用，謝謝
             </button>
         </div>
     </div>
