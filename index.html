@@ -1011,7 +1011,7 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
 
-    <!-- JavaScript 邏輯整合與多語言切換 -->
+<!-- JavaScript 邏輯整合與多語言切換 -->
     <script>
 
 function togglePaymentOptions() {
@@ -2967,12 +2967,13 @@ document.addEventListener('DOMContentLoaded', function() {
         pickupInput.addEventListener('change', checkShowFlightField);
     }
 });
+
 function sendWhatsApp(event) {
     event.preventDefault();
 
     // 檢查是否已選擇收費模式
     if (!selectedFareMode) {
-        alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
+        alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
         document.getElementById('fare-result').scrollIntoView({ behavior: 'smooth' });
         return;
     }
@@ -2981,17 +2982,14 @@ function sendWhatsApp(event) {
     const dropoff = document.getElementById('calc-dropoff') ? document.getElementById('calc-dropoff').value.trim() : '';
     
     if (!pickup || !dropoff) {
-        alert(currentLang === 'en' ? "Please fill in both Pickup and Destination locations!" : "請必須完整填寫「起點」和「終點」！");
-        if (!pickup) document.getElementById('calc-pickup')?.focus();
-        else document.getElementById('calc-dropoff')?.focus();
+        alert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！");
         return;
     }
 
     const phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length < 8) {
-        alert(currentLang === 'en' ? "Contact phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字，請重新輸入！");
-        document.getElementById('phone')?.focus();
+        alert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！");
         return;
     }
 
@@ -3000,26 +2998,19 @@ function sendWhatsApp(event) {
         return;
     }
 
-    // ✅ 檢查電話驗證
+    // 檢查電話驗證
     const inputCode = document.getElementById('verification_code').value.trim();
     
     if (inputCode === INTERNAL_CODE) {
         isInternalUser = true;
-        console.log('內部人員提交');
     } else if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
         isInternalUser = false;
-        
         if (!whatsappSent) {
-            alert(translations[currentLang].alert_need_whatsapp || '請先發送 WhatsApp 確認訊息！');
-            document.getElementById('verification-code-display').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            alert('請先發送 WhatsApp 確認訊息！');
             return;
         }
-        
-        console.log('客人驗證成功');
     } else {
-        alert(translations[currentLang].alert_verify_required || '請先完成電話驗證！');
-        document.getElementById('verification_code').focus();
-        document.getElementById('verification_code').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert('請先完成電話驗證！');
         return;
     }
 
@@ -3033,22 +3024,14 @@ function sendWhatsApp(event) {
     const date = document.getElementById('date') ? document.getElementById('date').value : '';
     const time = document.getElementById('time') ? document.getElementById('time').value : '';
     
-    // 檢查日期
-    if (!date) {
-        alert('請選擇預約日期！');
-        return;
-    }
+    if (!date) { alert('請選擇預約日期！'); return; }
     
     const selectedDate = new Date(date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const maxAllowedDate = new Date(today);
     maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
-    
-    if (selectedDate < today || selectedDate > maxAllowedDate) {
-        alert('預約日期必須在未來三日內！');
-        return;
-    }
+    if (selectedDate < today || selectedDate > maxAllowedDate) { alert('預約日期必須在未來三日內！'); return; }
 
     const passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
     const passengerCount = parseInt(passengers);
@@ -3061,9 +3044,7 @@ function sendWhatsApp(event) {
 
     const payEls = document.getElementsByName('payment_method');
     let payments = [];
-    for (let el of payEls) {
-        if (el.checked) payments.push(el.value);
-    }
+    for (let el of payEls) { if (el.checked) payments.push(el.value); }
     const paymentStr = payments.join(' / ');
 
     let timeStringFormatted = time;
@@ -3072,13 +3053,11 @@ function sendWhatsApp(event) {
         const [targetYear, targetMonth, targetDay] = date.split('-').map(Number);
         const [targetHour, targetMinute] = time.split(':').map(Number);
         const targetDateTime = new Date(targetYear, targetMonth - 1, targetDay, targetHour, targetMinute);
-        const diffMinutes = (targetDateTime - now) / (1000 * 60);
-        if (diffMinutes <= 15) {
+        if ((targetDateTime - now) / (1000 * 60) <= 15) {
             timeStringFormatted = `${time} ‼️⚠️ *即時用車* ⚠️‼️`;
         }
     }
 
-    // 計算總費用
     let totalFareForWhatsApp = 0;
     if (currentBaseFare > 0) {
         if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
@@ -3086,123 +3065,30 @@ function sendWhatsApp(event) {
             let discountTunnelFee = 0;
             if (currentTunnelFee > 0) {
                 const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                const otherTunnelFee = currentTunnelFee % 50;
-                discountTunnelFee = harborTunnelCount * 25 + otherTunnelFee;
+                discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
             }
             totalFareForWhatsApp = discountedBaseFare + discountTunnelFee + selectedSurcharge;
         } else {
             totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
-            if (currentBaseFare <= 100) {
-                totalFareForWhatsApp = 100 + currentTunnelFee + selectedSurcharge;
-            }
+            if (currentBaseFare <= 100) totalFareForWhatsApp = 100 + currentTunnelFee + selectedSurcharge;
         }
     }
 
-    // ✅ 確認預約前詢問升級問題
-    if (selectedCarName === '豐田混能的士' || selectedCarName === 'MAXUS MIFA 7') {
-        // 儲存當前資料，等升級選擇後繼續
-        pendingBookingData = {
-            pickup, dropoff, stopoverTexts, flightNo, date, time, timeStringFormatted,
-            passengers, passengerCount, luggages, hasPet, hasWheelchair,
-            surname, title, phone, paymentStr, totalFareForWhatsApp, selectedCarName
-        };
-        
-        // 顯示升級 Modal
-        showUpgradeModal(selectedCarName, passengerCount);
-        return; // 等用戶選擇後先繼續
-    } else {
-        // 唔需要升級問題，直接提交
-        upgradeChoice = null;
-        submitBookingAfterUpgrade();
-        return;
-    }
-
-    const fullMessage = msgLines.join('\n');
-
-    // ✅ 建立 bookingData（喺升級問題之後）
-    const bookingData = {
-        pickup: pickup,
-        stopover: stopoverTexts.join(' / '),
-        dropoff: dropoff,
-        date: date,
-        time: time,
-        timeFormatted: timeStringFormatted,
-        passengers: passengers,
-        luggages: luggages,
-        hasPet: hasPet,
-        hasWheelchair: hasWheelchair,
-        surname: surname,
-        title: title,
-        phone: phone,
-        paymentMethod: paymentStr,
-        carType: carDisplayText,
-        totalFare: totalFareForWhatsApp,
-        flightNo: flightNo,
-        upgradeOption: carDisplayText,
-        feeMode: selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費',
-        surcharge: selectedSurcharge,
-        tunnelFee: currentTunnelFee,
-        fullMessage: fullMessage,
-        isInternalBooking: isInternalUser
+    // 儲存資料
+    pendingBookingData = {
+        pickup, dropoff, stopoverTexts, flightNo, date, time, timeStringFormatted,
+        passengers, passengerCount, luggages, hasPet, hasWheelchair,
+        surname, title, phone, paymentStr, totalFareForWhatsApp, selectedCarName
     };
 
-    // 隱藏之前嘅訊息
-    const successMsg = document.getElementById('booking-success-message');
-    const errorMsg = document.getElementById('booking-error-message');
-    if (successMsg) successMsg.classList.add('hidden');
-    if (errorMsg) errorMsg.classList.add('hidden');
-
-    // 顯示處理中狀態
-    const submitBtn = document.getElementById('booking-submit-btn');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ${translations[currentLang].btn_sending_booking}`;
+    // 確認預約前詢問升級問題
+    if (selectedCarName === '豐田混能的士' || selectedCarName === 'MAXUS MIFA 7') {
+        showUpgradeModal(selectedCarName, passengerCount);
+        return;
+    } else {
+        upgradeChoice = null;
+        submitBookingAfterUpgrade();
     }
-
-    // 發送到 Netlify Function
-    fetch('/.netlify/functions/booking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Booking saved to calendar:', data);
-        
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
-        }
-        
-        if (data.success) {
-            const cleanMessage = fullMessage
-                .replace('[網站預約]', '')
-                .replace('[新事件已通知]', '')
-                .replace('👤 工作人員落單', '')
-                .trim();
-            
-            const encodedData = encodeURIComponent(cleanMessage);
-            window.location.href = `booking-success.html?data=${encodedData}`;
-        } else {
-            if (errorMsg) {
-                errorMsg.classList.remove('hidden');
-                errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error saving booking:', error);
-        
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
-        }
-        
-        if (errorMsg) {
-            errorMsg.classList.remove('hidden');
-            errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    });
 }
 
 function goBackToHome() {
@@ -3217,10 +3103,6 @@ function goBackToHome() {
     
     // 可選：重設表單
     document.getElementById('booking-form').reset();
-}
-
-function goBackToHome() {
-    // ...
 }
 
 // ============================================
@@ -3251,21 +3133,21 @@ text.innerHTML = currentLang === 'zh' ?
         if (passengerCount === 5) {
             text.innerHTML = currentLang === 'zh' ?
                 '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
-                '你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至其他五/六人車款，<br>請問是否接受？' :
+                '你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至其他五/六人車款<br>請問是否接受？' :
                 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
                 'You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
                 
         } else if (passengerCount === 6) {
             text.innerHTML = currentLang === 'zh' ?
                 '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
-                '你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> 至其他六人車款，<br>請問是否接受？' :
+                '你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> 至其他六人車款<br>請問是否接受？' :
                 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
                 'You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
                 
         } else {
             text.innerHTML = currentLang === 'zh' ?
                 '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
-                '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款，<br>請問是否接受？' :
+                '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' :
                 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
                 'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
         }
@@ -3286,10 +3168,10 @@ function confirmUpgrade(choice) {
 }
 
 // 升級選擇後繼續提交
+
 function submitBookingAfterUpgrade() {
     const data = pendingBookingData;
     
-    // 根據升級選擇更新 carDisplayText
     let carDisplayText = data.selectedCarName;
     
     if (data.selectedCarName === '豐田混能的士') {
@@ -3304,7 +3186,7 @@ function submitBookingAfterUpgrade() {
         }
     }
     
-    // 建立訊息
+    // ✅ 建立訊息（加返標題）
     let msgLines = [];
 
     msgLines.push(`🚘 預約車款：${carDisplayText}`);
@@ -3320,22 +3202,11 @@ function submitBookingAfterUpgrade() {
     msgLines.push(`⏰ 時間：${data.timeStringFormatted}`);
     msgLines.push(`👥 人數：${data.passengers}`);
     
-    if (data.luggages && data.luggages !== '0 件') {
-        msgLines.push(`🧳 行李件數： ${data.luggages}`);
-    }
-
-    if (data.hasPet) {
-        msgLines.push(`🐶寵物：✅`);
-    }
-
-    if (data.hasWheelchair) {
-        msgLines.push(`♿️輪椅放置尾箱：✅`);
-    }
+    if (data.luggages && data.luggages !== '0 件') msgLines.push(`🧳 行李件數： ${data.luggages}`);
+    if (data.hasPet) msgLines.push(`🐶寵物：✅（$5/隻）`);
+    if (data.hasWheelchair) msgLines.push(`♿️輪椅放置尾箱：✅（免費）`);
     if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
-    
-    if (data.surname) {
-        msgLines.push(`👤 聯絡人： ${data.surname} ${data.title}`);
-    }
+    if (data.surname) msgLines.push(`👤 聯絡人： ${data.surname} ${data.title}`);
     msgLines.push(`📞 電話：${data.phone}`);
 
     if (selectedFareMode === 'discount') {
@@ -3348,7 +3219,6 @@ function submitBookingAfterUpgrade() {
 
     const fullMessage = msgLines.join('\n');
 
-    // 建立 bookingData
     const bookingData = {
         pickup: data.pickup,
         stopover: data.stopoverTexts.join(' / '),
@@ -3375,20 +3245,17 @@ function submitBookingAfterUpgrade() {
         isInternalBooking: isInternalUser
     };
 
-    // 隱藏之前嘅訊息
     const successMsg = document.getElementById('booking-success-message');
     const errorMsg = document.getElementById('booking-error-message');
     if (successMsg) successMsg.classList.add('hidden');
     if (errorMsg) errorMsg.classList.add('hidden');
 
-    // 顯示處理中狀態
     const submitBtn = document.getElementById('booking-submit-btn');
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ${translations[currentLang].btn_sending_booking}`;
     }
 
-    // 發送到 Netlify Function
     fetch('/.netlify/functions/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3396,8 +3263,6 @@ function submitBookingAfterUpgrade() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Booking saved to calendar:', data);
-        
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
@@ -3409,28 +3274,19 @@ function submitBookingAfterUpgrade() {
                 .replace('[新事件已通知]', '')
                 .replace('👤 工作人員落單', '')
                 .trim();
-            
             const encodedData = encodeURIComponent(cleanMessage);
             window.location.href = `booking-success.html?data=${encodedData}`;
         } else {
-            if (errorMsg) {
-                errorMsg.classList.remove('hidden');
-                errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            if (errorMsg) { errorMsg.classList.remove('hidden'); errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
         }
     })
     .catch(error => {
-        console.error('Error saving booking:', error);
-        
+        console.error('Error:', error);
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
         }
-        
-        if (errorMsg) {
-            errorMsg.classList.remove('hidden');
-            errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (errorMsg) { errorMsg.classList.remove('hidden'); }
     });
 }
 
