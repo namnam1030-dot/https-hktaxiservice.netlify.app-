@@ -155,7 +155,7 @@ async function sendDiscordNotification(data) {
     // Discord Markdown 連結格式
     message = message.replace(
       `📞 電話：${data.phone}`,
-      `📞 電話：[${data.phone}](tel:${cleanPhone}) | [WhatsApp](https://wa.me/${phoneWithCode})`
+      `📞 電話：[${data.phone}](tel:${cleanPhone}) | [WhatsApp](<https://wa.me/${phoneWithCode}>)`
     );
   }
   
@@ -171,7 +171,8 @@ async function sendDiscordNotification(data) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        content: bookingSource + message + '\n\n ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦'
+        content: bookingSource + message + '\n\n ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦',
+flags: 4  // ✅ 雙重保護
       })
     });
     console.log('Discord 通知已發送');
