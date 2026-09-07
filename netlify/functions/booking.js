@@ -69,14 +69,32 @@ async function addToGoogleCalendar(data) {
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     const endTime = new Date(startTime);
 
-    // ✅ 判斷係咪內部人員落單
+// ✅ 判斷係咪內部人員落單
     const bookingSourceMark = data.isInternalBooking === true 
       ? '\n\n[網站預約] 👤 工作人員落單' 
       : '\n\n[網站預約]';
 
+    // ✅ 建立含可點擊連結嘅描述
+    let descriptionWithLinks = data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
+    
+    const cleanPhone = (data.phone || '').replace(/\D/g, '');
+    if (cleanPhone) {
+      let phoneWithCode = cleanPhone;
+      if (phoneWithCode.length === 8) {
+        phoneWithCode = '852' + phoneWithCode;
+      }
+      
+      // Google Calendar 會自動偵測電話號碼，加入 WhatsApp 連結
+      descriptionWithLinks = descriptionWithLinks.replace(
+        `📞 電話：${data.phone}`,
+        `📞 電話：${data.phone}\n📱 WhatsApp：https://wa.me/${phoneWithCode}`
+      );
+    }
+
     const event = {
       summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
-      description: (data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`) + bookingSourceMark,
+      description: descriptionWithLinks + bookingSourceMark,
+
       start: {
         dateTime: startTime.toISOString(),
         timeZone: 'Asia/Hong_Kong'
@@ -117,14 +135,29 @@ async function sendDiscordNotification(data) {
     return;
   }
 
-  const message = data.fullMessage || data.description || '收到新訂單';
+  let message = data.fullMessage || data.description || '收到新訂單';
   
   // ✅ 隱藏標記
-  const cleanMessage = message
+  message = message
     .replace('[網站預約]', '')
     .replace('[新事件已通知]', '')
     .replace('👤 工作人員落單', '')
     .trim();
+  
+  // ✅ 加入可點擊嘅電話連結
+  const cleanPhone = (data.phone || '').replace(/\D/g, '');
+  if (cleanPhone) {
+    let phoneWithCode = cleanPhone;
+    if (phoneWithCode.length === 8) {
+      phoneWithCode = '852' + phoneWithCode;
+    }
+    
+    // Discord Markdown 連結格式
+    message = message.replace(
+      `📞 電話：${data.phone}`,
+      `📞 電話：[${data.phone}](tel:${cleanPhone}) | [WhatsApp](https://wa.me/${phoneWithCode})`
+    );
+  }
   
   // ✅ 判斷係咪內部人員落單
   const bookingSource = data.isInternalBooking === true 
@@ -138,7 +171,7 @@ async function sendDiscordNotification(data) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        content: bookingSource + cleanMessage + '\n\n✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦'
+        content: bookingSource + message + '\n\n ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦'
       })
     });
     console.log('Discord 通知已發送');
