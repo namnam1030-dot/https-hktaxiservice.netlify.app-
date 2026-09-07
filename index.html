@@ -3241,35 +3241,35 @@ function showUpgradeModal(carType, passengerCount) {
     
     if (carType === '豐田混能的士') {
         title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        text.innerHTML = currentLang === 'zh' ? 
-            '你選擇咗 <span class="text-brand-yellow font-bold text-2xl">豐田混能的士</span><br><br>' +
-            '有機會被 <span class="text-brand-yellow font-bold text-2xl">免費升級</span> 至更高階車款，<br><br>請問是否接受？' :
+text.innerHTML = currentLang === 'zh' ? 
+    '你選擇咗 <span class="text-brand-yellow font-bold text-lg">豐田混能的士</span><br><br>' +
+    '有機會被 <span class="text-brand-yellow font-bold text-lg">免費升級</span> 至更高階車款，<br><br>請問是否接受？' :
             'You selected <span class="text-brand-yellow font-bold text-2xl">Toyota Hybrid Taxi</span><br><br>' +
             'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-2xl">FREE</span>.<br><br>Do you accept?';
             
-    } else if (carType === 'MAXUS MIFA 7') {
+} else if (carType === 'MAXUS MIFA 7') {
         title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
         
         if (passengerCount === 5) {
             text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-2xl">MAXUS MIFA 7</span><br><br>' +
-                '你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-2xl">免費升級</span> 至其他五/六人車款，<br><br>請問是否接受？' :
-                'You selected <span class="text-brand-yellow font-bold text-2xl">MAXUS MIFA 7</span><br><br>' +
-                'You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold text-2xl">FREE</span>.<br><br>Do you accept?';
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                '你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-lg">免費升級</span> 至其他五/六人車款，<br><br>請問是否接受？' :
+                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                'You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
                 
         } else if (passengerCount === 6) {
             text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-2xl">MAXUS MIFA 7</span><br><br>' +
-                '你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-2xl">免費升級</span> 至其他六人車款，<br><br>請問是否接受？' :
-                'You selected <span class="text-brand-yellow font-bold text-2xl">MAXUS MIFA 7</span><br><br>' +
-                'You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold text-2xl">FREE</span>.<br><br>Do you accept?';
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                '你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-lg">免費升級</span> 至其他六人車款，<br><br>請問是否接受？' :
+                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                'You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
                 
         } else {
             text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-2xl">MAXUS MIFA 7</span><br><br>' +
-                '有機會被 <span class="text-brand-yellow font-bold text-2xl">免費升級</span> 至更高階車款，<br><br>請問是否接受？' :
-                'You selected <span class="text-brand-yellow font-bold text-2xl">MAXUS MIFA 7</span><br><br>' +
-                'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-2xl">FREE</span>.<br><br>Do you accept?';
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                '有機會被 <span class="text-brand-yellow font-bold text-lg">免費升級</span> 至更高階車款，<br><br>請問是否接受？' :
+                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
         }
     }
     
@@ -3439,23 +3439,23 @@ function submitBookingAfterUpgrade() {
     </script>
 
     <!-- 升級提示 Modal -->
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
-            <div class="text-brand-yellow text-2xl mb-3">
-                <i class="fa-solid fa-gift"></i>
-            </div>
-            <h3 id="upgrade-modal-title" class="text-2xl font-extrabold text-white mb-4">免費升級提示</h3>
-            <p id="upgrade-modal-text" class="text-xl text-gray-300 mb-6 leading-relaxed"></p>
-            <div class="flex flex-col gap-3">
-                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-4 rounded-xl text-xl hover:opacity-90 transition">
-                    ✅ 接受免費升級
-                </button>
-                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-xl hover:opacity-90 transition">
-                    ❌不用，謝謝
-                </button>
-            </div>
+<div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+    <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
+        <div class="text-brand-yellow text-3xl mb-3">
+            <i class="fa-solid fa-gift"></i>
+        </div>
+        <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
+        <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
+        <div class="flex flex-col gap-3">
+            <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg hover:opacity-90 transition">
+                ✅ 接受免費升級
+            </button>
+            <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition">
+                不用，謝謝
+            </button>
         </div>
     </div>
+</div>
 
 </body>
 </html>
