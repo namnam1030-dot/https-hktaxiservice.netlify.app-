@@ -87,7 +87,7 @@ async function addToGoogleCalendar(data) {
       // Google Calendar 會自動偵測電話號碼，加入 WhatsApp 連結
       descriptionWithLinks = descriptionWithLinks.replace(
         `📞 電話：${data.phone}`,
-        `📞 電話：${data.phone}\n📱 WhatsApp：https://wa.me/${phoneWithCode}`
+        `📞 電話：${data.phone}\n📱 WhatsApp：(<https://wa.me/${phoneWithCode}>)`
       );
     }
 
