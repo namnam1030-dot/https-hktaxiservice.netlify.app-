@@ -2,24 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   
-  <!-- 主頁 -->
+  <!-- 主頁（繁體中文版） -->
   <url>
     <loc>https://hktaxiservice.netlify.app/</loc>
-    <lastmod>2026-09-05</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-09-08</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://hktaxiservice.netlify.app/logo.jpeg</image:loc>
-      <image:title>24小時的士預約服務</image:title>
+      <image:title>八五折的士 | 長途跨區・機場口岸接送 | 24小時網約的士</image:title>
+      <image:caption>香港24小時八五折的士預約服務，專營長途跨區及口岸接送</image:caption>
     </image:image>
   </url>
   
-  <!-- 英文版（如果 URL 有變） -->
+  <!-- 英文版 -->
   <url>
     <loc>https://hktaxiservice.netlify.app/?lang=en</loc>
-    <lastmod>2026-09-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <lastmod>2026-09-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   
 </urlset>
