@@ -1250,6 +1250,10 @@ function swapLocations() {
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('taxiLang', currentLang);
+    applyLanguage();
+}
+
+function applyLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
 
@@ -1901,24 +1905,13 @@ function updateFareModeAvailability() {
 }
 
 // 初始化語言
-const savedLang = localStorage.getItem('taxiLang');
-if (savedLang) {
-    currentLang = savedLang;
-}
+let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
-// 頁面載入時套用語言
+// 頁面載入時套用語言（唔切換）
 document.addEventListener('DOMContentLoaded', function() {
-    if (currentLang === 'en') {
-        const btn = document.getElementById('lang-toggle-btn');
-        if (btn) btn.innerText = '繁體';
-    }
-    toggleLanguage();
-    if (currentLang === 'zh') {
-        // 確保切換回來時正確顯示
-        currentLang = 'zh';
-        toggleLanguage();
-    }
+    applyLanguage();
 });
+
 </script>
 </body>
 </html>

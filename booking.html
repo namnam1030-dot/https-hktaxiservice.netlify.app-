@@ -1014,6 +1014,10 @@ function closeWeComQR() {
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('taxiLang', currentLang);
+    applyLanguage();
+}
+
+function applyLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
 
@@ -1463,24 +1467,11 @@ function submitBookingAfterUpgrade() {
     });
 }
 
-// 初始化語言
-const savedLang = localStorage.getItem('taxiLang');
-if (savedLang) {
-    currentLang = savedLang;
-}
-
-// 頁面載入時套用語言
+// 頁面載入時套用語言（唔切換）
 document.addEventListener('DOMContentLoaded', function() {
-    if (currentLang === 'en') {
-        const btn = document.getElementById('lang-toggle-btn');
-        if (btn) btn.innerText = '繁體';
-    }
-    toggleLanguage();
-    if (currentLang === 'zh') {
-        currentLang = 'zh';
-        toggleLanguage();
-    }
+    applyLanguage();
 });
+
 </script>
 </body>
 </html>

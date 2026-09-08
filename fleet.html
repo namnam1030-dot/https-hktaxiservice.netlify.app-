@@ -594,6 +594,10 @@ function updateCarCardFees() {
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('taxiLang', currentLang);
+    applyLanguage();
+}
+
+function applyLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
 
@@ -748,16 +752,8 @@ let currentTunnelFee = 0;
 window.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage();
     
-    // 套用語言
-    if (currentLang === 'en') {
-        const btn = document.getElementById('lang-toggle-btn');
-        if (btn) btn.innerText = '繁體';
-    }
-    toggleLanguage();
-    if (currentLang === 'zh') {
-        currentLang = 'zh';
-        toggleLanguage();
-    }
+    // 套用語言（唔切換）
+    applyLanguage();
 });
 
 // 註冊 Service Worker (PWA 必備)
@@ -770,6 +766,7 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
+
 </script>
 </body>
 </html>
