@@ -34,7 +34,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" async defer></script>
+    <script>
         tailwind.config = {
             theme: {
                 extend: {
@@ -236,7 +237,6 @@
                     <p class="text-xs text-gray-400 mb-3" data-i18n="min_fare_note">所有行程最低消費$100</p>
                     
                     <div class="space-y-3">
-                        <!-- 正價按錶收費選項 -->
                         <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition relative">
                             <input type="checkbox" id="fare-mode-normal" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('normal')">
                             <div class="flex-1">
@@ -248,7 +248,6 @@
                             </div>
                         </label>
 
-                        <!-- 八五折優惠選項 -->
                         <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition relative" id="discount-option-container">
                             <input type="checkbox" id="fare-mode-discount" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('discount')">
                             <div class="flex-1">
@@ -278,7 +277,6 @@
                     </button>
                 </div>
 
-                <!-- 立即預約按鍵 -->
                 <div class="mt-4 flex flex-col items-center">
                     <button onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer text-[20px]">
                         <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
@@ -322,92 +320,58 @@
 
 <script>
 // ============================================
-// 從 localStorage 讀取路線資料
+// 1. Google Maps callback（必須最前）
 // ============================================
 
-function loadRouteDataFromLocalStorage() {
-    const saved = localStorage.getItem('taxiRouteData');
-    if (saved) {
-        try {
-            return JSON.parse(saved);
-        } catch(e) {
-            return null;
-        }
-    }
-    return null;
-}
-
-function loadBookingDataFromLocalStorage() {
-    const saved = localStorage.getItem('taxiBookingData');
-    if (saved) {
-        try {
-            return JSON.parse(saved);
-        } catch(e) {
-            return null;
-        }
-    }
-    return null;
-}
-
-function saveBookingDataToLocalStorage() {
-    const data = {
-        selectedCarName: selectedCarName,
-        selectedCarNameEn: selectedCarNameEn,
-        selectedSurcharge: selectedSurcharge,
-        selectedMinFare: selectedMinFare,
-        selectedFeeMode: selectedFeeMode,
-        selectedFeeModeEn: selectedFeeModeEn,
-        selectedFareMode: selectedFareMode,
-        currentBaseFare: currentBaseFare,
-        currentTunnelFee: currentTunnelFee,
-        pickup: routeData?.pickup || '',
-        dropoff: routeData?.dropoff || '',
-        stopovers: routeData?.stopovers || []
-    };
+function initMap() {
+    routeData = loadRouteDataFromLocalStorage();
     
-    localStorage.setItem('taxiBookingData', JSON.stringify(data));
-}
-
-function goBackToInput() {
-    window.location.href = 'index.html';
-}
-
-function goToFleetPage() {
-    if (!selectedFareMode) {
-        alert(currentLang === 'en' ? "Please select a fare mode first!" : "請先選擇收費模式！");
-        return;
-    }
-    saveBookingDataToLocalStorage();
-    window.location.href = 'fleet.html';
-}
-
-function goToBookingPage() {
-    if (!selectedFareMode) {
-        alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
-        return;
+    const bookingData = loadBookingDataFromLocalStorage();
+    if (bookingData) {
+        selectedCarName = bookingData.selectedCarName || '';
+        selectedCarNameEn = bookingData.selectedCarNameEn || '';
+        selectedSurcharge = bookingData.selectedSurcharge || 0;
+        selectedMinFare = bookingData.selectedMinFare || 0;
+        selectedFeeMode = bookingData.selectedFeeMode || '';
+        selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
+        selectedFareMode = bookingData.selectedFareMode || '';
+        currentBaseFare = bookingData.currentBaseFare || 0;
+        currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
     
-    if (!selectedCarName) {
-        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
-    }
+    applyLanguage();
     
-    saveBookingDataToLocalStorage();
-    window.location.href = 'booking.html';
-}
-
-function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
-}
-
-function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
+    if (routeData && routeData.pickup && routeData.dropoff) {
+        calculateFareWithGoogle();
+    } else {
+        alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
+        window.location.href = 'index.html';
+    }
 }
 
 // ============================================
-// 語言系統
+// 2. 變數宣告
 // ============================================
 
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
+let selectedCarName = '';
+let selectedCarNameEn = '';
+let selectedSurcharge = 0;
+let selectedMinFare = 0;
+let selectedFeeMode = '';
+let selectedFeeModeEn = '';
+let selectedFareMode = '';
+let map = null;
+let directionsService = null;
+let directionsRenderer = null;
+let routesData = [];
+let currentBaseFare = 0;
+let currentTunnelFee = 0;
+let routeData = null;
+
+// ============================================
+// 3. 翻譯物件
+// ============================================
 
 const translations = {
     zh: {
@@ -484,22 +448,87 @@ const translations = {
     }
 };
 
-let selectedCarName = '';
-let selectedCarNameEn = '';
-let selectedSurcharge = 0;
-let selectedMinFare = 0;
-let selectedFeeMode = '';
-let selectedFeeModeEn = '';
-let selectedFareMode = '';
+// ============================================
+// 4. 所有函數定義
+// ============================================
 
-let map = null;
-let directionsService = null;
-let directionsRenderer = null;
-let routesData = [];
-let currentBaseFare = 0;
-let currentTunnelFee = 0;
+function loadRouteDataFromLocalStorage() {
+    const saved = localStorage.getItem('taxiRouteData');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch(e) {
+            return null;
+        }
+    }
+    return null;
+}
 
-let routeData = null;
+function loadBookingDataFromLocalStorage() {
+    const saved = localStorage.getItem('taxiBookingData');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch(e) {
+            return null;
+        }
+    }
+    return null;
+}
+
+function saveBookingDataToLocalStorage() {
+    const data = {
+        selectedCarName: selectedCarName,
+        selectedCarNameEn: selectedCarNameEn,
+        selectedSurcharge: selectedSurcharge,
+        selectedMinFare: selectedMinFare,
+        selectedFeeMode: selectedFeeMode,
+        selectedFeeModeEn: selectedFeeModeEn,
+        selectedFareMode: selectedFareMode,
+        currentBaseFare: currentBaseFare,
+        currentTunnelFee: currentTunnelFee,
+        pickup: routeData ? routeData.pickup : '',
+        dropoff: routeData ? routeData.dropoff : '',
+        stopovers: routeData ? routeData.stopovers : []
+    };
+    
+    localStorage.setItem('taxiBookingData', JSON.stringify(data));
+}
+
+function goBackToInput() {
+    window.location.href = 'index.html';
+}
+
+function goToFleetPage() {
+    if (!selectedFareMode) {
+        alert(currentLang === 'en' ? "Please select a fare mode first!" : "請先選擇收費模式！");
+        return;
+    }
+    saveBookingDataToLocalStorage();
+    window.location.href = 'fleet.html';
+}
+
+function goToBookingPage() {
+    if (!selectedFareMode) {
+        alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
+        return;
+    }
+    
+    if (!selectedCarName) {
+        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+    }
+    
+    saveBookingDataToLocalStorage();
+    window.location.href = 'booking.html';
+}
+
+function showWeComQR() {
+    document.getElementById('wecom-modal').classList.remove('hidden');
+}
+
+function closeWeComQR() {
+    document.getElementById('wecom-modal').classList.add('hidden');
+}
 
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -547,10 +576,6 @@ function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRec
         updateFareModeDisplay();
     }
 }
-
-// ============================================
-// 路線計算邏輯（同原本一樣）
-// ============================================
 
 function calculateTaxiBaseFare(km) {
     if (km <= 0) return 0;
@@ -736,7 +761,6 @@ function calculateFareWithGoogle() {
             routesData = processRoutes(result.routes, isShenzhenBay);
             result.routes = routesData;
 
-            // 隱藏載入中，顯示結果
             document.getElementById('loading-indicator').classList.add('hidden');
             document.getElementById('result-content').classList.remove('hidden');
 
@@ -1051,46 +1075,17 @@ function updateFareModeAvailability() {
 }
 
 // ============================================
-// 初始化
+// 5. 頁面初始化
 // ============================================
 
-// Google Maps 載入完成後嘅 callback
-function initMap() {
-    // 讀取路線資料
-    routeData = loadRouteDataFromLocalStorage();
-    
-    // 讀取已儲存嘅 booking 資料（如有）
-    const bookingData = loadBookingDataFromLocalStorage();
-    if (bookingData) {
-        selectedCarName = bookingData.selectedCarName || '';
-        selectedCarNameEn = bookingData.selectedCarNameEn || '';
-        selectedSurcharge = bookingData.selectedSurcharge || 0;
-        selectedMinFare = bookingData.selectedMinFare || 0;
-        selectedFeeMode = bookingData.selectedFeeMode || '';
-        selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
-        selectedFareMode = bookingData.selectedFareMode || '';
-        currentBaseFare = bookingData.currentBaseFare || 0;
-        currentTunnelFee = bookingData.currentTunnelFee || 0;
-    }
-    
-    // 套用語言
-    applyLanguage();
-    
-    // 開始計算路線
-    if (routeData && routeData.pickup && routeData.dropoff) {
-        calculateFareWithGoogle();
-    } else {
-        alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
-        window.location.href = 'index.html';
-    }
-}
-
-// 頁面載入時套用語言（唔依賴 Google Maps）
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 });
 
-// 註冊 Service Worker
+// ============================================
+// 6. Service Worker
+// ============================================
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(reg => {
