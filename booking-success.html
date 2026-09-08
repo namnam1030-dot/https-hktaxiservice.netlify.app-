@@ -3,7 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>預約成功 | 24小時的士預約服務</title>
+
+<!-- ============ SEO 基礎優化（預約成功頁面） ============ -->
+<title>預約成功 | 八五折的士 | 24小時網約車預約確認</title>
+
+<meta name="description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認。24小時八五折的士預約服務。">
+
+<meta name="keywords" content="預約成功,的士預約確認,八五折的士,85折的士,24小時的士,網約的士,WhatsApp叫車">
+
+<meta name="geo.region" content="HK">
+<meta name="geo.placename" content="Hong Kong">
+<meta name="geo.position" content="22.3193;114.1694">
+<meta name="ICBM" content="22.3193, 114.1694">
+
+<meta property="og:title" content="預約成功 | 八五折的士 | 24小時網約車">
+<meta property="og:description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內回覆確認。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hktaxiservice.netlify.app/booking-success.html">
+<meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
+<meta property="og:locale" content="zh_HK">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="預約成功 | 八五折的士 | 24小時網約車">
+<meta name="twitter:description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內回覆確認。">
+<meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
+
+<!-- 多語言標記 -->
+<link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking-success.html">
+<link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking-success.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking-success.html">
+
+<link rel="canonical" href="https://hktaxiservice.netlify.app/booking-success.html">
+
+<!-- Schema.org 結構化資料 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "預約成功 | 八五折的士 | 24小時網約車",
+  "description": "您嘅的士預約訂單已成功送出。",
+  "url": "https://hktaxiservice.netlify.app/booking-success.html",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "24小時八五折的士預約服務",
+    "url": "https://hktaxiservice.netlify.app/"
+  },
+  "provider": {
+    "@type": "TaxiService",
+    "name": "24小時八五折的士預約服務",
+    "telephone": "+85268815441",
+    "priceRange": "HK$29起",
+    "areaServed": "Hong Kong"
+  }
+}
+</script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -52,7 +107,6 @@
                     <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp 查詢
                 </a>
                 
-                <!-- ✅ 修正：改為直接顯示 WeChat Modal -->
                 <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
                     <i class="fa-brands fa-weixin text-xl"></i> WeChat 查詢
                 </button>
@@ -63,14 +117,14 @@
 
             </div>
             
-            <!-- 返回主頁 -->
-            <a href="https://hktaxiservice.netlify.app/" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                <i class="fa-solid fa-arrow-left text-xl "></i> 返回主頁
-            </a>
+            <!-- 返回主頁（清空資料） -->
+            <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                <i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁
+            </button>
         </div>
     </div>
 
-    <!-- ✅ WeChat Modal -->
+    <!-- WeChat Modal -->
     <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-green-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
             <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">
@@ -102,7 +156,6 @@
             document.getElementById('booking-details').textContent = '冇訂單資料';
         }
         
-        // ✅ WeChat Modal 函數
         function showWeComQR() {
             document.getElementById('wecom-modal').classList.remove('hidden');
         }
@@ -110,6 +163,13 @@
         function closeWeComQR() {
             document.getElementById('wecom-modal').classList.add('hidden');
         }
+        
+        // 返回主頁：清空所有資料
+        function goBackToHome() {
+            localStorage.removeItem('taxiRouteData');
+            localStorage.removeItem('taxiBookingData');
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
-</html> 
+</html>
