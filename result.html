@@ -34,7 +34,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" async defer></script>
+<!-- 移除 callback=initMap -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -110,31 +111,39 @@
     // 1. Google Maps callback（必須最前）
     // ============================================
 
-    function initMap() {
-        routeData = loadRouteDataFromLocalStorage();
-        
-        const bookingData = loadBookingDataFromLocalStorage();
-        if (bookingData) {
-            selectedCarName = bookingData.selectedCarName || '';
-            selectedCarNameEn = bookingData.selectedCarNameEn || '';
-            selectedSurcharge = bookingData.selectedSurcharge || 0;
-            selectedMinFare = bookingData.selectedMinFare || 0;
-            selectedFeeMode = bookingData.selectedFeeMode || '';
-            selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
-            selectedFareMode = bookingData.selectedFareMode || '';
-            currentBaseFare = bookingData.currentBaseFare || 0;
-            currentTunnelFee = bookingData.currentTunnelFee || 0;
-        }
-        
-        applyLanguage();
-        
-        if (routeData && routeData.pickup && routeData.dropoff) {
-            calculateFareWithGoogle();
-        } else {
-            alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
-            window.location.href = 'index.html';
-        }
+function initResultPage() {
+    routeData = loadRouteDataFromLocalStorage();
+    
+    const bookingData = loadBookingDataFromLocalStorage();
+    if (bookingData) {
+        selectedCarName = bookingData.selectedCarName || '';
+        selectedCarNameEn = bookingData.selectedCarNameEn || '';
+        selectedSurcharge = bookingData.selectedSurcharge || 0;
+        selectedMinFare = bookingData.selectedMinFare || 0;
+        selectedFeeMode = bookingData.selectedFeeMode || '';
+        selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
+        selectedFareMode = bookingData.selectedFareMode || '';
+        currentBaseFare = bookingData.currentBaseFare || 0;
+        currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
+    
+    applyLanguage();
+    
+    if (routeData && routeData.pickup && routeData.dropoff) {
+        calculateFareWithGoogle();
+    } else {
+        alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
+        window.location.href = 'index.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    applyLanguage();
+    // 等 Google Maps 完全載入後先執行
+    setTimeout(() => {
+        initResultPage();
+    }, 500);
+});
 
     // ============================================
     // 2. 變數宣告
