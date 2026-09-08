@@ -27,14 +27,46 @@
 
 <link rel="canonical" href="https://hktaxiservice.netlify.app/fleet.html">
 
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="選擇車款 | 八五折的士 | 豪華六座位的士 | 輪椅的士">
+<meta name="twitter:description" content="豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。八五折優惠，24小時機場口岸接送。">
+<meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
+
+<!-- 多語言標記 -->
+<link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/fleet.html">
+<link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/fleet.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/fleet.html">
+
+<!-- Schema.org 結構化資料 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "選擇車款 | 八五折的士 | 豪華六座位的士",
+  "description": "選擇您的士車款：豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。",
+  "url": "https://hktaxiservice.netlify.app/fleet.html",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "24小時八五折的士預約服務",
+    "url": "https://hktaxiservice.netlify.app/"
+  },
+  "provider": {
+    "@type": "TaxiService",
+    "name": "24小時八五折的士預約服務",
+    "telephone": "+85268815441",
+    "priceRange": "HK$29起",
+    "areaServed": "Hong Kong"
+  }
+}
+</script>
+
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- 引入 Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
@@ -52,7 +84,6 @@
         }
     </script>
 
-    <!-- PWA 必備 -->
     <script>
         (function() {
             const manifestData = {
@@ -64,16 +95,8 @@
                 "theme_color": "#FFF200",
                 "orientation": "portrait",
                 "icons": [
-                    {
-                        "src": "icon192.jpeg",
-                        "sizes": "192x192",
-                        "type": "image/jpeg"
-                    },
-                    {
-                        "src": "icon512.jpeg",
-                        "sizes": "512x512",
-                        "type": "image/jpeg"
-                    }
+                    { "src": "icon192.jpeg", "sizes": "192x192", "type": "image/jpeg" },
+                    { "src": "icon512.jpeg", "sizes": "512x512", "type": "image/jpeg" }
                 ]
             };
             const stringManifest = JSON.stringify(manifestData);
@@ -113,34 +136,19 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             z-index: 9999;
         }
-        .pac-item {
-            color: #ccc;
-            border-top: 1px solid #333;
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-        .pac-item:hover {
-            background-color: #333;
-        }
-        .pac-item-query {
-            color: #FFF200;
-            font-size: 17px;
-        }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar -->
+    <!-- 頁首 Navbar（同 index.html 完全一樣） -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
-            <!-- 左側：Logo -->
             <div class="flex items-center">
                 <a href="index.html">
                     <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
-            <!-- 中間：hotline.jpeg 與下方電話號碼 -->
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
                     <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
@@ -150,29 +158,52 @@
                 </a>
             </div>
 
-            <!-- 右側：語言切換按鈕與返回預約按鍵 -->
             <div class="flex flex-col items-end gap-1.5">
                 <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
                     EN
                 </button>
-                <a href="booking.html" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg">
-                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_booking">返回預約</span>
-                </a>
+                <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- 為了避免 fixed/sticky 頁首延遲或遮蓋下方內容，在此預留頁首高度空間 -->
+    <!-- 加入主畫面引導 Modal -->
+    <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-brand-yellow text-3xl mb-3">
+                <i class="fa-solid fa-circle-down animate-bounce"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
+                為了方便下次叫車，您可以將本服務加到手機主畫面：
+            </p>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
+            </div>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+                了解，關閉
+            </button>
+        </div>
+    </div>
+
     <div class="h-[92px] w-full"></div>
 
-    <!-- 車隊選擇 Fleet Section -->
+    <!-- 車隊選擇 Section -->
     <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
-        <div class="text-center mb-6 pt-4">
-            <h3 class="text-xl font-bold text-white flex items-center justify-center gap-2">
-                <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
-            </h3>
-            <p class="text-xs text-gray-400 mt-1" data-i18n="fleet_subtitle">點擊車型名稱可展開/收合詳細介紹與規格</p>
-        </div>
+        
+<div class="text-center mb-6 pt-2">
+    <h3 class="text-xl font-bold text-white flex items-center justify-center gap-2">
+        <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
+    </h3>
+    <p class="text-xs text-gray-400 mt-1" data-i18n="fleet_subtitle">點擊車型名稱可展開/收合詳細介紹與規格</p>
+    <a href="booking.html" class="inline-flex items-center gap-2 text-brand-yellow hover:text-white transition text-sm font-bold mt-2 bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black px-4 py-1.5 rounded-full">
+        <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_booking">返回預約頁面</span>
+    </a>
+</div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             
@@ -182,7 +213,6 @@
                     <div class="badge-container hidden absolute top-3 right-3 bg-brand-yellow text-black text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md">
                         <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                     </div>
-                    <!-- 點擊以展開/收合的車型名稱按鈕 -->
                     <div onclick="toggleCarDetail('豐田混能的士')" class="p-4 bg-brand-card cursor-pointer flex justify-between items-center hover:bg-neutral-800 transition">
                         <div>
                             <h3 class="text-lg font-bold text-white" data-i18n="car1_name">豐田混能的士</h3>
@@ -191,7 +221,6 @@
                         <i id="icon-toggle-豐田混能的士" class="fa-solid fa-chevron-down text-brand-yellow transition duration-300"></i>
                     </div>
 
-                    <!-- 內文詳細介紹容器 (已改為預設收合 hidden) -->
                     <div id="detail-豐田混能的士" class="hidden flex flex-col flex-1">
                         <div class="w-full h-52 bg-neutral-950 flex items-center justify-center p-4 overflow-hidden border-t border-b border-gray-800/60">
                             <img src="comf.jpeg" alt="豐田混能的士 - 網約車隊的士" class="w-full h-full object-contain transform hover:scale-105 transition duration-300" onerror="this.src='https://via.placeholder.com/400x200/000/fff?text=Taxi'">
@@ -381,14 +410,13 @@
         </div>
     </section>
 
-    <!-- 頁尾 Footer -->
+    <!-- 頁尾 Footer（同 index.html 完全一樣） -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
 
-            <!-- WeCom 二維碼彈窗 -->
             <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
                 <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
                     <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -416,71 +444,156 @@
 
 <script>
 // ============================================
-// 從 localStorage 讀取共享資料
+// 變數宣告
 // ============================================
 
-function loadFromLocalStorage() {
+let currentLang = localStorage.getItem('taxiLang') || 'zh';
+let selectedCarName = '';
+let selectedCarNameEn = '';
+let selectedSurcharge = 0;
+let selectedMinFare = 0;
+let selectedFeeMode = '';
+let selectedFeeModeEn = '';
+let selectedFareMode = '';
+let currentBaseFare = 0;
+let currentTunnelFee = 0;
+
+// ============================================
+// 翻譯物件
+// ============================================
+
+const translations = {
+    zh: {
+        fleet_title: "選擇車款類型",
+        fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
+        badge_selected: "已選擇",
+        btn_select_car: "選此車款",
+        btn_back_booking: "返回預約頁面",
+        btn_add_home: "APPS",
+        modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
+        btn_close_guide: "關閉",
+        car_cap_label: "載客容量：",
+        car_lug_label: "行李空間：",
+        car_feat_label: "車型特點：",
+        car1_name: "豐田混能的士",
+        car1_seats_desc: "4 座位 · 標準混能的士",
+        car1_cap: "最多 4 位乘客",
+        car1_lug: "約 2-3 件標準行李",
+        car1_feat: "特低地台、電動趟門",
+        car1_fee: "標準收費・無附加費",
+        car2_name: "MAXUS MIFA 7",
+        car2_seats_desc: "6 座位 · 純電動七人車",
+        car2_cap: "最多 6 位乘客",
+        car2_lug: "可放 4-5 件大型行李",
+        car2_feat: "純電動零排放、極度寧靜",
+        car2_fee: "<p>附加費 HK$50<br>(最低消費 $130)</p>",
+        car3_name: "廣汽 E9",
+        car3_seats_desc: "6 座位 · 豪華航空椅專車",
+        car3_cap: "最多 6 位乘客",
+        car3_lug: "可放 4-5 件大型行李",
+        car3_feat: "頭等航空級獨立大班椅",
+        car3_fee: "<p>附加費 HK$100<br>(最低消費 $180)</p>",
+        car4_name: "吉利大黃蜂",
+        car4_seats_desc: "6 座位 · 超大行李空間",
+        car4_cap: "最多 6 位乘客",
+        car4_lug: "6件以上大型行李",
+        car4_feat: "同級最大車廂、空間極佳",
+        car4_fee: "<p>附加費 HK$80<br>(最低消費 $160)</p>",
+        car5_name: "豐田 NOAH 輪椅的士",
+        car5_seats_desc: "1+5 座位 ·無障礙福祉專車",
+        car5_cap: "1位輪椅 + 5位乘客",
+        car5_lug: "可放 4-5 件大型行李",
+        car5_feat: "配備原廠金屬斜道，輪椅直上",
+        car5_fee: "<p>附加費 HK$150<br>(最低消費 $230)</p>",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+    },
+    en: {
+        fleet_title: "Select Vehicle Type",
+        fleet_subtitle: "Click vehicle name to expand/collapse details",
+        badge_selected: "Selected",
+        btn_select_car: "Select",
+        btn_back_booking: "Back to Booking",
+        btn_add_home: "APPS",
+        modal_title: "Add to Home Screen",
+        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
+        btn_close_guide: "Close",
+        car_cap_label: "Capacity: ",
+        car_lug_label: "Luggage: ",
+        car_feat_label: "Features: ",
+        car1_name: "Toyota Hybrid Taxi",
+        car1_seats_desc: "4 Seats · Standard Hybrid Taxi",
+        car1_cap: "Up to 4 passengers",
+        car1_lug: "Approx. 2-3 standard luggages",
+        car1_feat: "Low floor, power sliding door",
+        car1_fee: "Standard Fare · No Surcharge",
+        car2_name: "MAXUS MIFA 7",
+        car2_seats_desc: "6 Seats · Pure Electric MPV",
+        car2_cap: "Up to 6 passengers",
+        car2_lug: "Fits 4-5 large luggages",
+        car2_feat: "Zero emission, ultra-quiet",
+        car2_fee: "<p>Surcharge HK$50<br>(Min. Fare $130)</p>",
+        car3_name: "GAC E9",
+        car3_seats_desc: "6 Seats · Luxury Aviation Seat MPV",
+        car3_cap: "Up to 6 passengers",
+        car3_lug: "Fits 4-5 large luggages",
+        car3_feat: "First-class independent lounge seats",
+        car3_fee: "<p>Surcharge HK$100<br>(Min. Fare $180)</p>",
+        car4_name: "Geely Bumblebee",
+        car4_seats_desc: "6 Seats · Extra Large Luggage Space",
+        car4_cap: "Up to 6 passengers",
+        car4_lug: "6+ large luggages",
+        car4_feat: "Class-leading spacious cabin",
+        car4_fee: "<p>Surcharge HK$80<br>(Min. Fare $160)</p>",
+        car5_name: "Toyota NOAH Wheelchair Taxi",
+        car5_seats_desc: "1+5 Seats · Welfare Vehicle",
+        car5_cap: "1 wheelchair + 5 passengers",
+        car5_lug: "Fits 4-5 large luggages",
+        car5_feat: "Equipped with factory metal ramp",
+        car5_fee: "<p>Surcharge HK$150<br>(Min. Fare $230)</p>",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+    }
+};
+
+// ============================================
+// 函數定義
+// ============================================
+
+function loadBookingDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiBookingData');
     if (saved) {
         try {
-            const data = JSON.parse(saved);
-            selectedCarName = data.selectedCarName || '';
-            selectedCarNameEn = data.selectedCarNameEn || '';
-            selectedSurcharge = data.selectedSurcharge || 0;
-            selectedMinFare = data.selectedMinFare || 0;
-            selectedFeeMode = data.selectedFeeMode || '';
-            selectedFeeModeEn = data.selectedFeeModeEn || '';
-            selectedFareMode = data.selectedFareMode || '';
-            currentBaseFare = data.currentBaseFare || 0;
-            currentTunnelFee = data.currentTunnelFee || 0;
-            
-            // 更新車款卡片顯示
-            renderCarCardsVisual(selectedCarName);
-            
-            // 更新車款費用顯示
-            if (currentBaseFare > 0) {
-                updateCarCardFees();
-            }
-            
+            return JSON.parse(saved);
         } catch(e) {
-            console.log('No saved data');
+            return null;
         }
     }
+    return null;
 }
 
-function saveToLocalStorage() {
-    const saved = localStorage.getItem('taxiBookingData');
-    let data = {};
-    if (saved) {
-        try {
-            data = JSON.parse(saved);
-        } catch(e) {}
-    }
-    
-    data.selectedCarName = selectedCarName;
-    data.selectedCarNameEn = selectedCarNameEn;
-    data.selectedSurcharge = selectedSurcharge;
-    data.selectedMinFare = selectedMinFare;
-    data.selectedFeeMode = selectedFeeMode;
-    data.selectedFeeModeEn = selectedFeeModeEn;
-    data.selectedFareMode = selectedFareMode;
-    data.currentBaseFare = currentBaseFare;
-    data.currentTunnelFee = currentTunnelFee;
+function saveBookingDataToLocalStorage() {
+    const data = {
+        selectedCarName: selectedCarName,
+        selectedCarNameEn: selectedCarNameEn,
+        selectedSurcharge: selectedSurcharge,
+        selectedMinFare: selectedMinFare,
+        selectedFeeMode: selectedFeeMode,
+        selectedFeeModeEn: selectedFeeModeEn,
+        selectedFareMode: selectedFareMode,
+        currentBaseFare: currentBaseFare,
+        currentTunnelFee: currentTunnelFee
+    };
     
     localStorage.setItem('taxiBookingData', JSON.stringify(data));
 }
 
-// 選擇車款並返回預約頁面
 function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
-    // 檢查乘客人數限制
-    const saved = localStorage.getItem('taxiBookingData');
-    if (saved) {
-        try {
-            const data = JSON.parse(saved);
-            // 乘客數限制檢查由 booking.html 處理
-        } catch(e) {}
-    }
-    
     selectedCarName = name;
     selectedCarNameEn = nameEn;
     selectedSurcharge = surcharge;
@@ -488,18 +601,14 @@ function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeT
     selectedFeeMode = feeText;
     selectedFeeModeEn = feeTextEn;
     
-    // 如果選擇非豐田混能的士，確保收費模式為正價
     if (name !== '豐田混能的士') {
         selectedFareMode = 'normal';
     }
     
-    saveToLocalStorage();
-    
-    // 返回預約頁面
+    saveBookingDataToLocalStorage();
     window.location.href = 'booking.html';
 }
 
-// 車款介紹展開/收合控制
 function toggleCarDetail(carName) {
     const detailEl = document.getElementById('detail-' + carName);
     const iconEl = document.getElementById('icon-toggle-' + carName);
@@ -549,7 +658,6 @@ function renderCarCardsVisual(activeName) {
     }
 }
 
-// 更新車款卡片的預計車費顯示
 function updateCarCardFees() {
     if (currentBaseFare <= 0) return;
     
@@ -622,7 +730,6 @@ function applyLanguage() {
         }
     });
     
-    // 更新車款卡片費用顯示
     if (currentBaseFare > 0) {
         updateCarCardFees();
     }
@@ -636,127 +743,68 @@ function closeWeComQR() {
     document.getElementById('wecom-modal').classList.add('hidden');
 }
 
-// ============================================
-// 多語言翻譯
-// ============================================
-
-let currentLang = localStorage.getItem('taxiLang') || 'zh';
-
-const translations = {
-    zh: {
-        fleet_title: "選擇車款類型",
-        fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
-        badge_selected: "已選擇",
-        btn_select_car: "選此車款",
-        btn_back_booking: "返回預約",
-        car_cap_label: "載客容量：",
-        car_lug_label: "行李空間：",
-        car_feat_label: "車型特點：",
-        car1_name: "豐田混能的士",
-        car1_seats_desc: "4 座位 · 標準混能的士",
-        car1_cap: "最多 4 位乘客",
-        car1_lug: "約 2-3 件標準行李",
-        car1_feat: "特低地台、電動趟門",
-        car1_fee: "標準收費・無附加費",
-        car2_name: "MAXUS MIFA 7",
-        car2_seats_desc: "6 座位 · 純電動七人車",
-        car2_cap: "最多 6 位乘客",
-        car2_lug: "可放 4-5 件大型行李",
-        car2_feat: "純電動零排放、極度寧靜",
-        car2_fee: "<p>附加費 HK$50<br>(最低消費 $130)</p>",
-        car3_name: "廣汽 E9",
-        car3_seats_desc: "6 座位 · 豪華航空椅專車",
-        car3_cap: "最多 6 位乘客",
-        car3_lug: "可放 4-5 件大型行李",
-        car3_feat: "頭等航空級獨立大班椅",
-        car3_fee: "<p>附加費 HK$100<br>(最低消費 $180)</p>",
-        car4_name: "吉利大黃蜂",
-        car4_seats_desc: "6 座位 · 超大行李空間",
-        car4_cap: "最多 6 位乘客",
-        car4_lug: "6件以上大型行李",
-        car4_feat: "同級最大車廂、空間極佳",
-        car4_fee: "<p>附加費 HK$80<br>(最低消費 $160)</p>",
-        car5_name: "豐田 NOAH 輪椅的士",
-        car5_seats_desc: "1+5 座位 ·無障礙福祉專車",
-        car5_cap: "1位輪椅 + 5位乘客",
-        car5_lug: "可放 4-5 件大型行李",
-        car5_feat: "配備原廠金屬斜道，輪椅直上",
-        car5_fee: "<p>附加費 HK$150<br>(最低消費 $230)</p>",
-        wecom_modal_title: "掃描二維碼添加企業微信",
-        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
-        btn_close_guide: "關閉",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
-    },
-    en: {
-        fleet_title: "Select Vehicle Type",
-        fleet_subtitle: "Click vehicle name to expand/collapse details",
-        badge_selected: "Selected",
-        btn_select_car: "Select",
-        btn_back_booking: "Back to Booking",
-        car_cap_label: "Capacity: ",
-        car_lug_label: "Luggage: ",
-        car_feat_label: "Features: ",
-        car1_name: "Toyota Hybrid Taxi",
-        car1_seats_desc: "4 Seats · Standard Hybrid Taxi",
-        car1_cap: "Up to 4 passengers",
-        car1_lug: "Approx. 2-3 standard luggages",
-        car1_feat: "Low floor, power sliding door",
-        car1_fee: "Standard Fare · No Surcharge",
-        car2_name: "MAXUS MIFA 7",
-        car2_seats_desc: "6 Seats · Pure Electric MPV",
-        car2_cap: "Up to 6 passengers",
-        car2_lug: "Fits 4-5 large luggages",
-        car2_feat: "Zero emission, ultra-quiet",
-        car2_fee: "<p>Surcharge HK$50<br>(Min. Fare $130)</p>",
-        car3_name: "GAC E9",
-        car3_seats_desc: "6 Seats · Luxury Aviation Seat MPV",
-        car3_cap: "Up to 6 passengers",
-        car3_lug: "Fits 4-5 large luggages",
-        car3_feat: "First-class independent lounge seats",
-        car3_fee: "<p>Surcharge HK$100<br>(Min. Fare $180)</p>",
-        car4_name: "Geely Bumblebee",
-        car4_seats_desc: "6 Seats · Extra Large Luggage Space",
-        car4_cap: "Up to 6 passengers",
-        car4_lug: "6+ large luggages",
-        car4_feat: "Class-leading spacious cabin",
-        car4_fee: "<p>Surcharge HK$80<br>(Min. Fare $160)</p>",
-        car5_name: "Toyota NOAH Wheelchair Taxi",
-        car5_seats_desc: "1+5 Seats · Welfare Vehicle",
-        car5_cap: "1 wheelchair + 5 passengers",
-        car5_lug: "Fits 4-5 large luggages",
-        car5_feat: "Equipped with factory metal ramp",
-        car5_fee: "<p>Surcharge HK$150<br>(Min. Fare $230)</p>",
-        wecom_modal_title: "Scan QR Code to Add WeCom",
-        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
-        btn_close_guide: "Close",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+function showInstallGuide() {
+    const modal = document.getElementById('install-modal');
+    const content = document.getElementById('install-guide-content');
+    
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the Share button <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i> at the bottom of Safari.</p>
+            <p class="mt-1"><strong>2.</strong> Scroll down and tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Tap "Add" in the top right corner to complete!</p>
+        ` : `
+            <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
+        `;
+    } else {
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the menu button <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i> in the top right corner of Chrome.</p>
+            <p class="mt-1"><strong>2.</strong> Tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span> or <span class="text-brand-yellow font-bold">"Install App"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Confirm to complete installation!</p>
+        ` : `
+            <p><strong>1.</strong> 點擊 Chrome 瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 <span class="text-brand-yellow font-bold">「安裝應用程式」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 確認新增即可完成安裝！</p>
+        `;
     }
-};
+    modal.classList.remove('hidden');
+}
 
-let selectedCarName = '';
-let selectedCarNameEn = '';
-let selectedSurcharge = 0;
-let selectedMinFare = 0;
-let selectedFeeMode = '';
-let selectedFeeModeEn = '';
-let selectedFareMode = '';
-let currentBaseFare = 0;
-let currentTunnelFee = 0;
+function closeInstallGuide() {
+    document.getElementById('install-modal').classList.add('hidden');
+}
 
 // ============================================
-// 初始化
+// 頁面初始化
 // ============================================
 
 window.addEventListener('DOMContentLoaded', () => {
-    loadFromLocalStorage();
+    const bookingData = loadBookingDataFromLocalStorage();
+    if (bookingData) {
+        selectedCarName = bookingData.selectedCarName || '';
+        selectedCarNameEn = bookingData.selectedCarNameEn || '';
+        selectedSurcharge = bookingData.selectedSurcharge || 0;
+        selectedMinFare = bookingData.selectedMinFare || 0;
+        selectedFeeMode = bookingData.selectedFeeMode || '';
+        selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
+        selectedFareMode = bookingData.selectedFareMode || '';
+        currentBaseFare = bookingData.currentBaseFare || 0;
+        currentTunnelFee = bookingData.currentTunnelFee || 0;
+    }
     
-    // 套用語言（唔切換）
+    renderCarCardsVisual(selectedCarName);
+    
+    if (currentBaseFare > 0) {
+        updateCarCardFees();
+    }
+    
     applyLanguage();
 });
 
-// 註冊 Service Worker (PWA 必備)
+// 註冊 Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -766,7 +814,6 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
-
 </script>
 </body>
 </html>

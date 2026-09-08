@@ -459,7 +459,34 @@ if ('serviceWorker' in navigator) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    loadRouteDataFromLocalStorage();
+    
+    // 判斷係咪重新整理（F5）
+    const navType = performance.getEntriesByType('navigation')[0]?.type;
+    const isReload = navType === 'reload';
+    
+    if (isReload) {
+        // 重新整理：清空所有資料
+        localStorage.removeItem('taxiRouteData');
+        localStorage.removeItem('taxiBookingData');
+        
+        const pickupEl = document.getElementById('calc-pickup');
+        const dropoffEl = document.getElementById('calc-dropoff');
+        if (pickupEl) pickupEl.value = '';
+        if (dropoffEl) dropoffEl.value = '';
+        
+        for (let i = 1; i <= 3; i++) {
+            const stopInput = document.getElementById(`calc-stopover-${i}`);
+            const stopContainer = document.getElementById(`stopover-container-${i}`);
+            if (stopInput) stopInput.value = '';
+            if (stopContainer) stopContainer.classList.add('hidden');
+        }
+        currentStopCount = 0;
+        const addStopBtn = document.getElementById('add-stop-btn');
+        if (addStopBtn) addStopBtn.classList.remove('hidden');
+    } else {
+        // 由其他頁面跳轉/返回：保留資料
+        loadRouteDataFromLocalStorage();
+    }
     
     const pickupInput = document.getElementById('calc-pickup');
     if (pickupInput) {

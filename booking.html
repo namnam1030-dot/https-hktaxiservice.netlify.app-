@@ -27,14 +27,47 @@
 
 <link rel="canonical" href="https://hktaxiservice.netlify.app/booking.html">
 
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="預約的士 | 八五折的士 | 24小時網約車預約">
+<meta name="twitter:description" content="24小時八五折的士預約表格。機場口岸接送、長途跨區、豪華六座位的士。WhatsApp一鍵叫車。">
+<meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
+
+<!-- 多語言標記 -->
+<link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking.html">
+<link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking.html?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking.html">
+
+<!-- Schema.org 結構化資料 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "預約的士 | 八五折的士 | 24小時網約車預約",
+  "description": "24小時八五折的士預約表格。填寫用車日期、時間、起點終點、乘客人數，即可確認預約。",
+  "url": "https://hktaxiservice.netlify.app/booking.html",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "24小時八五折的士預約服務",
+    "url": "https://hktaxiservice.netlify.app/"
+  },
+  "provider": {
+    "@type": "TaxiService",
+    "name": "24小時八五折的士預約服務",
+    "telephone": "+85268815441",
+    "priceRange": "HK$29起",
+    "areaServed": "Hong Kong",
+    "paymentAccepted": ["現金", "PayMe", "八達通", "微信支付", "支付寶", "轉數快", "信用卡"]
+  }
+}
+</script>
+
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- 引入 Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
@@ -52,7 +85,6 @@
         }
     </script>
 
-    <!-- PWA 必備 -->
     <script>
         (function() {
             const manifestData = {
@@ -64,16 +96,8 @@
                 "theme_color": "#FFF200",
                 "orientation": "portrait",
                 "icons": [
-                    {
-                        "src": "icon192.jpeg",
-                        "sizes": "192x192",
-                        "type": "image/jpeg"
-                    },
-                    {
-                        "src": "icon512.jpeg",
-                        "sizes": "512x512",
-                        "type": "image/jpeg"
-                    }
+                    { "src": "icon192.jpeg", "sizes": "192x192", "type": "image/jpeg" },
+                    { "src": "icon512.jpeg", "sizes": "512x512", "type": "image/jpeg" }
                 ]
             };
             const stringManifest = JSON.stringify(manifestData);
@@ -92,9 +116,6 @@
     <meta name="theme-color" content="#FFF200">
 
     <style>
-        #booking-section {
-            scroll-margin-top: 82px;
-        }
         html { 
             font-size: 130%; 
         }
@@ -107,31 +128,19 @@
             font-size: 18px !important;
             line-height: 1.5;
         }
-        button[onclick*="swapLocations"], 
-        button[onclick*="addStopoverField"], 
-        button[onclick*="removeStopoverField"],
-        #add-stop-btn {
-            font-size: inherit !important;
-        }
-        #add-stop-btn span,
-        button[onclick*="swapLocations"] span {
-            font-size: 16px !important;
-        }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar -->
+    <!-- 頁首 Navbar（同 index.html 完全一樣） -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
-            <!-- 左側：Logo -->
             <div class="flex items-center">
                 <a href="index.html">
                     <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
-            <!-- 中間：hotline.jpeg 與下方電話號碼 -->
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
                     <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
@@ -141,35 +150,56 @@
                 </a>
             </div>
 
-            <!-- 右側：語言切換按鈕與返回首頁按鍵 -->
             <div class="flex flex-col items-end gap-1.5">
                 <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
                     EN
                 </button>
-                <a href="index.html" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg">
-                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_calc">重新計算</span>
-                </a>
+                <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- 為了避免 fixed/sticky 頁首延遲或遮蓋下方內容，在此預留頁首高度空間 -->
+    <!-- 加入主畫面引導 Modal -->
+    <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-brand-yellow text-3xl mb-3">
+                <i class="fa-solid fa-circle-down animate-bounce"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
+                為了方便下次叫車，您可以將本服務加到手機主畫面：
+            </p>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
+            </div>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+                了解，關閉
+            </button>
+        </div>
+    </div>
+
     <div class="h-[92px] w-full"></div>
 
-    <!-- 預約表單 Booking Section -->
+    <!-- 預約表單 Section -->
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
-            <!-- 車費摘要顯示區 -->
+            <!-- 車費摘要 -->
             <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
-                    <a href="index.html" class="text-brand-yellow text-xs underline" data-i18n="btn_edit_route">修改路線</a>
-                </div>
+<div class="flex justify-between items-center mb-2">
+    <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
+    <a href="index.html" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg hover:opacity-90 transition cursor-pointer">
+        <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">重新規劃路線</span>
+    </a>
+</div>
                 <div class="text-xs text-gray-300 space-y-1">
-                    <div><span class="text-gray-400">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>
-                    <div id="booking-stopover-display-wrapper" class="hidden"><span class="text-gray-400">中途站：</span><span id="booking-stopover-display" class="text-white font-medium">-</span></div>
-                    <div><span class="text-gray-400">目的地：</span><span id="booking-dropoff-display" class="text-white font-medium">-</span></div>
+                    <div><span class="text-gray-400" data-i18n="pickup_label">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>
+                    <div id="booking-stopover-display-wrapper" class="hidden"><span class="text-gray-400" data-i18n="stopover_label">中途站：</span><span id="booking-stopover-display" class="text-white font-medium">-</span></div>
+                    <div><span class="text-gray-400" data-i18n="dropoff_label">目的地：</span><span id="booking-dropoff-display" class="text-white font-medium">-</span></div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
                     <div class="text-xs">
@@ -193,60 +223,12 @@
                 </div>
             </div>
 
-            <!-- 豐田混能的士升級提示欄位 -->
-            <div id="booking-toyota-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
-                <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
-                    <i class="fa-solid fa-gift text-brand-yellow"></i>
-                    <span data-i18n-html="upgrade_box_text">預設為豐田混能的士，並有機會被<br><span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，<br>請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
-                </p>
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                        <input type="checkbox" name="booking_toyota_upgrade" value="接受免費升級" id="booking-upgrade-yes" onclick="handleBookingUpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n-html="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                        <input type="checkbox" name="booking_toyota_upgrade" value="不接受升級" id="booking-upgrade-no" onclick="handleBookingUpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n="upgrade_no_label">不接受升級</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- MIFA 7 升級提示欄位 -->
-            <div id="booking-mifa7-upgrade-container" class="hidden bg-brand-dark border-y border-brand-yellow/60 p-4 text-xs shadow-lg mb-4">
-                <p class="font-bold text-white mb-2 flex items-center gap-1.5 leading-relaxed">
-                    <i class="fa-solid fa-gift text-brand-yellow"></i>
-                    <span id="mifa7-upgrade-text" data-i18n-html="mifa7_upgrade_box_text">已選擇 MIFA 7，有機會被<br><span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，<br>請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span></span>
-                </p>
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                        <input type="checkbox" name="booking_mifa7_upgrade" value="接受免費升級" id="booking-mifa7-upgrade-yes" onclick="handleMifa7UpgradeCheckbox('yes')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n-html="upgrade_yes_label">接受<span class="text-brand-yellow font-bold">免費</span>升級</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200">
-                        <input type="checkbox" name="booking_mifa7_upgrade" value="不接受升級" id="booking-mifa7-upgrade-no" onclick="handleMifa7UpgradeCheckbox('no')" class="rounded text-brand-yellow focus:ring-brand-yellow">
-                        <span data-i18n="upgrade_no_label">不接受升級</span>
-                    </label>
-                </div>
-            </div>
-
             <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-4 text-sm">
 
-                <div id="field-flight-container" style="display:none;">
+                <div id="field-flight-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
-                
-                <div id="field-pickup-container" style="display:none;">
-                    <input type="text" id="pickup">
-                </div>
-
-                <div id="field-stopover-container" style="display:none;">
-                    <input type="text" id="stopover">
-                </div>
-
-                <div id="field-dropoff-container" style="display:none;">
-                    <input type="text" id="dropoff">
                 </div>
                 
                 <div class="grid grid-cols-1 gap-3 w-full">
@@ -374,7 +356,6 @@
                         </button>
                     </div>
                     
-                    <!-- 驗證碼顯示區 -->
                     <div id="verification-code-display" class="hidden mt-3 p-4 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl text-center">
                         <p class="text-xs text-gray-300 mb-2">
                             <span data-i18n="verification_code_label">你嘅驗證碼係：</span>
@@ -394,63 +375,36 @@
                 <button type="submit" id="booking-submit-btn" class="w-full bg-brand-yellow text-black font-extrabold text-base py-4 rounded-xl mt-4 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
                     <i class="fa-solid fa-calendar-check text-lg"></i> <span data-i18n="btn_confirm_booking">確認預約</span>
                 </button>
-
-                <!-- 成功訊息顯示區 -->
-                <div id="booking-success-message" class="hidden mt-4 p-4 bg-green-600/20 border-2 border-green-500 rounded-xl">
-                    <div class="text-center mb-4">
-                        <i class="fa-solid fa-check-circle text-green-400 text-4xl mb-2"></i>
-                        <p class="text-green-300 font-bold text-lg">
-                            <span data-i18n="success_title">✅ 預約訂單已成功送出！</span>
-                        </p>
-                        <p class="text-gray-300 text-xs mt-2">
-                            <span data-i18n="success_desc">我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認</span>
-                        </p>
-                    </div>
-                    
-                    <div id="success-booking-details" class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-4 text-left">
-                        <pre id="success-booking-content" class="text-white text-xs whitespace-pre-wrap font-mono"></pre>
-                    </div>
-                    
-                    <div class="flex flex-col gap-2 mt-3">
-                        <p class="text-gray-400 text-xs font-bold mb-1">
-                            <span data-i18n="success_contact_prompt">如有急需，可以直接聯絡我哋：</span>
-                        </p>
-                        
-                        <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-solid fa-phone"></i> 
-                            <span data-i18n="btn_call_now">致電 6881 5441</span>
-                        </a>
-                        
-                        <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-brands fa-whatsapp text-lg"></i> 
-                            <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
-                        </a>
-                        
-                        <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-brands fa-weixin text-lg"></i> 
-                            <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
-                        </button>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                            <i class="fa-solid fa-arrow-left"></i> 
-                            <span data-i18n="btn_back_home">返回主頁</span>
-                        </button>
-                    </div>
-                </div>
             </form>
         </div>
     </section>
 
-    <!-- 頁尾 Footer -->
+    <!-- 升級提示 Modal -->
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
+            <div class="text-brand-yellow text-3xl mb-3">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
+            <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
+            <div class="flex flex-col gap-3">
+                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg hover:opacity-90 transition">
+                    ✅ 接受免費升級
+                </button>
+                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition">
+                    ❌ 不用，謝謝
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 Footer（同 index.html 完全一樣） -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
 
-            <!-- WeCom 二維碼彈窗 -->
             <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
                 <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
                     <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -476,81 +430,185 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
 
-    <!-- 升級提示 Modal -->
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
-            <div class="text-brand-yellow text-3xl mb-3">
-                <i class="fa-solid fa-gift"></i>
-            </div>
-            <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
-            <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
-            <div class="flex flex-col gap-3">
-                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg hover:opacity-90 transition">
-                    ✅ 接受免費升級
-                </button>
-                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition">
-                    ❌不用，謝謝
-                </button>
-            </div>
-        </div>
-    </div>
-
 <script>
 // ============================================
-// 從 localStorage 讀取共享資料
+// 變數宣告
 // ============================================
 
-function loadFromLocalStorage() {
+let currentLang = localStorage.getItem('taxiLang') || 'zh';
+let selectedCarName = '';
+let selectedCarNameEn = '';
+let selectedSurcharge = 0;
+let selectedMinFare = 0;
+let selectedFeeMode = '';
+let selectedFeeModeEn = '';
+let selectedFareMode = '';
+let currentBaseFare = 0;
+let currentTunnelFee = 0;
+
+const INTERNAL_CODE = '888888';
+let currentVerificationCode = '';
+let isInternalUser = false;
+let whatsappSent = false;
+let upgradeChoice = null;
+let pendingBookingData = null;
+
+// ============================================
+// 翻譯物件
+// ============================================
+
+const translations = {
+    zh: {
+        ph_verification_code: "請點擊右方獲取驗證碼",
+        btn_more_payment: "更多付款方式",
+        label_verification: "電話驗證",
+        btn_get_code: "獲取驗證碼",
+        verification_code_label: "你嘅驗證碼係：",
+        btn_send_verify_whatsapp: "發送驗證碼到 WhatsApp",
+        verification_whatsapp_hint: "請先發送 WhatsApp 確認訊息，再提交預約",
+        alert_enter_phone: "請先輸入正確嘅電話號碼！",
+        alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
+        btn_confirm_booking: "確認預約",
+        btn_sending_booking: "正在送出預約...",
+        btn_call_now: "致電 6881 5441",
+        btn_whatsapp_inquiry: "WhatsApp 查詢",
+        btn_edit_route: "重新規劃路線",
+        btn_change_car: "選擇其他車款",
+        btn_add_home: "APPS",
+        modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
+        btn_close_guide: "關閉",
+        summary_route_label: "路線摘要",
+        summary_car_label: "目前選定車型",
+        estimated_fare_label: "預計車費",
+        fee_mode_label: "收費模式",
+        pickup_label: "起點：",
+        stopover_label: "中途站：",
+        dropoff_label: "目的地：",
+        label_flight: "航班編號 (選填，如適用)",
+        ph_flight: "例：CX250 (司機會自動監察航班時間)",
+        label_date: "用車日期",
+        label_time: "用車時間",
+        date_note: "接受最多3日內",
+        time_note: "如沒指定，最快15分鐘後",
+        label_passengers: "乘客人數",
+        label_luggages: "行李件數",
+        label_has_pet: "有寵物",
+        label_has_wheelchair: "輪椅放尾箱",
+        label_contact_title: "稱謂（選填）",
+        title_mr: "先生",
+        title_ms: "小姐",
+        label_contact_surname: "聯絡人（選填）",
+        ph_contact_surname: "例：陳",
+        label_payment_method: "選擇付款方式",
+        pay_cash: "現金",
+        pay_credit: "信用卡<br>(需另加手續費)",
+        pay_wechat: "微信",
+        pay_alipay: "支付寶",
+        pay_octopus: "八達通",
+        pay_payme: "PayMe",
+        pay_fps: "轉數快",
+        label_phone: "聯絡電話 (WhatsApp 接收確認)",
+        ph_phone: "例：9123 4567",
+        p1: "1 人", p2: "2 人", p3: "3 人", p4: "4 人", p5: "5 人", p6: "6 人",
+        l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+    },
+    en: {
+        ph_verification_code: "Tap the get code button",
+        btn_more_payment: "More Options",
+        label_verification: "Phone Verification",
+        btn_get_code: "Get Code",
+        verification_code_label: "Your verification code:",
+        btn_send_verify_whatsapp: "Send Code via WhatsApp",
+        verification_whatsapp_hint: "Please send WhatsApp confirmation before submitting",
+        alert_enter_phone: "Please enter a valid phone number first!",
+        alert_need_whatsapp: "Please send WhatsApp confirmation first!",
+        btn_confirm_booking: "Confirm Booking",
+        btn_sending_booking: "Sending Booking...",
+        btn_call_now: "Call 6881 5441",
+        btn_whatsapp_inquiry: "WhatsApp Enquiry",
+        btn_edit_route: "Re-plan Route",
+        btn_change_car: "Change Vehicle",
+        btn_add_home: "APPS",
+        modal_title: "Add to Home Screen",
+        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
+        btn_close_guide: "Close",
+        summary_route_label: "Route Summary",
+        summary_car_label: "Selected Vehicle",
+        estimated_fare_label: "Estimated Fare",
+        fee_mode_label: "Pricing Mode",
+        pickup_label: "Pickup: ",
+        stopover_label: "Stopover: ",
+        dropoff_label: "Destination: ",
+        label_flight: "Flight Number (Optional)",
+        ph_flight: "e.g., CX250 (Driver monitors flight time)",
+        label_date: "Service Date",
+        label_time: "Service Time",
+        date_note: "Up to 3 days",
+        time_note: "Fastest 15 mins",
+        label_passengers: "Passengers",
+        label_luggages: "Luggages",
+        label_has_pet: "Pets on board?",
+        label_has_wheelchair: "Wheelchair in trunk?",
+        label_contact_title: "Title",
+        title_mr: "Mr.",
+        title_ms: "Ms.",
+        label_contact_surname: "Contact",
+        ph_contact_surname: "e.g., Chan",
+        label_payment_method: "Payment Method",
+        pay_cash: "Cash",
+        pay_credit: "Credit Card<br>(Surcharge applies)",
+        pay_wechat: "WeChat Pay",
+        pay_alipay: "Alipay",
+        pay_octopus: "Octopus",
+        pay_payme: "PayMe",
+        pay_fps: "FPS",
+        label_phone: "Contact Phone (WhatsApp Confirmation)",
+        ph_phone: "e.g., 9123 4567",
+        p1: "1 Person", p2: "2 People", p3: "3 People", p4: "4 People", p5: "5 People", p6: "6 People",
+        l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+    }
+};
+
+// ============================================
+// 函數定義
+// ============================================
+
+function loadBookingDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiBookingData');
     if (saved) {
         try {
-            const data = JSON.parse(saved);
-            selectedCarName = data.selectedCarName || '';
-            selectedCarNameEn = data.selectedCarNameEn || '';
-            selectedSurcharge = data.selectedSurcharge || 0;
-            selectedMinFare = data.selectedMinFare || 0;
-            selectedFeeMode = data.selectedFeeMode || '';
-            selectedFeeModeEn = data.selectedFeeModeEn || '';
-            selectedFareMode = data.selectedFareMode || '';
-            currentBaseFare = data.currentBaseFare || 0;
-            currentTunnelFee = data.currentTunnelFee || 0;
-            
-            // 填回起點終點
-            if (data.pickup) {
-                document.getElementById('pickup').value = data.pickup;
-                document.getElementById('booking-pickup-display').innerText = data.pickup;
-                document.getElementById('field-pickup-container').style.display = 'block';
-            }
-            if (data.dropoff) {
-                document.getElementById('dropoff').value = data.dropoff;
-                document.getElementById('booking-dropoff-display').innerText = data.dropoff;
-                document.getElementById('field-dropoff-container').style.display = 'block';
-            }
-            
-            // 填回中途站
-            if (data.stopovers && data.stopovers.length > 0) {
-                document.getElementById('stopover').value = data.stopovers.join(' / ');
-                document.getElementById('booking-stopover-display').innerText = data.stopovers.join(' ➔ ');
-                document.getElementById('booking-stopover-display-wrapper').classList.remove('hidden');
-                document.getElementById('field-stopover-container').style.display = 'block';
-            }
-            
-            // 更新車款顯示
-            updateCarDisplay();
-            
-            // 更新收費模式顯示
-            updateFareModeDisplay();
-            
+            return JSON.parse(saved);
         } catch(e) {
-            console.log('No saved data');
+            return null;
         }
     }
+    return null;
+}
+
+function loadRouteDataFromLocalStorage() {
+    const saved = localStorage.getItem('taxiRouteData');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch(e) {
+            return null;
+        }
+    }
+    return null;
 }
 
 function updateCarDisplay() {
     const carTextEl = document.getElementById('selected-car-text');
     const priceTextEl = document.getElementById('selected-price-text');
-    const priceNoteEl = document.getElementById('selected-price-note');
     const fareModeTextEl = document.getElementById('selected-fare-mode-text');
     
     if (carTextEl) {
@@ -610,405 +668,38 @@ function closeWeComQR() {
     document.getElementById('wecom-modal').classList.add('hidden');
 }
 
-// 註冊 Service Worker (PWA 必備)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-            console.log('SW Registered!', reg);
-        }).catch(err => {
-            console.log('SW Registration Failed!', err);
-        });
-    });
+function showInstallGuide() {
+    const modal = document.getElementById('install-modal');
+    const content = document.getElementById('install-guide-content');
+    
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the Share button <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i> at the bottom of Safari.</p>
+            <p class="mt-1"><strong>2.</strong> Scroll down and tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Tap "Add" in the top right corner to complete!</p>
+        ` : `
+            <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
+        `;
+    } else {
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the menu button <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i> in the top right corner of Chrome.</p>
+            <p class="mt-1"><strong>2.</strong> Tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span> or <span class="text-brand-yellow font-bold">"Install App"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Confirm to complete installation!</p>
+        ` : `
+            <p><strong>1.</strong> 點擊 Chrome 瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 <span class="text-brand-yellow font-bold">「安裝應用程式」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 確認新增即可完成安裝！</p>
+        `;
+    }
+    modal.classList.remove('hidden');
 }
 
-// 修改 DOMContentLoaded 初始化
-window.addEventListener('DOMContentLoaded', () => {
-    loadFromLocalStorage();
-    
-    const dateInput = document.getElementById('date');
-    const timeInput = document.getElementById('time');
-    
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    dateInput.min = formattedDate;
-
-    const maxDate = new Date(now);
-    maxDate.setDate(maxDate.getDate() + 4);
-    const maxYear = maxDate.getFullYear();
-    const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
-    const maxDay = String(maxDate.getDate()).padStart(2, '0');
-    const maxFormattedDate = `${maxYear}-${maxMonth}-${maxDay}`;
-    dateInput.max = maxFormattedDate;
-
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const formattedTime = `${hours}:${minutes}`;
-
-    if (dateInput) dateInput.value = formattedDate;
-    if (timeInput) timeInput.value = formattedTime;
-
-    if (dateInput) {
-        dateInput.addEventListener('change', function() {
-            if (!this.value) return;
-            
-            const selectedDate = new Date(this.value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const maxAllowedDate = new Date(today);
-            maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
-            
-            if (selectedDate < today) {
-                alert(currentLang === 'en' ? 
-                    "⚠️ Booking date cannot be in the past!\n\nPlease select today or a future date." : 
-                    "⚠️ 預約日期不能係過去！\n\n請選擇今天或未來嘅日期。");
-                this.value = '';
-                this.focus();
-            } else if (selectedDate > maxAllowedDate) {
-                alert(currentLang === 'en' ? 
-                    `⚠️ Booking date cannot exceed 3 days!\n\nPlease select a date no later than ${maxAllowedDate.getMonth() + 1}/${maxAllowedDate.getDate()}/${maxAllowedDate.getFullYear()}.` : 
-                    `⚠️ 預約日期不能超過三日！\n\n請選擇 ${maxAllowedDate.getFullYear()}年${maxAllowedDate.getMonth() + 1}月${maxAllowedDate.getDate()}日 之前嘅日期。`);
-                this.value = '';
-                this.focus();
-            }
-        });
-    }
-
-    const bookingToyotaBox = document.getElementById('booking-toyota-upgrade-container');
-    if (bookingToyotaBox) bookingToyotaBox.classList.add('hidden');
-
-    const bookingMifa7Box = document.getElementById('booking-mifa7-upgrade-container');
-    if (bookingMifa7Box) bookingMifa7Box.classList.add('hidden');
-
-    checkPassengerLimit();
-    
-    // 檢查起點是否包含機場
-    const pickupInput = document.getElementById('pickup');
-    if (pickupInput && pickupInput.value) {
-        checkShowFlightField();
-    }
-});
-
-let currentLang = localStorage.getItem('taxiLang') || 'zh';
-
-const translations = {
-    zh: {
-        ph_verification_code: "請點擊右方獲取驗證碼",
-        btn_more_payment: "更多付款方式",
-        label_verification: "電話驗證",
-        btn_get_code: "獲取驗證碼",
-        verification_code_label: "你嘅驗證碼係：",
-        btn_send_verify_whatsapp: "發送驗證碼到 WhatsApp",
-        verification_whatsapp_hint: "請先發送 WhatsApp 確認訊息，再提交預約",
-        alert_enter_phone: "請先輸入正確嘅電話號碼！",
-        alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
-        alert_internal_success: "✅ 內部人員驗證成功！可以直接提交。",
-        alert_verify_success: "✅ 電話驗證成功！",
-        alert_verify_fail: "❌ 驗證碼錯誤，請重新輸入",
-        alert_verify_required: "請先完成電話驗證！",
-        btn_confirm_booking: "確認預約",
-        btn_sending_booking: "正在送出預約...",
-        success_title: "✅ 預約訂單已成功送出！",
-        success_desc: "我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認",
-        success_contact_prompt: "如有急需，可以直接聯絡我哋：",
-        error_title: "❌ 預約送出失敗",
-        error_desc: "請直接透過以下方式聯絡我哋預約：",
-        error_contact_prompt: "立即聯絡我哋：",
-        btn_call_now: "致電 6881 5441",
-        btn_whatsapp_inquiry: "WhatsApp 查詢",
-        btn_whatsapp_book: "WhatsApp 預約",
-        btn_wechat_inquiry: "WeChat 查詢",
-        wecom_modal_title: "掃描二維碼添加企業微信",
-        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
-        swap_locations: "起點🔃目的地",
-        estimated_fare_label: "預計車費",
-        btn_book_now: "立即預約",
-        fleet_title: "選擇車款類型",
-        fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
-        car1_seats_desc: "4 座位 · 標準混能的士",
-        car2_seats_desc: "6 座位 · 純電動七人車",
-        car3_seats_desc: "6 座位 · 豪華航空椅專車",
-        car4_seats_desc: "6 座位 · 超大行李空間",
-        car5_seats_desc: "1+5 座位 · 無障礙福祉專車",
-        btn_close_guide: "了解，關閉",
-        date_note: "接受最多3日內",
-        time_note: "如沒指定，最快15分鐘後",
-        fare_normal_label: "正價按錶收費",
-        fare_discount_label: "八五折優惠",
-        fare_discount_note: "(只限豐田混能的士)",
-        btn_add_home: "APPS",
-        modal_title: "一鍵加入主畫面",
-        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
-        btn_quick_query: "立即預約",
-        btn_view_fleet: "選擇車款類型",
-        notice_15min: "提供最快15分鐘後的即時訂單",
-        badge_selected: "已選擇",
-        btn_reselect_route: "重新選擇路線",
-        btn_back_calc: "重新計算",
-        btn_edit_route: "修改路線",
-        btn_change_car: "選擇其他車款",
-        btn_back_home: "返回主頁",
-        summary_route_label: "路線摘要",
-        car_cap_label: "載客容量：",
-        car_lug_label: "行李空間：",
-        car_feat_label: "車型特點：",
-        fee_mode_label: "收費模式",
-        fee_mode_title: "收費模式",
-        required_mark: "* (必須選擇)",
-        min_fare_note: "所有行程最低消費$100",
-        upgrade_box_text: '預設為豐田混能的士，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>',
-        upgrade_yes_label: '接受<span class="text-brand-yellow font-bold">免費</span>升級',
-        upgrade_no_label: '不接受升級',
-        mifa7_upgrade_box_text: '已選擇 MAXUS MIFA 7，並有機會被<span class="text-brand-yellow font-bold">免費</span>升級至更高階六座位車款，請問是否接受？ <span class="text-brand-yellow">* (必須選擇)</span>',
-        car1_name: "豐田混能的士",
-        car1_seats: "4 座位",
-        car1_type: "標準混能的士",
-        car1_cap: "最多 4 位乘客",
-        car1_lug: "約 2-3 件標準行李",
-        car1_feat: "特低地台、電動趟門",
-        car1_fee: "標準收費・無附加費",
-        car2_name: "MAXUS MIFA 7",
-        car2_seats: "6 座位",
-        car2_type: "純電動七人車",
-        car2_cap: "最多 6 位乘客",
-        car2_lug: "可放 3-4 件大型行李",
-        car2_feat: "純電動零排放、極度寧靜",
-        car2_fee: "附加費 HK$50 (最低 $130)",
-        car3_name: "廣汽 E9",
-        car3_seats: "6 座位",
-        car3_type: "豪華航空椅專車",
-        car3_cap: "最多 6 位乘客",
-        car3_lug: "約 3-4 件大型行李",
-        car3_feat: "頭等航空級獨立大班椅",
-        car3_fee: "附加費 HK$100 (最低 $180)",
-        car4_name: "吉利大黃蜂",
-        car4_seats: "6 座位",
-        car4_type: "超大空間尊車",
-        car4_cap: "最多 6 位乘客",
-        car4_lug: "4件以上大型行李",
-        car4_feat: "同級最大車廂、空間極佳",
-        car4_fee: "附加費 HK$80 (最低 $160)",
-        car5_name: "豐田 NOAH 輪椅的士",
-        car5_seats: "1+5 座位",
-        car5_type: "無障礙福祉專車",
-        car5_cap: "1位輪椅 + 5位乘客",
-        car5_lug: "可放 3-4 件大行李",
-        car5_feat: "配備原廠金屬斜道",
-        car5_fee: "附加費 HK$150 (最低 $230)",
-        label_flight: "航班編號 (選填，如適用)",
-        ph_flight: "例：CX250 (司機會自動監察航班時間)",
-        label_pickup: "上車地點 (起點)",
-        ph_pickup: "例：觀塘 APM",
-        label_stopover: "中途停靠點 (如沒有可留空)",
-        ph_stopover: "例：旺角朗豪坊",
-        label_dropoff: "落車地點 (終點)",
-        ph_dropoff: "例：深圳灣口岸",
-        label_date: "用車日期",
-        label_time: "用車時間",
-        label_passengers: "乘客人數",
-        label_luggages: "行李件數",
-        label_has_pet: "有寵物",
-        label_has_wheelchair: "輪椅放尾箱",
-        opt_select: "請選擇",
-        opt_yes: "是",
-        opt_no: "否",
-        label_contact_surname: "聯絡人",
-        ph_contact_surname: "例：陳",
-        label_contact_title: "稱謂 (選填)",
-        title_mr: "先生",
-        title_ms: "小姐",
-        label_payment_method: "選擇付款方式 (可選多項)",
-        pay_cash: "現金",
-        pay_credit: "信用卡<br>(需另加手續費)",
-        pay_wechat: "微信",
-        pay_alipay: "支付寶",
-        pay_octopus: "八達通",
-        pay_payme: "PayMe",
-        pay_fps: "轉數快",
-        label_phone: "聯絡電話 (WhatsApp 接收確認)",
-        ph_phone: "例：9123 4567",
-        p1: "1 人", p2: "2 人", p3: "3 人", p4: "4 人", p5: "5 人", p6: "6 人",
-        l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
-        summary_car_label: "目前選定車型",
-        summary_fee_label: "收費模式",
-        btn_submit_whatsapp: "確認預約並發送 WhatsApp",
-        form_footer_note: "點擊後將自動開啟 WhatsApp 應用程式傳送訂單資料，司機會盡快回覆確認。",
-        footer_slogan: "香港新一代豪華六座位的士預約服務・準時尊貴接送",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
-    },
-    en: {
-        ph_verification_code: "Tap the get code button",
-        btn_more_payment: "More Options",
-        label_verification: "Phone Verification",
-        btn_get_code: "Get Code",
-        verification_code_label: "Your verification code:",
-        btn_send_verify_whatsapp: "Send Code via WhatsApp",
-        verification_whatsapp_hint: "Please send WhatsApp confirmation before submitting",
-        alert_enter_phone: "Please enter a valid phone number first!",
-        alert_verify_required: "Please complete phone verification first!",
-        alert_need_whatsapp: "Please send WhatsApp confirmation first!",
-        alert_internal_success: "✅ Internal verification successful!",
-        alert_verify_success: "✅ Phone verification successful!",
-        alert_verify_fail: "❌ Invalid verification code. Please try again.",
-        btn_confirm_booking: "Confirm Booking",
-        btn_sending_booking: "Sending Booking...",
-        success_title: "✅ Booking Submitted Successfully!",
-        success_desc: "We will confirm via WhatsApp or phone within 5-10 minutes",
-        success_contact_prompt: "For urgent matters, contact us directly:",
-        error_title: "❌ Booking Submission Failed",
-        error_desc: "Please contact us directly to make a booking:",
-        error_contact_prompt: "Contact us now:",
-        btn_call_now: "Call 6881 5441",
-        btn_whatsapp_inquiry: "WhatsApp Enquiry",
-        btn_whatsapp_book: "WhatsApp Booking",
-        btn_wechat_inquiry: "WeChat Enquiry",
-        wecom_modal_title: "Scan QR Code to Add WeCom",
-        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
-        swap_locations: "Swap Pickup🔃Destination",
-        estimated_fare_label: "Estimated Fare",
-        btn_book_now: "Book Now",
-        fleet_title: "Select Vehicle Type",
-        fleet_subtitle: "Click vehicle name to expand/collapse details",
-        car1_seats_desc: "4 Seats · Standard Hybrid Taxi",
-        car2_seats_desc: "6 Seats · Pure Electric MPV",
-        car3_seats_desc: "6 Seats · Luxury Aviation Seat MPV",
-        car4_seats_desc: "6 Seats · Extra Large Luggage Space",
-        car5_seats_desc: "1+5 Seats · Welfare Vehicle",
-        btn_close_guide: "Got it, Close",
-        date_note: "Up to 3 days",
-        time_note: "Fastest 15 mins",
-        fare_discount_label: "15% Discount Offer",
-        fare_discount_note: "(Toyota Hybrid Taxi only)",
-        fare_normal_label: "Standard Metered Fare",
-        btn_add_home: "APPS",
-        modal_title: "Add to Home Screen",
-        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
-        btn_quick_query: "BOOK NOW",
-        btn_view_fleet: "Select Vehicle Type",
-        notice_15min: "Supports 15-minute advance booking & instant orders",
-        badge_selected: "Selected",
-        btn_reselect_route: "Re-select Route",
-        btn_back_calc: "Recalculate",
-        btn_edit_route: "Edit Route",
-        btn_change_car: "Change Vehicle",
-        btn_back_home: "Back to Home",
-        summary_route_label: "Route Summary",
-        car_cap_label: "Capacity: ",
-        car_lug_label: "Luggage: ",
-        car_feat_label: "Features: ",
-        fee_mode_label: "Pricing Mode",
-        fee_mode_title: "Pricing Mode",
-        required_mark: "* (Required)",
-        min_fare_note: "Minimum fare $100 for all trips",
-        upgrade_box_text: 'If choosing Toyota Hybrid Taxi, you may have the opportunity for a <span class="text-brand-yellow font-bold">free</span> upgrade to a higher-tier vehicle. Do you accept? <span class="text-brand-yellow font-extrabold">* (Required)</span>',
-        upgrade_yes_label: 'Accept <span class="text-brand-yellow font-bold">Free</span> Upgrade',
-        upgrade_no_label: 'Decline Upgrade',
-        mifa7_upgrade_box_text: 'If choosing MAXUS MIFA 7, you may have the opportunity for a <span class="text-brand-yellow font-bold">free</span> upgrade to a higher-tier 6-seater vehicle. Do you accept? <span class="text-brand-yellow font-extrabold">* (Required)</span>',
-        car1_name: "Toyota Hybrid Taxi",
-        car1_seats: "4 Seats",
-        car1_type: "Standard Hybrid Taxi",
-        car1_cap: "Up to 4 passengers",
-        car1_lug: "Approx. 2-3 standard luggages",
-        car1_feat: "Low floor, power sliding door",
-        car1_fee: "Standard Fare · No Surcharge",
-        car2_name: "MAXUS MIFA 7",
-        car2_seats: "6 Seats",
-        car2_type: "Pure Electric MPV",
-        car2_cap: "Up to 6 passengers",
-        car2_lug: "Fits 3-4 large luggages",
-        car2_feat: "Zero emission, ultra-quiet",
-        car2_fee: "Surcharge HK$50 (Min. $130)",
-        car3_name: "GAC E9",
-        car3_seats: "6 Seats",
-        car3_type: "Luxury Aviation Seat MPV",
-        car3_cap: "Up to 6 passengers",
-        car3_lug: "Approx. 3-4 large luggages",
-        car3_feat: "First-class independent lounge seats",
-        car3_fee: "Surcharge HK$100 (Min. $180)",
-        car4_name: "Geely Bumblebee",
-        car4_seats: "6 Seats",
-        car4_type: "Extra Large Luxury MPV",
-        car4_cap: "Up to 6 passengers",
-        car4_lug: "4+ large luggages",
-        car4_feat: "Class-leading spacious cabin",
-        car4_fee: "Surcharge HK$80 (Min. $160)",
-        car5_name: "Toyota NOAH Wheelchair Taxi",
-        car5_seats: "6 Seats",
-        car5_type: "Accessible Welfare Vehicle",
-        car5_cap: "1 wheelchair + 5 passengers",
-        car5_lug: "Fits 3-4 large luggages",
-        car5_feat: "Equipped with factory metal ramp",
-        car5_fee: "Surcharge HK$150 (Min. $230)",
-        label_flight: "Flight Number (Optional)",
-        ph_flight: "e.g., CX250 (Driver monitors flight time)",
-        label_pickup: "Pickup Location (Start)",
-        ph_pickup: "e.g., Kwun Tong APM",
-        label_stopover: "Mid-way Stop (Optional)",
-        ph_stopover: "e.g., Mong Kok Langham Place",
-        label_dropoff: "Drop-off Location (Destination)",
-        ph_dropoff: "e.g., Shenzhen Bay Port",
-        label_date: "Service Date",
-        label_time: "Service Time",
-        label_passengers: "Passengers",
-        label_luggages: "Luggages",
-        label_has_pet: "Pets on board?",
-        label_has_wheelchair: "Wheelchair to be placed in trunk?",
-        opt_select: "Please select",
-        opt_yes: "Yes",
-        opt_no: "No",
-        label_contact_surname: "Contact(Optional)",
-        ph_contact_surname: "e.g., Chan",
-        label_contact_title: "Title ",
-        title_mr: "Mr.",
-        title_ms: "Ms.",
-        label_payment_method: "Payment Method (Multiple Choice)",
-        pay_cash: "Cash",
-        pay_credit: "Credit Card<br>(Surcharge applies)",
-        pay_wechat: "WeChat Pay",
-        pay_alipay: "Alipay",
-        pay_octopus: "Octopus",
-        pay_payme: "PayMe",
-        pay_fps: "FPS",
-        label_phone: "Contact Phone (WhatsApp Confirmation)",
-        ph_phone: "e.g., 9123 4567",
-        p1: "1 Person", p2: "2 People", p3: "3 People", p4: "4 People", p5: "5 People", p6: "6 People",
-        l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
-        summary_car_label: "Selected Vehicle",
-        summary_fee_label: "Pricing Mode",
-        btn_submit_whatsapp: "Send via WhatsApp",
-        form_footer_note: "Clicking will open WhatsApp to send your order details. A driver will reply shortly.",
-        footer_slogan: "HK Next-Gen Luxury 6-Seater Taxi Booking Service · Punctual & Prestigious",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
-    }
-};
-
-let selectedCarName = '';
-let selectedCarNameEn = '';
-let selectedSurcharge = 0;
-let selectedMinFare = 0;
-let selectedFeeMode = '';
-let selectedFeeModeEn = '';
-let serviceType = 'normal';
-let selectedFareMode = '';
-
-let currentBaseFare = 0;
-let currentTunnelFee = 0;
-
-function togglePaymentOptions() {
-    document.getElementById('more-payment-options').classList.toggle('hidden');
-}
-
-function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
-}
-
-function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
+function closeInstallGuide() {
+    document.getElementById('install-modal').classList.add('hidden');
 }
 
 function toggleLanguage() {
@@ -1041,24 +732,22 @@ function applyLanguage() {
             el.placeholder = translations[currentLang][key];
         }
     });
-
+    
     updateCarDisplay();
 }
 
 function checkShowFlightField() {
-    const pickupInput = document.getElementById('pickup');
+    const routeData = loadRouteDataFromLocalStorage();
     const flightContainer = document.getElementById('field-flight-container');
     
-    if (pickupInput && flightContainer) {
-        const pickupValue = pickupInput.value.trim().toLowerCase();
+    if (routeData && routeData.pickup && flightContainer) {
+        const pickupValue = routeData.pickup.toLowerCase();
         const airportKeywords = ['機場', 'airport', '香港國際機場', 'hkg', 'hong kong international'];
         const isAirport = airportKeywords.some(keyword => pickupValue.includes(keyword));
         
         if (isAirport) {
-            flightContainer.style.display = 'block';
             flightContainer.classList.remove('hidden');
         } else {
-            flightContainer.style.display = 'none';
             flightContainer.classList.add('hidden');
         }
     }
@@ -1070,67 +759,13 @@ function checkPassengerLimit() {
     
     if (passengerVal > 4 && selectedCarName === '豐田混能的士') {
         alert(currentLang === 'en' ? 
-            "Passenger count exceeds 4. Toyota Hybrid Taxi (4 seats) cannot be selected. Please choose other 6-seater vehicle models." : 
-            "乘客人數超過四人，4 座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
+            "Passenger count exceeds 4. Toyota Hybrid Taxi cannot be selected. Please choose a 6-seater vehicle." : 
+            "乘客人數超過四人，豐田混能的士無法選擇，請選擇其他 6 座位車款。");
         selectedCarName = '';
         selectedCarNameEn = '';
-        selectedSurcharge = 0;
-        selectedMinFare = 0;
         updateCarDisplay();
     }
 }
-
-function handleBookingUpgradeCheckbox(choice) {
-    const bookingYesBox = document.getElementById('booking-upgrade-yes');
-    const bookingNoBox = document.getElementById('booking-upgrade-no');
-
-    if (choice === 'yes') {
-        if (bookingYesBox) bookingYesBox.checked = true;
-        if (bookingNoBox) bookingNoBox.checked = false;
-    } else if (choice === 'no') {
-        if (bookingYesBox) bookingYesBox.checked = false;
-        if (bookingNoBox) bookingNoBox.checked = true;
-    }
-}
-
-function handleMifa7UpgradeCheckbox(choice) {
-    const bookingYesBox = document.getElementById('booking-mifa7-upgrade-yes');
-    const bookingNoBox = document.getElementById('booking-mifa7-upgrade-no');
-
-    if (choice === 'yes') {
-        if (bookingYesBox) bookingYesBox.checked = true;
-        if (bookingNoBox) bookingNoBox.checked = false;
-    } else if (choice === 'no') {
-        if (bookingYesBox) bookingYesBox.checked = false;
-        if (bookingNoBox) bookingNoBox.checked = true;
-    }
-}
-
-function validatePassengerAndCar(carName) {
-    const passengersSelect = document.getElementById('passengers');
-    const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
-    if (passengerVal > 4 && carName === '豐田混能的士') {
-        alert(currentLang === 'en' ? 
-            "Passenger count exceeds 4. Toyota Hybrid Taxi (4 seats) cannot be selected. Please choose other 6-seater vehicle models." : 
-            "乘客人數超過四人，4 座位的豐田混能的士無法選擇，請選擇其他 6 座位車款。");
-        return false;
-    }
-    return true;
-}
-
-function goBackToHome() {
-    window.location.href = 'index.html';
-}
-
-// ============================================
-// 電話驗證系統
-// ============================================
-
-const INTERNAL_CODE = '888888';
-
-let currentVerificationCode = '';
-let isInternalUser = false;
-let whatsappSent = false;
 
 function sendVerificationCode() {
     const phone = document.getElementById('phone').value.trim();
@@ -1144,9 +779,7 @@ function sendVerificationCode() {
     
     currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
-    const codeInput = document.getElementById('verification_code');
-    codeInput.value = currentVerificationCode;
-    
+    document.getElementById('verification_code').value = currentVerificationCode;
     whatsappSent = false;
     
     const displayContainer = document.getElementById('verification-code-display');
@@ -1167,6 +800,169 @@ function sendVerificationCode() {
     displayContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+function showUpgradeModal(carType, passengerCount) {
+    const modal = document.getElementById('upgrade-modal');
+    const title = document.getElementById('upgrade-modal-title');
+    const text = document.getElementById('upgrade-modal-text');
+    
+    upgradeChoice = null;
+    
+    if (carType === '豐田混能的士') {
+        title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
+        text.innerHTML = currentLang === 'zh' ? 
+            '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>' +
+            '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' :
+            'You selected <span class="text-brand-yellow font-bold text-lg">Toyota Hybrid Taxi</span><br><br>' +
+            'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
+    } else if (carType === 'MAXUS MIFA 7') {
+        title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
+        if (passengerCount === 5) {
+            text.innerHTML = currentLang === 'zh' ?
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
+                '你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至其他五/六人車款<br>請問是否接受？' :
+                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                'You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
+        } else if (passengerCount === 6) {
+            text.innerHTML = currentLang === 'zh' ?
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
+                '你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> 至其他六人車款<br>請問是否接受？' :
+                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                'You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
+        } else {
+            text.innerHTML = currentLang === 'zh' ?
+                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
+                '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' :
+                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
+                'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
+        }
+    }
+    
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function confirmUpgrade(choice) {
+    upgradeChoice = choice;
+    document.getElementById('upgrade-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+    submitBookingAfterUpgrade();
+}
+
+function submitBookingAfterUpgrade() {
+    const data = pendingBookingData;
+    
+    let carDisplayText = data.selectedCarName;
+    
+    if (data.selectedCarName === '豐田混能的士') {
+        carDisplayText = upgradeChoice ? '接受混能以上任何車款' : '‼️只接受豐田混能的士‼️';
+    } else if (data.selectedCarName === 'MAXUS MIFA 7') {
+        if (data.passengerCount === 5) {
+            carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
+        } else if (data.passengerCount === 6) {
+            carDisplayText = upgradeChoice ? '接受任何六人車款' : '‼️只接受MIFA 7‼️';
+        } else {
+            carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
+        }
+    }
+    
+    let msgLines = [];
+  
+    msgLines.push(`🚘 預約車款：${carDisplayText}`);
+
+    if (data.flightNo) {
+        msgLines.push(`✈️ 航班編號：${data.flightNo}`);
+    }
+
+    msgLines.push(`📍 起點：${data.pickup}`);
+    data.stopoverTexts.forEach(s => msgLines.push(`🛑 ${s}`));
+    msgLines.push(`🏁 終點：${data.dropoff}`);
+    msgLines.push(`📅 日期：${data.date}`);
+    msgLines.push(`⏰ 時間：${data.timeStringFormatted}`);
+    msgLines.push(`👥 人數：${data.passengers}`);
+    
+    if (data.luggages && data.luggages !== '0 件') msgLines.push(`🧳 行李件數：${data.luggages}`);
+    if (data.hasPet) msgLines.push(`🐶 寵物：✅`);
+    if (data.hasWheelchair) msgLines.push(`♿️ 輪椅放置尾箱：✅`);
+    if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
+    if (data.surname) msgLines.push(`👤 聯絡人：${data.surname} ${data.title}`);
+    msgLines.push(`📞 電話：${data.phone}`);
+
+    if (selectedFareMode === 'discount') {
+        msgLines.push(`💎 收費模式：8️⃣5️⃣ 八五折優惠`);
+    } else {
+        msgLines.push(`💎 收費模式：💯 正價按錶收費`);
+    }
+
+    msgLines.push(`💰 預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
+
+    const fullMessage = msgLines.join('\n');
+
+    const bookingData = {
+        pickup: data.pickup,
+        stopover: data.stopoverTexts.join(' / '),
+        dropoff: data.dropoff,
+        date: data.date,
+        time: data.time,
+        timeFormatted: data.timeStringFormatted,
+        passengers: data.passengers,
+        luggages: data.luggages,
+        hasPet: data.hasPet,
+        hasWheelchair: data.hasWheelchair,
+        surname: data.surname,
+        title: data.title,
+        phone: data.phone,
+        paymentMethod: data.paymentStr,
+        carType: carDisplayText,
+        totalFare: data.totalFareForWhatsApp,
+        flightNo: data.flightNo,
+        upgradeOption: carDisplayText,
+        feeMode: selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費',
+        surcharge: selectedSurcharge,
+        tunnelFee: currentTunnelFee,
+        fullMessage: fullMessage,
+        isInternalBooking: isInternalUser
+    };
+
+    const submitBtn = document.getElementById('booking-submit-btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ${translations[currentLang].btn_sending_booking}`;
+    }
+
+    fetch('/.netlify/functions/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
+        }
+        
+        if (data.success) {
+            const cleanMessage = fullMessage
+                .replace('[網站預約]', '')
+                .replace('[新事件已通知]', '')
+                .replace('👤 工作人員落單', '')
+                .trim();
+            const encodedData = encodeURIComponent(cleanMessage);
+            window.location.href = `booking-success.html?data=${encodedData}`;
+        } else {
+            alert(currentLang === 'en' ? 'Booking failed. Please try again.' : '預約送出失敗，請重試。');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
+        }
+        alert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
+    });
+}
+
 function sendWhatsApp(event) {
     event.preventDefault();
 
@@ -1175,10 +971,8 @@ function sendWhatsApp(event) {
         return;
     }
 
-    const pickup = document.getElementById('pickup') ? document.getElementById('pickup').value.trim() : '';
-    const dropoff = document.getElementById('dropoff') ? document.getElementById('dropoff').value.trim() : '';
-    
-    if (!pickup || !dropoff) {
+    const routeData = loadRouteDataFromLocalStorage();
+    if (!routeData || !routeData.pickup || !routeData.dropoff) {
         alert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！");
         return;
     }
@@ -1190,10 +984,6 @@ function sendWhatsApp(event) {
         return;
     }
 
-    if (!validatePassengerAndCar(selectedCarName)) {
-        return;
-    }
-
     const inputCode = document.getElementById('verification_code').value.trim();
     
     if (inputCode === INTERNAL_CODE) {
@@ -1201,20 +991,18 @@ function sendWhatsApp(event) {
     } else if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
         isInternalUser = false;
         if (!whatsappSent) {
-            alert('請先發送 WhatsApp 確認訊息！');
+            alert(currentLang === 'en' ? "Please send WhatsApp confirmation first!" : "請先發送 WhatsApp 確認訊息！");
             return;
         }
     } else {
-        alert('請先完成電話驗證！');
+        alert(currentLang === 'en' ? "Please complete phone verification first!" : "請先完成電話驗證！");
         return;
     }
 
     let stopoverTexts = [];
-    const stopoverVal = document.getElementById('stopover') ? document.getElementById('stopover').value.trim() : '';
-    if (stopoverVal) {
-        const stops = stopoverVal.split('/');
-        stops.forEach((s, i) => {
-            if (s.trim()) stopoverTexts.push(`中途站${i+1}: ${s.trim()}`);
+    if (routeData.stopovers) {
+        routeData.stopovers.forEach((s, i) => {
+            stopoverTexts.push(`中途站${i+1}: ${s}`);
         });
     }
 
@@ -1222,7 +1010,7 @@ function sendWhatsApp(event) {
     const date = document.getElementById('date') ? document.getElementById('date').value : '';
     const time = document.getElementById('time') ? document.getElementById('time').value : '';
     
-    if (!date) { alert('請選擇預約日期！'); return; }
+    if (!date) { alert(currentLang === 'en' ? "Please select a date!" : "請選擇預約日期！"); return; }
     
     const selectedDate = new Date(date);
     const today = new Date();
@@ -1230,7 +1018,7 @@ function sendWhatsApp(event) {
     const maxAllowedDate = new Date(today);
     maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
     if (selectedDate < today || selectedDate > maxAllowedDate) { 
-        alert('預約日期必須在未來三日內！'); 
+        alert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！"); 
         return; 
     }
 
@@ -1276,9 +1064,24 @@ function sendWhatsApp(event) {
     }
 
     pendingBookingData = {
-        pickup, dropoff, stopoverTexts, flightNo, date, time, timeStringFormatted,
-        passengers, passengerCount, luggages, hasPet, hasWheelchair,
-        surname, title, phone, paymentStr, totalFareForWhatsApp, selectedCarName
+        pickup: routeData.pickup,
+        dropoff: routeData.dropoff,
+        stopoverTexts,
+        flightNo,
+        date,
+        time,
+        timeStringFormatted,
+        passengers,
+        passengerCount,
+        luggages,
+        hasPet,
+        hasWheelchair,
+        surname,
+        title,
+        phone,
+        paymentStr,
+        totalFareForWhatsApp,
+        selectedCarName
     };
 
     if (selectedCarName === '豐田混能的士' || selectedCarName === 'MAXUS MIFA 7') {
@@ -1291,187 +1094,101 @@ function sendWhatsApp(event) {
 }
 
 // ============================================
-// 升級提示 Modal
+// 頁面初始化
 // ============================================
-let upgradeChoice = null;
-let pendingBookingData = null;
 
-function showUpgradeModal(carType, passengerCount) {
-    const modal = document.getElementById('upgrade-modal');
-    const title = document.getElementById('upgrade-modal-title');
-    const text = document.getElementById('upgrade-modal-text');
+window.addEventListener('DOMContentLoaded', () => {
+    const bookingData = loadBookingDataFromLocalStorage();
+    if (bookingData) {
+        selectedCarName = bookingData.selectedCarName || '';
+        selectedCarNameEn = bookingData.selectedCarNameEn || '';
+        selectedSurcharge = bookingData.selectedSurcharge || 0;
+        selectedMinFare = bookingData.selectedMinFare || 0;
+        selectedFeeMode = bookingData.selectedFeeMode || '';
+        selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
+        selectedFareMode = bookingData.selectedFareMode || '';
+        currentBaseFare = bookingData.currentBaseFare || 0;
+        currentTunnelFee = bookingData.currentTunnelFee || 0;
+    }
     
-    upgradeChoice = null;
+    const routeData = loadRouteDataFromLocalStorage();
+    if (routeData) {
+        if (routeData.pickup) {
+            document.getElementById('booking-pickup-display').innerText = routeData.pickup;
+        }
+        if (routeData.dropoff) {
+            document.getElementById('booking-dropoff-display').innerText = routeData.dropoff;
+        }
+        if (routeData.stopovers && routeData.stopovers.length > 0) {
+            document.getElementById('booking-stopover-display').innerText = routeData.stopovers.join(' ➔ ');
+            document.getElementById('booking-stopover-display-wrapper').classList.remove('hidden');
+        }
+    }
     
-    if (carType === '豐田混能的士') {
-        title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        text.innerHTML = currentLang === 'zh' ? 
-            '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>' +
-            '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' :
-            'You selected <span class="text-brand-yellow font-bold text-2xl">Toyota Hybrid Taxi</span><br><br>' +
-            'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-2xl">FREE</span>.<br><br>Do you accept?';
+    updateCarDisplay();
+    
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    dateInput.min = formattedDate;
+    
+    const maxDate = new Date(now);
+    maxDate.setDate(maxDate.getDate() + 4);
+    const maxYear = maxDate.getFullYear();
+    const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
+    const maxDay = String(maxDate.getDate()).padStart(2, '0');
+    const maxFormattedDate = `${maxYear}-${maxMonth}-${maxDay}`;
+    dateInput.max = maxFormattedDate;
+    
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`;
+    
+    if (dateInput) dateInput.value = formattedDate;
+    if (timeInput) timeInput.value = formattedTime;
+    
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            if (!this.value) return;
             
-    } else if (carType === 'MAXUS MIFA 7') {
-        title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        
-        if (passengerCount === 5) {
-            text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
-                '你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至其他五/六人車款<br>請問是否接受？' :
-                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
-                'You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
-                
-        } else if (passengerCount === 6) {
-            text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
-                '你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> 至其他六人車款<br>請問是否接受？' :
-                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
-                'You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
-                
-        } else {
-            text.innerHTML = currentLang === 'zh' ?
-                '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
-                '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' :
-                'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>' +
-                'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
-        }
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const maxAllowedDate = new Date(today);
+            maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
+            
+            if (selectedDate < today) {
+                alert(currentLang === 'en' ? "⚠️ Booking date cannot be in the past!" : "⚠️ 預約日期不能係過去！");
+                this.value = '';
+                this.focus();
+            } else if (selectedDate > maxAllowedDate) {
+                alert(currentLang === 'en' ? "⚠️ Booking date cannot exceed 3 days!" : "⚠️ 預約日期不能超過三日！");
+                this.value = '';
+                this.focus();
+            }
+        });
     }
     
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
-
-function confirmUpgrade(choice) {
-    upgradeChoice = choice;
-    document.getElementById('upgrade-modal').classList.add('hidden');
-    document.body.style.overflow = '';
-    
-    submitBookingAfterUpgrade();
-}
-
-function submitBookingAfterUpgrade() {
-    const data = pendingBookingData;
-    
-    let carDisplayText = data.selectedCarName;
-    
-    if (data.selectedCarName === '豐田混能的士') {
-        carDisplayText = upgradeChoice ? '接受混能以上任何車款' : '‼️只接受豐田混能的士‼️';
-    } else if (data.selectedCarName === 'MAXUS MIFA 7') {
-        if (data.passengerCount === 5) {
-            carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
-        } else if (data.passengerCount === 6) {
-            carDisplayText = upgradeChoice ? '接受任何六人車款' : '‼️只接受MIFA 7‼️';
-        } else {
-            carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
-        }
-    }
-    
-    let msgLines = [];
-  
-    msgLines.push(`🚘 預約車款：${carDisplayText}`);
-
-    if (serviceType === 'airport' && data.flightNo) {
-        msgLines.push(`✈️ 航班編號：${data.flightNo}`);
-    }
-
-    msgLines.push(`📍 起點：${data.pickup}`);
-    data.stopoverTexts.forEach(s => msgLines.push(`🛑 ${s}`));
-    msgLines.push(`🏁 終點：${data.dropoff}`);
-    msgLines.push(`📅 日期：${data.date}`);
-    msgLines.push(`⏰ 時間：${data.timeStringFormatted}`);
-    msgLines.push(`👥 人數：${data.passengers}`);
-    
-    if (data.luggages && data.luggages !== '0 件') msgLines.push(`🧳 行李件數： ${data.luggages}`);
-    if (data.hasPet) msgLines.push(`🐶寵物：✅`);
-    if (data.hasWheelchair) msgLines.push(`♿️輪椅放置尾箱：✅`);
-    if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
-    if (data.surname) msgLines.push(`👤 聯絡人： ${data.surname} ${data.title}`);
-    msgLines.push(`📞 電話：${data.phone}`);
-
-    if (selectedFareMode === 'discount') {
-        msgLines.push(`💎收費模式：8️⃣5️⃣八五折優惠`);
-    } else {
-        msgLines.push(`💎收費模式：💯 *正價按錶收費* `);
-    }
-
-    msgLines.push(`💰預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
-
-    const fullMessage = msgLines.join('\n');
-
-    const bookingData = {
-        pickup: data.pickup,
-        stopover: data.stopoverTexts.join(' / '),
-        dropoff: data.dropoff,
-        date: data.date,
-        time: data.time,
-        timeFormatted: data.timeStringFormatted,
-        passengers: data.passengers,
-        luggages: data.luggages,
-        hasPet: data.hasPet,
-        hasWheelchair: data.hasWheelchair,
-        surname: data.surname,
-        title: data.title,
-        phone: data.phone,
-        paymentMethod: data.paymentStr,
-        carType: carDisplayText,
-        totalFare: data.totalFareForWhatsApp,
-        flightNo: data.flightNo,
-        upgradeOption: carDisplayText,
-        feeMode: selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費',
-        surcharge: selectedSurcharge,
-        tunnelFee: currentTunnelFee,
-        fullMessage: fullMessage,
-        isInternalBooking: isInternalUser
-    };
-
-    const successMsg = document.getElementById('booking-success-message');
-    if (successMsg) successMsg.classList.add('hidden');
-
-    const submitBtn = document.getElementById('booking-submit-btn');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ${translations[currentLang].btn_sending_booking}`;
-    }
-
-    fetch('/.netlify/functions/booking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
-        }
-        
-        if (data.success) {
-            const cleanMessage = fullMessage
-                .replace('[網站預約]', '')
-                .replace('[新事件已通知]', '')
-                .replace('👤 工作人員落單', '')
-                .trim();
-            const encodedData = encodeURIComponent(cleanMessage);
-            window.location.href = `booking-success.html?data=${encodedData}`;
-        } else {
-            alert(currentLang === 'en' ? 'Booking failed. Please try again.' : '預約送出失敗，請重試。');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-calendar-check text-lg"></i> ${translations[currentLang].btn_confirm_booking}`;
-        }
-        alert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
-    });
-}
-
-// 頁面載入時套用語言（唔切換）
-document.addEventListener('DOMContentLoaded', function() {
+    checkPassengerLimit();
+    checkShowFlightField();
     applyLanguage();
 });
 
+// 註冊 Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('SW Registered!', reg);
+        }).catch(err => {
+            console.log('SW Registration Failed!', err);
+        });
+    });
+}
 </script>
 </body>
 </html>
