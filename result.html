@@ -34,8 +34,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK" async defer></script>
-    <script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" async defer></script>
         tailwind.config = {
             theme: {
                 extend: {
@@ -1055,7 +1054,8 @@ function updateFareModeAvailability() {
 // 初始化
 // ============================================
 
-window.addEventListener('DOMContentLoaded', () => {
+// Google Maps 載入完成後嘅 callback
+function initMap() {
     // 讀取路線資料
     routeData = loadRouteDataFromLocalStorage();
     
@@ -1078,25 +1078,16 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // 開始計算路線
     if (routeData && routeData.pickup && routeData.dropoff) {
-        // 等待 Google Maps 載入
-        if (window.google && google.maps) {
-            calculateFareWithGoogle();
-        } else {
-            // 如果 Google Maps 未載入，等待
-            const checkGoogleMaps = setInterval(() => {
-                if (window.google && google.maps) {
-                    clearInterval(checkGoogleMaps);
-                    calculateFareWithGoogle();
-                }
-            }, 500);
-            
-            // 10秒後停止等待
-            setTimeout(() => clearInterval(checkGoogleMaps), 10000);
-        }
+        calculateFareWithGoogle();
     } else {
         alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
         window.location.href = 'index.html';
     }
+}
+
+// 頁面載入時套用語言（唔依賴 Google Maps）
+document.addEventListener('DOMContentLoaded', function() {
+    applyLanguage();
 });
 
 // 註冊 Service Worker

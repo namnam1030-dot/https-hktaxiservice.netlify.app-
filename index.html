@@ -837,12 +837,13 @@ function startVoiceRecognition() {
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        setTimeout(() => {
-            micBtn.classList.remove('bg-brand-yellow', 'text-black');
-            micText.innerText = translations[currentLang].voice_btn_text;
-            micIcon.className = "fa-solid fa-microphone text-base";
-        }, 1000);
-    };
+setTimeout(() => {
+    micBtn.classList.remove('bg-brand-yellow', 'text-black');
+    micText.innerText = translations[currentLang].voice_btn_text;
+    micIcon.className = "fa-solid fa-microphone text-base";
+    // 語音輸入完成後自動跳轉去 result.html
+    calculateAndGoToResult();
+}, 1000);
 
     recognition.onerror = () => {
         recognition.stop();
