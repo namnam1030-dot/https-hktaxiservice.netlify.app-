@@ -480,7 +480,7 @@ let upgradeChoice = null;
 let pendingBookingData = null;
 
 // ============================================
-// 翻譯物件（同上一版一樣，保持不變）
+// 翻譯物件
 // ============================================
 
 const translations = {
@@ -609,7 +609,7 @@ const translations = {
 };
 
 // ============================================
-// 函數定義（同上一版一樣）
+// 函數定義
 // ============================================
 
 function switchOrderType(type) {
@@ -915,11 +915,8 @@ function submitBookingAfterUpgrade() {
     
     let msgLines = [];
   
-    if (orderType === 'instant') {
-        msgLines.push(`⚡ 訂單類型：即時訂單（15分鐘內用車）`);
-    } else {
-        msgLines.push(`📅 訂單類型：預約訂單`);
-    }
+    // 即時訂單：唔顯示「訂單類型」字眼，直接開始路線資料
+    // 預約訂單：都唔顯示「訂單類型」，日期時間喺訊息內顯示
     
     msgLines.push(`📍 起點：${data.pickup}`);
     data.stopoverTexts.forEach(s => msgLines.push(`🛑 ${s}`));
@@ -938,7 +935,7 @@ function submitBookingAfterUpgrade() {
     
     if (data.luggages && data.luggages !== '0 件') msgLines.push(`🧳 行李件數：${data.luggages}`);
     if (data.hasPet) msgLines.push(`🐶 寵物：🐯🐯🐯🐯🐯🐯`);
-    if (data.hasWheelchair) msgLines.push(`♿️ 輪椅放置尾箱：♿️♿️♿️♿️♿️♿️`);
+    if (data.hasWheelchair) msgLines.push(`♿️ 輪椅放置尾箱：♿️♿️♿️`);
     if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
     if (data.surname) msgLines.push(`👤 聯絡人：${data.surname} ${data.title}`);
     msgLines.push(`📞 電話：${data.phone}`);
@@ -952,13 +949,16 @@ function submitBookingAfterUpgrade() {
     msgLines.push(`🚘 預約車款：${carDisplayText}`);
 
     msgLines.push(`💰 預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
-    
-    msgLines.push(``);
-    msgLines.push(`🆕 **新訂單通知** 👤 *工作人員落單*`);
-    
-    msgLines.push(` ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦`);
 
-    const fullMessage = msgLines.join('\n');
+    // 客人版（唔包含通知標題同分隔線）
+    const customerMessage = msgLines.join('\n');
+    
+    // Discord 版（包含通知標題同分隔線）
+    const discordMsgLines = [...msgLines];
+    discordMsgLines.push(``);
+    discordMsgLines.push(`🆕 **新訂單通知** 👤 *工作人員落單*`);
+    discordMsgLines.push(` ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦`);
+    const fullMessage = discordMsgLines.join('\n');
 
     const bookingData = {
         pickup: data.pickup,
@@ -983,6 +983,7 @@ function submitBookingAfterUpgrade() {
         surcharge: selectedSurcharge,
         tunnelFee: currentTunnelFee,
         fullMessage: fullMessage,
+        customerMessage: customerMessage,
         orderType: orderType,
         isInternalBooking: isInternalUser
     };
@@ -1006,12 +1007,7 @@ function submitBookingAfterUpgrade() {
         }
         
         if (data.success) {
-            const cleanMessage = fullMessage
-                .replace('[網站預約]', '')
-                .replace('[新事件已通知]', '')
-                .replace('👤 工作人員落單', '')
-                .trim();
-            const encodedData = encodeURIComponent(cleanMessage);
+            const encodedData = encodeURIComponent(customerMessage);
             window.location.href = `booking-success.html?data=${encodedData}`;
         } else {
             alert(currentLang === 'en' ? 'Booking failed. Please try again.' : '預約送出失敗，請重試。');
