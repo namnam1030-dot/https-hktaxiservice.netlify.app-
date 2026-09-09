@@ -17,8 +17,15 @@ exports.handler = async (event) => {
     
     console.log('收到訂單：', bookingData);
     
-    await addToGoogleCalendar(bookingData);
-    await sendDiscordNotification(bookingData);
+    // 即時訂單唔加入 Calendar，只發 Discord 通知
+    if (bookingData.orderType === 'instant') {
+      console.log('即時訂單，跳過 Calendar');
+      await sendDiscordNotification(bookingData);
+    } else {
+      // 預約訂單：加入 Calendar + 發 Discord
+      await addToGoogleCalendar(bookingData);
+      await sendDiscordNotification(bookingData);
+    }
     
     return {
       statusCode: 200,
@@ -27,7 +34,7 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({ 
         success: true, 
-        message: '預約成功，已加入日曆' 
+        message: '預約成功' 
       })
     };
   } catch (error) {
@@ -61,14 +68,8 @@ async function addToGoogleCalendar(data) {
 
     const calendar = google.calendar({ version: 'v3', auth });
     
-    let startTime;
-    if (data.orderType === 'instant' || !data.date || !data.time) {
-      startTime = new Date();
-      startTime.setMinutes(startTime.getMinutes() + 15);
-    } else {
-      startTime = new Date(`${data.date}T${data.time}:00+08:00`);
-    }
-    
+    // 預約訂單：用客戶指定時間
+    const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     const endTime = new Date(startTime);
     endTime.setHours(endTime.getHours() + 1);
 
@@ -103,14 +104,12 @@ async function addToGoogleCalendar(data) {
         timeZone: 'Asia/Hong_Kong'
       },
       colorId: '10',
-      reminders: data.orderType === 'instant' 
-        ? { useDefault: false }
-        : {
-            useDefault: false,
-            overrides: [
-              { method: 'popup', minutes: 30 }
-            ]
-          }
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: 'popup', minutes: 30 }
+        ]
+      }
     };
 
     const result = await calendar.events.insert({
