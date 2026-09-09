@@ -913,11 +913,9 @@ function submitBookingAfterUpgrade() {
         }
     }
     
+    // 客人版訊息（唔包含 Discord 通知標題同分隔線）
     let msgLines = [];
   
-    // 即時訂單：唔顯示「訂單類型」字眼，直接開始路線資料
-    // 預約訂單：都唔顯示「訂單類型」，日期時間喺訊息內顯示
-    
     msgLines.push(`📍 起點：${data.pickup}`);
     data.stopoverTexts.forEach(s => msgLines.push(`🛑 ${s}`));
     msgLines.push(`🏁 終點：${data.dropoff}`);
@@ -934,8 +932,8 @@ function submitBookingAfterUpgrade() {
     msgLines.push(`👥 人數：${data.passengers}`);
     
     if (data.luggages && data.luggages !== '0 件') msgLines.push(`🧳 行李件數：${data.luggages}`);
-    if (data.hasPet) msgLines.push(`🐶 寵物：🐯🐯🐯🐯🐯🐯`);
-    if (data.hasWheelchair) msgLines.push(`♿️ 輪椅放置尾箱：♿️♿️♿️`);
+    if (data.hasPet) msgLines.push(`🐶 寵物：✅`);
+    if (data.hasWheelchair) msgLines.push(`♿️ 輪椅放置尾箱：✅`);
     if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
     if (data.surname) msgLines.push(`👤 聯絡人：${data.surname} ${data.title}`);
     msgLines.push(`📞 電話：${data.phone}`);
@@ -950,14 +948,26 @@ function submitBookingAfterUpgrade() {
 
     msgLines.push(`💰 預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
 
-    // 客人版（唔包含通知標題同分隔線）
+    // 客人版
     const customerMessage = msgLines.join('\n');
     
-    // Discord 版（包含通知標題同分隔線）
-    const discordMsgLines = [...msgLines];
+    // Discord 版
+    const discordMsgLines = [];
+    
+    // 即時訂單：頂部加閃電標記
+    if (orderType === 'instant') {
+        discordMsgLines.push(`⚡ 即時訂單 ⚡`);
+        discordMsgLines.push(``);
+    }
+    
+    // 加入內容
+    discordMsgLines.push(...msgLines);
+    
+    // 通知標題同分隔線
     discordMsgLines.push(``);
     discordMsgLines.push(`🆕 **新訂單通知** 👤 *工作人員落單*`);
     discordMsgLines.push(` ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦`);
+    
     const fullMessage = discordMsgLines.join('\n');
 
     const bookingData = {
