@@ -1,7 +1,6 @@
 const { google } = require('googleapis');
 
 exports.handler = async (event) => {
-  // 處理 CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -18,10 +17,7 @@ exports.handler = async (event) => {
     
     console.log('收到訂單：', bookingData);
     
-    // 1. 寫入 Google Calendar
     await addToGoogleCalendar(bookingData);
-    
-    // 2. 發送 Discord 通知（新事件）
     await sendDiscordNotification(bookingData);
     
     return {
@@ -49,7 +45,6 @@ exports.handler = async (event) => {
   }
 };
 
-// Google Calendar 整合
 async function addToGoogleCalendar(data) {
   try {
     if (!process.env.GOOGLE_SERVICE_ACCOUNT) {
@@ -66,8 +61,6 @@ async function addToGoogleCalendar(data) {
 
     const calendar = google.calendar({ version: 'v3', auth });
     
-    // 即時訂單：用而家時間
-    // 預約訂單：用客戶指定時間
     let startTime;
     if (data.orderType === 'instant' || !data.date || !data.time) {
       startTime = new Date();
@@ -76,19 +69,15 @@ async function addToGoogleCalendar(data) {
       startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     }
     
-    // 結束時間：起點時間 + 1 小時
     const endTime = new Date(startTime);
     endTime.setHours(endTime.getHours() + 1);
 
-    // ✅ 判斷係咪內部人員落單
     const bookingSourceMark = data.isInternalBooking === true 
       ? '\n\n[網站預約] 👤 工作人員落單' 
       : '\n\n[網站預約]';
 
-    // ✅ 建立描述（使用客人版訊息，唔包含 Discord 通知標題）
     let descriptionWithLinks = data.customerMessage || data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
     
-    // ✅ 加入可點擊嘅 WhatsApp 連結
     const cleanPhone = (data.phone || '').replace(/\D/g, '');
     if (cleanPhone) {
       let phoneWithCode = cleanPhone;
@@ -114,12 +103,14 @@ async function addToGoogleCalendar(data) {
         timeZone: 'Asia/Hong_Kong'
       },
       colorId: '10',
-      reminders: {
-        useDefault: false,
-        overrides: [
-          { method: 'popup', minutes: 20 }
-        ]
-      }
+      reminders: data.orderType === 'instant' 
+        ? { useDefault: false }
+        : {
+            useDefault: false,
+            overrides: [
+              { method: 'popup', minutes: 30 }
+            ]
+          }
     };
 
     const result = await calendar.events.insert({
@@ -136,7 +127,6 @@ async function addToGoogleCalendar(data) {
   }
 }
 
-// Discord 通知（新事件）
 async function sendDiscordNotification(data) {
   const discordWebhook = process.env.DISCORD_WEBHOOK_URL;
   
@@ -145,10 +135,8 @@ async function sendDiscordNotification(data) {
     return;
   }
 
-  // 使用前端傳嚟嘅 fullMessage（已包含通知標題同分隔線）
   let message = data.fullMessage || data.description || '收到新訂單';
   
-  // ✅ 加入可點擊嘅電話連結
   const cleanPhone = (data.phone || '').replace(/\D/g, '');
   if (cleanPhone) {
     let phoneWithCode = cleanPhone;
@@ -156,10 +144,10 @@ async function sendDiscordNotification(data) {
       phoneWithCode = '852' + phoneWithCode;
     }
     
-    // Discord Markdown 連結格式
+    // Discord 電話連結：只顯示一個電話號碼，可直接點擊撥號
     message = message.replace(
       `📞 電話：${data.phone}`,
-      `📞 電話：[${data.phone}](tel:${cleanPhone}) | [WhatsApp](<https://wa.me/${phoneWithCode}>)`
+      `📞 電話：[${data.phone}](tel:${cleanPhone})`
     );
   }
 
