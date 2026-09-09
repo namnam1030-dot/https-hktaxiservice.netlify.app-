@@ -249,9 +249,11 @@
     <!-- 車費估算器輸入 Section -->
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
-            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
-                <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
-            </h3>
+            
+            <!-- 標題 + 重設按鈕 -->
+<h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
+    <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
+</h3>
 
             <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-xl text-xs text-gray-300 mb-4 shadow-inner">
                 <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
@@ -271,12 +273,17 @@
 
                 <div class="space-y-2">
                     <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
-                            <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-arrow-up-down"></i> <span class="text-xs" data-i18n="swap_locations">起點🔃目的地</span>
-                            </button>
-                        </div>
+<div class="flex justify-between items-center mb-1">
+    <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
+<div class="flex items-center gap-2">
+    <button type="button" onclick="clearAllInputs()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn_clear">重設</span>
+    </button>
+<button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+    <span>起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span>目的地</span>
+</button>
+</div>
+</div>
                         <div class="relative flex items-center">
                             <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
                             <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
@@ -286,7 +293,7 @@
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
-                        <label class="block text-[15px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
+                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
                         <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
                         </button>
@@ -338,7 +345,7 @@
                 </div>
             </div>
 
-            <!-- 計算按鈕 - 跳轉去 result.html -->
+            <!-- 計算按鈕 -->
             <button type="button" onclick="calculateAndGoToResult()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-[20px] shadow-md">
                 <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即預計車費</span>
             </button>
@@ -426,6 +433,44 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
+// 一鍵重設所有輸入格
+function clearAllInputs() {
+    const pickupEl = document.getElementById('calc-pickup');
+    if (pickupEl) {
+        pickupEl.value = '';
+        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+    }
+    
+    const dropoffEl = document.getElementById('calc-dropoff');
+    if (dropoffEl) {
+        dropoffEl.value = '';
+        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+    }
+    
+    for (let i = 1; i <= 3; i++) {
+        const stopInput = document.getElementById(`calc-stopover-${i}`);
+        const stopContainer = document.getElementById(`stopover-container-${i}`);
+        if (stopInput) {
+            stopInput.value = '';
+        }
+        if (stopContainer) {
+            stopContainer.classList.add('hidden');
+        }
+    }
+    currentStopCount = 0;
+    const addStopBtn = document.getElementById('add-stop-btn');
+    if (addStopBtn) {
+        addStopBtn.classList.remove('hidden');
+    }
+    
+    localStorage.removeItem('taxiRouteData');
+    localStorage.removeItem('taxiBookingData');
+    
+    if (pickupEl) {
+        pickupEl.focus();
+    }
+}
+
 // 計算並跳轉去 result.html
 function calculateAndGoToResult() {
     const pickupVal = document.getElementById('calc-pickup')?.value.trim() || '';
@@ -460,12 +505,10 @@ if ('serviceWorker' in navigator) {
 
 window.addEventListener('DOMContentLoaded', () => {
     
-    // 判斷係咪重新整理（F5）
     const navType = performance.getEntriesByType('navigation')[0]?.type;
     const isReload = navType === 'reload';
     
     if (isReload) {
-        // 重新整理：清空所有資料
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
         
@@ -484,7 +527,6 @@ window.addEventListener('DOMContentLoaded', () => {
         const addStopBtn = document.getElementById('add-stop-btn');
         if (addStopBtn) addStopBtn.classList.remove('hidden');
     } else {
-        // 由其他頁面跳轉/返回：保留資料
         loadRouteDataFromLocalStorage();
     }
     
@@ -538,6 +580,7 @@ const translations = {
         btn_view_fleet: "選擇車款類型",
         badge_selected: "已選擇",
         btn_reselect_route: "重新選擇路線",
+        btn_clear: "重設",
         calc_title: "智能規劃路線與預計車費",
         calc_tip_title: "預計車費使用說明：",
         calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
@@ -589,6 +632,7 @@ const translations = {
         btn_view_fleet: "Select Vehicle Type",
         badge_selected: "Selected",
         btn_reselect_route: "Re-select Route",
+        btn_clear: "Reset",
         calc_title: "Smart Route & Fare Estimator",
         calc_tip_title: "Fare Estimation Instructions:",
         calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Airport to ShenZhen Bay Port"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
@@ -864,7 +908,6 @@ function startVoiceRecognition() {
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        // 語音輸入完成後自動跳轉去 result.html
         setTimeout(() => {
             micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
