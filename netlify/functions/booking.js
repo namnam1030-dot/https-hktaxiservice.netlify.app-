@@ -88,7 +88,7 @@ async function addToGoogleCalendar(data) {
       
       descriptionWithLinks = descriptionWithLinks.replace(
         `📞 電話：${data.phone}`,
-        `📞 電話：${data.phone}\n📱 WhatsApp：https://wa.me/${phoneWithCode}`
+        `📞 電話：${data.phone}\n📱 WhatsApp：<https://wa.me/${phoneWithCode}>`
       );
     }
 
