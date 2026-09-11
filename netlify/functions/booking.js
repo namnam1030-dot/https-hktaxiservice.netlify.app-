@@ -77,21 +77,18 @@ async function addToGoogleCalendar(data) {
       ? '\n\n[網站預約] 👤 工作人員落單' 
       : '\n\n[網站預約]';
 
-    let descriptionWithLinks = data.customerMessage || data.fullMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
+    // ✅ 用精簡版（fullMessage），並將 Discord Markdown 轉為純文字
+    let descriptionWithLinks = data.fullMessage || data.customerMessage || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
     
-    const cleanPhone = (data.phone || '').replace(/\D/g, '');
-    if (cleanPhone) {
-      let phoneWithCode = cleanPhone;
-      if (phoneWithCode.length === 8) {
-        phoneWithCode = '852' + phoneWithCode;
-      }
-      
-      // ✅ 日曆描述加入 WhatsApp 連結（用 < > 防止預覽）
-      descriptionWithLinks = descriptionWithLinks.replace(
-        `📞 電話：${data.phone}`,
-        `📞 電話：${data.phone}\n📱 WhatsApp：<https://wa.me/${phoneWithCode}>`
-      );
-    }
+    // ✅ 將 Discord Markdown 連結轉換為純文字
+    descriptionWithLinks = descriptionWithLinks
+      // [88888888](tel:88888888) -> 88888888
+      .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
+      // [WhatsApp](<https://wa.me/xxx>) -> WhatsApp：https://wa.me/xxx
+      .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, 'WhatsApp：$1')
+      // 移除 Discord 頂部嘅「即時訂單」標記同底部嘅分隔線（日曆唔需要）
+      .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
+      .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
 
     const event = {
       summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
@@ -136,20 +133,6 @@ async function sendDiscordNotification(data) {
   }
 
   let message = data.fullMessage || data.description || '收到新訂單';
-  
-  const cleanPhone = (data.phone || '').replace(/\D/g, '');
-  if (cleanPhone) {
-    let phoneWithCode = cleanPhone;
-    if (phoneWithCode.length === 8) {
-      phoneWithCode = '852' + phoneWithCode;
-    }
-    
-    // ✅ 修正：加入 tel: 同 WhatsApp 連結（用 < > 防止廣告預覽）
-    message = message.replace(
-      `📞 電話：${data.phone}`,
-      `📞 電話：[${data.phone}](tel:${cleanPhone}) | [WhatsApp](<https://wa.me/${phoneWithCode}>)`
-    );
-  }
 
   try {
     await fetch(discordWebhook, {
@@ -159,7 +142,7 @@ async function sendDiscordNotification(data) {
       },
       body: JSON.stringify({
         content: message,
-        flags: 4  // ✅ 抑制 Discord 廣告預覽
+        flags: 4
       })
     });
     console.log('Discord 通知已發送');
