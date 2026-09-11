@@ -140,7 +140,7 @@
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar（同 index.html 完全一樣） -->
+    <!-- 頁首 Navbar -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
@@ -423,7 +423,7 @@
         </div>
     </div>
 
-    <!-- 頁尾 Footer（同 index.html 完全一樣） -->
+    <!-- 頁尾 Footer -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
@@ -994,7 +994,8 @@ function submitBookingAfterUpgrade() {
         fullMessage: fullMessage,
         customerMessage: customerMessage,
         orderType: orderType,
-        isInternalBooking: isInternalUser
+        // ✅ 修正：確保係嚴格 boolean
+        isInternalBooking: isInternalUser === true
     };
 
     const submitBtn = document.getElementById('booking-submit-btn');
@@ -1034,6 +1035,9 @@ function submitBookingAfterUpgrade() {
 
 function sendWhatsApp(event) {
     event.preventDefault();
+
+    // ✅ 修正：每次提交都重置內部人員標記（防止殘留）
+    isInternalUser = false;
 
     if (!selectedFareMode) {
         alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
