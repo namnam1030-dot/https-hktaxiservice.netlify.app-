@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ SEO 基礎優化（預約頁面） ============ -->
 <title>預約的士 | 八五折的士 | 24小時網約車預約 | 機場口岸接送</title>
 
 <meta name="description" content="24小時八五折（85折）的士預約表格。填寫用車日期、時間、起點終點、乘客人數，即可確認預約。支援現金、PayMe、八達通、支付寶、微信、轉數快、信用卡。WhatsApp一鍵叫車。">
@@ -25,20 +24,17 @@
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
 
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="預約的士 | 八五折的士 | 24小時網約車預約">
 <meta name="twitter:description" content="24小時八五折的士預約表格。機場口岸接送、長途跨區、豪華六座位的士。WhatsApp一鍵叫車。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 
-<!-- 多語言標記 -->
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking.html">
 
 <link rel="canonical" href="https://hktaxiservice.netlify.app/booking.html">
 
-<!-- Schema.org 結構化資料 -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -116,9 +112,7 @@
     <meta name="theme-color" content="#FFF200">
 
     <style>
-        html { 
-            font-size: 130%; 
-        }
+        html { font-size: 130%; }
         body { 
             background-color: #0B0B0B; 
             color: #ffffff; 
@@ -140,7 +134,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
@@ -169,7 +162,6 @@
         </div>
     </header>
 
-    <!-- 加入主畫面引導 Modal -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
             <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -192,11 +184,9 @@
 
     <div class="h-[92px] w-full"></div>
 
-    <!-- 預約表單 Section -->
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
-            <!-- 車費摘要 -->
             <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
@@ -231,7 +221,6 @@
                 </div>
             </div>
 
-            <!-- 訂單類型選擇 -->
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <button type="button" id="btn-instant-order" onclick="switchOrderType('instant')" class="w-full bg-brand-yellow text-black font-bold py-2 rounded-xl text-sm shadow-lg hover:opacity-90 transition cursor-pointer flex flex-col items-center justify-center gap-0.5 animate-pulse min-h-[70px]">
                     <span class="flex items-center gap-1.5">
@@ -247,7 +236,6 @@
                 </button>
             </div>
 
-            <!-- 表單本體 -->
             <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-3 text-sm">
 
                 <div id="field-flight-container" class="hidden">
@@ -255,7 +243,6 @@
                     <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-lg py-1 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
                 
-                <!-- 日期時間（預約訂單時顯示） -->
                 <div id="datetime-container" class="hidden">
                     <div class="grid grid-cols-1 gap-2 w-full">
                         <div class="bg-brand-dark border border-gray-800 rounded-lg py-1 px-2 transition hover:border-brand-yellow/50">
@@ -365,7 +352,6 @@
                     <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                 </div>
 
-                <!-- 電話驗證欄位 -->
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1">
                         <i class="fa-solid fa-shield-check text-brand-yellow mr-1.5"></i>
@@ -404,7 +390,6 @@
         </div>
     </section>
 
-    <!-- 升級提示 Modal -->
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
             <div class="text-brand-yellow text-3xl mb-3">
@@ -423,7 +408,6 @@
         </div>
     </div>
 
-    <!-- 頁尾 Footer -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
@@ -456,10 +440,6 @@
     </footer>
 
 <script>
-// ============================================
-// 變數宣告
-// ============================================
-
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
 let selectedCarName = '';
 let selectedCarNameEn = '';
@@ -478,10 +458,6 @@ let isInternalUser = false;
 let whatsappSent = false;
 let upgradeChoice = null;
 let pendingBookingData = null;
-
-// ============================================
-// 翻譯物件
-// ============================================
 
 const translations = {
     zh: {
@@ -607,10 +583,6 @@ const translations = {
         footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
     }
 };
-
-// ============================================
-// 函數定義
-// ============================================
 
 function switchOrderType(type) {
     orderType = type;
@@ -913,7 +885,7 @@ function submitBookingAfterUpgrade() {
         }
     }
     
-    // 客人版訊息（唔包含 Discord 通知標題同分隔線）
+    // 客人版訊息（保持原狀）
     let msgLines = [];
   
     msgLines.push(`📍 起點：${data.pickup}`);
@@ -945,25 +917,70 @@ function submitBookingAfterUpgrade() {
     }
 
     msgLines.push(`🚘 預約車款：${carDisplayText}`);
-
     msgLines.push(`💰 預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
 
-    // 客人版
     const customerMessage = msgLines.join('\n');
     
-    // Discord 版
+    // ✅ Discord 版（精簡 + 星期幾 + WhatsApp 連結，無廣告預覽）
     const discordMsgLines = [];
     
-    // 即時訂單：頂部加閃電標記
     if (orderType === 'instant') {
         discordMsgLines.push(`⚡ 即時訂單 ⚡`);
         discordMsgLines.push(``);
     }
     
-    // 加入內容
-    discordMsgLines.push(...msgLines);
+    let routeLine = `🚕 ${data.pickup} → ${data.dropoff}`;
+    if (data.stopoverTexts && data.stopoverTexts.length > 0) {
+        const stops = data.stopoverTexts.map(s => s.replace(/中途站\d+:\s*/, '')).join('、');
+        routeLine += `（經 ${stops}）`;
+    }
+    discordMsgLines.push(routeLine);
     
-    // 通知標題同分隔線
+    if (data.flightNo) {
+        discordMsgLines.push(`✈️ 航班：${data.flightNo}`);
+    }
+    
+    if (orderType === 'booking') {
+        const dateObj = new Date(data.date);
+        const weekdays = currentLang === 'zh' ? 
+            ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'] :
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const weekday = weekdays[dateObj.getDay()];
+        discordMsgLines.push(`📅 ${data.date}（${weekday}）⏰ ${data.timeStringFormatted}`);
+    }
+    
+    let passengerLine = `👥 ${data.passengers}`;
+    if (data.luggages && data.luggages !== '0 件') passengerLine += ` | 🧳 ${data.luggages}`;
+    if (data.hasPet) passengerLine += ` | 🐶`;
+    if (data.hasWheelchair) passengerLine += ` | ♿`;
+    discordMsgLines.push(passengerLine);
+    
+    if (data.paymentStr) {
+        discordMsgLines.push(`💳 ${data.paymentStr}`);
+    }
+    
+    const cleanPhone = (data.phone || '').replace(/\D/g, '');
+    let phoneWithCode = cleanPhone;
+    if (phoneWithCode.length === 8) {
+        phoneWithCode = '852' + phoneWithCode;
+    }
+    
+    if (data.surname) {
+        discordMsgLines.push(`👤 ${data.surname}${data.title} | 📞 [${data.phone}](tel:${cleanPhone}) | [WhatsApp](<https://wa.me/${phoneWithCode}>)`);
+    } else {
+        discordMsgLines.push(`📞 [${data.phone}](tel:${cleanPhone}) | [WhatsApp](<https://wa.me/${phoneWithCode}>)`);
+    }
+    
+    discordMsgLines.push(`🚘 ${carDisplayText}`);
+    
+    if (selectedFareMode === 'discount') {
+        discordMsgLines.push(`💎 八五折優惠`);
+    } else {
+        discordMsgLines.push(`💎 正價按錶收費`);
+    }
+    
+    discordMsgLines.push(`💰 HK$${data.totalFareForWhatsApp}`);
+    
     discordMsgLines.push(``);
     discordMsgLines.push(`🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸`);
     
@@ -994,7 +1011,6 @@ function submitBookingAfterUpgrade() {
         fullMessage: fullMessage,
         customerMessage: customerMessage,
         orderType: orderType,
-        // ✅ 修正：確保係嚴格 boolean
         isInternalBooking: isInternalUser === true
     };
 
@@ -1036,7 +1052,7 @@ function submitBookingAfterUpgrade() {
 function sendWhatsApp(event) {
     event.preventDefault();
 
-    // ✅ 修正：每次提交都重置內部人員標記（防止殘留）
+    // ✅ 每次提交都重置內部人員標記（防止殘留）
     isInternalUser = false;
 
     if (!selectedFareMode) {
@@ -1172,10 +1188,6 @@ function sendWhatsApp(event) {
     }
 }
 
-// ============================================
-// 頁面初始化
-// ============================================
-
 window.addEventListener('DOMContentLoaded', () => {
     const bookingData = loadBookingDataFromLocalStorage();
     if (bookingData) {
@@ -1260,7 +1272,6 @@ window.addEventListener('DOMContentLoaded', () => {
     switchOrderType('instant');
 });
 
-// 註冊 Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(reg => {
