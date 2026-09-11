@@ -86,6 +86,7 @@ async function addToGoogleCalendar(data) {
         phoneWithCode = '852' + phoneWithCode;
       }
       
+      // ✅ 日曆描述加入 WhatsApp 連結（用 < > 防止預覽）
       descriptionWithLinks = descriptionWithLinks.replace(
         `📞 電話：${data.phone}`,
         `📞 電話：${data.phone}\n📱 WhatsApp：<https://wa.me/${phoneWithCode}>`
@@ -143,10 +144,10 @@ async function sendDiscordNotification(data) {
       phoneWithCode = '852' + phoneWithCode;
     }
     
-    // Discord 電話連結：只顯示一個電話號碼，可直接點擊撥號
+    // ✅ 修正：加入 tel: 同 WhatsApp 連結（用 < > 防止廣告預覽）
     message = message.replace(
       `📞 電話：${data.phone}`,
-      `📞 電話：[${data.phone}](tel:${cleanPhone})`
+      `📞 電話：[${data.phone}](tel:${cleanPhone}) | [WhatsApp](<https://wa.me/${phoneWithCode}>)`
     );
   }
 
@@ -158,7 +159,7 @@ async function sendDiscordNotification(data) {
       },
       body: JSON.stringify({
         content: message,
-        flags: 4
+        flags: 4  // ✅ 抑制 Discord 廣告預覽
       })
     });
     console.log('Discord 通知已發送');
