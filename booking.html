@@ -459,6 +459,53 @@ let whatsappSent = false;
 let upgradeChoice = null;
 let pendingBookingData = null;
 
+// ============================================
+// ✅ 統一收費計算
+// 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
+// 豐田八五折：折後跳錶不足 $100 時，按 $100 收（即不提供八五折）
+// ============================================
+function calculateTotalFare() {
+    if (currentBaseFare <= 0) return 0;
+    
+    // ===== 豐田混能的士 =====
+    // 正價：max(跳錶, 100) + 隧道費
+    // 八五折：max(round(跳錶 × 0.85), 100) + 折扣隧道費
+    if (selectedCarName === '豐田混能的士') {
+        if (selectedFareMode === 'discount') {
+            const discountedBase = Math.max(Math.round(currentBaseFare * 0.85), 100);
+            let discountTunnelFee = 0;
+            if (currentTunnelFee > 0) {
+                const harborTunnelCount = Math.floor(currentTunnelFee / 50);
+                discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
+            }
+            return discountedBase + discountTunnelFee;
+        }
+        const minBaseFare = 100;
+        const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+        return adjustedBase + currentTunnelFee;
+    }
+    
+    // ===== MAXUS MIFA 7 =====
+    // 跳錶最低 $80（總額最低 $130）；隧道費另加
+    // 跳錶（調整後）+ 附加費 ≥ $250 減 $50
+    if (selectedCarName === 'MAXUS MIFA 7') {
+        const minBaseFare = 80;
+        const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+        const basePlusSurcharge = adjustedBase + 50;
+        
+        if (basePlusSurcharge >= 250) {
+            return basePlusSurcharge - 50 + currentTunnelFee;
+        }
+        return basePlusSurcharge + currentTunnelFee;
+    }
+    
+    // ===== 廣汽 E9 / 吉利大黃蜂 / 豐田 NOAH =====
+    // 跳錶最低 $80；隧道費另加
+    const minBaseFare = 80;
+    const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+    return adjustedBase + selectedSurcharge + currentTunnelFee;
+}
+
 const translations = {
     zh: {
         ph_verification_code: "請點擊右方獲取驗證碼",
@@ -649,26 +696,10 @@ function updateCarDisplay() {
         }
     }
     
+    // ✅ 使用統一 calculateTotalFare()
     if (priceTextEl) {
         if (currentBaseFare > 0) {
-            let totalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
-            
-            if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
-                let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-                let discountTunnelFee = 0;
-                if (currentTunnelFee > 0) {
-                    const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                    discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
-                }
-                totalFare = discountedBaseFare + discountTunnelFee;
-            } else {
-                if (currentBaseFare <= 100) totalFare = 100 + currentTunnelFee + selectedSurcharge;
-            }
-            
-            if (selectedMinFare > 0 && totalFare < selectedMinFare) {
-                totalFare = selectedMinFare;
-            }
-            
+            const totalFare = calculateTotalFare();
             priceTextEl.innerText = `HK$ ${totalFare}`;
         } else {
             priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
@@ -885,7 +916,6 @@ function submitBookingAfterUpgrade() {
         }
     }
     
-    // 客人版訊息（保持原狀）
     let msgLines = [];
   
     msgLines.push(`📍 起點：${data.pickup}`);
@@ -921,7 +951,6 @@ function submitBookingAfterUpgrade() {
 
     const customerMessage = msgLines.join('\n');
     
-    // ✅ Discord 版（精簡 + 星期幾 + WhatsApp 連結，無廣告預覽）
     const discordMsgLines = [];
     
     if (orderType === 'instant') {
@@ -1052,7 +1081,6 @@ function submitBookingAfterUpgrade() {
 function sendWhatsApp(event) {
     event.preventDefault();
 
-    // ✅ 每次提交都重置內部人員標記（防止殘留）
     isInternalUser = false;
 
     if (!selectedFareMode) {
@@ -1142,21 +1170,8 @@ function sendWhatsApp(event) {
         timeStringFormatted = '即時用車（15分鐘內）';
     }
 
-    let totalFareForWhatsApp = 0;
-    if (currentBaseFare > 0) {
-        if (selectedFareMode === 'discount' && selectedCarName === '豐田混能的士') {
-            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-            let discountTunnelFee = 0;
-            if (currentTunnelFee > 0) {
-                const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
-            }
-            totalFareForWhatsApp = discountedBaseFare + discountTunnelFee + selectedSurcharge;
-        } else {
-            totalFareForWhatsApp = currentBaseFare + currentTunnelFee + selectedSurcharge;
-            if (currentBaseFare <= 100) totalFareForWhatsApp = 100 + currentTunnelFee + selectedSurcharge;
-        }
-    }
+    // ✅ 使用統一 calculateTotalFare()
+    const totalFareForWhatsApp = calculateTotalFare();
 
     pendingBookingData = {
         pickup: routeData.pickup,

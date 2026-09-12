@@ -165,7 +165,6 @@
             color: #FFF200;
             border: 1px solid rgba(255,242,0,0.4);
         }
-        /* 豐田按鈕字體同預計參考車費一樣大 */
         .toyota-mode-btn-active,
         .toyota-mode-btn-inactive {
             font-size: 18px !important;
@@ -649,6 +648,8 @@ function renderCarCardsVisual(activeName) {
     }
 }
 
+// ✅ 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
+// ✅ 豐田八五折：折後跳錶不足 $100 時，按 $100 收（即不提供八五折）
 function updateCarCardFees() {
     if (currentBaseFare <= 0) {
         ['car1-fee-display', 'car2-fee-display', 'car3-fee-display', 'car4-fee-display', 'car5-fee-display'].forEach(id => {
@@ -662,100 +663,91 @@ function updateCarCardFees() {
         return;
     }
     
-    // 豐田混能的士 —— 八五折模式直接顯示折後價，不加標註
+    // ===== 豐田混能的士 =====
+    // 正價：max(跳錶, 100) + 隧道費
+    // 八五折：max(round(跳錶 × 0.85), 100) + 折扣隧道費
     const car1El = document.getElementById('car1-fee-display');
     if (car1El) {
         let fare, note = '';
+        
         if (selectedFareMode === 'discount') {
-            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+            const discountedBase = Math.max(Math.round(currentBaseFare * 0.85), 100);
             let discountTunnelFee = 0;
             if (currentTunnelFee > 0) {
                 const harborTunnelCount = Math.floor(currentTunnelFee / 50);
                 discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
             }
-            fare = discountedBaseFare + discountTunnelFee;
-            // 不顯示「八五折」標註
+            fare = discountedBase + discountTunnelFee;
         } else {
-            fare = currentBaseFare + currentTunnelFee;
-            if (currentBaseFare <= 100) {
-                fare = 100 + currentTunnelFee;
+            const minBaseFare = 100;
+            const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+            fare = adjustedBase + currentTunnelFee;
+            if (currentBaseFare <= minBaseFare) {
                 note = currentLang === 'en' ? 'Min.' : '最低消費';
             }
         }
         car1El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
     }
     
-    // MAXUS MIFA 7 —— 加刪除線、優惠橫幅放在兩行車費之間
+    // ===== MAXUS MIFA 7 =====
+    // 跳錶最低 $80（即總額最低 $130，不含隧道費）；隧道費另加
+    // 跳錶 + 附加費 ≥ $250 減 $50
     const car2El = document.getElementById('car2-fee-display');
     const car2BadgeRow = document.getElementById('car2-badge-row');
     const car2DiscountRow = document.getElementById('car2-discount-row');
     const car2DiscountDisplay = document.getElementById('car2-discount-display');
     if (car2El) {
-        const surcharge = 50, minFare = 130;
-        const basePlusSurcharge = currentBaseFare + surcharge;
+        const surcharge = 50;
+        const minBaseFare = 80;
+        const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+        const basePlusSurcharge = adjustedBase + surcharge;
         
         if (basePlusSurcharge >= 250) {
             const originalFare = basePlusSurcharge + currentTunnelFee;
             const finalFare = basePlusSurcharge - 50 + currentTunnelFee;
-            
-            // 上方參考車費加刪除線
             car2El.innerHTML = `<span class="line-through">HK$ ${originalFare}</span>`;
-            
             if (car2BadgeRow) car2BadgeRow.classList.remove('hidden');
             if (car2DiscountRow && car2DiscountDisplay) {
                 car2DiscountRow.classList.remove('hidden');
                 car2DiscountDisplay.innerHTML = `HK$ ${finalFare}`;
             }
         } else {
-            let fare = basePlusSurcharge + currentTunnelFee;
-            let note = '';
-            if (basePlusSurcharge < minFare) {
-                fare = minFare + currentTunnelFee;
-                note = currentLang === 'en' ? 'Min.' : '最低消費';
-            }
+            const fare = basePlusSurcharge + currentTunnelFee;
+            const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
             car2El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
-            
             if (car2BadgeRow) car2BadgeRow.classList.add('hidden');
             if (car2DiscountRow) car2DiscountRow.classList.add('hidden');
         }
     }
     
-    // 廣汽 E9
+    // ===== 廣汽 E9 =====
+    // 跳錶最低 $80；隧道費另加
     const car3El = document.getElementById('car3-fee-display');
     if (car3El) {
-        const surcharge = 100, minFare = 180;
-        let fare = currentBaseFare + currentTunnelFee + surcharge;
-        let note = '';
-        if (fare < minFare) {
-            fare = minFare;
-            note = currentLang === 'en' ? 'Min.' : '最低消費';
-        }
+        const surcharge = 100, minBaseFare = 80;
+        const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+        const fare = adjustedBase + surcharge + currentTunnelFee;
+        const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
         car3El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
     }
     
-    // 吉利大黃蜂
+    // ===== 吉利大黃蜂 =====
     const car4El = document.getElementById('car4-fee-display');
     if (car4El) {
-        const surcharge = 80, minFare = 160;
-        let fare = currentBaseFare + currentTunnelFee + surcharge;
-        let note = '';
-        if (fare < minFare) {
-            fare = minFare;
-            note = currentLang === 'en' ? 'Min.' : '最低消費';
-        }
+        const surcharge = 80, minBaseFare = 80;
+        const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+        const fare = adjustedBase + surcharge + currentTunnelFee;
+        const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
         car4El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
     }
     
-    // 豐田 NOAH 輪椅的士
+    // ===== 豐田 NOAH 輪椅的士 =====
     const car5El = document.getElementById('car5-fee-display');
     if (car5El) {
-        const surcharge = 150, minFare = 230;
-        let fare = currentBaseFare + currentTunnelFee + surcharge;
-        let note = '';
-        if (fare < minFare) {
-            fare = minFare;
-            note = currentLang === 'en' ? 'Min.' : '最低消費';
-        }
+        const surcharge = 150, minBaseFare = 80;
+        const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+        const fare = adjustedBase + surcharge + currentTunnelFee;
+        const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
         car5El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
     }
 }
@@ -860,7 +852,6 @@ window.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
 });
 
-// 註冊 Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(reg => {
