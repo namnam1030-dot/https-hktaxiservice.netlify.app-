@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ SEO 基礎優化 ============ -->
 <title>八五折的士 | 長途跨區・機場口岸接送 | 豪華六座位的士 | 24小時網約的士</title>
 
 <meta name="description" content="24小時八五折（85折）的士預約，專營長途跨區及口岸接送：屯門、元朗、天水圍、上水、粉嶺往返九龍香港，機場及港珠澳、深圳灣、落馬洲、香園圍、羅湖口岸。提供豪華六座位的士、輪椅的士，WhatsApp一鍵叫車。">
@@ -135,11 +134,13 @@
     <style>
         html { 
             font-size: 130%; 
+            scroll-padding-top: 92px;
         }
         body { 
             background-color: #0B0B0B; 
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
+            padding-top: 92px;
         }
         .text-xs, .text-\[11px\] {
             font-size: 18px !important;
@@ -176,6 +177,18 @@
         .pac-item-query {
             color: #FFF200;
             font-size: 17px;
+        }
+        /* 拖動相關 */
+        .stopover-drag-handle {
+            cursor: grab;
+            user-select: none;
+        }
+        .stopover-drag-handle:active {
+            cursor: grabbing;
+        }
+        .stopover-drop-target {
+            background-color: rgba(255, 242, 0, 0.1);
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -231,8 +244,6 @@
         </div>
     </div>
 
-    <div class="h-[92px] w-full"></div>
-
 <!-- H1 主標題 -->
     <div class="w-full px-0 bg-brand-dark border-b border-gray-800">
         <div class="max-w-4xl mx-auto px-4 py-3 text-center">
@@ -250,10 +261,9 @@
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             
-            <!-- 標題 + 重設按鈕 -->
-<h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
-    <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
-</h3>
+            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
+                <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
+            </h3>
 
             <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-xl text-xs text-gray-300 mb-4 shadow-inner">
                 <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
@@ -273,17 +283,17 @@
 
                 <div class="space-y-2">
                     <div>
-<div class="flex justify-between items-center mb-1">
-    <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
-<div class="flex items-center gap-2">
-    <button type="button" onclick="clearAllInputs()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn_clear">重設</span>
-    </button>
-<button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-    <span>起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span>目的地</span>
-</button>
-</div>
-</div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="clearAllInputs()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn_clear">重設</span>
+                                </button>
+                                <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+                                    <span>起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span>目的地</span>
+                                </button>
+                            </div>
+                        </div>
                         <div class="relative flex items-center">
                             <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
                             <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
@@ -299,7 +309,11 @@
                         </button>
                     </div>
 
-                    <div id="stopover-container-1" class="hidden flex items-center gap-2">
+                    <!-- 中途站 1 -->
+                    <div id="stopover-container-1" class="hidden flex items-center gap-1.5">
+                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="1" title="拖動以重新排序">
+                            <i class="fa-solid fa-grip-vertical"></i>
+                        </div>
                         <div class="relative flex items-center w-full">
                             <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
                             <button type="button" id="clear-stop-1-btn" onclick="clearInput('calc-stopover-1', 'clear-stop-1-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
@@ -310,7 +324,12 @@
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
-                    <div id="stopover-container-2" class="hidden flex items-center gap-2">
+
+                    <!-- 中途站 2 -->
+                    <div id="stopover-container-2" class="hidden flex items-center gap-1.5">
+                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="2" title="拖動以重新排序">
+                            <i class="fa-solid fa-grip-vertical"></i>
+                        </div>
                         <div class="relative flex items-center w-full">
                             <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
                             <button type="button" id="clear-stop-2-btn" onclick="clearInput('calc-stopover-2', 'clear-stop-2-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
@@ -321,7 +340,12 @@
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
-                    <div id="stopover-container-3" class="hidden flex items-center gap-2">
+
+                    <!-- 中途站 3 -->
+                    <div id="stopover-container-3" class="hidden flex items-center gap-1.5">
+                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="3" title="拖動以重新排序">
+                            <i class="fa-solid fa-grip-vertical"></i>
+                        </div>
                         <div class="relative flex items-center w-full">
                             <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
                             <button type="button" id="clear-stop-3-btn" onclick="clearInput('calc-stopover-3', 'clear-stop-3-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
@@ -345,7 +369,6 @@
                 </div>
             </div>
 
-            <!-- 計算按鈕 -->
             <button type="button" onclick="calculateAndGoToResult()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-[20px] shadow-md">
                 <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即預計車費</span>
             </button>
@@ -503,12 +526,88 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ============================================
+// 中途站拖動重新排序
+// ============================================
+
+let draggedStopoverIndex = null;
+
+function setupStopoverDragging() {
+    for (let i = 1; i <= 3; i++) {
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (!container) continue;
+        
+        const handle = container.querySelector('.stopover-drag-handle');
+        if (!handle) continue;
+        
+        // 手柄 dragstart
+        handle.addEventListener('dragstart', function(e) {
+            draggedStopoverIndex = i;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', i.toString());
+            container.classList.add('opacity-50');
+        });
+        
+        handle.addEventListener('dragend', function(e) {
+            container.classList.remove('opacity-50');
+            document.querySelectorAll('[id^="stopover-container-"]').forEach(c => {
+                c.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+            });
+            draggedStopoverIndex = null;
+        });
+        
+        // 容器 dragover / drop
+        container.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
+                container.classList.add('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+            }
+        });
+        
+        container.addEventListener('dragleave', function(e) {
+            container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+        });
+        
+        container.addEventListener('drop', function(e) {
+            e.preventDefault();
+            container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+            
+            if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
+                swapStopoverValues(draggedStopoverIndex, i);
+            }
+        });
+    }
+}
+
+function swapStopoverValues(fromIndex, toIndex) {
+    const fromInput = document.getElementById(`calc-stopover-${fromIndex}`);
+    const toInput = document.getElementById(`calc-stopover-${toIndex}`);
+    
+    if (fromInput && toInput) {
+        const temp = fromInput.value;
+        fromInput.value = toInput.value;
+        toInput.value = temp;
+        
+        toggleClearBtn(`calc-stopover-${fromIndex}`, `clear-stop-${fromIndex}-btn`);
+        toggleClearBtn(`calc-stopover-${toIndex}`, `clear-stop-${toIndex}-btn`);
+    }
+}
+
+// ============================================
+// 頁面初始化
+// ============================================
 window.addEventListener('DOMContentLoaded', () => {
     
-    const navType = performance.getEntriesByType('navigation')[0]?.type;
-    const isReload = navType === 'reload';
+    // 檢查係咪由 result.html 或 booking.html 返回
+    const referrer = document.referrer || '';
+    const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
     
-    if (isReload) {
+    if (fromResultOrBooking) {
+        // 由 result.html 或 booking.html 返回 → 保留資料
+        loadRouteDataFromLocalStorage();
+    } else {
+        // 其他情況（F5、直接訪問、由 index 來）→ 清空所有資料
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
         
@@ -526,10 +625,12 @@ window.addEventListener('DOMContentLoaded', () => {
         currentStopCount = 0;
         const addStopBtn = document.getElementById('add-stop-btn');
         if (addStopBtn) addStopBtn.classList.remove('hidden');
-    } else {
-        loadRouteDataFromLocalStorage();
     }
     
+    // 設定中途站拖動
+    setupStopoverDragging();
+    
+    // 語音欄位顯示檢查
     const pickupInput = document.getElementById('calc-pickup');
     if (pickupInput) {
         pickupInput.addEventListener('input', checkShowFlightField);
