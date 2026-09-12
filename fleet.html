@@ -154,6 +154,23 @@
         .instant-discount-badge {
             animation: pulse-red 1.5s infinite;
         }
+        .toyota-mode-btn-active {
+            background-color: #FFF200;
+            color: #000000;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255,242,0,0.4);
+        }
+        .toyota-mode-btn-inactive {
+            background-color: transparent;
+            color: #FFF200;
+            border: 1px solid rgba(255,242,0,0.4);
+        }
+        /* 豐田按鈕字體同預計參考車費一樣大 */
+        .toyota-mode-btn-active,
+        .toyota-mode-btn-inactive {
+            font-size: 18px !important;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -227,28 +244,34 @@
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="flex items-center p-3 gap-3">
-                    <div class="car-image-container shrink-0">
-                        <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('comf.jpeg', '豐田混能的士')">
-                            <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Taxi'">
-                        </div>
-                    </div>
                     <div class="flex-1 min-w-0">
                         <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car1_name">豐田混能的士</h3>
                         <div class="mt-1 space-y-0.5 text-[11px] text-gray-300">
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car1_cap">最多 4 位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car1_lug">約 2-3 件行李</span></div>
                         </div>
-                        <div class="mt-1">
-                            <span id="car1-fee-display" class="text-[11px] text-brand-yellow font-bold" data-i18n="car1_fee">標準收費・無附加費</span>
+                        <div class="mt-2 flex items-baseline gap-1 flex-wrap">
+                            <span class="text-[11px] text-gray-400" data-i18n="estimated_fare_label">預計參考車費：</span>
+                            <span id="car1-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                         </div>
-                        <div class="mt-2 flex gap-2">
-                            <button type="button" onclick="selectCarAndGoToBooking('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="flex-1 bg-brand-dark border border-brand-yellow text-brand-yellow font-bold px-2 py-1.5 rounded-lg text-[11px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center justify-center gap-1">
+                        <div class="mt-2 flex gap-1.5">
+                            <button type="button" id="toyota-normal-btn" onclick="setToyotaFareMode('normal')" class="toyota-mode-btn-active px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1">
                                 <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_normal">正價</span>
                             </button>
-                            <button type="button" onclick="selectCarWithDiscount('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="flex-1 bg-brand-yellow text-black font-bold px-2 py-1.5 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center justify-center gap-1">
+                            <button type="button" id="toyota-discount-btn" onclick="setToyotaFareMode('discount')" class="toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1">
                                 <i class="fa-solid fa-percent"></i> <span data-i18n="btn_select_discount">八五折</span>
                             </button>
                         </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 shrink-0">
+                        <div class="car-image-container">
+                            <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('comf.jpeg', '豐田混能的士')">
+                                <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Taxi'">
+                            </div>
+                        </div>
+                        <button type="button" onclick="selectToyotaCar()" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                            <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -259,25 +282,32 @@
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="flex items-center p-3 gap-3">
-                    <div class="car-image-container shrink-0">
-                        <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('m7.jpeg', 'MAXUS MIFA 7')">
-                            <img src="m7.jpeg" alt="MAXUS MIFA 7" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=MAXUS'">
-                        </div>
-                    </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car2_name">MAXUS MIFA 7</h3>
-                            <button type="button" onclick="selectCarAndGoToBooking('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5 shrink-0 ml-2">
-                                <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選此</span>
-                            </button>
-                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car2_name">MAXUS MIFA 7</h3>
                         <div class="mt-1 space-y-0.5 text-[11px] text-gray-300">
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car2_cap">最多 6 位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car2_lug">4-5 件行李</span></div>
                         </div>
-                        <div class="mt-1">
-                            <span id="car2-fee-display" class="text-[11px] text-brand-yellow font-bold" data-i18n-html="car2_fee"><p>附加費 HK$50</p></span>
+                        <div class="mt-2 space-y-0.5">
+                            <div class="flex items-baseline gap-1 flex-wrap">
+                                <span class="text-[11px] text-gray-400" data-i18n="estimated_fare_label">預計參考車費：</span>
+                                <span id="car2-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
+                            </div>
+                            <div id="car2-discount-row" class="hidden flex items-baseline gap-1 flex-wrap">
+                                <span class="text-[11px] text-brand-yellow font-bold" data-i18n="estimated_after_discount_label">預計優惠後車費：</span>
+                                <span id="car2-discount-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
+                            </div>
                         </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 shrink-0">
+                        <div class="car-image-container">
+                            <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('m7.jpeg', 'MAXUS MIFA 7')">
+                                <img src="m7.jpeg" alt="MAXUS MIFA 7" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=MAXUS'">
+                            </div>
+                        </div>
+                        <button type="button" onclick="selectCarAndGoToBooking('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                            <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -288,25 +318,26 @@
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="flex items-center p-3 gap-3">
-                    <div class="car-image-container shrink-0">
-                        <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('e9.jpeg', '廣汽 E9')">
-                            <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=GAC'">
-                        </div>
-                    </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car3_name">廣汽 E9</h3>
-                            <button type="button" onclick="selectCarAndGoToBooking('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5 shrink-0 ml-2">
-                                <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選此</span>
-                            </button>
-                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car3_name">廣汽 E9</h3>
                         <div class="mt-1 space-y-0.5 text-[11px] text-gray-300">
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car3_cap">最多 6 位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car3_lug">4-5 件行李</span></div>
                         </div>
-                        <div class="mt-1">
-                            <span id="car3-fee-display" class="text-[11px] text-brand-yellow font-bold" data-i18n-html="car3_fee"><p>附加費 HK$100</p></span>
+                        <div class="mt-2 flex items-baseline gap-1 flex-wrap">
+                            <span class="text-[11px] text-gray-400" data-i18n="estimated_fare_label">預計參考車費：</span>
+                            <span id="car3-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                         </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 shrink-0">
+                        <div class="car-image-container">
+                            <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('e9.jpeg', '廣汽 E9')">
+                                <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=GAC'">
+                            </div>
+                        </div>
+                        <button type="button" onclick="selectCarAndGoToBooking('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                            <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -317,25 +348,26 @@
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="flex items-center p-3 gap-3">
-                    <div class="car-image-container shrink-0">
-                        <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('bee.jpeg', '吉利大黃蜂')">
-                            <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Geely'">
-                        </div>
-                    </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car4_name">吉利大黃蜂</h3>
-                            <button type="button" onclick="selectCarAndGoToBooking('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5 shrink-0 ml-2">
-                                <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選此</span>
-                            </button>
-                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car4_name">吉利大黃蜂</h3>
                         <div class="mt-1 space-y-0.5 text-[11px] text-gray-300">
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car4_cap">最多 6 位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car4_lug">6件以上行李</span></div>
                         </div>
-                        <div class="mt-1">
-                            <span id="car4-fee-display" class="text-[11px] text-brand-yellow font-bold" data-i18n-html="car4_fee"><p>附加費 HK$80</p></span>
+                        <div class="mt-2 flex items-baseline gap-1 flex-wrap">
+                            <span class="text-[11px] text-gray-400" data-i18n="estimated_fare_label">預計參考車費：</span>
+                            <span id="car4-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                         </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 shrink-0">
+                        <div class="car-image-container">
+                            <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('bee.jpeg', '吉利大黃蜂')">
+                                <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Geely'">
+                            </div>
+                        </div>
+                        <button type="button" onclick="selectCarAndGoToBooking('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                            <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -346,25 +378,26 @@
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
                 <div class="flex items-center p-3 gap-3">
-                    <div class="car-image-container shrink-0">
-                        <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('NOAH.jpeg', '豐田 NOAH 輪椅的士')">
-                            <img src="NOAH.jpeg" alt="豐田 NOAH 輪椅的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=NOAH'">
-                        </div>
-                    </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car5_name">豐田 NOAH 輪椅的士</h3>
-                            <button type="button" onclick="selectCarAndGoToBooking('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5 shrink-0 ml-2">
-                                <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選此</span>
-                            </button>
-                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car5_name">豐田 NOAH 輪椅的士</h3>
                         <div class="mt-1 space-y-0.5 text-[11px] text-gray-300">
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car5_cap">1位輪椅 + 5位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car5_lug">4-5 件行李</span></div>
                         </div>
-                        <div class="mt-1">
-                            <span id="car5-fee-display" class="text-[11px] text-brand-yellow font-bold" data-i18n-html="car5_fee"><p>附加費 HK$150</p></span>
+                        <div class="mt-2 flex items-baseline gap-1 flex-wrap">
+                            <span class="text-[11px] text-gray-400" data-i18n="estimated_fare_label">預計參考車費：</span>
+                            <span id="car5-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                         </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 shrink-0">
+                        <div class="car-image-container">
+                            <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('NOAH.jpeg', '豐田 NOAH 輪椅的士')">
+                                <img src="NOAH.jpeg" alt="豐田 NOAH 輪椅的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=NOAH'">
+                            </div>
+                        </div>
+                        <button type="button" onclick="selectCarAndGoToBooking('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                            <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -425,7 +458,7 @@ let selectedSurcharge = 0;
 let selectedMinFare = 0;
 let selectedFeeMode = '';
 let selectedFeeModeEn = '';
-let selectedFareMode = '';
+let selectedFareMode = 'normal';
 let currentBaseFare = 0;
 let currentTunnelFee = 0;
 
@@ -437,9 +470,11 @@ const translations = {
     zh: {
         fleet_title: "選擇車款類型",
         badge_selected: "已選擇",
-        btn_select_car: "選此",
+        btn_select_car: "選定車款",
         btn_select_normal: "正價",
         btn_select_discount: "八五折",
+        estimated_fare_label: "預計參考車費：",
+        estimated_after_discount_label: "預計優惠後車費：",
         btn_back_booking: "返回預約頁面",
         btn_add_home: "APPS",
         modal_title: "一鍵加入主畫面",
@@ -448,23 +483,18 @@ const translations = {
         car1_name: "豐田混能的士",
         car1_cap: "最多 4 位乘客",
         car1_lug: "約 2-3 件行李",
-        car1_fee: "標準收費・無附加費",
         car2_name: "MAXUS MIFA 7",
         car2_cap: "最多 6 位乘客",
         car2_lug: "4-5 件行李",
-        car2_fee: "<p>附加費 HK$50</p>",
         car3_name: "廣汽 E9",
         car3_cap: "最多 6 位乘客",
         car3_lug: "4-5 件行李",
-        car3_fee: "<p>附加費 HK$100</p>",
         car4_name: "吉利大黃蜂",
         car4_cap: "最多 6 位乘客",
         car4_lug: "6件以上行李",
-        car4_fee: "<p>附加費 HK$80</p>",
         car5_name: "豐田 NOAH 輪椅的士",
         car5_cap: "1位輪椅 + 5位乘客",
         car5_lug: "4-5 件行李",
-        car5_fee: "<p>附加費 HK$150</p>",
         wecom_modal_title: "掃描二維碼添加企業微信",
         wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
         whatsapp_inquiry: "WhatsApp",
@@ -476,6 +506,8 @@ const translations = {
         btn_select_car: "Select",
         btn_select_normal: "Standard",
         btn_select_discount: "15% Off",
+        estimated_fare_label: "Estimated Fare: ",
+        estimated_after_discount_label: "Est. After Discount: ",
         btn_back_booking: "Back to Booking",
         btn_add_home: "APPS",
         modal_title: "Add to Home Screen",
@@ -484,23 +516,18 @@ const translations = {
         car1_name: "Toyota Hybrid Taxi",
         car1_cap: "Up to 4 passengers",
         car1_lug: "2-3 luggages",
-        car1_fee: "Standard Fare · No Surcharge",
         car2_name: "MAXUS MIFA 7",
         car2_cap: "Up to 6 passengers",
         car2_lug: "4-5 luggages",
-        car2_fee: "<p>Surcharge HK$50</p>",
         car3_name: "GAC E9",
         car3_cap: "Up to 6 passengers",
         car3_lug: "4-5 luggages",
-        car3_fee: "<p>Surcharge HK$100</p>",
         car4_name: "Geely Bumblebee",
         car4_cap: "Up to 6 passengers",
         car4_lug: "6+ luggages",
-        car4_fee: "<p>Surcharge HK$80</p>",
         car5_name: "Toyota NOAH Wheelchair Taxi",
         car5_cap: "1 wheelchair + 5 passengers",
         car5_lug: "4-5 luggages",
-        car5_fee: "<p>Surcharge HK$150</p>",
         wecom_modal_title: "Scan QR Code to Add WeCom",
         wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
         whatsapp_inquiry: "WhatsApp",
@@ -550,6 +577,38 @@ function saveBookingDataToLocalStorage() {
     localStorage.setItem('taxiBookingData', JSON.stringify(data));
 }
 
+function setToyotaFareMode(mode) {
+    selectedFareMode = mode;
+    updateToyotaModeButtons();
+    updateCarCardFees();
+}
+
+function updateToyotaModeButtons() {
+    const normalBtn = document.getElementById('toyota-normal-btn');
+    const discountBtn = document.getElementById('toyota-discount-btn');
+    if (!normalBtn || !discountBtn) return;
+    
+    if (selectedFareMode === 'discount') {
+        normalBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
+        discountBtn.className = 'toyota-mode-btn-active px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
+    } else {
+        normalBtn.className = 'toyota-mode-btn-active px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
+        discountBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
+    }
+}
+
+function selectToyotaCar() {
+    selectedCarName = '豐田混能的士';
+    selectedCarNameEn = 'Toyota Hybrid Taxi';
+    selectedSurcharge = 0;
+    selectedMinFare = 0;
+    selectedFeeMode = '標準收費・無附加費';
+    selectedFeeModeEn = 'Standard Fare · No Surcharge';
+    
+    saveBookingDataToLocalStorage();
+    window.location.href = 'booking.html';
+}
+
 function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
     selectedCarName = name;
     selectedCarNameEn = nameEn;
@@ -557,22 +616,7 @@ function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeT
     selectedMinFare = minFare;
     selectedFeeMode = feeText;
     selectedFeeModeEn = feeTextEn;
-    
-    // 豐田混能的士 - 正價按鈕，強制設為正價；其他車款都係正價
     selectedFareMode = 'normal';
-    
-    saveBookingDataToLocalStorage();
-    window.location.href = 'booking.html';
-}
-
-function selectCarWithDiscount(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
-    selectedCarName = name;
-    selectedCarNameEn = nameEn;
-    selectedSurcharge = surcharge;
-    selectedMinFare = minFare;
-    selectedFeeMode = feeText;
-    selectedFeeModeEn = feeTextEn;
-    selectedFareMode = 'discount';
     
     saveBookingDataToLocalStorage();
     window.location.href = 'booking.html';
@@ -602,93 +646,110 @@ function renderCarCardsVisual(activeName) {
 }
 
 function updateCarCardFees() {
-    if (currentBaseFare <= 0) return;
+    if (currentBaseFare <= 0) {
+        ['car1-fee-display', 'car2-fee-display', 'car3-fee-display', 'car4-fee-display', 'car5-fee-display'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = 'HK$ --';
+        });
+        const discountRow = document.getElementById('car2-discount-row');
+        if (discountRow) discountRow.classList.add('hidden');
+        return;
+    }
     
-    const carConfigs = [
-        { id: 'car1-fee-display', surcharge: 0, minFare: 0, name: '豐田混能的士' },
-        { id: 'car2-fee-display', surcharge: 50, minFare: 130, name: 'MAXUS MIFA 7' },
-        { id: 'car3-fee-display', surcharge: 100, minFare: 180, name: '廣汽 E9' },
-        { id: 'car4-fee-display', surcharge: 80, minFare: 160, name: '吉利大黃蜂' },
-        { id: 'car5-fee-display', surcharge: 150, minFare: 230, name: '豐田 NOAH 輪椅的士' }
-    ];
+    // 豐田混能的士
+    const car1El = document.getElementById('car1-fee-display');
+    if (car1El) {
+        let fare, note = '';
+        if (selectedFareMode === 'discount') {
+            let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+            let discountTunnelFee = 0;
+            if (currentTunnelFee > 0) {
+                const harborTunnelCount = Math.floor(currentTunnelFee / 50);
+                discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
+            }
+            fare = discountedBaseFare + discountTunnelFee;
+            note = currentLang === 'en' ? '15% Off' : '八五折';
+        } else {
+            fare = currentBaseFare + currentTunnelFee;
+            if (currentBaseFare <= 100) {
+                fare = 100 + currentTunnelFee;
+                note = currentLang === 'en' ? 'Min.' : '最低消費';
+            }
+        }
+        car1El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+    }
     
-    carConfigs.forEach(config => {
-        const displayEl = document.getElementById(config.id);
+    // MAXUS MIFA 7
+    const car2El = document.getElementById('car2-fee-display');
+    const car2DiscountRow = document.getElementById('car2-discount-row');
+    const car2DiscountDisplay = document.getElementById('car2-discount-display');
+    if (car2El) {
+        const surcharge = 50, minFare = 130;
+        const basePlusSurcharge = currentBaseFare + surcharge;
         
-        if (!displayEl) return;
-        
-        // 豐田混能的士
-        if (config.name === '豐田混能的士') {
-            let totalFare = currentBaseFare + currentTunnelFee;
-            let noteText = '';
+        if (basePlusSurcharge >= 250) {
+            const originalFare = basePlusSurcharge + currentTunnelFee;
+            const finalFare = basePlusSurcharge - 50 + currentTunnelFee;
             
-            if (selectedFareMode === 'discount') {
-                let discountedBaseFare = Math.round(currentBaseFare * 0.85);
-                let discountTunnelFee = 0;
-                if (currentTunnelFee > 0) {
-                    const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                    discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
-                }
-                totalFare = discountedBaseFare + discountTunnelFee;
-                noteText = currentLang === 'en' ? '85% Off' : '八五折優惠';
-            } else {
-                if (currentBaseFare <= 100) {
-                    totalFare = 100 + currentTunnelFee;
-                    noteText = currentLang === 'en' ? 'Min. Fare' : '最低消費';
-                }
+            car2El.innerHTML = `HK$ ${originalFare}`;
+            
+            if (car2DiscountRow && car2DiscountDisplay) {
+                car2DiscountRow.classList.remove('hidden');
+                car2DiscountDisplay.innerHTML = `HK$ ${finalFare} <span class="instant-discount-badge bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] inline-block ml-1">即減$50</span>`;
             }
-            
-            displayEl.innerHTML = currentLang === 'en' ? 
-                `HK$ ${totalFare}${noteText ? ' <span class="text-gray-400">(' + noteText + ')</span>' : ''}` : 
-                `HK$ ${totalFare}${noteText ? ' <span class="text-gray-400">（' + noteText + '）</span>' : ''}`;
-            displayEl.className = 'text-[11px] text-brand-yellow font-bold';
-            return;
-        }
-        
-        // MIFA 7：判斷基本跳錶費 + 車款附加費 ≥ $250 才減 $50（不含隧道費）
-        if (config.name === 'MAXUS MIFA 7') {
-            const basePlusSurcharge = currentBaseFare + config.surcharge;
-            
-            let effectiveBasePlusSurcharge = basePlusSurcharge;
-            let noteText = '';
-            if (basePlusSurcharge < config.minFare) {
-                effectiveBasePlusSurcharge = config.minFare;
-                noteText = currentLang === 'en' ? 'Min. Fare' : '最低消費';
+        } else {
+            let fare = basePlusSurcharge + currentTunnelFee;
+            let note = '';
+            if (basePlusSurcharge < minFare) {
+                fare = minFare + currentTunnelFee;
+                note = currentLang === 'en' ? 'Min.' : '最低消費';
             }
+            car2El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
             
-            // 達 $250 → 減 $50
-            if (basePlusSurcharge >= 250) {
-                const originalFare = basePlusSurcharge + currentTunnelFee;
-                const finalFare = basePlusSurcharge - 50 + currentTunnelFee;
-                displayEl.innerHTML = currentLang === 'en' ? 
-                    `<span class="line-through text-gray-500 text-[10px]">HK$ ${originalFare}</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="instant-discount-badge bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] inline-block">-HK$50</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="text-brand-yellow font-bold">HK$ ${finalFare}</span>` : 
-                    `<span class="line-through text-gray-500 text-[10px]">HK$ ${originalFare}</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="instant-discount-badge bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] inline-block">即減$50</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="text-brand-yellow font-bold">HK$ ${finalFare}</span>`;
-                displayEl.className = 'text-[11px]';
-                return;
-            } else {
-                const finalFare = effectiveBasePlusSurcharge + currentTunnelFee;
-                displayEl.innerHTML = currentLang === 'en' ? 
-                    `HK$ ${finalFare}${noteText ? ' <span class="text-gray-400">(' + noteText + ')</span>' : ''}` : 
-                    `HK$ ${finalFare}${noteText ? ' <span class="text-gray-400">（' + noteText + '）</span>' : ''}`;
-                displayEl.className = 'text-[11px] text-brand-yellow font-bold';
-                return;
+            if (car2DiscountRow) {
+                car2DiscountRow.classList.add('hidden');
             }
         }
-        
-        // 其他車款
-        let totalFare = currentBaseFare + currentTunnelFee + config.surcharge;
-        let noteText = '';
-        
-        if (totalFare < config.minFare) {
-            totalFare = config.minFare;
-            noteText = currentLang === 'en' ? 'Min. Fare' : '最低消費';
+    }
+    
+    // 廣汽 E9
+    const car3El = document.getElementById('car3-fee-display');
+    if (car3El) {
+        const surcharge = 100, minFare = 180;
+        let fare = currentBaseFare + currentTunnelFee + surcharge;
+        let note = '';
+        if (fare < minFare) {
+            fare = minFare;
+            note = currentLang === 'en' ? 'Min.' : '最低消費';
         }
-        
-        displayEl.innerHTML = currentLang === 'en' ? 
-            `HK$ ${totalFare}${noteText ? ' <span class="text-gray-400">(' + noteText + ')</span>' : ''}` : 
-            `HK$ ${totalFare}${noteText ? ' <span class="text-gray-400">（' + noteText + '）</span>' : ''}`;
-        displayEl.className = 'text-[11px] text-brand-yellow font-bold';
-    });
+        car3El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+    }
+    
+    // 吉利大黃蜂
+    const car4El = document.getElementById('car4-fee-display');
+    if (car4El) {
+        const surcharge = 80, minFare = 160;
+        let fare = currentBaseFare + currentTunnelFee + surcharge;
+        let note = '';
+        if (fare < minFare) {
+            fare = minFare;
+            note = currentLang === 'en' ? 'Min.' : '最低消費';
+        }
+        car4El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+    }
+    
+    // 豐田 NOAH 輪椅的士
+    const car5El = document.getElementById('car5-fee-display');
+    if (car5El) {
+        const surcharge = 150, minFare = 230;
+        let fare = currentBaseFare + currentTunnelFee + surcharge;
+        let note = '';
+        if (fare < minFare) {
+            fare = minFare;
+            note = currentLang === 'en' ? 'Min.' : '最低消費';
+        }
+        car5El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+    }
 }
 
 function toggleLanguage() {
@@ -780,12 +841,13 @@ window.addEventListener('DOMContentLoaded', () => {
         selectedMinFare = bookingData.selectedMinFare || 0;
         selectedFeeMode = bookingData.selectedFeeMode || '';
         selectedFeeModeEn = bookingData.selectedFeeModeEn || '';
-        selectedFareMode = bookingData.selectedFareMode || '';
+        selectedFareMode = bookingData.selectedFareMode || 'normal';
         currentBaseFare = bookingData.currentBaseFare || 0;
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
     
     renderCarCardsVisual(selectedCarName);
+    updateToyotaModeButtons();
     updateCarCardFees();
     applyLanguage();
 });
