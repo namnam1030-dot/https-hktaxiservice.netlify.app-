@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- ============ SEO 基礎優化 ============ -->
 <title>八五折的士 | 長途跨區・機場口岸接送 | 豪華六座位的士 | 24小時網約的士</title>
 
 <meta name="description" content="24小時八五折（85折）的士預約，專營長途跨區及口岸接送：屯門、元朗、天水圍、上水、粉嶺往返九龍香港，機場及港珠澳、深圳灣、落馬洲、香園圍、羅湖口岸。提供豪華六座位的士、輪椅的士，WhatsApp一鍵叫車。">
@@ -134,13 +135,11 @@
     <style>
         html { 
             font-size: 130%; 
-            scroll-padding-top: 92px;
         }
         body { 
             background-color: #0B0B0B; 
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
-            padding-top: 92px;
         }
         .text-xs, .text-\[11px\] {
             font-size: 18px !important;
@@ -409,6 +408,18 @@
 
 <script>
 // ============================================
+// 動態計算頁首高度
+// ============================================
+function adjustBodyPaddingForHeader() {
+    const header = document.querySelector('header');
+    if (header) {
+        const headerHeight = header.offsetHeight;
+        document.body.style.paddingTop = headerHeight + 'px';
+        document.documentElement.style.scrollPaddingTop = headerHeight + 'px';
+    }
+}
+
+// ============================================
 // 跨頁面共享變數
 // ============================================
 
@@ -540,7 +551,6 @@ function setupStopoverDragging() {
         const handle = container.querySelector('.stopover-drag-handle');
         if (!handle) continue;
         
-        // 手柄 dragstart
         handle.addEventListener('dragstart', function(e) {
             draggedStopoverIndex = i;
             e.dataTransfer.effectAllowed = 'move';
@@ -556,7 +566,6 @@ function setupStopoverDragging() {
             draggedStopoverIndex = null;
         });
         
-        // 容器 dragover / drop
         container.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -599,6 +608,9 @@ function swapStopoverValues(fromIndex, toIndex) {
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
     
+    // 動態計算頁首高度
+    adjustBodyPaddingForHeader();
+    
     // 檢查係咪由 result.html 或 booking.html 返回
     const referrer = document.referrer || '';
     const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
@@ -638,6 +650,14 @@ window.addEventListener('DOMContentLoaded', () => {
         pickupInput.addEventListener('blur', checkShowFlightField);
     }
 });
+
+// 視窗大小改變時重新計算頁首高度
+window.addEventListener('resize', adjustBodyPaddingForHeader);
+
+// 字體載入完成後重新計算
+if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(adjustBodyPaddingForHeader);
+}
 
 // ============================================
 // 語言系統
@@ -1068,6 +1088,7 @@ function applyLanguage() {
 // 頁面載入時套用語言
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
+    adjustBodyPaddingForHeader();
 });
 
 </script>
