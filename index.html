@@ -193,8 +193,8 @@
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar -->
-    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
+    <!-- 頁首 Navbar（加入 min-height 保險） -->
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md" style="min-height: 92px;">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
@@ -408,7 +408,7 @@
 
 <script>
 // ============================================
-// 動態計算頁首高度
+// 動態計算頁首高度（用 ResizeObserver 監聽變化）
 // ============================================
 function adjustBodyPaddingForHeader() {
     const header = document.querySelector('header');
@@ -416,6 +416,18 @@ function adjustBodyPaddingForHeader() {
         const headerHeight = header.offsetHeight;
         document.body.style.paddingTop = headerHeight + 'px';
         document.documentElement.style.scrollPaddingTop = headerHeight + 'px';
+    }
+}
+
+function setupHeaderResizeObserver() {
+    const header = document.querySelector('header');
+    if (!header) return;
+    
+    if (window.ResizeObserver) {
+        const observer = new ResizeObserver(() => {
+            adjustBodyPaddingForHeader();
+        });
+        observer.observe(header);
     }
 }
 
@@ -611,6 +623,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // 動態計算頁首高度
     adjustBodyPaddingForHeader();
     
+    // 設定 ResizeObserver 監聽 header 高度變化
+    setupHeaderResizeObserver();
+    
     // 檢查係咪由 result.html 或 booking.html 返回
     const referrer = document.referrer || '';
     const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
@@ -651,7 +666,14 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 視窗大小改變時重新計算頁首高度
+// 頁面完全載入後（包括所有圖片、字體）再計算多次
+window.addEventListener('load', () => {
+    adjustBodyPaddingForHeader();
+    setTimeout(adjustBodyPaddingForHeader, 100);
+    setTimeout(adjustBodyPaddingForHeader, 500);
+});
+
+// 視窗大小改變時重新計算
 window.addEventListener('resize', adjustBodyPaddingForHeader);
 
 // 字體載入完成後重新計算
@@ -1089,6 +1111,7 @@ function applyLanguage() {
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
     adjustBodyPaddingForHeader();
+    setupHeaderResizeObserver();
 });
 
 </script>
