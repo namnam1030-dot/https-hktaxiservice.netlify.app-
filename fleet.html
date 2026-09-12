@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ SEO 基礎優化（車隊選擇頁面） ============ -->
 <title>選擇車款 | 八五折的士 | 豪華六座位的士 | 輪椅的士 | 機場口岸接送</title>
 
 <meta name="description" content="選擇您的士車款：豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。八五折優惠，豪華六座位的士，24小時機場口岸接送。">
@@ -25,20 +24,17 @@
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
 
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="選擇車款 | 八五折的士 | 豪華六座位的士">
 <meta name="twitter:description" content="豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。八五折優惠。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 
-<!-- 多語言標記 -->
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/fleet.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/fleet.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/fleet.html">
 
 <link rel="canonical" href="https://hktaxiservice.netlify.app/fleet.html">
 
-<!-- Schema.org 結構化資料 -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -151,11 +147,17 @@
             align-items: center;
             justify-content: center;
         }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .instant-discount-badge {
+            animation: pulse-red 1.5s infinite;
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar（同 index.html 完全一樣） -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
@@ -184,7 +186,6 @@
         </div>
     </header>
 
-    <!-- 加入主畫面引導 Modal -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
             <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -207,10 +208,8 @@
 
     <div class="h-[92px] w-full"></div>
 
-    <!-- 車隊選擇 Section -->
     <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
         
-        <!-- 標題 + 返回按鈕 同一行 -->
         <div class="flex justify-between items-center mb-4 pt-2">
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
@@ -234,18 +233,21 @@
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car1_name">豐田混能的士</h3>
-                            <button type="button" onclick="selectCarAndGoToBooking('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5 shrink-0 ml-2">
-                                <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選此</span>
-                            </button>
-                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight" data-i18n="car1_name">豐田混能的士</h3>
                         <div class="mt-1 space-y-0.5 text-[11px] text-gray-300">
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car1_cap">最多 4 位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car1_lug">約 2-3 件行李</span></div>
                         </div>
                         <div class="mt-1">
                             <span id="car1-fee-display" class="text-[11px] text-brand-yellow font-bold" data-i18n="car1_fee">標準收費・無附加費</span>
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <button type="button" onclick="selectCarAndGoToBooking('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="flex-1 bg-brand-dark border border-brand-yellow text-brand-yellow font-bold px-2 py-1.5 rounded-lg text-[11px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_normal">正價</span>
+                            </button>
+                            <button type="button" onclick="selectCarWithDiscount('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge')" class="flex-1 bg-brand-yellow text-black font-bold px-2 py-1.5 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-percent"></i> <span data-i18n="btn_select_discount">八五折</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -370,7 +372,6 @@
         </div>
     </section>
 
-    <!-- 圖片放大 Modal -->
     <div id="image-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onclick="closeImageModal()">
         <div class="max-w-2xl w-full text-center relative" onclick="event.stopPropagation()">
             <button onclick="closeImageModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-3xl z-10">
@@ -381,7 +382,6 @@
         </div>
     </div>
 
-    <!-- 頁尾 Footer（同 index.html 完全一樣） -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
@@ -438,13 +438,13 @@ const translations = {
         fleet_title: "選擇車款類型",
         badge_selected: "已選擇",
         btn_select_car: "選此",
+        btn_select_normal: "正價",
+        btn_select_discount: "八五折",
         btn_back_booking: "返回預約頁面",
         btn_add_home: "APPS",
         modal_title: "一鍵加入主畫面",
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
         btn_close_guide: "關閉",
-        car_cap_label: "載客容量：",
-        car_lug_label: "行李空間：",
         car1_name: "豐田混能的士",
         car1_cap: "最多 4 位乘客",
         car1_lug: "約 2-3 件行李",
@@ -474,13 +474,13 @@ const translations = {
         fleet_title: "Select Vehicle Type",
         badge_selected: "Selected",
         btn_select_car: "Select",
+        btn_select_normal: "Standard",
+        btn_select_discount: "15% Off",
         btn_back_booking: "Back to Booking",
         btn_add_home: "APPS",
         modal_title: "Add to Home Screen",
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
         btn_close_guide: "Close",
-        car_cap_label: "Capacity: ",
-        car_lug_label: "Luggage: ",
         car1_name: "Toyota Hybrid Taxi",
         car1_cap: "Up to 4 passengers",
         car1_lug: "2-3 luggages",
@@ -558,9 +558,21 @@ function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeT
     selectedFeeMode = feeText;
     selectedFeeModeEn = feeTextEn;
     
-    if (name !== '豐田混能的士') {
-        selectedFareMode = 'normal';
-    }
+    // 豐田混能的士 - 正價按鈕，強制設為正價；其他車款都係正價
+    selectedFareMode = 'normal';
+    
+    saveBookingDataToLocalStorage();
+    window.location.href = 'booking.html';
+}
+
+function selectCarWithDiscount(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
+    selectedCarName = name;
+    selectedCarNameEn = nameEn;
+    selectedSurcharge = surcharge;
+    selectedMinFare = minFare;
+    selectedFeeMode = feeText;
+    selectedFeeModeEn = feeTextEn;
+    selectedFareMode = 'discount';
     
     saveBookingDataToLocalStorage();
     window.location.href = 'booking.html';
@@ -605,10 +617,11 @@ function updateCarCardFees() {
         
         if (!displayEl) return;
         
-        let totalFare = currentBaseFare + currentTunnelFee + config.surcharge;
-        let noteText = '';
-        
+        // 豐田混能的士
         if (config.name === '豐田混能的士') {
+            let totalFare = currentBaseFare + currentTunnelFee;
+            let noteText = '';
+            
             if (selectedFareMode === 'discount') {
                 let discountedBaseFare = Math.round(currentBaseFare * 0.85);
                 let discountTunnelFee = 0;
@@ -624,11 +637,51 @@ function updateCarCardFees() {
                     noteText = currentLang === 'en' ? 'Min. Fare' : '最低消費';
                 }
             }
-        } else {
-            if (totalFare < config.minFare) {
-                totalFare = config.minFare;
+            
+            displayEl.innerHTML = currentLang === 'en' ? 
+                `HK$ ${totalFare}${noteText ? ' <span class="text-gray-400">(' + noteText + ')</span>' : ''}` : 
+                `HK$ ${totalFare}${noteText ? ' <span class="text-gray-400">（' + noteText + '）</span>' : ''}`;
+            displayEl.className = 'text-[11px] text-brand-yellow font-bold';
+            return;
+        }
+        
+        // MIFA 7：判斷基本跳錶費 + 車款附加費 ≥ $250 才減 $50（不含隧道費）
+        if (config.name === 'MAXUS MIFA 7') {
+            const basePlusSurcharge = currentBaseFare + config.surcharge;
+            
+            let effectiveBasePlusSurcharge = basePlusSurcharge;
+            let noteText = '';
+            if (basePlusSurcharge < config.minFare) {
+                effectiveBasePlusSurcharge = config.minFare;
                 noteText = currentLang === 'en' ? 'Min. Fare' : '最低消費';
             }
+            
+            // 達 $250 → 減 $50
+            if (basePlusSurcharge >= 250) {
+                const originalFare = basePlusSurcharge + currentTunnelFee;
+                const finalFare = basePlusSurcharge - 50 + currentTunnelFee;
+                displayEl.innerHTML = currentLang === 'en' ? 
+                    `<span class="line-through text-gray-500 text-[10px]">HK$ ${originalFare}</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="instant-discount-badge bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] inline-block">-HK$50</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="text-brand-yellow font-bold">HK$ ${finalFare}</span>` : 
+                    `<span class="line-through text-gray-500 text-[10px]">HK$ ${originalFare}</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="instant-discount-badge bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] inline-block">即減$50</span><span class="text-gray-400 text-[10px] mx-1">→</span><span class="text-brand-yellow font-bold">HK$ ${finalFare}</span>`;
+                displayEl.className = 'text-[11px]';
+                return;
+            } else {
+                const finalFare = effectiveBasePlusSurcharge + currentTunnelFee;
+                displayEl.innerHTML = currentLang === 'en' ? 
+                    `HK$ ${finalFare}${noteText ? ' <span class="text-gray-400">(' + noteText + ')</span>' : ''}` : 
+                    `HK$ ${finalFare}${noteText ? ' <span class="text-gray-400">（' + noteText + '）</span>' : ''}`;
+                displayEl.className = 'text-[11px] text-brand-yellow font-bold';
+                return;
+            }
+        }
+        
+        // 其他車款
+        let totalFare = currentBaseFare + currentTunnelFee + config.surcharge;
+        let noteText = '';
+        
+        if (totalFare < config.minFare) {
+            totalFare = config.minFare;
+            noteText = currentLang === 'en' ? 'Min. Fare' : '最低消費';
         }
         
         displayEl.innerHTML = currentLang === 'en' ? 
