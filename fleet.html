@@ -239,7 +239,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             
             <!-- 車款 1 : 豐田混能的士 -->
-            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl">
+            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl" data-car="豐田混能的士">
                 <div class="badge-container hidden absolute top-2 right-2 bg-brand-yellow text-black text-xs font-bold px-2.5 py-0.5 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
@@ -277,7 +277,7 @@
             </div>
 
             <!-- 車款 2 : MAXUS MIFA 7 -->
-            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl">
+            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl" data-car="MAXUS MIFA 7">
                 <div class="badge-container hidden absolute top-2 right-2 bg-brand-yellow text-black text-xs font-bold px-2.5 py-0.5 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
@@ -288,10 +288,13 @@
                             <div class="flex items-center"><i class="fa-solid fa-user-group text-brand-yellow w-5"></i> <span data-i18n="car2_cap">最多 6 位乘客</span></div>
                             <div class="flex items-center"><i class="fa-solid fa-suitcase-rolling text-brand-yellow w-5"></i> <span data-i18n="car2_lug">4-5 件行李</span></div>
                         </div>
-                        <div class="mt-2 space-y-0.5">
+                        <div class="mt-2 space-y-1.5">
                             <div class="flex items-baseline gap-1 flex-wrap">
                                 <span class="text-[11px] text-gray-400" data-i18n="estimated_fare_label">預計參考車費：</span>
                                 <span id="car2-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
+                            </div>
+                            <div id="car2-badge-row" class="hidden">
+                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block">恭喜獲得滿$250即減$50優惠</span>
                             </div>
                             <div id="car2-discount-row" class="hidden flex items-baseline gap-1 flex-wrap">
                                 <span class="text-[11px] text-brand-yellow font-bold" data-i18n="estimated_after_discount_label">預計優惠後車費：</span>
@@ -313,7 +316,7 @@
             </div>
 
             <!-- 車款 3 : 廣汽 E9 -->
-            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl">
+            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl" data-car="廣汽 E9">
                 <div class="badge-container hidden absolute top-2 right-2 bg-brand-yellow text-black text-xs font-bold px-2.5 py-0.5 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
@@ -343,7 +346,7 @@
             </div>
 
             <!-- 車款 4 : 吉利大黃蜂 -->
-            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl">
+            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl" data-car="吉利大黃蜂">
                 <div class="badge-container hidden absolute top-2 right-2 bg-brand-yellow text-black text-xs font-bold px-2.5 py-0.5 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
@@ -373,7 +376,7 @@
             </div>
 
             <!-- 車款 5 : 豐田 NOAH 輪椅的士 -->
-            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl md:col-span-2">
+            <div class="car-card bg-brand-card border border-gray-800 hover:border-brand-yellow transition relative rounded-xl md:col-span-2" data-car="豐田 NOAH 輪椅的士">
                 <div class="badge-container hidden absolute top-2 right-2 bg-brand-yellow text-black text-xs font-bold px-2.5 py-0.5 rounded-full z-10 shadow-md">
                     <i class="fa-solid fa-check mr-1"></i> <span data-i18n="badge_selected">已選擇</span>
                 </div>
@@ -628,8 +631,8 @@ function renderCarCardsVisual(activeName) {
 
         const badge = card.querySelector('.badge-container');
         if (badge) {
-            const cardCarName = card.id.replace('card-', '');
-            if (cardCarName === selectedCarName && selectedCarName !== '') {
+            const cardCarName = card.dataset.car || '';
+            if (cardCarName !== '' && cardCarName === selectedCarName) {
                 badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
@@ -638,10 +641,11 @@ function renderCarCardsVisual(activeName) {
     });
 
     if (activeName && activeName !== '') {
-        const activeCard = document.getElementById('card-' + activeName);
-        if (activeCard) {
-            activeCard.classList.add('border-brand-yellow');
-        }
+        document.querySelectorAll('.car-card').forEach(card => {
+            if ((card.dataset.car || '') === activeName) {
+                card.classList.add('border-brand-yellow');
+            }
+        });
     }
 }
 
@@ -651,12 +655,14 @@ function updateCarCardFees() {
             const el = document.getElementById(id);
             if (el) el.innerHTML = 'HK$ --';
         });
+        const badgeRow = document.getElementById('car2-badge-row');
+        if (badgeRow) badgeRow.classList.add('hidden');
         const discountRow = document.getElementById('car2-discount-row');
         if (discountRow) discountRow.classList.add('hidden');
         return;
     }
     
-    // 豐田混能的士
+    // 豐田混能的士 —— 八五折模式直接顯示折後價，不加標註
     const car1El = document.getElementById('car1-fee-display');
     if (car1El) {
         let fare, note = '';
@@ -668,7 +674,7 @@ function updateCarCardFees() {
                 discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
             }
             fare = discountedBaseFare + discountTunnelFee;
-            note = currentLang === 'en' ? '15% Off' : '八五折';
+            // 不顯示「八五折」標註
         } else {
             fare = currentBaseFare + currentTunnelFee;
             if (currentBaseFare <= 100) {
@@ -679,8 +685,9 @@ function updateCarCardFees() {
         car1El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
     }
     
-    // MAXUS MIFA 7
+    // MAXUS MIFA 7 —— 加刪除線、優惠橫幅放在兩行車費之間
     const car2El = document.getElementById('car2-fee-display');
+    const car2BadgeRow = document.getElementById('car2-badge-row');
     const car2DiscountRow = document.getElementById('car2-discount-row');
     const car2DiscountDisplay = document.getElementById('car2-discount-display');
     if (car2El) {
@@ -691,11 +698,13 @@ function updateCarCardFees() {
             const originalFare = basePlusSurcharge + currentTunnelFee;
             const finalFare = basePlusSurcharge - 50 + currentTunnelFee;
             
-            car2El.innerHTML = `HK$ ${originalFare}`;
+            // 上方參考車費加刪除線
+            car2El.innerHTML = `<span class="line-through">HK$ ${originalFare}</span>`;
             
+            if (car2BadgeRow) car2BadgeRow.classList.remove('hidden');
             if (car2DiscountRow && car2DiscountDisplay) {
                 car2DiscountRow.classList.remove('hidden');
-                car2DiscountDisplay.innerHTML = `HK$ ${finalFare} <span class="instant-discount-badge bg-red-500 text-white px-1.5 py-0.5 rounded text-[10px] inline-block ml-1">即減$50</span>`;
+                car2DiscountDisplay.innerHTML = `HK$ ${finalFare}`;
             }
         } else {
             let fare = basePlusSurcharge + currentTunnelFee;
@@ -706,9 +715,8 @@ function updateCarCardFees() {
             }
             car2El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
             
-            if (car2DiscountRow) {
-                car2DiscountRow.classList.add('hidden');
-            }
+            if (car2BadgeRow) car2BadgeRow.classList.add('hidden');
+            if (car2DiscountRow) car2DiscountRow.classList.add('hidden');
         }
     }
     
