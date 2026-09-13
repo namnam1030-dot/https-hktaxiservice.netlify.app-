@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ SEO 基礎優化 ============ -->
 <title>八五折的士 | 長途跨區・機場口岸接送 | 豪華六座位的士 | 24小時網約的士</title>
 
 <meta name="description" content="24小時八五折（85折）的士預約，專營長途跨區及口岸接送：屯門、元朗、天水圍、上水、粉嶺往返九龍香港，機場及港珠澳、深圳灣、落馬洲、香園圍、羅湖口岸。提供豪華六座位的士、輪椅的士，WhatsApp一鍵叫車。">
@@ -177,7 +176,6 @@
             color: #FFF200;
             font-size: 17px;
         }
-        /* 拖動相關 */
         .stopover-drag-handle {
             cursor: grab;
             user-select: none;
@@ -193,7 +191,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar（加入 min-height 保險） -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md" style="min-height: 92px;">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
@@ -222,7 +219,6 @@
         </div>
     </header>
 
-    <!-- 加入主畫面引導 Modal -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
             <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -243,20 +239,19 @@
         </div>
     </div>
 
-<!-- H1 主標題 -->
+    <!-- H1 主標題（加 i18n） -->
     <div class="w-full px-0 bg-brand-dark border-b border-gray-800">
         <div class="max-w-4xl mx-auto px-4 py-3 text-center">
             <h1 class="text-lg md:text-xl font-extrabold text-white leading-relaxed">
-                長途跨區・機場口岸接送<br>
-                <span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>
+                <span data-i18n="index_h1_line1">長途跨區・機場口岸接送</span><br>
+                <span class="text-brand-yellow" data-i18n="index_h1_line2">八五折(85折)的士 | 六座豪華的士</span>
             </h1>
-            <p class="text-[11px] font-extrabold text-white mt-1.5 leading-relaxed">
+            <p class="text-[11px] font-extrabold text-white mt-1.5 leading-relaxed" data-i18n-html="index_subtitle">
                 機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士
             </p>
         </div>
     </div>
 
-    <!-- 車費估算器輸入 Section -->
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             
@@ -266,7 +261,7 @@
 
             <div class="bg-gray-900/90 border border-brand-yellow/30 p-3.5 rounded-xl text-xs text-gray-300 mb-4 shadow-inner">
                 <p class="font-bold text-brand-yellow mb-1 flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">車費預計使用說明：</span>
+                    <i class="fa-solid fa-circle-info text-sm"></i> <span data-i18n="calc_tip_title">預計車費使用說明：</span>
                 </p>
                 <ul class="list-disc list-inside space-y-1 text-gray-300">
                     <li data-i18n-html="calc_tip_1"><strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span><br>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。</li>
@@ -288,8 +283,8 @@
                                 <button type="button" onclick="clearAllInputs()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
                                     <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn_clear">重設</span>
                                 </button>
-                                <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                    <span>起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span>目的地</span>
+                                <button type="button" onclick="swapLocations()" data-i18n-title="title_swap" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
+                                    <span data-i18n="btn_swap_pickup">起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span data-i18n="btn_swap_dropoff">目的地</span>
                                 </button>
                             </div>
                         </div>
@@ -302,7 +297,7 @@
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
-                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
+                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站（選填，最多3個）</label>
                         <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
                         </button>
@@ -310,48 +305,48 @@
 
                     <!-- 中途站 1 -->
                     <div id="stopover-container-1" class="hidden flex items-center gap-1.5">
-                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="1" title="拖動以重新排序">
+                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="1" data-i18n-title="title_drag" title="拖動以重新排序">
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
+                            <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_1" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
                             <button type="button" id="clear-stop-1-btn" onclick="clearInput('calc-stopover-1', 'clear-stop-1-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <button type="button" onclick="removeStopoverField(1)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                        <button type="button" onclick="removeStopoverField(1)" data-i18n-title="title_remove_stop" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
 
                     <!-- 中途站 2 -->
                     <div id="stopover-container-2" class="hidden flex items-center gap-1.5">
-                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="2" title="拖動以重新排序">
+                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="2" data-i18n-title="title_drag" title="拖動以重新排序">
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
+                            <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_2" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
                             <button type="button" id="clear-stop-2-btn" onclick="clearInput('calc-stopover-2', 'clear-stop-2-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <button type="button" onclick="removeStopoverField(2)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                        <button type="button" onclick="removeStopoverField(2)" data-i18n-title="title_remove_stop" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
 
                     <!-- 中途站 3 -->
                     <div id="stopover-container-3" class="hidden flex items-center gap-1.5">
-                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="3" title="拖動以重新排序">
+                        <div class="stopover-drag-handle text-gray-600 hover:text-brand-yellow p-1 shrink-0" draggable="true" data-index="3" data-i18n-title="title_drag" title="拖動以重新排序">
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
+                            <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_3" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
                             <button type="button" id="clear-stop-3-btn" onclick="clearInput('calc-stopover-3', 'clear-stop-3-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <button type="button" onclick="removeStopoverField(3)" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
+                        <button type="button" onclick="removeStopoverField(3)" data-i18n-title="title_remove_stop" title="減少中途站" class="bg-brand-dark border border-red-500/50 hover:bg-red-500/20 text-red-400 px-3 py-2.5 rounded-lg text-xs transition cursor-pointer flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-minus"></i>
                         </button>
                     </div>
@@ -374,7 +369,6 @@
         </div>
     </section>
 
-    <!-- 頁尾 Footer -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
@@ -405,10 +399,9 @@
         </div>
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
-
 <script>
 // ============================================
-// 動態計算頁首高度（用 ResizeObserver 監聽變化）
+// 動態計算頁首高度
 // ============================================
 function adjustBodyPaddingForHeader() {
     const header = document.querySelector('header');
@@ -479,7 +472,6 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
-// 一鍵重設所有輸入格
 function clearAllInputs() {
     const pickupEl = document.getElementById('calc-pickup');
     if (pickupEl) {
@@ -517,7 +509,6 @@ function clearAllInputs() {
     }
 }
 
-// 計算並跳轉去 result.html
 function calculateAndGoToResult() {
     const pickupVal = document.getElementById('calc-pickup')?.value.trim() || '';
     const dropoffVal = document.getElementById('calc-dropoff')?.value.trim() || '';
@@ -619,22 +610,15 @@ function swapStopoverValues(fromIndex, toIndex) {
 // 頁面初始化
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
-    
-    // 動態計算頁首高度
     adjustBodyPaddingForHeader();
-    
-    // 設定 ResizeObserver 監聽 header 高度變化
     setupHeaderResizeObserver();
     
-    // 檢查係咪由 result.html 或 booking.html 返回
     const referrer = document.referrer || '';
     const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
     
     if (fromResultOrBooking) {
-        // 由 result.html 或 booking.html 返回 → 保留資料
         loadRouteDataFromLocalStorage();
     } else {
-        // 其他情況（F5、直接訪問、由 index 來）→ 清空所有資料
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
         
@@ -654,10 +638,8 @@ window.addEventListener('DOMContentLoaded', () => {
         if (addStopBtn) addStopBtn.classList.remove('hidden');
     }
     
-    // 設定中途站拖動
     setupStopoverDragging();
     
-    // 語音欄位顯示檢查
     const pickupInput = document.getElementById('calc-pickup');
     if (pickupInput) {
         pickupInput.addEventListener('input', checkShowFlightField);
@@ -666,17 +648,14 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 頁面完全載入後（包括所有圖片、字體）再計算多次
 window.addEventListener('load', () => {
     adjustBodyPaddingForHeader();
     setTimeout(adjustBodyPaddingForHeader, 100);
     setTimeout(adjustBodyPaddingForHeader, 500);
 });
 
-// 視窗大小改變時重新計算
 window.addEventListener('resize', adjustBodyPaddingForHeader);
 
-// 字體載入完成後重新計算
 if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(adjustBodyPaddingForHeader);
 }
@@ -689,6 +668,52 @@ let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
 const translations = {
     zh: {
+        // ===== 共用 =====
+        btn_add_home: "APPS",
+        modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
+        btn_close_guide: "了解，關閉",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
+
+        // ===== H1 主標題（新增） =====
+        index_h1_line1: "長途跨區・機場口岸接送",
+        index_h1_line2: "八五折(85折)的士 | 六座豪華的士",
+        index_subtitle: "機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士",
+
+        // ===== 車費估算器 =====
+        calc_title: "智能路線規劃與預計車費",
+        calc_tip_title: "預計車費使用說明：",
+        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span><br>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
+        calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
+        calc_label_pickup: "起點",
+        calc_label_stopover: "中途站（選填，最多3個）",
+        calc_label_dropoff: "目的地",
+        btn_clear: "重設",
+        btn_swap_pickup: "起點",
+        btn_swap_dropoff: "目的地",
+        title_swap: "對調起點與終點",
+        title_drag: "拖動以重新排序",
+        title_remove_stop: "減少中途站",
+        btn_add_stop: "增加中途站",
+        ph_pickup: "輸入起點...",
+        ph_stopover_1: "輸入中途站 1...",
+        ph_stopover_2: "輸入中途站 2...",
+        ph_stopover_3: "輸入中途站 3...",
+        ph_dropoff_opt: "輸入目的地...",
+        voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
+        btn_calc_fare: "立即預計車費",
+
+        // ===== 語音提示（新增） =====
+        voice_unsupported: "您的瀏覽器暫不支援語音辨識，請直接使用輸入框填寫。",
+        voice_listening: "聆聽中...請講出完整行程",
+        voice_heard_prefix: "聽到：「",
+        voice_heard_suffix: "」",
+        voice_failed: "未能識別語音，請重試或以文字輸入",
+
+        // ===== 其他頁面共用（保留） =====
         btn_more_payment: "更多付款方式",
         label_verification: "電話驗證",
         btn_get_code: "獲取驗證碼",
@@ -705,42 +730,66 @@ const translations = {
         btn_call_now: "致電 6881 5441",
         btn_whatsapp_inquiry: "WhatsApp 查詢",
         btn_wechat_inquiry: "WeChat 查詢",
-        wecom_modal_title: "掃描二維碼添加企業微信",
-        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
         swap_locations: "起點🔃目的地",
         estimated_fare_label: "預計車費",
         btn_book_now: "立即預約",
         fleet_title: "選擇車款類型",
         fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
-        btn_close_guide: "了解，關閉",
         fare_normal_label: "正價按錶收費",
         fare_discount_label: "八五折優惠",
         fare_discount_note: "(只限豐田混能的士)",
-        btn_add_home: "APPS",
-        modal_title: "一鍵加入主畫面",
-        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
         btn_quick_query: "立即預約",
         btn_view_fleet: "選擇車款類型",
         badge_selected: "已選擇",
-        btn_reselect_route: "重新選擇路線",
-        btn_clear: "重設",
-        calc_title: "智能規劃路線與預計車費",
-        calc_tip_title: "預計車費使用說明：",
-        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
-        calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
-        calc_label_pickup: "起點 (出發地)",
-        calc_label_stopover: "中途站 (最多3個)",
-        calc_label_dropoff: "終點 (目的地)",
-        btn_add_stop: "增加中途站",
-        ph_pickup: "輸入起點...",
-        ph_stopover_opt: "輸入中途站...",
-        ph_dropoff_opt: "輸入終點...",
-        voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
-        btn_calc_fare: "立即預計車費",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+        btn_reselect_route: "重新選擇路線"
     },
     en: {
+        // ===== 共用 =====
+        btn_add_home: "APPS",
+        modal_title: "Add to Home Screen",
+        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
+        btn_close_guide: "Got it, Close",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
+
+        // ===== H1 主標題 =====
+        index_h1_line1: "Long Distance & Cross-District · Airport & Border Transfer",
+        index_h1_line2: "15% Off Taxi | 6-Seater Luxury Taxi",
+        index_subtitle: "Airport & Major Border Crossings · New Territories to HK Island & Kowloon<br>Airport · HZMB · Shenzhen Bay · Lok Ma Chau · Heung Yuen Wai<br>Tuen Mun · Yuen Long · Tin Shui Wai · Sheung Shui · Fanling<br>Luxury 6-Seater · Hybrid Taxi · Wheelchair Taxi",
+
+        // ===== 車費估算器 =====
+        calc_title: "Smart Route & Fare Estimator",
+        calc_tip_title: "Fare Estimation Instructions:",
+        calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Airport to Shenzhen Bay Port"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
+        calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below, then click calculate fare.',
+        calc_label_pickup: "Pickup",
+        calc_label_stopover: "Stopovers (Optional, Max 3)",
+        calc_label_dropoff: "Destination",
+        btn_clear: "Reset",
+        btn_swap_pickup: "Pickup",
+        btn_swap_dropoff: "Destination",
+        title_swap: "Swap Pickup & Destination",
+        title_drag: "Drag to reorder",
+        title_remove_stop: "Remove stopover",
+        btn_add_stop: "Add Stopover",
+        ph_pickup: "Enter pickup...",
+        ph_stopover_1: "Enter stopover 1...",
+        ph_stopover_2: "Enter stopover 2...",
+        ph_stopover_3: "Enter stopover 3...",
+        ph_dropoff_opt: "Enter destination...",
+        voice_btn_text: "[Pickup] via [Stopover] to [Destination]",
+        btn_calc_fare: "Calculate Estimated Fare",
+
+        // ===== 語音提示 =====
+        voice_unsupported: "Speech recognition is not supported on your browser. Please enter text instead.",
+        voice_listening: "Listening... Please speak your full trip",
+        voice_heard_prefix: "Heard: \"",
+        voice_heard_suffix: "\"",
+        voice_failed: "Speech not recognized. Please try again or enter text manually",
+
+        // ===== 其他頁面共用 =====
         btn_more_payment: "More Options",
         label_verification: "Phone Verification",
         btn_get_code: "Get Code",
@@ -757,40 +806,18 @@ const translations = {
         btn_call_now: "Call 6881 5441",
         btn_whatsapp_inquiry: "WhatsApp Enquiry",
         btn_wechat_inquiry: "WeChat Enquiry",
-        wecom_modal_title: "Scan QR Code to Add WeCom",
-        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
         swap_locations: "Swap Pickup🔃Destination",
         estimated_fare_label: "Estimated Fare",
         btn_book_now: "Book Now",
         fleet_title: "Select Vehicle Type",
         fleet_subtitle: "Click vehicle name to expand/collapse details",
-        btn_close_guide: "Got it, Close",
+        fare_normal_label: "Standard Metered Fare",
         fare_discount_label: "15% Discount Offer",
         fare_discount_note: "(Toyota Hybrid Taxi only)",
-        fare_normal_label: "Standard Metered Fare",
-        btn_add_home: "APPS",
-        modal_title: "Add to Home Screen",
-        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
         btn_quick_query: "BOOK NOW",
         btn_view_fleet: "Select Vehicle Type",
         badge_selected: "Selected",
-        btn_reselect_route: "Re-select Route",
-        btn_clear: "Reset",
-        calc_title: "Smart Route & Fare Estimator",
-        calc_tip_title: "Fare Estimation Instructions:",
-        calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Airport to ShenZhen Bay Port"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
-        calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below, then click calculate fare.',
-        calc_label_pickup: "Pickup Location",
-        calc_label_stopover: "Stopovers (Max 3)",
-        calc_label_dropoff: "Drop-off Location",
-        btn_add_stop: "Add Stopover",
-        ph_pickup: "Enter pickup...",
-        ph_stopover_opt: "Enter stopover...",
-        ph_dropoff_opt: "Enter destination...",
-        voice_btn_text: "Speak your trip...",
-        btn_calc_fare: "Calculate Estimated Fare",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+        btn_reselect_route: "Re-select Route"
     }
 };
 
@@ -965,10 +992,11 @@ function swapLocations() {
     }
 }
 
+// ✅ 語音辨識：改用翻譯 key
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        alert("您的瀏覽器暫不支援語音辨識，請直接使用輸入框填寫。");
+        alert(translations[currentLang].voice_unsupported);
         return;
     }
 
@@ -981,7 +1009,7 @@ function startVoiceRecognition() {
     const micIcon = document.getElementById('mic-icon');
 
     micBtn.classList.add('bg-brand-yellow', 'text-black');
-    micText.innerText = "聆聽中...請講出完整行程";
+    micText.innerText = translations[currentLang].voice_listening;
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
     recognition.start();
@@ -989,7 +1017,7 @@ function startVoiceRecognition() {
     recognition.onresult = (event) => {
         recognition.stop();
         const speechResult = event.results[0][0].transcript;
-        micText.innerText = "聽到：「" + speechResult + "」";
+        micText.innerText = translations[currentLang].voice_heard_prefix + speechResult + translations[currentLang].voice_heard_suffix;
 
         let pickup = "", dropoff = "", stopover = "";
         let text = speechResult;
@@ -1061,7 +1089,7 @@ function startVoiceRecognition() {
 
     recognition.onerror = () => {
         recognition.stop();
-        micText.innerText = "未能識別語音，請重試或以文字輸入";
+        micText.innerText = translations[currentLang].voice_failed;
         setTimeout(() => {
             micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
@@ -1081,6 +1109,7 @@ function toggleLanguage() {
     applyLanguage();
 }
 
+// ✅ 支援 data-i18n-title
 function applyLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
@@ -1105,9 +1134,16 @@ function applyLanguage() {
             el.placeholder = translations[currentLang][key];
         }
     });
+
+    // ✅ 新增：支援 title 屬性翻譯
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.title = translations[currentLang][key];
+        }
+    });
 }
 
-// 頁面載入時套用語言
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
     adjustBodyPaddingForHeader();

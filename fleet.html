@@ -235,6 +235,14 @@
             </button>
         </div>
         
+        <!-- 提示橫幅 -->
+        <div class="mb-4 py-2.5 px-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl shadow-lg flex items-start gap-3">
+            <i class="fa-solid fa-circle-info text-brand-yellow text-lg mt-0.5"></i>
+            <p class="text-[15px] font-bold text-brand-yellow leading-relaxed" data-i18n="fleet_note">
+                以下預計車費已包含自動偵測途經隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。
+            </p>
+        </div>
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             
             <!-- 車款 1 : 豐田混能的士 -->
@@ -293,7 +301,7 @@
                                 <span id="car2-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                             </div>
                             <div id="car2-badge-row" class="hidden">
-                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block">恭喜獲得滿$250即減$50優惠</span>
+                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block" data-i18n="car2_badge">滿$250即減$50</span>
                             </div>
                             <div id="car2-discount-row" class="hidden flex items-baseline gap-1 flex-wrap">
                                 <span class="text-[11px] text-brand-yellow font-bold" data-i18n="estimated_after_discount_label">預計優惠後車費：</span>
@@ -472,12 +480,14 @@ let currentTunnelFee = 0;
 const translations = {
     zh: {
         fleet_title: "選擇車款類型",
+        fleet_note: "以下預計車費已包含自動偵測途經隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。",
         badge_selected: "已選擇",
         btn_select_car: "選定車款",
         btn_select_normal: "正價",
         btn_select_discount: "八五折",
         estimated_fare_label: "預計參考車費：",
         estimated_after_discount_label: "預計優惠後車費：",
+        car2_badge: "滿$250即減$50",
         btn_back_booking: "返回預約頁面",
         btn_add_home: "APPS",
         modal_title: "一鍵加入主畫面",
@@ -505,12 +515,14 @@ const translations = {
     },
     en: {
         fleet_title: "Select Vehicle Type",
+        fleet_note: "The estimated fares below include automatic tunnel fee detection; however, they do not include any parking, luggage, waiting time, or other statutory charges. Subject to actual conditions.",
         badge_selected: "Selected",
         btn_select_car: "Select",
         btn_select_normal: "Standard",
         btn_select_discount: "15% Off",
         estimated_fare_label: "Estimated Fare: ",
         estimated_after_discount_label: "Est. After Discount: ",
+        car2_badge: "Spend HK$250, Save HK$50",
         btn_back_booking: "Back to Booking",
         btn_add_home: "APPS",
         modal_title: "Add to Home Screen",
@@ -518,7 +530,7 @@ const translations = {
         btn_close_guide: "Close",
         car1_name: "Toyota Hybrid Taxi",
         car1_cap: "Up to 4 passengers",
-        car1_lug: "2-3 luggages",
+        car1_lug: "Approx. 2-3 luggages",
         car2_name: "MAXUS MIFA 7",
         car2_cap: "Up to 6 passengers",
         car2_lug: "4-5 luggages",
@@ -622,7 +634,6 @@ function updateToyotaModeButtons() {
     const discountedBase = Math.round(currentBaseFare * 0.85);
     const discountAvailable = currentBaseFare > 0 && discountedBase > 100;
     
-    // 八五折不可用但 preview 仲係 discount → 自動切返正價
     if (!discountAvailable && previewFareMode === 'discount') {
         previewFareMode = 'normal';
     }
@@ -668,9 +679,11 @@ function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeT
     window.location.href = 'booking.html';
 }
 
+// ✅ 黃框改用內聯樣式，確保一定顯示
 function renderCarCardsVisual(activeName) {
     document.querySelectorAll('.car-card').forEach(card => {
         card.classList.remove('border-brand-yellow');
+        card.style.borderColor = '';
 
         const badge = card.querySelector('.badge-container');
         if (badge) {
@@ -686,7 +699,7 @@ function renderCarCardsVisual(activeName) {
     if (activeName && activeName !== '') {
         document.querySelectorAll('.car-card').forEach(card => {
             if ((card.dataset.car || '') === activeName) {
-                card.classList.add('border-brand-yellow');
+                card.style.borderColor = '#FFF200';
             }
         });
     }
@@ -696,7 +709,6 @@ function renderCarCardsVisual(activeName) {
 // ✅ 豐田八五折：折後跳錶 > $100 才真正享受；否則完全按正價
 // ✅ 所有車款銀碼後面都唔標註最低消費
 function updateCarCardFees() {
-    // ✅ 每次更新車費時，順便刷新豐田按鈕狀態
     updateToyotaModeButtons();
     
     if (currentBaseFare <= 0) {
@@ -720,7 +732,6 @@ function updateCarCardFees() {
             const discountedBase = Math.round(currentBaseFare * 0.85);
             
             if (discountedBase > 100) {
-                // 真正享受85折
                 let discountTunnelFee = 0;
                 if (currentTunnelFee > 0) {
                     const harborTunnelCount = Math.floor(currentTunnelFee / 50);
@@ -728,7 +739,6 @@ function updateCarCardFees() {
                 }
                 fare = discountedBase + discountTunnelFee;
             } else {
-                // 觸發最低消費，冇85折，完全按正價
                 const adjustedBase = Math.max(currentBaseFare, 100);
                 fare = adjustedBase + currentTunnelFee;
             }
@@ -889,7 +899,6 @@ window.addEventListener('DOMContentLoaded', () => {
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
     
-    // 初始化預覽模式 = 已保存模式
     previewFareMode = selectedFareMode;
     
     renderCarCardsVisual(selectedCarName);

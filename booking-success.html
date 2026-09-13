@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ SEO 基礎優化（預約成功頁面） ============ -->
 <title>預約成功 | 八五折的士 | 24小時網約車預約確認</title>
 
 <meta name="description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認。24小時八五折的士預約服務。">
@@ -23,20 +22,17 @@
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
 
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="預約成功 | 八五折的士 | 24小時網約車">
 <meta name="twitter:description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內回覆確認。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 
-<!-- 多語言標記 -->
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking-success.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking-success.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking-success.html">
 
 <link rel="canonical" href="https://hktaxiservice.netlify.app/booking-success.html">
 
-<!-- Schema.org 結構化資料 -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -83,48 +79,53 @@
         }
     </style>
 </head>
-<body class="antialiased min-h-screen flex items-center justify-center p-4">
+<body class="antialiased min-h-screen flex items-center justify-center p-4 relative">
     
+    <!-- 右上角語言切換按鈕 -->
+    <button onclick="toggleLanguage()" id="lang-toggle-btn" class="fixed top-4 right-4 bg-black text-white px-3 py-1.5 rounded font-bold text-sm hover:opacity-80 transition cursor-pointer z-50 border border-gray-700">
+        EN
+    </button>
+
     <div class="w-full max-w-2xl">
-        <!-- 成功訊息區 -->
         <div class="bg-green-600/20 border-2 border-green-500 rounded-2xl p-6">
             <div class="text-center mb-6">
                 <i class="fa-solid fa-check-circle text-green-400 text-5xl mb-3"></i>
-                <h1 class="text-green-300 font-bold text-3xl mb-2">✅ 預約訂單已成功送出！</h1>
-                <p class="text-gray-300 text-xl mt-2">我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或  電話回覆確認</p>
+                <h1 class="text-green-300 font-bold text-3xl mb-2">
+                    <span>✅</span> <span data-i18n="success_title">預約訂單已成功送出！</span>
+                </h1>
+                <p class="text-gray-300 text-xl mt-2" data-i18n-html="success_desc">
+                    我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認
+                </p>
             </div>
             
-            <!-- 訂單內容 -->
             <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
                 <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
             </div>
             
-            <!-- 聯絡按鈕 -->
             <div class="flex flex-col gap-2 mb-4">
-                <p class="text-gray-400 text-xl font-bold text-center mb-1">如有急需，可以直接聯絡我哋：</p>
+                <p class="text-gray-400 text-xl font-bold text-center mb-1" data-i18n="success_contact_prompt">
+                    如有急需，可以直接聯絡我哋：
+                </p>
                              
                 <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                    <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp 查詢
+                    <i class="fa-brands fa-whatsapp text-xl"></i> <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
                 </a>
                 
                 <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                    <i class="fa-brands fa-weixin text-xl"></i> WeChat 查詢
+                    <i class="fa-brands fa-weixin text-xl"></i> <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
                 </button>
 
                 <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                    <i class="fa-solid fa-phone text-xl"></i> 致電 6881 5441
+                    <i class="fa-solid fa-phone text-xl"></i> <span data-i18n="btn_call_now">致電 6881 5441</span>
                 </a>
-
             </div>
             
-            <!-- 返回主頁（清空資料） -->
             <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
-                <i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁
+                <i class="fa-solid fa-arrow-left text-xl"></i> <span data-i18n="btn_back_home">返回主頁</span>
             </button>
         </div>
     </div>
 
-    <!-- WeChat Modal -->
     <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-green-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
             <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">
@@ -133,18 +134,74 @@
             <div class="text-green-500 text-4xl mb-3">
                 <i class="fa-brands fa-weixin"></i>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-2">掃描二維碼添加企業微信</h3>
-            <p class="text-xl text-gray-300 mb-4">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
+            <h3 class="text-2xl font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
+            <p class="text-xl text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
             <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                 <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
             </div>
-            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl hover:opacity-90">
+            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl hover:opacity-90" data-i18n="btn_close">
                 關閉
             </button>
         </div>
     </div>
 
     <script>
+        let currentLang = localStorage.getItem('taxiLang') || 'zh';
+
+        const translations = {
+            zh: {
+                success_title: "預約訂單已成功送出！",
+                success_desc: "我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認",
+                success_contact_prompt: "如有急需，可以直接聯絡我哋：",
+                btn_whatsapp_inquiry: "WhatsApp 查詢",
+                btn_wechat_inquiry: "WeChat 查詢",
+                btn_call_now: "致電 6881 5441",
+                btn_back_home: "返回主頁",
+                wecom_modal_title: "掃描二維碼添加企業微信",
+                wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+                btn_close: "關閉",
+                no_booking_data: "冇訂單資料"
+            },
+            en: {
+                success_title: "Booking Submitted Successfully!",
+                success_desc: "We will confirm via <br>WhatsApp or phone within 5-10 minutes",
+                success_contact_prompt: "For urgent matters, contact us directly:",
+                btn_whatsapp_inquiry: "WhatsApp Enquiry",
+                btn_wechat_inquiry: "WeChat Enquiry",
+                btn_call_now: "Call 6881 5441",
+                btn_back_home: "Back to Home",
+                wecom_modal_title: "Scan QR Code to Add WeCom",
+                wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+                btn_close: "Close",
+                no_booking_data: "No booking data"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('taxiLang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const btn = document.getElementById('lang-toggle-btn');
+            if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.getAttribute('data-i18n-html');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.innerHTML = translations[currentLang][key];
+                }
+            });
+        }
+
         // 從 URL 參數讀取訂單內容
         const urlParams = new URLSearchParams(window.location.search);
         const bookingData = urlParams.get('data');
@@ -153,7 +210,7 @@
             const decodedData = decodeURIComponent(bookingData);
             document.getElementById('booking-details').textContent = decodedData;
         } else {
-            document.getElementById('booking-details').textContent = '冇訂單資料';
+            document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
         }
         
         function showWeComQR() {
@@ -164,12 +221,16 @@
             document.getElementById('wecom-modal').classList.add('hidden');
         }
         
-        // 返回主頁：清空所有資料
         function goBackToHome() {
             localStorage.removeItem('taxiRouteData');
             localStorage.removeItem('taxiBookingData');
             window.location.href = 'index.html';
         }
+
+        // 頁面初始化時套用語言
+        document.addEventListener('DOMContentLoaded', function() {
+            applyLanguage();
+        });
     </script>
 </body>
 </html>

@@ -156,7 +156,7 @@
     let routeData = null;
 
     // ============================================
-    // 2. 翻譯物件
+    // 2. 翻譯物件（新增路線標籤 + 分鐘單位）
     // ============================================
 
     const translations = {
@@ -173,13 +173,14 @@
             res_duration: "預計行車時間：",
             unit_km: "公里",
             unit_min: "分鐘",
+            unit_min_short: "分鐘",
             res_base_fee: "跳錶基本收費：",
             res_tunnel_fee: "預計自動偵測隧道費：",
             res_surcharge: "車款附加費：",
             res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ",
             res_min_note_post: ")",
             res_total_title: "預計車費總額：",
-            res_note: "以上預計車費已包含自動偵測途經隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。",
+            res_note: " |以上預計車費已包含自動偵測途經隧道費；但並未 Big包括任何停車場、行李、等候時間等其他法定收費，一切 Boss按實際情況為準。",
             fee_mode_title: "收費模式",
             required_mark: "* (必須選擇)",
             min_fare_note: "所有行程最低消費$100",
@@ -196,7 +197,13 @@
             wecom_modal_title: "掃描二維碼添加企業微信",
             wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
             whatsapp_inquiry: "WhatsApp",
-            footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+            footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
+            // 路線標籤
+            route_best: "最佳路線",
+            route_fastest: "最快路線",
+            route_shortest: "最短路線",
+            route_fastest_shortest: "最快及最短路線",
+            route_main: "主要路線"
         },
         en: {
             result_title: "Route Planning Result",
@@ -212,6 +219,7 @@
             res_duration: "Estimated Duration: ",
             unit_km: "km",
             unit_min: "mins",
+            unit_min_short: "mins",
             res_base_fee: "Metered Base Fare: ",
             res_tunnel_fee: "Estimated Tunnel Fee: ",
             res_surcharge: "Vehicle Surcharge: ",
@@ -235,7 +243,13 @@
             wecom_modal_title: "Scan QR Code to Add WeCom",
             wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
             whatsapp_inquiry: "WhatsApp",
-            footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+            footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Bumblebee | Big Bee | 15% Discount Taxi",
+            // Route Labels
+            route_best: "Best Route",
+            route_fastest: "Fastest Route",
+            route_shortest: "Shortest Route",
+            route_fastest_shortest: "Fastest & Shortest Route",
+            route_main: "Main Route"
         }
     };
 
@@ -290,14 +304,12 @@
         window.location.href = 'index.html';
     }
 
-    // ✅ 修復：加咗預設車款檢查，避免保存空值
     function goToFleetPage() {
         if (!selectedFareMode) {
             alert(currentLang === 'en' ? "Please select a fare mode first!" : "請先選擇收費模式！");
             return;
         }
         
-        // 如果未選車款，預設用豐田，避免保存空值覆蓋
         if (!selectedCarName) {
             selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
         }
@@ -453,10 +465,11 @@
         return trimmed;
     }
 
+    // ✅ processRoutes：路線標籤改用 i18n
     function processRoutes(routes, isShenzhenBay) {
         if (!routes || routes.length === 0) return [];
         if (routes.length === 1) {
-            routes[0].customLabel = "最佳路線";
+            routes[0].customLabel = translations[currentLang].route_best;
             return [routes[0]];
         }
 
@@ -473,11 +486,11 @@
         let shortest = [...routeMetrics].sort((a, b) => a.dist - b.dist)[0];
 
         if (fastest.index !== shortest.index) {
-            fastest.route.customLabel = "最快路線";
-            shortest.route.customLabel = "最短路線";
+            fastest.route.customLabel = translations[currentLang].route_fastest;
+            shortest.route.customLabel = translations[currentLang].route_shortest;
             return [fastest.route, shortest.route];
         } else {
-            fastest.route.customLabel = "最快及最短路線";
+            fastest.route.customLabel = translations[currentLang].route_fastest_shortest;
             return [fastest.route];
         }
     }
@@ -613,14 +626,15 @@
                         let distKm = distMeters / 1000;
                         if (isShenzhenBay) distKm += 2.8;
 
-                        let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
+                        // ✅ 路線標籤 + 主要路線 改用 i18n
+                        let routeLabel = route.customLabel || (index === 0 ? translations[currentLang].route_fastest : translations[currentLang].route_shortest);
 
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
                         btn.onclick = () => selectRouteOption(index, isShenzhenBay);
-                        btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
-                                        <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
+                        btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || translations[currentLang].route_main}</div>
+                                        <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} ${translations[currentLang].unit_min_short}</div>`;
                         routeListContainer.appendChild(btn);
                     });
                 } else {
