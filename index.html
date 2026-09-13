@@ -518,6 +518,13 @@ function calculateAndGoToResult() {
         return;
     }
     
+    // ✅ 每次重新規劃路線，清走舊車款資料，避免 result 頁記住舊車款
+    localStorage.removeItem('taxiBookingData');
+    
+    saveRouteDataToLocalStorage();
+    window.location.href = 'result.html';
+}
+    
     saveRouteDataToLocalStorage();
     window.location.href = 'result.html';
 }
