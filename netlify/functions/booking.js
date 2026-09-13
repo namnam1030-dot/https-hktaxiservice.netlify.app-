@@ -71,7 +71,7 @@ async function addToGoogleCalendar(data) {
     // 預約訂單：用客戶指定時間
     const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
     const endTime = new Date(startTime);
-    endTime.setHours(endTime.getHours() + 1);
+    endTime.setMinutes(endTime.getMinutes() + 1);
 
     const bookingSourceMark = data.isInternalBooking === true 
       ? '\n\n[網站預約] 👤 工作人員落單' 
