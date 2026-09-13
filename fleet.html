@@ -293,7 +293,7 @@
                                 <span id="car2-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                             </div>
                             <div id="car2-badge-row" class="hidden">
-                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block">自動享有滿$250即減$50優惠</span>
+                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block">恭喜獲得滿$250即減$50優惠</span>
                             </div>
                             <div id="car2-discount-row" class="hidden flex items-baseline gap-1 flex-wrap">
                                 <span class="text-[11px] text-brand-yellow font-bold" data-i18n="estimated_after_discount_label">預計優惠後車費：</span>
@@ -461,7 +461,7 @@ let selectedMinFare = 0;
 let selectedFeeMode = '';
 let selectedFeeModeEn = '';
 let selectedFareMode = 'normal';
-let previewFareMode = 'normal';   // ✅ 新增：fleet 頁預覽用（唔會影響實際保存）
+let previewFareMode = 'normal';
 let currentBaseFare = 0;
 let currentTunnelFee = 0;
 
@@ -580,33 +580,64 @@ function saveBookingDataToLocalStorage() {
     localStorage.setItem('taxiBookingData', JSON.stringify(data));
 }
 
-// ✅ 返回 booking：保持原本設定不變（唔會套用 preview）
+// ✅ 返回 booking：保持原本 selectedFareMode 不變（唔套用 preview）
+// ✅ 額外保險：離開前如果係豐田八五折，但折後 ≤ $100，自動改返正價
 function backToBooking() {
     if (selectedCarName) {
+        if (selectedCarName === '豐田混能的士' && selectedFareMode === 'discount') {
+            const discountedBase = Math.round(currentBaseFare * 0.85);
+            if (discountedBase <= 100) {
+                selectedFareMode = 'normal';
+            }
+        }
         saveBookingDataToLocalStorage();
     }
     window.location.href = 'booking.html';
 }
 
-// ✅ 按正價/八五折 → 只改 previewFareMode，唔會影響 selectedFareMode
+// ✅ 按正價/八五折：只改 previewFareMode
+// ✅ 八五折不可用時，彈提示唔切換
 function setToyotaFareMode(mode) {
+    if (mode === 'discount' && currentBaseFare > 0) {
+        const discountedBase = Math.round(currentBaseFare * 0.85);
+        if (discountedBase <= 100) {
+            alert(currentLang === 'en' ? 
+                "15% discount is not applicable for this trip (minimum fare not reached)" : 
+                "此行程未達到八五折優惠的最低消費要求");
+            return;
+        }
+    }
+    
     previewFareMode = mode;
     updateToyotaModeButtons();
     updateCarCardFees();
 }
 
-// ✅ 按鈕高亮根據 previewFareMode
+// ✅ 按鈕高亮 + 八五折不可用時灰掉 + 自動 fallback 正價
 function updateToyotaModeButtons() {
     const normalBtn = document.getElementById('toyota-normal-btn');
     const discountBtn = document.getElementById('toyota-discount-btn');
     if (!normalBtn || !discountBtn) return;
     
-    if (previewFareMode === 'discount') {
+    const discountedBase = Math.round(currentBaseFare * 0.85);
+    const discountAvailable = currentBaseFare > 0 && discountedBase > 100;
+    
+    // 八五折不可用但 preview 仲係 discount → 自動切返正價
+    if (!discountAvailable && previewFareMode === 'discount') {
+        previewFareMode = 'normal';
+    }
+    
+    if (previewFareMode === 'discount' && discountAvailable) {
         normalBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
         discountBtn.className = 'toyota-mode-btn-active px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
     } else {
         normalBtn.className = 'toyota-mode-btn-active px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
-        discountBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
+        
+        if (!discountAvailable) {
+            discountBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition flex items-center gap-1 opacity-40 cursor-not-allowed';
+        } else {
+            discountBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
+        }
     }
 }
 
@@ -618,7 +649,7 @@ function selectToyotaCar() {
     selectedMinFare = 0;
     selectedFeeMode = '標準收費・無附加費';
     selectedFeeModeEn = 'Standard Fare · No Surcharge';
-    selectedFareMode = previewFareMode;   // ✅ 套用預覽模式
+    selectedFareMode = previewFareMode;
     
     saveBookingDataToLocalStorage();
     window.location.href = 'booking.html';
@@ -662,9 +693,12 @@ function renderCarCardsVisual(activeName) {
 }
 
 // ✅ 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
-// ✅ 豐田八五折：折後跳錶不足 $100 時，按 $100 收
+// ✅ 豐田八五折：折後跳錶 > $100 才真正享受；否則完全按正價
 // ✅ 所有車款銀碼後面都唔標註最低消費
 function updateCarCardFees() {
+    // ✅ 每次更新車費時，順便刷新豐田按鈕狀態
+    updateToyotaModeButtons();
+    
     if (currentBaseFare <= 0) {
         ['car1-fee-display', 'car2-fee-display', 'car3-fee-display', 'car4-fee-display', 'car5-fee-display'].forEach(id => {
             const el = document.getElementById(id);
@@ -683,16 +717,23 @@ function updateCarCardFees() {
         let fare;
         
         if (previewFareMode === 'discount') {
-            const discountedBase = Math.max(Math.round(currentBaseFare * 0.85), 100);
-            let discountTunnelFee = 0;
-            if (currentTunnelFee > 0) {
-                const harborTunnelCount = Math.floor(currentTunnelFee / 50);
-                discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
+            const discountedBase = Math.round(currentBaseFare * 0.85);
+            
+            if (discountedBase > 100) {
+                // 真正享受85折
+                let discountTunnelFee = 0;
+                if (currentTunnelFee > 0) {
+                    const harborTunnelCount = Math.floor(currentTunnelFee / 50);
+                    discountTunnelFee = harborTunnelCount * 25 + (currentTunnelFee % 50);
+                }
+                fare = discountedBase + discountTunnelFee;
+            } else {
+                // 觸發最低消費，冇85折，完全按正價
+                const adjustedBase = Math.max(currentBaseFare, 100);
+                fare = adjustedBase + currentTunnelFee;
             }
-            fare = discountedBase + discountTunnelFee;
         } else {
-            const minBaseFare = 100;
-            const adjustedBase = Math.max(currentBaseFare, minBaseFare);
+            const adjustedBase = Math.max(currentBaseFare, 100);
             fare = adjustedBase + currentTunnelFee;
         }
         car1El.innerHTML = `HK$ ${fare}`;
@@ -848,7 +889,7 @@ window.addEventListener('DOMContentLoaded', () => {
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
     
-    // ✅ 初始化預覽模式 = 已保存的模式（保持不變直到按「選定車款」）
+    // 初始化預覽模式 = 已保存模式
     previewFareMode = selectedFareMode;
     
     renderCarCardsVisual(selectedCarName);
