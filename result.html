@@ -156,7 +156,7 @@
     let routeData = null;
 
     // ============================================
-    // 2. 翻譯物件（新增切換按鈕）
+    // 2. 翻譯物件
     // ============================================
 
     const translations = {
@@ -190,7 +190,7 @@
             btn_reselect_route: "重新規劃路線",
             btn_view_fleet: "選擇車款類型",
             btn_quick_query: "立即預約",
-btn_quick_query_note: "* 如未選擇車款，預設為豐田混能的士",
+            btn_quick_query_note: "* 如未選擇車款，預設為豐田混能的士",
             btn_add_home: "APPS",
             modal_title: "一鍵加入主畫面",
             modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
@@ -199,16 +199,11 @@ btn_quick_query_note: "* 如未選擇車款，預設為豐田混能的士",
             wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
             whatsapp_inquiry: "WhatsApp",
             footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
-            // 路線標籤
             route_best: "最佳路線",
             route_fastest: "最快路線",
             route_shortest: "最短路線",
             route_fastest_shortest: "最快及最短路線",
-            route_main: "主要路線",
-            // ✅ 新增：切換到豐田按鈕
-            switch_to_toyota_btn: "💡點擊此處切換到豐田混能的士",
-            // 提示：非豐田車款
-            discount_not_available_note: "此車款不適用八五折優惠"
+            route_main: "主要路線"
         },
         en: {
             result_title: "Route Planning Result",
@@ -241,7 +236,7 @@ btn_quick_query_note: "* 如未選擇車款，預設為豐田混能的士",
             btn_reselect_route: "Re-plan Route",
             btn_view_fleet: "Select Vehicle Type",
             btn_quick_query: "BOOK NOW",
-btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
+            btn_quick_query_note: "* Default vehicle: Toyota Hybrid Taxi if none selected",
             btn_add_home: "APPS",
             modal_title: "Add to Home Screen",
             modal_desc: "For quick booking next time, add this service to your phone's home screen:",
@@ -250,16 +245,11 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
             wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
             whatsapp_inquiry: "WhatsApp",
             footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
-            // Route Labels
             route_best: "Best Route",
             route_fastest: "Fastest Route",
             route_shortest: "Shortest Route",
             route_fastest_shortest: "Fastest & Shortest Route",
-            route_main: "Main Route",
-            // ✅ NEW: Switch to Toyota button
-            switch_to_toyota_btn: "💡 Want 15% off? Tap to switch to Toyota Hybrid Taxi",
-            // Note: non-Toyota vehicles
-            discount_not_available_note: "15% discount not applicable for this vehicle"
+            route_main: "Main Route"
         }
     };
 
@@ -795,33 +785,6 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
         updateFareModeDisplay();
     }
 
-    // ✅ 新增：切換到豐田混能的士（並自動套用 85 折，如可用）
-    function switchToToyotaForDiscount() {
-        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
-        
-        const discountedBaseFare = Math.round(currentBaseFare * 0.85);
-        const normalCb = document.getElementById('fare-mode-normal');
-        const discountCb = document.getElementById('fare-mode-discount');
-        
-        if (discountedBaseFare > 100) {
-            // 可用 → 自動套用 85 折
-            selectedFareMode = 'discount';
-            if (discountCb) discountCb.checked = true;
-            if (normalCb) normalCb.checked = false;
-        } else {
-            // 未達最低消費 → 顯示提示，維持正價
-            alert(currentLang === 'en' ? 
-                "15% discount is not applicable for this trip (minimum fare not reached)" : 
-                "此行程未達到八五折優惠的最低消費要求");
-            selectedFareMode = 'normal';
-            if (discountCb) discountCb.checked = false;
-            if (normalCb) normalCb.checked = true;
-        }
-        
-        updateFareModeAvailability();
-        updateFareModeDisplay();
-    }
-
     function updateFareModeDisplay() {
         if (currentBaseFare <= 0) return;
         
@@ -870,11 +833,6 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
         }
         
         if (discountEligible) {
-            if (discountContainer) {
-                discountContainer.style.opacity = '1';
-                discountContainer.style.pointerEvents = 'auto';
-            }
-            
             if (discountFareVal) {
                 discountFareVal.innerText = `HK$ ${discountFare}`;
                 discountFareVal.className = 'text-brand-yellow font-bold text-base';
@@ -886,10 +844,6 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
                     '單程隧道費、免行李及寵物費';
             }
         } else {
-            if (discountContainer) {
-                discountContainer.style.opacity = '0.5';
-            }
-            
             if (discountFareVal) {
                 discountFareVal.innerText = currentLang === 'en' ? 'Not Applicable' : '不適用';
                 discountFareVal.className = 'text-gray-400 font-bold text-sm';
@@ -919,11 +873,10 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
         }
     }
 
-    // ✅ 重寫：非豐田時灰掉 + 顯示切換按鈕
+    // ✅ 非豐田或未達最低消費時，灰掉 85 折（純灰掉，冇切換按鈕）
     function updateFareModeAvailability() {
         const discountContainer = document.getElementById('discount-option-container');
         const discountCheckbox = document.getElementById('fare-mode-discount');
-        const switchBtn = document.getElementById('switch-to-toyota-btn');
         
         if (currentBaseFare <= 0) return;
         
@@ -938,26 +891,8 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
                 discountContainer.style.pointerEvents = 'auto';
             }
             if (discountCheckbox) discountCheckbox.disabled = false;
-            if (switchBtn) switchBtn.classList.add('hidden');
-        } else if (!isToyota) {
-            // 非豐田 → 灰掉 + 停用 checkbox + 顯示切換按鈕
-            if (discountContainer) {
-                discountContainer.style.opacity = '0.6';
-                discountContainer.style.pointerEvents = 'auto'; // 保持可點擊，讓切換按鈕可用
-            }
-            if (discountCheckbox) {
-                discountCheckbox.disabled = true;
-                discountCheckbox.checked = false;
-            }
-            if (switchBtn) switchBtn.classList.remove('hidden');
-            
-            // 自動切返正價
-            if (selectedFareMode === 'discount') {
-                selectedFareMode = 'normal';
-                document.getElementById('fare-mode-normal').checked = true;
-            }
         } else {
-            // 豐田但未達最低消費 → 灰掉，唔顯示切換按鈕
+            // 非豐田 或 未達最低消費 → 灰掉、停用
             if (discountContainer) {
                 discountContainer.style.opacity = '0.5';
                 discountContainer.style.pointerEvents = 'auto';
@@ -966,8 +901,8 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
                 discountCheckbox.disabled = true;
                 discountCheckbox.checked = false;
             }
-            if (switchBtn) switchBtn.classList.add('hidden');
             
+            // 自動切返正價
             if (selectedFareMode === 'discount') {
                 selectedFareMode = 'normal';
                 document.getElementById('fare-mode-normal').checked = true;
@@ -1018,7 +953,6 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
     }
     </script>
 </head>
-
 <body class="antialiased">
 
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
@@ -1186,11 +1120,6 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
                                     <span class="text-xs text-gray-400" data-i18n="fare_discount_note">(只限豐田混能的士)</span>
                                 </div>
                                 <p class="text-xs text-gray-400 mt-1" id="discount-fare-note">已包含隧道費或最低消費</p>
-                                
-                                <!-- ✅ 新增：切換到豐田按鈕（非豐田車款時顯示） -->
-                                <button type="button" id="switch-to-toyota-btn" onclick="switchToToyotaForDiscount()" class="hidden mt-2.5 w-full bg-brand-yellow/10 border border-brand-yellow text-brand-yellow hover:bg-brand-yellow hover:text-black font-bold py-2 rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-1.5">
-                                    <span data-i18n="switch_to_toyota_btn">💡點擊此處切換到豐田混能的士</span>
-                                </button>
                             </div>
                         </label>
                     </div>
@@ -1205,14 +1134,14 @@ btn_quick_query_note: "* Default: Toyota Hybrid Taxi if none selected",
                     </button>
                 </div>
 
-<div class="mt-4 flex flex-col items-center">
-    <button onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer flex flex-col items-center justify-center gap-0.5">
-        <span class="flex items-center gap-2 text-[20px]">
-            <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
-        </span>
-        <span class="text-xs opacity-70" data-i18n="btn_quick_query_note">* 如未選擇車款，預設為豐田混能的士</span>
-    </button>
-</div>
+                <div class="mt-4 flex flex-col items-center">
+                    <button onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer flex flex-col items-center justify-center gap-0.5">
+                        <span class="flex items-center gap-2 text-[20px]">
+                            <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
+                        </span>
+                        <span class="text-xs opacity-70" data-i18n="btn_quick_query_note">* 如未選擇車款，預設為豐田混能的士</span>
+                    </button>
+                </div>
             </div>
         </div>
     </section>
