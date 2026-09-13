@@ -1005,7 +1005,24 @@ function submitBookingAfterUpgrade() {
     if (selectedFareMode === 'discount') {
         discordMsgLines.push(`💎 八五折優惠`);
     } else {
-        discordMsgLines.push(`💎 正價按錶收費`);
+        // ✅ 只限 Discord 訊息：有車款附加費時顯示（正價+$xxx）
+        let feeModeText = '💯正價按錶收費';
+        
+        if (selectedCarName === 'MAXUS MIFA 7') {
+            // MIFA 7 特別處理：滿 $250 減 $50
+            const adjustedBase = Math.max(currentBaseFare, 80);
+            const basePlusSurcharge = adjustedBase + 50;
+            if (basePlusSurcharge < 250) {
+                // 冇即減 $50 → 顯示附加費
+                feeModeText = '💯正價+$50';
+            }
+            // 否則保持「正價按錶收費」（即減 $50 優惠觸發）
+        } else if (selectedSurcharge > 0) {
+            // 廣汽 E9 (+$100) / 吉利大黃蜂 (+$80) / 豐田 NOAH (+$150)
+            feeModeText = `💯正價+$${selectedSurcharge}`;
+        }
+        
+        discordMsgLines.push(`💎 ${feeModeText}`);
     }
     
     discordMsgLines.push(`💰 HK$${data.totalFareForWhatsApp}`);
