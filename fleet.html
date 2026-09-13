@@ -230,9 +230,10 @@
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
             </h3>
-            <a href="booking.html" class="inline-flex items-center gap-2 text-brand-yellow hover:text-white transition text-sm font-bold bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black px-4 py-1.5 rounded-full">
+            <!-- ✅ 改為按鈕，用 backToBooking() 保險保存 -->
+            <button type="button" onclick="backToBooking()" class="inline-flex items-center gap-2 text-brand-yellow hover:text-white transition text-sm font-bold bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black px-4 py-1.5 rounded-full cursor-pointer">
                 <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_booking">返回預約頁面</span>
-            </a>
+            </button>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -579,6 +580,15 @@ function saveBookingDataToLocalStorage() {
     localStorage.setItem('taxiBookingData', JSON.stringify(data));
 }
 
+// ✅ 額外保險：返回 booking 頁前，只有當 selectedCarName 有值才保存
+// 避免空值覆蓋原本選好嘅車款
+function backToBooking() {
+    if (selectedCarName) {
+        saveBookingDataToLocalStorage();
+    }
+    window.location.href = 'booking.html';
+}
+
 function setToyotaFareMode(mode) {
     selectedFareMode = mode;
     updateToyotaModeButtons();
@@ -664,8 +674,6 @@ function updateCarCardFees() {
     }
     
     // ===== 豐田混能的士 =====
-    // 正價：max(跳錶, 100) + 隧道費
-    // 八五折：max(round(跳錶 × 0.85), 100) + 折扣隧道費
     const car1El = document.getElementById('car1-fee-display');
     if (car1El) {
         let fare, note = '';
@@ -690,8 +698,6 @@ function updateCarCardFees() {
     }
     
     // ===== MAXUS MIFA 7 =====
-    // 跳錶最低 $80（即總額最低 $130，不含隧道費）；隧道費另加
-    // 跳錶 + 附加費 ≥ $250 減 $50
     const car2El = document.getElementById('car2-fee-display');
     const car2BadgeRow = document.getElementById('car2-badge-row');
     const car2DiscountRow = document.getElementById('car2-discount-row');
@@ -721,7 +727,6 @@ function updateCarCardFees() {
     }
     
     // ===== 廣汽 E9 =====
-    // 跳錶最低 $80；隧道費另加
     const car3El = document.getElementById('car3-fee-display');
     if (car3El) {
         const surcharge = 100, minBaseFare = 80;

@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ SEO 基礎優化（車費結果頁面） ============ -->
 <title>車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士</title>
 
 <meta name="description" content="查看您的士路線規劃同預計車費。系統自動偵測隧道費，支援八五折優惠。24小時機場口岸接送，豪華六座位的士。">
@@ -27,18 +26,15 @@
 
 <link rel="canonical" href="https://hktaxiservice.netlify.app/result.html">
 
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士">
 <meta name="twitter:description" content="查看您的士路線規劃同預計車費。系統自動偵測隧道費，支援八五折優惠。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 
-<!-- 多語言標記 -->
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/result.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/result.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/result.html">
 
-<!-- Schema.org 結構化資料 -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -138,7 +134,6 @@
         }
     </style>
 
-    <!-- ============ 所有 JavaScript 喺 head 入面定義 ============ -->
     <script>
     // ============================================
     // 1. 變數宣告
@@ -168,7 +163,6 @@
         zh: {
             result_title: "路線規劃結果",
             loading_text: "正在計算路線同車費...",
-           
             route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
             confirm_route_label: "請確認查詢路線：",
             pickup_label: "起點：",
@@ -296,11 +290,18 @@
         window.location.href = 'index.html';
     }
 
+    // ✅ 修復：加咗預設車款檢查，避免保存空值
     function goToFleetPage() {
         if (!selectedFareMode) {
             alert(currentLang === 'en' ? "Please select a fare mode first!" : "請先選擇收費模式！");
             return;
         }
+        
+        // 如果未選車款，預設用豐田，避免保存空值覆蓋
+        if (!selectedCarName) {
+            selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+        }
+        
         saveBookingDataToLocalStorage();
         window.location.href = 'fleet.html';
     }
@@ -905,10 +906,6 @@
         updateFareModeDisplay();
     }
 
-    // ============================================
-    // 4. Google Maps callback（由 API 自動呼叫）
-    // ============================================
-
     function initMap() {
         routeData = loadRouteDataFromLocalStorage();
         
@@ -935,17 +932,9 @@
         }
     }
 
-    // ============================================
-    // 5. 頁面初始化
-    // ============================================
-
     document.addEventListener('DOMContentLoaded', function() {
         applyLanguage();
     });
-
-    // ============================================
-    // 6. Service Worker
-    // ============================================
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -960,7 +949,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- 頁首 Navbar（同 index.html 完全一樣） -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
@@ -989,7 +977,6 @@
         </div>
     </header>
 
-    <!-- 加入主畫面引導 Modal -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
             <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -1012,7 +999,6 @@
 
     <div class="h-[92px] w-full"></div>
 
-    <!-- 車費結果 Section -->
     <section id="result-section" class="w-full px-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             
@@ -1151,7 +1137,6 @@
         </div>
     </section>
 
-    <!-- 頁尾 Footer（同 index.html 完全一樣） -->
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
