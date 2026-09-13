@@ -230,7 +230,6 @@
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
             </h3>
-            <!-- ✅ 改為按鈕，用 backToBooking() 保險保存 -->
             <button type="button" onclick="backToBooking()" class="inline-flex items-center gap-2 text-brand-yellow hover:text-white transition text-sm font-bold bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black px-4 py-1.5 rounded-full cursor-pointer">
                 <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_booking">返回預約頁面</span>
             </button>
@@ -462,6 +461,7 @@ let selectedMinFare = 0;
 let selectedFeeMode = '';
 let selectedFeeModeEn = '';
 let selectedFareMode = 'normal';
+let previewFareMode = 'normal';   // ✅ 新增：fleet 頁預覽用（唔會影響實際保存）
 let currentBaseFare = 0;
 let currentTunnelFee = 0;
 
@@ -580,8 +580,7 @@ function saveBookingDataToLocalStorage() {
     localStorage.setItem('taxiBookingData', JSON.stringify(data));
 }
 
-// ✅ 額外保險：返回 booking 頁前，只有當 selectedCarName 有值才保存
-// 避免空值覆蓋原本選好嘅車款
+// ✅ 返回 booking：保持原本設定不變（唔會套用 preview）
 function backToBooking() {
     if (selectedCarName) {
         saveBookingDataToLocalStorage();
@@ -589,18 +588,20 @@ function backToBooking() {
     window.location.href = 'booking.html';
 }
 
+// ✅ 按正價/八五折 → 只改 previewFareMode，唔會影響 selectedFareMode
 function setToyotaFareMode(mode) {
-    selectedFareMode = mode;
+    previewFareMode = mode;
     updateToyotaModeButtons();
     updateCarCardFees();
 }
 
+// ✅ 按鈕高亮根據 previewFareMode
 function updateToyotaModeButtons() {
     const normalBtn = document.getElementById('toyota-normal-btn');
     const discountBtn = document.getElementById('toyota-discount-btn');
     if (!normalBtn || !discountBtn) return;
     
-    if (selectedFareMode === 'discount') {
+    if (previewFareMode === 'discount') {
         normalBtn.className = 'toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
         discountBtn.className = 'toyota-mode-btn-active px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1';
     } else {
@@ -609,6 +610,7 @@ function updateToyotaModeButtons() {
     }
 }
 
+// ✅ 按「選定車款」才真正套用 previewFareMode
 function selectToyotaCar() {
     selectedCarName = '豐田混能的士';
     selectedCarNameEn = 'Toyota Hybrid Taxi';
@@ -616,6 +618,7 @@ function selectToyotaCar() {
     selectedMinFare = 0;
     selectedFeeMode = '標準收費・無附加費';
     selectedFeeModeEn = 'Standard Fare · No Surcharge';
+    selectedFareMode = previewFareMode;   // ✅ 套用預覽模式
     
     saveBookingDataToLocalStorage();
     window.location.href = 'booking.html';
@@ -659,7 +662,8 @@ function renderCarCardsVisual(activeName) {
 }
 
 // ✅ 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
-// ✅ 豐田八五折：折後跳錶不足 $100 時，按 $100 收（即不提供八五折）
+// ✅ 豐田八五折：折後跳錶不足 $100 時，按 $100 收
+// ✅ 豐田正價：最低消費唔標註
 function updateCarCardFees() {
     if (currentBaseFare <= 0) {
         ['car1-fee-display', 'car2-fee-display', 'car3-fee-display', 'car4-fee-display', 'car5-fee-display'].forEach(id => {
@@ -676,9 +680,9 @@ function updateCarCardFees() {
     // ===== 豐田混能的士 =====
     const car1El = document.getElementById('car1-fee-display');
     if (car1El) {
-        let fare, note = '';
+        let fare;
         
-        if (selectedFareMode === 'discount') {
+        if (previewFareMode === 'discount') {
             const discountedBase = Math.max(Math.round(currentBaseFare * 0.85), 100);
             let discountTunnelFee = 0;
             if (currentTunnelFee > 0) {
@@ -690,11 +694,9 @@ function updateCarCardFees() {
             const minBaseFare = 100;
             const adjustedBase = Math.max(currentBaseFare, minBaseFare);
             fare = adjustedBase + currentTunnelFee;
-            if (currentBaseFare <= minBaseFare) {
-                note = currentLang === 'en' ? 'Min.' : '最低消費';
-            }
+            // ✅ 正價唔標註最低消費
         }
-        car1El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+        car1El.innerHTML = `HK$ ${fare}`;
     }
     
     // ===== MAXUS MIFA 7 =====
@@ -850,6 +852,9 @@ window.addEventListener('DOMContentLoaded', () => {
         currentBaseFare = bookingData.currentBaseFare || 0;
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
+    
+    // ✅ 初始化預覽模式 = 已保存的模式（保持不變直到按「選定車款」）
+    previewFareMode = selectedFareMode;
     
     renderCarCardsVisual(selectedCarName);
     updateToyotaModeButtons();
