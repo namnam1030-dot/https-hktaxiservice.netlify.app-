@@ -307,10 +307,10 @@
                             <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow"> <span data-i18n="pay_cash">現金</span>
                         </label>
                         <button type="button" onclick="togglePaymentOptions()" class="text-brand-yellow text-sm underline">
-                            <span data-i18n="btn_more_payment">更多付款-方式</span>
-                        </button2>
-                    </ pxdiv>
-                    <-div id="more-payment3-options" class="hidden grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                            <span data-i18n="btn_more_payment">更多付款方式</span>
+                        </button>
+                    </div>
+                    <div id="more-payment-options" class="hidden grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                         <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
                             <input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_payme">PayMe</span>
                         </label>
@@ -323,7 +323,7 @@
                         <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
                             <input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_octopus">八達通</span>
                         </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
+                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
                             <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
                         </label>
                         <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
@@ -395,13 +395,13 @@
             <div class="text-brand-yellow text-3xl mb-3">
                 <i class="fa-solid fa-gift"></i>
             </div>
-            <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4" data-i18n="upgrade_modal_title">免費升級提示</h3>
+            <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
             <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
             <div class="flex flex-col gap-3">
-                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg hover:opacity-90 transition" data-i18n="btn_accept_upgrade">
+                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg hover:opacity-90 transition">
                     ✅ 接受免費升級
                 </button>
-                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition" data-i18n="btn_decline_upgrade">
+                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition">
                     ❌ 不用，謝謝
                 </button>
             </div>
@@ -461,10 +461,15 @@ let pendingBookingData = null;
 
 // ============================================
 // ✅ 統一收費計算
+// 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
+// 豐田八五折：折後跳錶不足 $100 時，按 $100 收（即不提供八五折）
 // ============================================
 function calculateTotalFare() {
     if (currentBaseFare <= 0) return 0;
     
+    // ===== 豐田混能的士 =====
+    // 正價：max(跳錶, 100) + 隧道費
+    // 八五折：max(round(跳錶 × 0.85), 100) + 折扣隧道費
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') {
             const discountedBase = Math.max(Math.round(currentBaseFare * 0.85), 100);
@@ -480,6 +485,9 @@ function calculateTotalFare() {
         return adjustedBase + currentTunnelFee;
     }
     
+    // ===== MAXUS MIFA 7 =====
+    // 跳錶最低 $80（總額最低 $130）；隧道費另加
+    // 跳錶（調整後）+ 附加費 ≥ $250 減 $50
     if (selectedCarName === 'MAXUS MIFA 7') {
         const minBaseFare = 80;
         const adjustedBase = Math.max(currentBaseFare, minBaseFare);
@@ -491,6 +499,8 @@ function calculateTotalFare() {
         return basePlusSurcharge + currentTunnelFee;
     }
     
+    // ===== 廣汽 E9 / 吉利大黃蜂 / 豐田 NOAH =====
+    // 跳錶最低 $80；隧道費另加
     const minBaseFare = 80;
     const adjustedBase = Math.max(currentBaseFare, minBaseFare);
     return adjustedBase + selectedSurcharge + currentTunnelFee;
@@ -498,7 +508,6 @@ function calculateTotalFare() {
 
 const translations = {
     zh: {
-        // ===== 表單相關 =====
         ph_verification_code: "請點擊右方獲取驗證碼",
         btn_more_payment: "更多付款方式",
         label_verification: "電話驗證",
@@ -510,20 +519,14 @@ const translations = {
         alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
         btn_confirm_booking: "確認預約",
         btn_sending_booking: "正在送出預約...",
-        
-        // ===== 導航按鈕 =====
         btn_call_now: "致電 6881 5441",
         btn_whatsapp_inquiry: "WhatsApp 查詢",
         btn_edit_route: "修改路線",
         btn_change_car: "選擇其他車款",
         btn_add_home: "APPS",
-        
-        // ===== Modal =====
         modal_title: "一鍵加入主畫面",
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
         btn_close_guide: "關閉",
-        
-        // ===== 路線摘要 =====
         summary_route_label: "路線摘要",
         summary_car_label: "目前選定車型",
         estimated_fare_label: "預計車費",
@@ -531,14 +534,10 @@ const translations = {
         pickup_label: "起點：",
         stopover_label: "中途站：",
         dropoff_label: "目的地：",
-        
-        // ===== 訂單類型 =====
         instant_order: "即時訂單",
         instant_note: "15分鐘內用車",
         booking_order: "預約訂單",
         booking_note: "接受最多3日內",
-        
-        // ===== 表單欄位 =====
         label_flight: "航班編號 (選填，如適用)",
         ph_flight: "例：CX250 (司機會自動監察航班時間)",
         label_date: "用車日期",
@@ -553,8 +552,6 @@ const translations = {
         label_contact_surname: "聯絡人（選填）",
         ph_contact_surname: "例：陳",
         label_payment_method: "選擇付款方式",
-        
-        // ===== 付款方式 =====
         pay_cash: "現金",
         pay_credit: "信用卡<br>(需另加手續費)",
         pay_wechat: "微信",
@@ -562,28 +559,16 @@ const translations = {
         pay_octopus: "八達通",
         pay_payme: "PayMe",
         pay_fps: "轉數快",
-        
-        // ===== 電話 =====
         label_phone: "聯絡電話 (WhatsApp 接收確認)",
         ph_phone: "例：9123 4567",
-        
-        // ===== 下拉選項 =====
         p1: "1 人", p2: "2 人", p3: "3 人", p4: "4 人", p5: "5 人", p6: "6 人",
         l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
-        
-        // ===== ✅ 新增：升級 Modal =====
-        upgrade_modal_title: "免費升級提示",
-        btn_accept_upgrade: "✅ 接受免費升級",
-        btn_decline_upgrade: "❌ 不用，謝謝",
-        
-        // ===== 其他 =====
         wecom_modal_title: "掃描二維碼添加企業微信",
         wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
         whatsapp_inquiry: "WhatsApp",
         footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
     },
     en: {
-        // ===== Form Related =====
         ph_verification_code: "Tap the get code button",
         btn_more_payment: "More Options",
         label_verification: "Phone Verification",
@@ -595,20 +580,14 @@ const translations = {
         alert_need_whatsapp: "Please send WhatsApp confirmation first!",
         btn_confirm_booking: "Confirm Booking",
         btn_sending_booking: "Sending Booking...",
-        
-        // ===== Navigation Buttons =====
         btn_call_now: "Call 6881 5441",
         btn_whatsapp_inquiry: "WhatsApp Enquiry",
         btn_edit_route: "Edit Route",
         btn_change_car: "Change Vehicle",
         btn_add_home: "APPS",
-        
-        // ===== Modal =====
         modal_title: "Add to Home Screen",
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
         btn_close_guide: "Close",
-        
-        // ===== Route Summary =====
         summary_route_label: "Route Summary",
         summary_car_label: "Selected Vehicle",
         estimated_fare_label: "Estimated Fare",
@@ -616,14 +595,10 @@ const translations = {
         pickup_label: "Pickup: ",
         stopover_label: "Stopover: ",
         dropoff_label: "Destination: ",
-        
-        // ===== Order Type =====
         instant_order: "Instant Order",
         instant_note: "Within 15 mins",
         booking_order: "Booking Order",
         booking_note: "Up to 3 days",
-        
-        // ===== Form Fields =====
         label_flight: "Flight Number (Optional)",
         ph_flight: "e.g., CX250 (Driver monitors flight time)",
         label_date: "Service Date",
@@ -638,8 +613,6 @@ const translations = {
         label_contact_surname: "Contact",
         ph_contact_surname: "e.g., Chan",
         label_payment_method: "Payment Method",
-        
-        // ===== Payment Methods =====
         pay_cash: "Cash",
         pay_credit: "Credit Card<br>(Surcharge applies)",
         pay_wechat: "WeChat Pay",
@@ -647,21 +620,10 @@ const translations = {
         pay_octopus: "Octopus",
         pay_payme: "PayMe",
         pay_fps: "FPS",
-        
-        // ===== Phone =====
         label_phone: "Contact Phone (WhatsApp Confirmation)",
         ph_phone: "e.g., 9123 4567",
-        
-        // ===== Dropdown Options =====
         p1: "1 Person", p2: "2 People", p3: "3 People", p4: "4 People", p5: "5 People", p6: "6 People",
         l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
-        
-        // ===== ✅ NEW: Upgrade Modal =====
-        upgrade_modal_title: "Free Upgrade Offer",
-        btn_accept_upgrade: "✅ Accept Free Upgrade",
-        btn_decline_upgrade: "❌ No, Thank You",
-        
-        // ===== Others =====
         wecom_modal_title: "Scan QR Code to Add WeCom",
         wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
         whatsapp_inquiry: "WhatsApp",
@@ -734,6 +696,7 @@ function updateCarDisplay() {
         }
     }
     
+    // ✅ 使用統一 calculateTotalFare()
     if (priceTextEl) {
         if (currentBaseFare > 0) {
             const totalFare = calculateTotalFare();
@@ -888,7 +851,6 @@ function sendVerificationCode() {
     displayContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// ✅ 升級 modal 標題使用 i18n
 function showUpgradeModal(carType, passengerCount) {
     const modal = document.getElementById('upgrade-modal');
     const title = document.getElementById('upgrade-modal-title');
@@ -897,14 +859,14 @@ function showUpgradeModal(carType, passengerCount) {
     upgradeChoice = null;
     
     if (carType === '豐田混能的士') {
-        title.textContent = translations[currentLang].upgrade_modal_title;
+        title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
         text.innerHTML = currentLang === 'zh' ? 
             '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>' +
             '有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' :
             'You selected <span class="text-brand-yellow font-bold text-lg">Toyota Hybrid Taxi</span><br><br>' +
             'You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
     } else if (carType === 'MAXUS MIFA 7') {
-        title.textContent = translations[currentLang].upgrade_modal_title;
+        title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
         if (passengerCount === 5) {
             text.innerHTML = currentLang === 'zh' ?
                 '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>' +
@@ -1208,6 +1170,7 @@ function sendWhatsApp(event) {
         timeStringFormatted = '即時用車（15分鐘內）';
     }
 
+    // ✅ 使用統一 calculateTotalFare()
     const totalFareForWhatsApp = calculateTotalFare();
 
     pendingBookingData = {
