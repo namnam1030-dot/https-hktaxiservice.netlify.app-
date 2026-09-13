@@ -293,7 +293,7 @@
                                 <span id="car2-fee-display" class="text-base text-brand-yellow font-bold">HK$ --</span>
                             </div>
                             <div id="car2-badge-row" class="hidden">
-                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block">恭喜獲得滿$250即減$50優惠</span>
+                                <span class="instant-discount-badge bg-red-500 text-white px-2 py-1 rounded text-base font-bold inline-block">自動享有滿$250即減$50優惠</span>
                             </div>
                             <div id="car2-discount-row" class="hidden flex items-baseline gap-1 flex-wrap">
                                 <span class="text-[11px] text-brand-yellow font-bold" data-i18n="estimated_after_discount_label">預計優惠後車費：</span>
@@ -663,7 +663,7 @@ function renderCarCardsVisual(activeName) {
 
 // ✅ 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
 // ✅ 豐田八五折：折後跳錶不足 $100 時，按 $100 收
-// ✅ 豐田正價：最低消費唔標註
+// ✅ 所有車款銀碼後面都唔標註最低消費
 function updateCarCardFees() {
     if (currentBaseFare <= 0) {
         ['car1-fee-display', 'car2-fee-display', 'car3-fee-display', 'car4-fee-display', 'car5-fee-display'].forEach(id => {
@@ -694,7 +694,6 @@ function updateCarCardFees() {
             const minBaseFare = 100;
             const adjustedBase = Math.max(currentBaseFare, minBaseFare);
             fare = adjustedBase + currentTunnelFee;
-            // ✅ 正價唔標註最低消費
         }
         car1El.innerHTML = `HK$ ${fare}`;
     }
@@ -721,8 +720,7 @@ function updateCarCardFees() {
             }
         } else {
             const fare = basePlusSurcharge + currentTunnelFee;
-            const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
-            car2El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+            car2El.innerHTML = `HK$ ${fare}`;
             if (car2BadgeRow) car2BadgeRow.classList.add('hidden');
             if (car2DiscountRow) car2DiscountRow.classList.add('hidden');
         }
@@ -734,8 +732,7 @@ function updateCarCardFees() {
         const surcharge = 100, minBaseFare = 80;
         const adjustedBase = Math.max(currentBaseFare, minBaseFare);
         const fare = adjustedBase + surcharge + currentTunnelFee;
-        const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
-        car3El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+        car3El.innerHTML = `HK$ ${fare}`;
     }
     
     // ===== 吉利大黃蜂 =====
@@ -744,8 +741,7 @@ function updateCarCardFees() {
         const surcharge = 80, minBaseFare = 80;
         const adjustedBase = Math.max(currentBaseFare, minBaseFare);
         const fare = adjustedBase + surcharge + currentTunnelFee;
-        const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
-        car4El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+        car4El.innerHTML = `HK$ ${fare}`;
     }
     
     // ===== 豐田 NOAH 輪椅的士 =====
@@ -754,8 +750,7 @@ function updateCarCardFees() {
         const surcharge = 150, minBaseFare = 80;
         const adjustedBase = Math.max(currentBaseFare, minBaseFare);
         const fare = adjustedBase + surcharge + currentTunnelFee;
-        const note = currentBaseFare <= minBaseFare ? (currentLang === 'en' ? 'Min.' : '最低消費') : '';
-        car5El.innerHTML = `HK$ ${fare}${note ? ' <span class="text-gray-400 text-[10px]">(' + note + ')</span>' : ''}`;
+        car5El.innerHTML = `HK$ ${fare}`;
     }
 }
 
