@@ -77,6 +77,106 @@
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
         }
+
+        /* ===== 成功預約彈窗 ===== */
+        .booking-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, .75);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .3s ease, visibility .3s ease;
+        }
+
+        .booking-modal.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .booking-modal__box {
+            width: 100%;
+            max-width: 400px;
+            padding: 36px 28px 28px;
+            background: #161616;
+            border: 2px solid #22c55e;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .5);
+            transform: translateY(24px) scale(.95);
+            transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .booking-modal.is-open .booking-modal__box {
+            transform: translateY(0) scale(1);
+        }
+
+        .booking-modal__icon {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            color: #fff;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: bookingPop .5s ease .15s both;
+        }
+
+        @keyframes bookingPop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .booking-modal__title {
+            margin: 0 0 14px;
+            font-size: 27px;
+            font-weight: 700;
+            color: #4ade80;
+            line-height: 1.4;
+        }
+
+        .booking-modal__text {
+            margin: 0 0 28px;
+            font-size: 21px;
+            line-height: 1.7;
+            color: #d1d5db;
+        }
+
+        .booking-modal__btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #000;
+            background: #FFF200;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: opacity .2s ease;
+        }
+
+        .booking-modal__btn:active {
+            opacity: .85;
+        }
+
+        body.modal-lock {
+            overflow: hidden;
+        }
+
+        /* 細螢幕微調 */
+        @media (max-width: 380px) {
+            .booking-modal__title { font-size: 24px; }
+            .booking-modal__text  { font-size: 19px; }
+            .booking-modal__btn   { font-size: 20px; }
+        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-4 relative">
@@ -145,6 +245,24 @@
         </div>
     </div>
 
+    <!-- ===== 成功預約彈窗 ===== -->
+    <div class="booking-modal" id="bookingModal" aria-hidden="true">
+        <div class="booking-modal__box" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+            <div class="booking-modal__icon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="booking-modal__title" id="bookingModalTitle" data-i18n="popup_title">
+                預約訂單已成功送出！
+            </h2>
+            <p class="booking-modal__text" data-i18n-html="popup_desc">
+                我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
+            </p>
+            <button type="button" class="booking-modal__btn" id="bookingModalClose" data-i18n="popup_btn">
+                知道喇
+            </button>
+        </div>
+    </div>
+
     <script>
         let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
@@ -160,7 +278,10 @@
                 wecom_modal_title: "掃描二維碼添加企業微信",
                 wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
                 btn_close: "關閉",
-                no_booking_data: "冇訂單資料"
+                no_booking_data: "冇訂單資料",
+                popup_title: "預約訂單已成功送出！",
+                popup_desc: "我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認",
+                popup_btn: "知道喇"
             },
             en: {
                 success_title: "Booking Submitted Successfully!",
@@ -173,7 +294,10 @@
                 wecom_modal_title: "Scan QR Code to Add WeCom",
                 wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
                 btn_close: "Close",
-                no_booking_data: "No booking data"
+                no_booking_data: "No booking data",
+                popup_title: "Booking Submitted Successfully!",
+                popup_desc: "We will confirm via<br>WhatsApp or phone within 5-10 minutes",
+                popup_btn: "Got it"
             }
         };
 
@@ -226,6 +350,46 @@
             localStorage.removeItem('taxiBookingData');
             window.location.href = 'index.html';
         }
+
+        // ===== 成功預約彈窗控制 =====
+        (function () {
+            var modal = document.getElementById('bookingModal');
+            if (!modal) return;
+
+            var closeBtn = document.getElementById('bookingModalClose');
+
+            function openModal() {
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-lock');
+            }
+
+            function closeModal() {
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-lock');
+            }
+
+            // 只彈一次（避免刷新重複見到）
+            if (sessionStorage.getItem('bookingPopupShown') !== '1') {
+                window.addEventListener('load', function () {
+                    setTimeout(function () {
+                        openModal();
+                        sessionStorage.setItem('bookingPopupShown', '1');
+                    }, 200);
+                });
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+            });
+        })();
 
         // 頁面初始化時套用語言
         document.addEventListener('DOMContentLoaded', function() {
