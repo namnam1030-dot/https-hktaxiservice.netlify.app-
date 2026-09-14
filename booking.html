@@ -236,7 +236,7 @@
                 </button>
             </div>
 
-            <form id="booking-form" onsubmit="sendWhatsApp(event)" class="space-y-3 text-sm">
+            <form id="booking-form" onsubmit="submitBooking(event)" class="space-y-3 text-sm">
 
                 <div id="field-flight-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-0.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
@@ -348,59 +348,19 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp 接收確認)</span></label>
+                    <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp / 微信 接收確認)</span></label>
                     <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1">
-                        <i class="fa-solid fa-shield-check text-brand-yellow mr-1.5"></i>
-                        <span data-i18n="label_verification">電話驗證</span>
-                    </label>
-                    <div class="flex gap-2">
-                        <input type="text" id="verification_code" data-i18n-placeholder="ph_verification_code" placeholder="請點擊右方獲取驗證碼" 
-                               class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition"
-                               maxlength="6" inputmode="numeric" pattern="[0-9]*">
-                        <button type="button" onclick="sendVerificationCode()" 
-                                class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-sm whitespace-nowrap hover:opacity-90 transition">
-                            <span data-i18n="btn_get_code">獲取驗證碼</span>
-                        </button>
-                    </div>
-                    
-                    <div id="verification-code-display" class="hidden mt-2 p-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl text-center">
-                        <p class="text-xs text-gray-300 mb-1">
-                            <span data-i18n="verification_code_label">你嘅驗證碼係：</span>
-                        </p>
-                        <p id="verification-code-value" class="text-2xl font-extrabold text-brand-yellow tracking-widest mb-3">------</p>
-
-                        <p class="text-xs text-gray-300 mb-2">
-                            <span data-i18n="verification_send_hint">請揀其中一個方式發送驗證碼俾我哋：</span>
-                        </p>
-
-                        <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                            <a id="whatsapp-verify-link" href="#" target="_blank" 
-                               class="inline-flex items-center justify-center gap-1.5 bg-green-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition shadow-md">
-                                <i class="fa-brands fa-whatsapp text-lg"></i> 
-                                <span data-i18n="btn_send_verify_whatsapp">WhatsApp 發送</span>
-                            </a>
-                            <button type="button" onclick="sendVerifyViaWeChat()"
-                               class="inline-flex items-center justify-center gap-1.5 bg-[#07C160] text-white font-bold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition shadow-md cursor-pointer">
-                                <i class="fa-brands fa-weixin text-lg"></i> 
-                                <span data-i18n="btn_send_verify_wechat">微信發送</span>
+                    <!-- 微信加好友提示 -->
+                    <div class="mt-3 bg-green-600/10 border border-green-500/50 rounded-xl p-3 flex items-center gap-3">
+                        <i class="fa-brands fa-weixin text-green-500 text-2xl flex-shrink-0"></i>
+                        <div class="flex-1 text-xs">
+                            <p class="text-green-400 font-bold" data-i18n="wechat_note_title">如需微信確認訂單，請先加好友</p>
+                            <button type="button" onclick="showWeComQR()" class="mt-2 inline-flex items-center gap-1.5 bg-[#07C160] text-white font-bold px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition cursor-pointer">
+                                <i class="fa-brands fa-weixin"></i>
+                                <span data-i18n="btn_add_wechat_now">立即加微信</span>
                             </button>
                         </div>
-
-                        <p class="text-xs text-gray-400 mt-3">
-                            <span data-i18n="verification_whatsapp_hint">請先發送確認訊息，再提交預約</span>
-                        </p>
-
-                        <p class="text-xs text-gray-400 mt-2 pt-2 border-t border-brand-yellow/20">
-                            <span data-i18n="verification_hotline_hint">冇 WhatsApp 又冇微信？</span><br>
-                            <a href="tel:68815441" class="text-brand-yellow font-bold underline">
-                                <i class="fa-solid fa-phone"></i> <span data-i18n="verification_hotline_call">致電 6881 5441</span>
-                            </a>
-                            <span data-i18n="verification_hotline_tail">由同事幫你落單</span>
-                        </p>
                     </div>
                 </div>
 
@@ -447,15 +407,6 @@
                     <h3 id="wecom-modal-title" class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p id="wecom-modal-desc" class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
 
-                    <div id="wecom-code-hint" class="hidden mb-4 p-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl">
-                        <p class="text-xs text-gray-300 mb-1" data-i18n="verification_code_label">你嘅驗證碼係：</p>
-                        <p id="wecom-code-value" class="text-2xl font-extrabold text-brand-yellow tracking-widest mb-2">------</p>
-                        <button type="button" onclick="copyWeComCode()" class="text-xs text-brand-yellow underline cursor-pointer">
-                            <i class="fa-solid fa-copy"></i> <span data-i18n="btn_copy_code">複製驗證碼</span>
-                        </button>
-                        <p class="text-[11px] text-gray-400 mt-2" data-i18n="wecom_code_hint">加我哋做朋友之後，將驗證碼發送俾我哋就得</p>
-                    </div>
-
                     <div class="bg-white p-3 rounded-xl mb-2 inline-block">
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
@@ -490,20 +441,11 @@ let currentBaseFare = 0;
 let currentTunnelFee = 0;
 let orderType = 'instant';
 
-const INTERNAL_CODE = '888888';
-let currentVerificationCode = '';
-let isInternalUser = false;
-let whatsappSent = false;
 let upgradeChoice = null;
 let pendingBookingData = null;
 
-// ✅ 記錄客人用邊個通道聯絡（whatsapp / wechat / internal）
-let contactChannel = 'whatsapp';
-
 // ============================================
 // ✅ 統一收費計算
-// 最低消費只計跳錶費（含車款附加費），隧道費永遠另加
-// 豐田八五折：折後跳錶不足 $100 時，按 $100 收（即不提供八五折）
 // ============================================
 function calculateTotalFare() {
     if (currentBaseFare <= 0) return 0;
@@ -541,7 +483,6 @@ function calculateTotalFare() {
 
 // ============================================
 // ✅ 判斷係咪觸發最低消費
-// 最低消費只計跳錶費（含車款附加費），唔計隧道費
 // ============================================
 function isMinimumCharge() {
     if (!selectedFareMode) return false;
@@ -549,57 +490,33 @@ function isMinimumCharge() {
     
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') {
-            // 折後不足 $100 → 觸發最低消費
             return Math.round(currentBaseFare * 0.85) < 100;
         }
-        // 正價不足 $100 → 觸發最低消費
         return currentBaseFare < 100;
     }
     
-    // 其他所有車款：跳錶最低 $80
     return currentBaseFare < 80;
 }
 
 // ============================================
 // ✅ 最低消費總額（最低跳錶消費 + 隧道費原價）
-// 最低消費冇八五折，過海隧道一律按 $50/條 計
 // ============================================
 function getMinimumChargeTotal() {
     let minBase;
     if (selectedCarName === '豐田混能的士') {
         minBase = 100;
     } else if (selectedMinFare > 0) {
-        // 直接用 fleet.html 傳過嚟嘅最低消費（已包含車款附加費）
         minBase = selectedMinFare;
     } else {
-        // fallback：跳錶 $80 + 附加費
         minBase = 80 + selectedSurcharge;
     }
     
-    // currentTunnelFee 本身存嘅係原價（唔係八五折後）
     return minBase + currentTunnelFee;
 }
 
 const translations = {
     zh: {
-        ph_verification_code: "請點擊右方獲取驗證碼",
         btn_more_payment: "更多付款方式",
-        label_verification: "電話驗證",
-        btn_get_code: "獲取驗證碼",
-        verification_code_label: "你嘅驗證碼係：",
-        btn_send_verify_whatsapp: "WhatsApp 發送",
-        verification_whatsapp_hint: "請先發送確認訊息，再提交預約",
-        verification_send_hint: "請揀其中一個方式發送驗證碼俾我哋：",
-        btn_send_verify_wechat: "微信發送",
-        btn_copy_code: "複製驗證碼",
-        wecom_code_hint: "加我哋做朋友之後，將驗證碼發送俾我哋就得",
-        wecom_qr_hint: "手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取",
-        verification_hotline_hint: "冇 WhatsApp 又冇微信？",
-        verification_hotline_call: "致電 6881 5441",
-        verification_hotline_tail: "由同事幫你落單",
-        alert_enter_phone: "請先輸入正確嘅電話號碼！",
-        alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
-        alert_need_contact: "請先經 WhatsApp 或微信發送驗證碼！",
         btn_confirm_booking: "確認預約",
         btn_sending_booking: "正在送出預約...",
         btn_call_now: "致電 6881 5441",
@@ -642,34 +559,20 @@ const translations = {
         pay_octopus: "八達通",
         pay_payme: "PayMe",
         pay_fps: "轉數快",
-        label_phone: "聯絡電話 (WhatsApp 接收確認)",
+        label_phone: "聯絡電話 (WhatsApp / 微信 接收確認)",
         ph_phone: "例：9123 4567",
         p1: "1 人", p2: "2 人", p3: "3 人", p4: "4 人", p5: "5 人", p6: "6 人",
         l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
         wecom_modal_title: "掃描二維碼添加企業微信",
         wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        wecom_qr_hint: "手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
+        wechat_note_title: "如需微信確認訂單，請先加好友",
+        btn_add_wechat_now: "立即加微信"
     },
     en: {
-        ph_verification_code: "Tap the get code button",
         btn_more_payment: "More Options",
-        label_verification: "Phone Verification",
-        btn_get_code: "Get Code",
-        verification_code_label: "Your verification code:",
-        btn_send_verify_whatsapp: "Send via WhatsApp",
-        verification_whatsapp_hint: "Please send confirmation before submitting",
-        verification_send_hint: "Choose a channel to send the code:",
-        btn_send_verify_wechat: "Send via WeChat",
-        btn_copy_code: "Copy Code",
-        wecom_code_hint: "Add us, then send the code via WeChat",
-        wecom_qr_hint: "Mobile: Long press to save → Open WeChat Scan → Pick from album",
-        verification_hotline_hint: "No WhatsApp or WeChat?",
-        verification_hotline_call: "Call 6881 5441",
-        verification_hotline_tail: "and our staff will help",
-        alert_enter_phone: "Please enter a valid phone number first!",
-        alert_need_whatsapp: "Please send WhatsApp confirmation first!",
-        alert_need_contact: "Please send the code via WhatsApp or WeChat first!",
         btn_confirm_booking: "Confirm Booking",
         btn_sending_booking: "Sending Booking...",
         btn_call_now: "Call 6881 5441",
@@ -712,14 +615,17 @@ const translations = {
         pay_octopus: "Octopus",
         pay_payme: "PayMe",
         pay_fps: "FPS",
-        label_phone: "Contact Phone (WhatsApp Confirmation)",
+        label_phone: "Contact Phone (WhatsApp / WeChat Confirmation)",
         ph_phone: "e.g., 9123 4567",
         p1: "1 Person", p2: "2 People", p3: "3 People", p4: "4 People", p5: "5 People", p6: "6 People",
         l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
         wecom_modal_title: "Scan QR Code to Add WeCom",
         wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        wecom_qr_hint: "Mobile: Long press to save → Open WeChat Scan → Pick from album",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
+        wechat_note_title: "To confirm your order via WeChat, please add us as friend first",
+        btn_add_wechat_now: "Add WeChat Now"
     }
 };
 
@@ -802,65 +708,17 @@ function togglePaymentOptions() {
     document.getElementById('more-payment-options').classList.toggle('hidden');
 }
 
-function showWeComQR(isVerification = false) {
+// ✅ 修復：加 style.display 兜底，避免 hidden + flex 衝突
+function showWeComQR() {
     const modal = document.getElementById('wecom-modal');
-    const codeHint = document.getElementById('wecom-code-hint');
-    const modalTitle = document.getElementById('wecom-modal-title');
-    const modalDesc = document.getElementById('wecom-modal-desc');
-
-    if (isVerification) {
-        const code = document.getElementById('verification-code-value').textContent;
-        document.getElementById('wecom-code-value').textContent = code;
-        codeHint.classList.remove('hidden');
-        modalTitle.textContent = currentLang === 'en' ? 'Send Code via WeChat' : '用微信發送驗證碼';
-        modalDesc.textContent = currentLang === 'en'
-            ? 'Scan the QR code with WeChat, add us, then send the code.'
-            : '請用微信掃描以下二維碼，加我哋做朋友之後，將驗證碼發送俾我哋：';
-    } else {
-        codeHint.classList.add('hidden');
-        modalTitle.textContent = translations[currentLang].wecom_modal_title;
-        modalDesc.textContent = translations[currentLang].wecom_modal_desc;
-    }
-
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 }
 
 function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
-}
-
-function sendVerifyViaWeChat() {
-    const code = document.getElementById('verification-code-value').textContent;
-    if (!code || code === '------') {
-        alert(currentLang === 'en' ? 'Please get the verification code first!' : '請先獲取驗證碼！');
-        return;
-    }
-
-    const message = `我嘅預約驗證碼係：${code}`;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(message).catch(() => {});
-    }
-
-    whatsappSent = true;
-    contactChannel = 'wechat';
-
-    showWeComQR(true);
-}
-
-function copyWeComCode() {
-    const code = document.getElementById('wecom-code-value').textContent;
-    const message = `我嘅預約驗證碼係：${code}`;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(message).then(() => {
-            alert(currentLang === 'en' ? 'Code copied!' : '驗證碼已複製！');
-        }).catch(() => {
-            alert(currentLang === 'en' ? 'Please copy manually: ' + code : '請手動複製：' + code);
-        });
-    } else {
-        alert(currentLang === 'en' ? 'Please copy manually: ' + code : '請手動複製：' + code);
-    }
+    const modal = document.getElementById('wecom-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
 }
 
 function showInstallGuide() {
@@ -891,10 +749,13 @@ function showInstallGuide() {
         `;
     }
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 }
 
 function closeInstallGuide() {
-    document.getElementById('install-modal').classList.add('hidden');
+    const modal = document.getElementById('install-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
 }
 
 function toggleLanguage() {
@@ -962,41 +823,6 @@ function checkPassengerLimit() {
     }
 }
 
-function sendVerificationCode() {
-    const phone = document.getElementById('phone').value.trim();
-    const cleanPhone = phone.replace(/\D/g, '');
-    
-    if (cleanPhone.length < 8) {
-        alert(translations[currentLang].alert_enter_phone);
-        document.getElementById('phone').focus();
-        return;
-    }
-    
-    currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    document.getElementById('verification_code').value = currentVerificationCode;
-    whatsappSent = false;
-    contactChannel = 'whatsapp';
-    
-    const displayContainer = document.getElementById('verification-code-display');
-    const displayValue = document.getElementById('verification-code-value');
-    const whatsappLink = document.getElementById('whatsapp-verify-link');
-    
-    displayContainer.classList.remove('hidden');
-    displayValue.textContent = currentVerificationCode;
-    
-    const message = `我嘅預約驗證碼係：${currentVerificationCode}\n\n電話號碼：${phone}`;
-    const encodedMessage = encodeURIComponent(message);
-    whatsappLink.href = `https://wa.me/85268815441?text=${encodedMessage}`;
-    
-    whatsappLink.onclick = function() {
-        whatsappSent = true;
-        contactChannel = 'whatsapp';
-    };
-    
-    displayContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
 function showUpgradeModal(carType, passengerCount) {
     const modal = document.getElementById('upgrade-modal');
     const title = document.getElementById('upgrade-modal-title');
@@ -1035,12 +861,15 @@ function showUpgradeModal(carType, passengerCount) {
     }
     
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
 function confirmUpgrade(choice) {
     upgradeChoice = choice;
-    document.getElementById('upgrade-modal').classList.add('hidden');
+    const modal = document.getElementById('upgrade-modal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
     document.body.style.overflow = '';
     submitBookingAfterUpgrade();
 }
@@ -1062,10 +891,8 @@ function submitBookingAfterUpgrade() {
         }
     }
     
-    // ✅ 判斷係咪觸發最低消費
     const minCharge = isMinimumCharge();
     const minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
-    // ✅ 只有經過隧道才標註「（已包含隧道費）」
     const tunnelSuffix = currentTunnelFee > 0 ? '（已包含隧道費）' : '';
     
     let msgLines = [];
@@ -1093,8 +920,6 @@ function submitBookingAfterUpgrade() {
     msgLines.push(`📞 電話：${data.phone}`);
     msgLines.push(`🚘 預約車款：${carDisplayText}`);
 
-    // ✅ 最低消費：隱藏收費模式同預計車費，直接顯示最低消費總額
-    // ✅ 有過隧道才標註「（已包含隧道費）」
     if (minCharge) {
         msgLines.push(`💰 收費模式：最低消費 HK$${minChargeTotal}${tunnelSuffix}`);
     } else {
@@ -1159,8 +984,6 @@ function submitBookingAfterUpgrade() {
     
     discordMsgLines.push(`🚘 ${carDisplayText}`);
     
-    // ✅ 最低消費：Discord 同客人睇到嘅完全一樣
-    // ✅ 有過隧道才標註「（已包含隧道費）」
     if (minCharge) {
         discordMsgLines.push(`💰 收費模式：最低消費 HK$${minChargeTotal}${tunnelSuffix}`);
     } else {
@@ -1183,14 +1006,6 @@ function submitBookingAfterUpgrade() {
         }
         discordMsgLines.push(`💰預計參考車費 HK$${data.totalFareForWhatsApp}`);
     }
-
-    let channelTag = '📱 WhatsApp';
-    if (isInternalUser) {
-        channelTag = '🔑 內部人員';
-    } else if (contactChannel === 'wechat') {
-        channelTag = '💚 微信（請主動加返客人）';
-    }
-    discordMsgLines.push(`📲 聯絡通道：${channelTag}`);
     
     discordMsgLines.push(``);
     discordMsgLines.push(`🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸`);
@@ -1223,9 +1038,7 @@ function submitBookingAfterUpgrade() {
         tunnelFee: currentTunnelFee,
         fullMessage: fullMessage,
         customerMessage: customerMessage,
-        orderType: orderType,
-        isInternalBooking: isInternalUser === true,
-        contactChannel: isInternalUser ? 'internal' : contactChannel
+        orderType: orderType
     };
 
     const submitBtn = document.getElementById('booking-submit-btn');
@@ -1263,10 +1076,8 @@ function submitBookingAfterUpgrade() {
     });
 }
 
-function sendWhatsApp(event) {
+function submitBooking(event) {
     event.preventDefault();
-
-    isInternalUser = false;
 
     if (!selectedFareMode) {
         alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
@@ -1283,22 +1094,6 @@ function sendWhatsApp(event) {
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length < 8) {
         alert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！");
-        return;
-    }
-
-    const inputCode = document.getElementById('verification_code').value.trim();
-    
-    if (inputCode === INTERNAL_CODE) {
-        isInternalUser = true;
-        contactChannel = 'internal';
-    } else if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
-        isInternalUser = false;
-        if (!whatsappSent) {
-            alert(translations[currentLang].alert_need_contact);
-            return;
-        }
-    } else {
-        alert(currentLang === 'en' ? "Please complete phone verification first!" : "請先完成電話驗證！");
         return;
     }
 
