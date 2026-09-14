@@ -540,7 +540,7 @@ function calculateTotalFare() {
 }
 
 // ============================================
-// ✅ 新增：判斷係咪觸發最低消費
+// ✅ 判斷係咪觸發最低消費
 // 最低消費只計跳錶費（含車款附加費），唔計隧道費
 // ============================================
 function isMinimumCharge() {
@@ -561,7 +561,7 @@ function isMinimumCharge() {
 }
 
 // ============================================
-// ✅ 新增：最低消費總額（最低跳錶消費 + 隧道費原價）
+// ✅ 最低消費總額（最低跳錶消費 + 隧道費原價）
 // 最低消費冇八五折，過海隧道一律按 $50/條 計
 // ============================================
 function getMinimumChargeTotal() {
@@ -589,7 +589,6 @@ const translations = {
         verification_code_label: "你嘅驗證碼係：",
         btn_send_verify_whatsapp: "WhatsApp 發送",
         verification_whatsapp_hint: "請先發送確認訊息，再提交預約",
-        // ✅ 新增 key
         verification_send_hint: "請揀其中一個方式發送驗證碼俾我哋：",
         btn_send_verify_wechat: "微信發送",
         btn_copy_code: "複製驗證碼",
@@ -660,7 +659,6 @@ const translations = {
         verification_code_label: "Your verification code:",
         btn_send_verify_whatsapp: "Send via WhatsApp",
         verification_whatsapp_hint: "Please send confirmation before submitting",
-        // ✅ 新增 key
         verification_send_hint: "Choose a channel to send the code:",
         btn_send_verify_wechat: "Send via WeChat",
         btn_copy_code: "Copy Code",
@@ -804,7 +802,6 @@ function togglePaymentOptions() {
     document.getElementById('more-payment-options').classList.toggle('hidden');
 }
 
-// ✅ 改動：支援「查詢模式」同「驗證碼模式」
 function showWeComQR(isVerification = false) {
     const modal = document.getElementById('wecom-modal');
     const codeHint = document.getElementById('wecom-code-hint');
@@ -832,7 +829,6 @@ function closeWeComQR() {
     document.getElementById('wecom-modal').classList.add('hidden');
 }
 
-// ✅ 新增：微信驗證通道
 function sendVerifyViaWeChat() {
     const code = document.getElementById('verification-code-value').textContent;
     if (!code || code === '------') {
@@ -842,19 +838,16 @@ function sendVerifyViaWeChat() {
 
     const message = `我嘅預約驗證碼係：${code}`;
 
-    // 自動複製，方便客人直接喺微信貼上
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(message).catch(() => {});
     }
 
-    // 解鎖提交（等同 WhatsApp 已發送）
     whatsappSent = true;
-    contactChannel = 'wechat'; // ✅ 記錄通道
+    contactChannel = 'wechat';
 
     showWeComQR(true);
 }
 
-// ✅ 新增：複製驗證碼
 function copyWeComCode() {
     const code = document.getElementById('wecom-code-value').textContent;
     const message = `我嘅預約驗證碼係：${code}`;
@@ -983,7 +976,7 @@ function sendVerificationCode() {
     
     document.getElementById('verification_code').value = currentVerificationCode;
     whatsappSent = false;
-    contactChannel = 'whatsapp'; // ✅ 預設，等客人揀
+    contactChannel = 'whatsapp';
     
     const displayContainer = document.getElementById('verification-code-display');
     const displayValue = document.getElementById('verification-code-value');
@@ -996,7 +989,6 @@ function sendVerificationCode() {
     const encodedMessage = encodeURIComponent(message);
     whatsappLink.href = `https://wa.me/85268815441?text=${encodedMessage}`;
     
-    // ✅ 改動：點 WhatsApp link 時記錄通道
     whatsappLink.onclick = function() {
         whatsappSent = true;
         contactChannel = 'whatsapp';
@@ -1073,6 +1065,8 @@ function submitBookingAfterUpgrade() {
     // ✅ 判斷係咪觸發最低消費
     const minCharge = isMinimumCharge();
     const minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
+    // ✅ 只有經過隧道才標註「（已包含隧道費）」
+    const tunnelSuffix = currentTunnelFee > 0 ? '（已包含隧道費）' : '';
     
     let msgLines = [];
   
@@ -1099,12 +1093,10 @@ function submitBookingAfterUpgrade() {
     msgLines.push(`📞 電話：${data.phone}`);
     msgLines.push(`🚘 預約車款：${carDisplayText}`);
 
-    // ✅ 最低消費：隱藏收費模式同預計車費，直接顯示最低消費總額（已包含隧道費）
+    // ✅ 最低消費：隱藏收費模式同預計車費，直接顯示最低消費總額
+    // ✅ 有過隧道才標註「（已包含隧道費）」
     if (minCharge) {
-        const minText = currentLang === 'en'
-            ? `💰 收費模式：最低消費 HK$${minChargeTotal}（已包含隧道費）`
-            : `💰 收費模式：最低消費 HK$${minChargeTotal}（已包含隧道費）`;
-        msgLines.push(minText);
+        msgLines.push(`💰 收費模式：最低消費 HK$${minChargeTotal}${tunnelSuffix}`);
     } else {
         if (selectedFareMode === 'discount') {
             msgLines.push(`💎 收費模式：8️⃣5️⃣ 八五折優惠`);
@@ -1168,8 +1160,9 @@ function submitBookingAfterUpgrade() {
     discordMsgLines.push(`🚘 ${carDisplayText}`);
     
     // ✅ 最低消費：Discord 同客人睇到嘅完全一樣
+    // ✅ 有過隧道才標註「（已包含隧道費）」
     if (minCharge) {
-        discordMsgLines.push(`💰 收費模式：最低消費 HK$${minChargeTotal}（已包含隧道費）`);
+        discordMsgLines.push(`💰 收費模式：最低消費 HK$${minChargeTotal}${tunnelSuffix}`);
     } else {
         if (selectedFareMode === 'discount') {
             discordMsgLines.push(`💎 八五折優惠`);
@@ -1191,7 +1184,6 @@ function submitBookingAfterUpgrade() {
         discordMsgLines.push(`💰預計參考車費 HK$${data.totalFareForWhatsApp}`);
     }
 
-    // ✅ 新增：喺 Discord 通知顯示客人用邊個通道聯絡
     let channelTag = '📱 WhatsApp';
     if (isInternalUser) {
         channelTag = '🔑 內部人員';
@@ -1224,7 +1216,6 @@ function submitBookingAfterUpgrade() {
         totalFare: data.totalFareForWhatsApp,
         flightNo: data.flightNo,
         upgradeOption: carDisplayText,
-        // ✅ 最低消費時，feeMode 標記為「最低消費」
         feeMode: minCharge ? '最低消費' : (selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費'),
         isMinimumCharge: minCharge,
         minimumChargeTotal: minChargeTotal,
@@ -1234,7 +1225,6 @@ function submitBookingAfterUpgrade() {
         customerMessage: customerMessage,
         orderType: orderType,
         isInternalBooking: isInternalUser === true,
-        // ✅ 新增：通道資訊送到 backend
         contactChannel: isInternalUser ? 'internal' : contactChannel
     };
 
@@ -1300,10 +1290,9 @@ function sendWhatsApp(event) {
     
     if (inputCode === INTERNAL_CODE) {
         isInternalUser = true;
-        contactChannel = 'internal'; // ✅ 內部人員標記
+        contactChannel = 'internal';
     } else if (inputCode === currentVerificationCode && currentVerificationCode !== '') {
         isInternalUser = false;
-        // ✅ 改動：訊息提示支援雙通道
         if (!whatsappSent) {
             alert(translations[currentLang].alert_need_contact);
             return;
