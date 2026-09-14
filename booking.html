@@ -367,7 +367,6 @@
                         </button>
                     </div>
                     
-                    <!-- ✅ 改動：驗證碼顯示區加入「微信發送」按鈕 + 熱線提示 -->
                     <div id="verification-code-display" class="hidden mt-2 p-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl text-center">
                         <p class="text-xs text-gray-300 mb-1">
                             <span data-i18n="verification_code_label">你嘅驗證碼係：</span>
@@ -395,7 +394,6 @@
                             <span data-i18n="verification_whatsapp_hint">請先發送確認訊息，再提交預約</span>
                         </p>
 
-                        <!-- ✅ 新增：熱線兜底 -->
                         <p class="text-xs text-gray-400 mt-2 pt-2 border-t border-brand-yellow/20">
                             <span data-i18n="verification_hotline_hint">冇 WhatsApp 又冇微信？</span><br>
                             <a href="tel:68815441" class="text-brand-yellow font-bold underline">
@@ -437,7 +435,6 @@
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
 
-            <!-- ✅ 改動：企業微信彈窗加入「驗證碼模式」顯示區 + QR 長按提示 -->
             <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
                 <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
                     <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -450,7 +447,6 @@
                     <h3 id="wecom-modal-title" class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p id="wecom-modal-desc" class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
 
-                    <!-- ✅ 新增：驗證碼模式顯示區 -->
                     <div id="wecom-code-hint" class="hidden mb-4 p-3 bg-brand-yellow/10 border-2 border-brand-yellow rounded-xl">
                         <p class="text-xs text-gray-300 mb-1" data-i18n="verification_code_label">你嘅驗證碼係：</p>
                         <p id="wecom-code-value" class="text-2xl font-extrabold text-brand-yellow tracking-widest mb-2">------</p>
@@ -464,7 +460,6 @@
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
 
-                    <!-- ✅ 新增：QR 長按提示 -->
                     <p class="text-[11px] text-gray-400 mb-4">
                         <i class="fa-solid fa-hand-pointer"></i>
                         <span data-i18n="wecom_qr_hint">手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取</span>
@@ -502,7 +497,7 @@ let whatsappSent = false;
 let upgradeChoice = null;
 let pendingBookingData = null;
 
-// ✅ 新增：記錄客人用邊個通道聯絡（whatsapp / wechat / internal）
+// ✅ 記錄客人用邊個通道聯絡（whatsapp / wechat / internal）
 let contactChannel = 'whatsapp';
 
 // ============================================
@@ -542,6 +537,47 @@ function calculateTotalFare() {
     const minBaseFare = 80;
     const adjustedBase = Math.max(currentBaseFare, minBaseFare);
     return adjustedBase + selectedSurcharge + currentTunnelFee;
+}
+
+// ============================================
+// ✅ 新增：判斷係咪觸發最低消費
+// 最低消費只計跳錶費（含車款附加費），唔計隧道費
+// ============================================
+function isMinimumCharge() {
+    if (!selectedFareMode) return false;
+    if (currentBaseFare <= 0) return false;
+    
+    if (selectedCarName === '豐田混能的士') {
+        if (selectedFareMode === 'discount') {
+            // 折後不足 $100 → 觸發最低消費
+            return Math.round(currentBaseFare * 0.85) < 100;
+        }
+        // 正價不足 $100 → 觸發最低消費
+        return currentBaseFare < 100;
+    }
+    
+    // 其他所有車款：跳錶最低 $80
+    return currentBaseFare < 80;
+}
+
+// ============================================
+// ✅ 新增：最低消費總額（最低跳錶消費 + 隧道費原價）
+// 最低消費冇八五折，過海隧道一律按 $50/條 計
+// ============================================
+function getMinimumChargeTotal() {
+    let minBase;
+    if (selectedCarName === '豐田混能的士') {
+        minBase = 100;
+    } else if (selectedMinFare > 0) {
+        // 直接用 fleet.html 傳過嚟嘅最低消費（已包含車款附加費）
+        minBase = selectedMinFare;
+    } else {
+        // fallback：跳錶 $80 + 附加費
+        minBase = 80 + selectedSurcharge;
+    }
+    
+    // currentTunnelFee 本身存嘅係原價（唔係八五折後）
+    return minBase + currentTunnelFee;
 }
 
 const translations = {
@@ -1034,6 +1070,10 @@ function submitBookingAfterUpgrade() {
         }
     }
     
+    // ✅ 判斷係咪觸發最低消費
+    const minCharge = isMinimumCharge();
+    const minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
+    
     let msgLines = [];
   
     msgLines.push(`📍 起點：${data.pickup}`);
@@ -1057,15 +1097,22 @@ function submitBookingAfterUpgrade() {
     if (data.paymentStr) msgLines.push(`💳 付款方式：${data.paymentStr}`);
     if (data.surname) msgLines.push(`👤 聯絡人：${data.surname} ${data.title}`);
     msgLines.push(`📞 電話：${data.phone}`);
-
-    if (selectedFareMode === 'discount') {
-        msgLines.push(`💎 收費模式：8️⃣5️⃣ 八五折優惠`);
-    } else {
-        msgLines.push(`💎 收費模式：💯 正價按錶收費`);
-    }
-
     msgLines.push(`🚘 預約車款：${carDisplayText}`);
-    msgLines.push(`💰 預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
+
+    // ✅ 最低消費：隱藏收費模式同預計車費，直接顯示最低消費總額（已包含隧道費）
+    if (minCharge) {
+        const minText = currentLang === 'en'
+            ? `💰 收費模式：最低消費 HK$${minChargeTotal}（已包含隧道費）`
+            : `💰 收費模式：最低消費 HK$${minChargeTotal}（已包含隧道費）`;
+        msgLines.push(minText);
+    } else {
+        if (selectedFareMode === 'discount') {
+            msgLines.push(`💎 收費模式：8️⃣5️⃣ 八五折優惠`);
+        } else {
+            msgLines.push(`💎 收費模式：💯 正價按錶收費`);
+        }
+        msgLines.push(`💰 預計車費總額：HK$${data.totalFareForWhatsApp} (基本收費${selectedSurcharge > 0 ? '+車款附加費' : ''}${currentTunnelFee > 0 ? '+隧道費' : ''})`);
+    }
 
     const customerMessage = msgLines.join('\n');
     
@@ -1120,25 +1167,29 @@ function submitBookingAfterUpgrade() {
     
     discordMsgLines.push(`🚘 ${carDisplayText}`);
     
-    if (selectedFareMode === 'discount') {
-        discordMsgLines.push(`💎 八五折優惠`);
+    // ✅ 最低消費：Discord 同客人睇到嘅完全一樣
+    if (minCharge) {
+        discordMsgLines.push(`💰 收費模式：最低消費 HK$${minChargeTotal}（已包含隧道費）`);
     } else {
-        let feeModeText = '💯正價按錶收費';
-        
-        if (selectedCarName === 'MAXUS MIFA 7') {
-            const adjustedBase = Math.max(currentBaseFare, 80);
-            const basePlusSurcharge = adjustedBase + 50;
-            if (basePlusSurcharge < 250) {
-                feeModeText = '💯正價+$50';
+        if (selectedFareMode === 'discount') {
+            discordMsgLines.push(`💎 八五折優惠`);
+        } else {
+            let feeModeText = '💯正價按錶收費';
+            
+            if (selectedCarName === 'MAXUS MIFA 7') {
+                const adjustedBase = Math.max(currentBaseFare, 80);
+                const basePlusSurcharge = adjustedBase + 50;
+                if (basePlusSurcharge < 250) {
+                    feeModeText = '💯正價+$50';
+                }
+            } else if (selectedSurcharge > 0) {
+                feeModeText = `💯正價+$${selectedSurcharge}`;
             }
-        } else if (selectedSurcharge > 0) {
-            feeModeText = `💯正價+$${selectedSurcharge}`;
+            
+            discordMsgLines.push(`💎 ${feeModeText}`);
         }
-        
-        discordMsgLines.push(`💎 ${feeModeText}`);
+        discordMsgLines.push(`💰預計參考車費 HK$${data.totalFareForWhatsApp}`);
     }
-    
-    discordMsgLines.push(`💰預計參考車費 HK$${data.totalFareForWhatsApp}`);
 
     // ✅ 新增：喺 Discord 通知顯示客人用邊個通道聯絡
     let channelTag = '📱 WhatsApp';
@@ -1173,7 +1224,10 @@ function submitBookingAfterUpgrade() {
         totalFare: data.totalFareForWhatsApp,
         flightNo: data.flightNo,
         upgradeOption: carDisplayText,
-        feeMode: selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費',
+        // ✅ 最低消費時，feeMode 標記為「最低消費」
+        feeMode: minCharge ? '最低消費' : (selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費'),
+        isMinimumCharge: minCharge,
+        minimumChargeTotal: minChargeTotal,
         surcharge: selectedSurcharge,
         tunnelFee: currentTunnelFee,
         fullMessage: fullMessage,
