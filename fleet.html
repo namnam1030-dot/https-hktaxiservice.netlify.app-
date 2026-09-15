@@ -2,39 +2,38 @@
 <html lang="zh-HK">
 <head>
 
-    <!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
-    <script>
-    (function() {
-        var isLight = false;
-        try {
-            var saved = localStorage.getItem('taxiTheme');
-            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
-            if (override && (saved === 'light' || saved === 'dark')) {
-                isLight = saved === 'light';
-            } else {
-                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-            }
-        } catch(e) {}
-        document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
-        document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
-        if (isLight) document.documentElement.classList.add('preload-light');
-    })();
-    </script>
-    <style>
-        html.preload-light,
-        html.preload-light body {
-            background-color: #FFFFFF !important;
-            color: #000000 !important;
+<!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
+<script>
+(function() {
+    var isLight = false;
+    try {
+        var saved = localStorage.getItem('taxiTheme');
+        var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+        if (override && (saved === 'light' || saved === 'dark')) {
+            isLight = saved === 'light';
+        } else {
+            isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
-        html.preload-light body,
-        html.preload-light body * {
-            transition: none !important;
-        }
-        html:not(.preload-light) body {
-            background-color: #0B0B0B;
-            color: #FFFFFF;
-        }
-    </style>
+    } catch(e) {}
+    var bg = isLight ? '#FFFFFF' : '#0B0B0B';
+    var fg = isLight ? '#000000' : '#FFFFFF';
+    document.documentElement.style.backgroundColor = bg;
+    document.documentElement.style.color = fg;
+    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+})();
+</script>
+<style>
+    html[data-theme="light"],
+    html[data-theme="light"] body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
+    html[data-theme="dark"],
+    html[data-theme="dark"] body {
+        background-color: #0B0B0B !important;
+        color: #FFFFFF !important;
+    }
+</style>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,30 +98,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FFF200">
 
-    <!-- ✅ 反黑閃：搶先判斷主題 -->
-    <script>
-    (function() {
-        try {
-            var saved = localStorage.getItem('taxiTheme');
-            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
-            var isLight;
-            if (override && (saved === 'light' || saved === 'dark')) {
-                isLight = saved === 'light';
-            } else {
-                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-            }
-            if (isLight) document.documentElement.classList.add('preload-light');
-        } catch (e) {}
-    })();
-    </script>
-    <style>
-        html.preload-light,
-        html.preload-light body {
-            background-color: #FFFFFF !important;
-            color: #000000 !important;
-        }
-    </style>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="theme.css">
@@ -144,11 +119,9 @@
 
     <style>
         html { font-size: 130%; }
+        /* ✅ 反黑閃：body 背景由 html[data-theme] 控制 */
         body { 
-            background-color: #0B0B0B; 
-            color: #ffffff; 
-            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
-            transition: background-color 0.25s ease, color 0.25s ease;
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
         }
         .text-xs, .text-\[11px\] {
             font-size: 18px !important;

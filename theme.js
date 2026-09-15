@@ -11,10 +11,11 @@ const systemThemeQuery = window.matchMedia ? window.matchMedia('(prefers-color-s
 function applyTheme(isLight) {
     if (isLight) document.body.classList.add('light-theme');
     else document.body.classList.remove('light-theme');
-    // ✅ 反黑閃終極版：移除臨時 class + inline style
-    document.documentElement.classList.remove('preload-light');
-    document.documentElement.style.backgroundColor = '';
-    document.documentElement.style.color = '';
+
+    // ✅ 反黑閃：同步更新 html data-theme + inline style
+    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+    document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+    document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
 }
 
 function toggleTheme() {
