@@ -258,8 +258,9 @@
             fare_discount_note: "(只限豐田混能的士)",
             btn_reselect_route: "重新規劃路線",
             btn_view_fleet: "選擇車款類型",
+            btn_select_6seater: "選擇六人車款",
             btn_quick_query: "立即預約",
-btn_quick_query_note: "預設為豐田混能的士",
+            btn_quick_query_note: "預設豐田混能的士",
             btn_add_home: "APPS",
             modal_title: "一鍵加入主畫面",
             modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
@@ -298,8 +299,9 @@ btn_quick_query_note: "預設為豐田混能的士",
             fare_discount_note: "(Toyota Hybrid Taxi only)",
             btn_reselect_route: "Re-plan Route",
             btn_view_fleet: "Select Vehicle Type",
+            btn_select_6seater: "Select 6-Seater",
             btn_quick_query: "BOOK NOW",
-btn_quick_query_note: "Default: Toyota Hybrid Taxi",
+            btn_quick_query_note: "Default: Toyota Hybrid Taxi",
             btn_add_home: "APPS",
             modal_title: "Add to Home Screen",
             modal_desc: "For quick booking next time, add this service to your phone's home screen:",
@@ -898,9 +900,14 @@ btn_quick_query_note: "Default: Toyota Hybrid Taxi",
     <section id="result-section" class="w-full px-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             
-            <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
-                <i class="fa-solid fa-route text-brand-yellow"></i> <span data-i18n="result_title">路線規劃結果</span>
-            </h3>
+            <div class="flex justify-between items-center mb-2 gap-2">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-white">
+                    <i class="fa-solid fa-route text-brand-yellow"></i> <span data-i18n="result_title">路線規劃結果</span>
+                </h3>
+                <button type="button" onclick="goBackToInput()" class="text-xs font-extrabold text-black bg-brand-yellow py-2 px-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md whitespace-nowrap">
+                    <i class="fa-solid fa-route"></i> <span data-i18n="btn_reselect_route">重新規劃路線</span>
+                </button>
+            </div>
 
             <div id="loading-indicator" class="text-center py-8">
                 <i class="fa-solid fa-spinner fa-spin text-brand-yellow text-3xl mb-3"></i>
@@ -1015,21 +1022,16 @@ btn_quick_query_note: "Default: Toyota Hybrid Taxi",
                     </div>
                 </div>
 
+                <!-- ✅ 選擇六人車款（左） + 立即預約（右，注解在內、同尺寸） -->
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    <button type="button" onclick="goBackToInput()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-route"></i> <span data-i18n="btn_reselect_route">重新規劃路線</span>
+                    <button type="button" onclick="goToFleetPage()" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-car"></i> <span data-i18n="btn_select_6seater">選擇六人車款</span>
                     </button>
-                    <button type="button" onclick="goToFleetPage()" class="w-full text-xs font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-car"></i> <span data-i18n="btn_view_fleet">選擇車款類型</span>
-                    </button>
-                </div>
-
-                <div class="mt-4 flex flex-col items-center">
-                    <button onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-6 py-3 rounded-xl font-bold hover:opacity-95 transition shadow-lg shadow-brand-yellow/10 cursor-pointer flex flex-col items-center justify-center gap-0.5">
-                        <span class="flex items-center gap-2 text-[20px]">
+                    <button type="button" onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-4 py-3 rounded-xl font-bold hover:opacity-95 transition cursor-pointer inline-flex flex-col items-center justify-center gap-0.5 shadow-md">
+                        <span class="flex items-center gap-1.5 text-base font-extrabold">
                             <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
                         </span>
-                        <span class="text-xs opacity-70" data-i18n="btn_quick_query_note">預設為豐田混能的士</span>
+                        <span class="text-[16px] font-extrabold" data-i18n="btn_quick_query_note">預設豐田混能的士</span>
                     </button>
                 </div>
             </div>
