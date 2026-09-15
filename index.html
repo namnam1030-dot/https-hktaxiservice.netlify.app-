@@ -1,48 +1,73 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
 
-    <!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
-    <script>
-    (function() {
-        var isLight = false;
-        try {
-            var saved = localStorage.getItem('taxiTheme');
-            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
-            if (override && (saved === 'light' || saved === 'dark')) {
-                isLight = saved === 'light';
-            } else {
-                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+<!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
+<script>
+(function() {
+    var isLight = false;
+    try {
+        var saved = localStorage.getItem('taxiTheme');
+        var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+        if (override && (saved === 'light' || saved === 'dark')) {
+            isLight = saved === 'light';
+        } else {
+            isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        }
+    } catch(e) {}
+
+    var root = document.documentElement;
+
+    // ⭐ 即刻落 class 落 <html>
+    root.classList.toggle('light-theme', isLight);
+
+    // 底色 + data-theme
+    root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+    root.style.color           = isLight ? '#000000' : '#FFFFFF';
+    root.style.colorScheme     = isLight ? 'light' : 'dark';
+    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
+    if (isLight) {
+        var obs = new MutationObserver(function() {
+            if (document.body) {
+                document.body.classList.add('light-theme');
+                obs.disconnect();
             }
-        } catch(e) {}
+        });
+        obs.observe(root, { childList: true });
+    }
+})();
+</script>
 
-        var bg = isLight ? '#FFFFFF' : '#0B0B0B';
-        var fg = isLight ? '#000000' : '#FFFFFF';
+<style>
+    /* html + body 用同一組 data-theme 控制，一 parse 即生效 */
+    html[data-theme="light"],
+    html[data-theme="light"] body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
+    html[data-theme="dark"],
+    html[data-theme="dark"] body {
+        background-color: #0B0B0B !important;
+        color: #FFFFFF !important;
+    }
 
-        document.documentElement.style.backgroundColor = bg;
-        document.documentElement.style.color = fg;
-        document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
-    })();
-    </script>
-    <style>
-        /* html + body 用同一組 data-theme 控制，一 parse 即生效 */
-        html[data-theme="light"],
-        html[data-theme="light"] body {
-            background-color: #FFFFFF !important;
-            color: #000000 !important;
-        }
-        html[data-theme="dark"],
-        html[data-theme="dark"] body {
-            background-color: #0B0B0B !important;
-            color: #FFFFFF !important;
-        }
-    </style>
+    /* ⭐ 新增：html.light-theme 一落即生效 */
+    html.light-theme,
+    html.light-theme body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
+</style>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>八五折的士 | 長途跨區・機場口岸接送 | 豪華六座位的士 | 24小時網約的士</title>
 
@@ -119,116 +144,116 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="theme.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="theme.css">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-yellow': '#FFF200',
-                        'brand-dark': '#0B0B0B',
-                        'brand-gray': '#161616',
-                        'brand-card': '#1E1E1E'
-                    }
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'brand-yellow': '#FFF200',
+                    'brand-dark': '#0B0B0B',
+                    'brand-gray': '#161616',
+                    'brand-card': '#1E1E1E'
                 }
             }
         }
-    </script>
+    }
+</script>
 
-    <style>
-        html { 
-            font-size: 130%; 
-        }
-        /* ✅ 反黑閃：body 背景由 html[data-theme] 控制 */
-        body { 
-            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        }
-        .text-xs, .text-\[11px\] {
-            font-size: 18px !important;
-            line-height: 1.5;
-        }
-        button[onclick*="swapLocations"], 
-        button[onclick*="addStopoverField"], 
-        button[onclick*="removeStopoverField"],
-        #add-stop-btn {
-            font-size: inherit !important;
-        }
-        #add-stop-btn span,
-        button[onclick*="swapLocations"] span {
-            font-size: 16px !important;
-        }
-        .pac-container {
-            background-color: #1E1E1E;
-            color: #ffffff;
-            border: 1px solid #333;
-            border-radius: 0.5rem;
-            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-        }
-        .pac-item {
-            color: #ccc;
-            border-top: 1px solid #333;
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-        .pac-item:hover {
-            background-color: #333;
-        }
-        .pac-item-query {
-            color: #FFF200;
-            font-size: 17px;
-        }
-        .stopover-drag-handle {
-            cursor: grab;
-            user-select: none;
-        }
-        .stopover-drag-handle:active {
-            cursor: grabbing;
-        }
-        .stopover-drop-target {
-            background-color: rgba(255, 242, 0, 0.1);
-            border-radius: 0.5rem;
-        }
+<style>
+    html { 
+        font-size: 130%; 
+    }
+    body { 
+        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+    }
+    .text-xs, .text-\[11px\] {
+        font-size: 18px !important;
+        line-height: 1.5;
+    }
+    button[onclick*="swapLocations"], 
+    button[onclick*="addStopoverField"], 
+    button[onclick*="removeStopoverField"],
+    #add-stop-btn {
+        font-size: inherit !important;
+    }
+    #add-stop-btn span,
+    button[onclick*="swapLocations"] span {
+        font-size: 16px !important;
+    }
+    .pac-container {
+        background-color: #1E1E1E;
+        color: #ffffff;
+        border: 1px solid #333;
+        border-radius: 0.5rem;
+        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
+    .pac-item {
+        color: #ccc;
+        border-top: 1px solid #333;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    .pac-item:hover {
+        background-color: #333;
+    }
+    .pac-item-query {
+        color: #FFF200;
+        font-size: 17px;
+    }
+    .stopover-drag-handle {
+        cursor: grab;
+        user-select: none;
+    }
+    .stopover-drag-handle:active {
+        cursor: grabbing;
+    }
+    .stopover-drop-target {
+        background-color: rgba(255, 242, 0, 0.1);
+        border-radius: 0.5rem;
+    }
 
-        /* 淺色主題下的 pac-container */
-        body.light-theme .pac-container {
-            background-color: #FFFFFF;
-            color: #000000;
-            border-color: #D1D5DB;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-        }
-        body.light-theme .pac-item {
-            color: #374151;
-            border-top-color: #E5E7EB;
-        }
-        body.light-theme .pac-item:hover {
-            background-color: #F3F4F6;
-        }
-        body.light-theme .pac-item-query {
-            color: #000000;
-            font-weight: 700;
-        }
+    /* ===== 淺色主題（body.light-theme → html.light-theme body）===== */
+    html.light-theme body .pac-container {
+        background-color: #FFFFFF;
+        color: #000000;
+        border-color: #D1D5DB;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+    }
+    html.light-theme body .pac-item {
+        color: #374151;
+        border-top-color: #E5E7EB;
+    }
+    html.light-theme body .pac-item:hover {
+        background-color: #F3F4F6;
+    }
+    html.light-theme body .pac-item-query {
+        color: #000000;
+        font-weight: 700;
+    }
 
-        /* 淺色主題下的按鈕（頁面專屬） */
-        body.light-theme #voice-btn,
-        body.light-theme button[onclick*="clearAllInputs"],
-        body.light-theme button[onclick*="swapLocations"],
-        body.light-theme #add-stop-btn,
-        body.light-theme button[onclick*="removeStopoverField"],
-        body.light-theme button[onclick*="calculateAndGoToResult"] {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-    </style>
+    /* 淺色主題下的按鈕（頁面專屬） */
+    html.light-theme body #voice-btn,
+    html.light-theme body button[onclick*="clearAllInputs"],
+    html.light-theme body button[onclick*="swapLocations"],
+    html.light-theme body #add-stop-btn,
+    html.light-theme body button[onclick*="removeStopoverField"],
+    html.light-theme body button[onclick*="calculateAndGoToResult"] {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+</style>
 </head>
 <body class="antialiased">
 

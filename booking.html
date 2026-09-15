@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
 
-    <!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
+<!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -15,13 +18,31 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-    var bg = isLight ? '#FFFFFF' : '#0B0B0B';
-    var fg = isLight ? '#000000' : '#FFFFFF';
-    document.documentElement.style.backgroundColor = bg;
-    document.documentElement.style.color = fg;
-    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    var root = document.documentElement;
+
+    // ⭐ 即刻落 class 落 <html>
+    root.classList.toggle('light-theme', isLight);
+
+    // 底色 + data-theme
+    root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+    root.style.color           = isLight ? '#000000' : '#FFFFFF';
+    root.style.colorScheme     = isLight ? 'light' : 'dark';
+    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    // ⭐ body 一出現即補 class
+    if (isLight) {
+        var obs = new MutationObserver(function() {
+            if (document.body) {
+                document.body.classList.add('light-theme');
+                obs.disconnect();
+            }
+        });
+        obs.observe(root, { childList: true });
+    }
 })();
 </script>
+
 <style>
     html[data-theme="light"],
     html[data-theme="light"] body {
@@ -33,13 +54,19 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
+
+    /* ⭐ 新增：html.light-theme 一落即生效 */
+    html.light-theme,
+    html.light-theme body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
 </style>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約的士 | 八五折的士 | 24小時網約車預約 | 機場口岸接送</title>
 
@@ -96,227 +123,227 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- ⭐ 由 black-translucent 改為 default -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="theme.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="theme.css">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-yellow': '#FFF200',
-                        'brand-dark': '#0B0B0B',
-                        'brand-gray': '#161616',
-                        'brand-card': '#1E1E1E'
-                    }
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'brand-yellow': '#FFF200',
+                    'brand-dark': '#0B0B0B',
+                    'brand-gray': '#161616',
+                    'brand-card': '#1E1E1E'
                 }
             }
         }
-    </script>
+    }
+</script>
 
-    <style>
-        html { font-size: 130%; }
-        /* ✅ 反黑閃：body 背景由 html[data-theme] 控制 */
-        body { 
-            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        }
-        .text-xs, .text-\[11px\] {
-            font-size: 18px !important;
-            line-height: 1.5;
-        }
-        input, select {
-            padding-top: 0.5rem !important;
-            padding-bottom: 0.5rem !important;
-        }
-        #date, #time, #flight_no {
-            padding-top: 0.25rem !important;
-            padding-bottom: 0.25rem !important;
-        }
+<style>
+    html { font-size: 130%; }
+    body { 
+        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+    }
+    .text-xs, .text-\[11px\] {
+        font-size: 18px !important;
+        line-height: 1.5;
+    }
+    input, select {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    #date, #time, #flight_no {
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+    }
 
-        /* ===== 訂單類型按鈕 ===== */
-        .order-type-btn {
-            width: 100%;
-            font-weight: 700;
-            font-size: 0.875rem;
-            padding: 0.5rem 0;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0.125rem;
-            min-height: 70px;
-            border: 2px solid #374151;
-            background-color: #0B0B0B;
-            color: #9CA3AF;
-        }
-        .order-type-btn:hover:not(.selected) {
-            border-color: #FFF200;
-            color: #FFF200;
-        }
-        .order-type-btn.selected {
-            background-color: #FFF200;
-            color: #000000;
-            border-color: #FFF200;
-            box-shadow: 0 10px 15px -3px rgba(255, 242, 0, 0.15);
-            animation: orderBtnPulse 2s ease-in-out infinite;
-        }
-        @keyframes orderBtnPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.82; }
-        }
+    /* ===== 訂單類型按鈕 ===== */
+    .order-type-btn {
+        width: 100%;
+        font-weight: 700;
+        font-size: 0.875rem;
+        padding: 0.5rem 0;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.125rem;
+        min-height: 70px;
+        border: 2px solid #374151;
+        background-color: #0B0B0B;
+        color: #9CA3AF;
+    }
+    .order-type-btn:hover:not(.selected) {
+        border-color: #FFF200;
+        color: #FFF200;
+    }
+    .order-type-btn.selected {
+        background-color: #FFF200;
+        color: #000000;
+        border-color: #FFF200;
+        box-shadow: 0 10px 15px -3px rgba(255, 242, 0, 0.15);
+        animation: orderBtnPulse 2s ease-in-out infinite;
+    }
+    @keyframes orderBtnPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.82; }
+    }
 
-        /* ===== 淺色主題：訂單類型按鈕 ===== */
-        body.light-theme .order-type-btn:not(.selected) {
-            background-color: #FFFFFF !important;
-            color: #000000 !important;
-            border-color: #D1D5DB !important;
-        }
-        body.light-theme .order-type-btn:not(.selected) span {
-            color: #000000 !important;
-            opacity: 1 !important;
-        }
-        body.light-theme .order-type-btn:not(.selected):hover {
-            border-color: #000000 !important;
-            color: #000000 !important;
-        }
-        body.light-theme .order-type-btn.selected {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-            border-color: #000000 !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-        }
-        body.light-theme .order-type-btn.selected span {
-            color: #000000 !important;
-            opacity: 1 !important;
-        }
+    /* ===== 淺色主題：訂單類型按鈕（body.light-theme → html.light-theme body）===== */
+    html.light-theme body .order-type-btn:not(.selected) {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        border-color: #D1D5DB !important;
+    }
+    html.light-theme body .order-type-btn:not(.selected) span {
+        color: #000000 !important;
+        opacity: 1 !important;
+    }
+    html.light-theme body .order-type-btn:not(.selected):hover {
+        border-color: #000000 !important;
+        color: #000000 !important;
+    }
+    html.light-theme body .order-type-btn.selected {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    html.light-theme body .order-type-btn.selected span {
+        color: #000000 !important;
+        opacity: 1 !important;
+    }
 
-        /* ===== 微信 CTA 按鈕 ===== */
-        .wechat-cta-btn {
-            background-color: #07C160 !important;
-            color: #FFFFFF !important;
-            border: 1px solid #07C160 !important;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            font-weight: 700;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            transition: background-color 0.2s ease, opacity 0.2s ease;
-            cursor: pointer;
-        }
-        .wechat-cta-btn:hover {
-            background-color: #06AD56 !important;
-            border-color: #06AD56 !important;
-            opacity: 1;
-        }
-        body.light-theme .wechat-cta-btn {
-            background-color: #07C160 !important;
-            color: #FFFFFF !important;
-            border-color: #07C160 !important;
-        }
-        body.light-theme .wechat-cta-btn:hover {
-            background-color: #06AD56 !important;
-            border-color: #06AD56 !important;
-        }
+    /* ===== 微信 CTA 按鈕 ===== */
+    .wechat-cta-btn {
+        background-color: #07C160 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #07C160 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-weight: 700;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        transition: background-color 0.2s ease, opacity 0.2s ease;
+        cursor: pointer;
+    }
+    .wechat-cta-btn:hover {
+        background-color: #06AD56 !important;
+        border-color: #06AD56 !important;
+        opacity: 1;
+    }
+    html.light-theme body .wechat-cta-btn {
+        background-color: #07C160 !important;
+        color: #FFFFFF !important;
+        border-color: #07C160 !important;
+    }
+    html.light-theme body .wechat-cta-btn:hover {
+        background-color: #06AD56 !important;
+        border-color: #06AD56 !important;
+    }
 
-        /* ===== 淺色主題：預約頁面專屬 ===== */
-        body.light-theme #booking-section a[href="index.html"],
-        body.light-theme #booking-section a[href="fleet.html"],
-        body.light-theme #booking-section button[onclick*="index.html"],
-        body.light-theme #booking-section button[onclick*="fleet.html"] {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-        body.light-theme #booking-submit-btn {
-            border: 1px solid #000000 !important;
-        }
-        body.light-theme .bg-green-600\/10 {
-            background-color: rgba(22, 163, 74, 0.1) !important;
-        }
-        body.light-theme .text-green-400 {
-            color: #15803D !important;
-        }
+    /* ===== 淺色主題：預約頁面專屬 ===== */
+    html.light-theme body #booking-section a[href="index.html"],
+    html.light-theme body #booking-section a[href="fleet.html"],
+    html.light-theme body #booking-section button[onclick*="index.html"],
+    html.light-theme body #booking-section button[onclick*="fleet.html"] {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+    html.light-theme body #booking-submit-btn {
+        border: 1px solid #000000 !important;
+    }
+    html.light-theme body .bg-green-600\/10 {
+        background-color: rgba(22, 163, 74, 0.1) !important;
+    }
+    html.light-theme body .text-green-400 {
+        color: #15803D !important;
+    }
 
-        /* ===== 淺色主題：所有 label 文字轉黑 ===== */
-        body.light-theme .text-gray-200,
-        body.light-theme .text-gray-300 {
-            color: #000000 !important;
-        }
+    /* ===== 淺色主題：所有 label 文字轉黑 ===== */
+    html.light-theme body .text-gray-200,
+    html.light-theme body .text-gray-300 {
+        color: #000000 !important;
+    }
 
-        /* ===== 淺色主題：輸入框 / 下拉選單（全部白色） ===== */
-        body.light-theme input[type="text"],
-        body.light-theme input[type="tel"],
-        body.light-theme input[type="date"],
-        body.light-theme input[type="time"],
-        body.light-theme select,
-        body.light-theme #flight_no,
-        body.light-theme #date,
-        body.light-theme #time,
-        body.light-theme #passengers,
-        body.light-theme #luggages,
-        body.light-theme #contact_title,
-        body.light-theme #contact_surname {
-            background-color: #FFFFFF !important;
-            border-color: #D1D5DB !important;
-            color: #000000 !important;
-        }
-        body.light-theme input[type="text"]:focus,
-        body.light-theme input[type="tel"]:focus,
-        body.light-theme input[type="date"]:focus,
-        body.light-theme input[type="time"]:focus,
-        body.light-theme select:focus,
-        body.light-theme #flight_no:focus,
-        body.light-theme #date:focus,
-        body.light-theme #time:focus,
-        body.light-theme #passengers:focus,
-        body.light-theme #luggages:focus,
-        body.light-theme #contact_title:focus,
-        body.light-theme #contact_surname:focus {
-            background-color: #FFFFFF !important;
-            border-color: #000000 !important;
-        }
-        /* 包住日期 / 時間嘅外框 */
-        body.light-theme #datetime-container > div > div {
-            background-color: #FFFFFF !important;
-            border-color: #D1D5DB !important;
-        }
+    /* ===== 淺色主題：輸入框 / 下拉選單（全部白色） ===== */
+    html.light-theme body input[type="text"],
+    html.light-theme body input[type="tel"],
+    html.light-theme body input[type="date"],
+    html.light-theme body input[type="time"],
+    html.light-theme body select,
+    html.light-theme body #flight_no,
+    html.light-theme body #date,
+    html.light-theme body #time,
+    html.light-theme body #passengers,
+    html.light-theme body #luggages,
+    html.light-theme body #contact_title,
+    html.light-theme body #contact_surname {
+        background-color: #FFFFFF !important;
+        border-color: #D1D5DB !important;
+        color: #000000 !important;
+    }
+    html.light-theme body input[type="text"]:focus,
+    html.light-theme body input[type="tel"]:focus,
+    html.light-theme body input[type="date"]:focus,
+    html.light-theme body input[type="time"]:focus,
+    html.light-theme body select:focus,
+    html.light-theme body #flight_no:focus,
+    html.light-theme body #date:focus,
+    html.light-theme body #time:focus,
+    html.light-theme body #passengers:focus,
+    html.light-theme body #luggages:focus,
+    html.light-theme body #contact_title:focus,
+    html.light-theme body #contact_surname:focus {
+        background-color: #FFFFFF !important;
+        border-color: #000000 !important;
+    }
+    /* 包住日期 / 時間嘅外框 */
+    html.light-theme body #datetime-container > div > div {
+        background-color: #FFFFFF !important;
+        border-color: #D1D5DB !important;
+    }
 
-        /* ===== 淺色主題：只有電話號碼一格 = 半透明黃底 ===== */
-        body.light-theme #phone {
-            background-color: rgba(255, 242, 0, 0.35) !important;
-            border-color: rgba(0, 0, 0, 0.3) !important;
-            color: #000000 !important;
-        }
-        body.light-theme #phone:focus {
-            background-color: rgba(255, 242, 0, 0.5) !important;
-            border-color: #000000 !important;
-        }
+    /* ===== 淺色主題：只有電話號碼一格 = 半透明黃底 ===== */
+    html.light-theme body #phone {
+        background-color: rgba(255, 242, 0, 0.35) !important;
+        border-color: rgba(0, 0, 0, 0.3) !important;
+        color: #000000 !important;
+    }
+    html.light-theme body #phone:focus {
+        background-color: rgba(255, 242, 0, 0.5) !important;
+        border-color: #000000 !important;
+    }
 
-        /* ===== 淺色主題：升級彈窗 ===== */
-        body.light-theme #upgrade-modal > div {
-            background-color: #FFFFFF !important;
-            border-color: #000000 !important;
-        }
-        body.light-theme #upgrade-modal h3 {
-            color: #000000 !important;
-        }
-        body.light-theme #upgrade-modal p {
-            color: #374151 !important;
-        }
-        body.light-theme #upgrade-modal .text-brand-yellow {
-            color: #000000 !important;
-            font-weight: bold !important;
-        }
-    </style>
+    /* ===== 淺色主題：升級彈窗 ===== */
+    html.light-theme body #upgrade-modal > div {
+        background-color: #FFFFFF !important;
+        border-color: #000000 !important;
+    }
+    html.light-theme body #upgrade-modal h3 {
+        color: #000000 !important;
+    }
+    html.light-theme body #upgrade-modal p {
+        color: #374151 !important;
+    }
+    html.light-theme body #upgrade-modal .text-brand-yellow {
+        color: #000000 !important;
+        font-weight: bold !important;
+    }
+</style>
 </head>
 <body class="antialiased">
 

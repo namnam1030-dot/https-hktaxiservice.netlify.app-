@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
 
 <!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
 <script>
@@ -15,13 +18,31 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-    var bg = isLight ? '#FFFFFF' : '#0B0B0B';
-    var fg = isLight ? '#000000' : '#FFFFFF';
-    document.documentElement.style.backgroundColor = bg;
-    document.documentElement.style.color = fg;
-    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    var root = document.documentElement;
+
+    // ⭐ 即刻落 class 落 <html>
+    root.classList.toggle('light-theme', isLight);
+
+    // 底色 + data-theme
+    root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+    root.style.color           = isLight ? '#000000' : '#FFFFFF';
+    root.style.colorScheme     = isLight ? 'light' : 'dark';
+    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    // ⭐ body 一出現即補 class
+    if (isLight) {
+        var obs = new MutationObserver(function() {
+            if (document.body) {
+                document.body.classList.add('light-theme');
+                obs.disconnect();
+            }
+        });
+        obs.observe(root, { childList: true });
+    }
 })();
 </script>
+
 <style>
     html[data-theme="light"],
     html[data-theme="light"] body {
@@ -33,13 +54,19 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
+
+    /* ⭐ 新增：html.light-theme 一落即生效 */
+    html.light-theme,
+    html.light-theme body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
 </style>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>選擇車款 | 八五折的士 | 豪華六座位的士 | 輪椅的士 | 機場口岸接送</title>
 
@@ -95,128 +122,128 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- ⭐ 由 black-translucent 改為 default -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="theme.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="theme.css">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-yellow': '#FFF200',
-                        'brand-dark': '#0B0B0B',
-                        'brand-gray': '#161616',
-                        'brand-card': '#1E1E1E'
-                    }
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'brand-yellow': '#FFF200',
+                    'brand-dark': '#0B0B0B',
+                    'brand-gray': '#161616',
+                    'brand-card': '#1E1E1E'
                 }
             }
         }
-    </script>
+    }
+</script>
 
-    <style>
-        html { font-size: 130%; }
-        /* ✅ 反黑閃：body 背景由 html[data-theme] 控制 */
-        body { 
-            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        }
-        .text-xs, .text-\[11px\] {
-            font-size: 18px !important;
-            line-height: 1.5;
-        }
+<style>
+    html { font-size: 130%; }
+    body { 
+        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+    }
+    .text-xs, .text-\[11px\] {
+        font-size: 18px !important;
+        line-height: 1.5;
+    }
 
-        /* ===== 車款卡片專屬 ===== */
-        .car-image {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .car-image:hover { transform: scale(1.08); }
-        .car-image-container { position: relative; }
-        .car-image-container::after {
-            content: '🔍';
-            position: absolute;
-            bottom: 4px;
-            right: 4px;
-            font-size: 12px;
-            background: rgba(0,0,0,0.7);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    /* ===== 車款卡片專屬 ===== */
+    .car-image {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .car-image:hover { transform: scale(1.08); }
+    .car-image-container { position: relative; }
+    .car-image-container::after {
+        content: '🔍';
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        font-size: 12px;
+        background: rgba(0,0,0,0.7);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        /* ===== 即減優惠動畫 ===== */
-        @keyframes pulse-red {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        .instant-discount-badge { animation: pulse-red 1.5s infinite; }
+    /* ===== 即減優惠動畫 ===== */
+    @keyframes pulse-red {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    .instant-discount-badge { animation: pulse-red 1.5s infinite; }
 
-        /* ===== 豐田正價/八五折按鈕 ===== */
-        .toyota-mode-btn-active {
-            background-color: #FFF200;
-            color: #000000;
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(255,242,0,0.4);
-        }
-        .toyota-mode-btn-inactive {
-            background-color: transparent;
-            color: #FFF200;
-            border: 1px solid rgba(255,242,0,0.4);
-        }
-        .toyota-mode-btn-active,
-        .toyota-mode-btn-inactive {
-            font-size: 18px !important;
-            line-height: 1.5;
-        }
+    /* ===== 豐田正價/八五折按鈕 ===== */
+    .toyota-mode-btn-active {
+        background-color: #FFF200;
+        color: #000000;
+        font-weight: 700;
+        box-shadow: 0 2px 6px rgba(255,242,0,0.4);
+    }
+    .toyota-mode-btn-inactive {
+        background-color: transparent;
+        color: #FFF200;
+        border: 1px solid rgba(255,242,0,0.4);
+    }
+    .toyota-mode-btn-active,
+    .toyota-mode-btn-inactive {
+        font-size: 18px !important;
+        line-height: 1.5;
+    }
 
-        /* ===== 選中效果（方案 B：深色黃框、淺色黑框） ===== */
-        .car-card.selected-car {
-            outline: 2px solid #FFF200;
-            outline-offset: 0;
-        }
-        body.light-theme .car-card.selected-car {
-            outline: 2px solid #000000;
-        }
+    /* ===== 選中效果（方案 B：深色黃框、淺色黑框） ===== */
+    .car-card.selected-car {
+        outline: 2px solid #FFF200;
+        outline-offset: 0;
+    }
+    html.light-theme body .car-card.selected-car {
+        outline: 2px solid #000000;
+    }
 
-        /* ===== 淺色主題專屬覆蓋 ===== */
-        body.light-theme .car-card {
-            background-color: #FFFFFF !important;
-            border-color: #D1D5DB !important;
-        }
-        body.light-theme .car-card:hover {
-            border-color: #000000 !important;
-        }
-        body.light-theme .bg-neutral-950 {
-            background-color: #F3F4F6 !important;
-        }
-        body.light-theme .toyota-mode-btn-active {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-        }
-        body.light-theme .toyota-mode-btn-inactive {
-            background-color: transparent !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-        /* 返回預約頁面（淺色主題下保持黃底黑字+黑邊） */
-        body.light-theme button[onclick="backToBooking()"] {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-        body.light-theme button[onclick^="selectCarAndGoToBooking"],
-        body.light-theme button[onclick="selectToyotaCar()"] {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-    </style>
+    /* ===== 淺色主題專屬覆蓋（body.light-theme → html.light-theme body）===== */
+    html.light-theme body .car-card {
+        background-color: #FFFFFF !important;
+        border-color: #D1D5DB !important;
+    }
+    html.light-theme body .car-card:hover {
+        border-color: #000000 !important;
+    }
+    html.light-theme body .bg-neutral-950 {
+        background-color: #F3F4F6 !important;
+    }
+    html.light-theme body .toyota-mode-btn-active {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+    }
+    html.light-theme body .toyota-mode-btn-inactive {
+        background-color: transparent !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+    /* 返回預約頁面（淺色主題下保持黃底黑字+黑邊） */
+    html.light-theme body button[onclick="backToBooking()"] {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+    html.light-theme body button[onclick^="selectCarAndGoToBooking"],
+    html.light-theme body button[onclick="selectToyotaCar()"] {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+</style>
 </head>
 <body class="antialiased">
 

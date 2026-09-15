@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark light">
 
 <!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
 <script>
@@ -15,13 +18,31 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-    var bg = isLight ? '#FFFFFF' : '#0B0B0B';
-    var fg = isLight ? '#000000' : '#FFFFFF';
-    document.documentElement.style.backgroundColor = bg;
-    document.documentElement.style.color = fg;
-    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    var root = document.documentElement;
+
+    // ⭐ 即刻落 class 落 <html>
+    root.classList.toggle('light-theme', isLight);
+
+    // 底色 + data-theme
+    root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+    root.style.color           = isLight ? '#000000' : '#FFFFFF';
+    root.style.colorScheme     = isLight ? 'light' : 'dark';
+    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
+    // ⭐ body 一出現即補 class
+    if (isLight) {
+        var obs = new MutationObserver(function() {
+            if (document.body) {
+                document.body.classList.add('light-theme');
+                obs.disconnect();
+            }
+        });
+        obs.observe(root, { childList: true });
+    }
 })();
 </script>
+
 <style>
     html[data-theme="light"],
     html[data-theme="light"] body {
@@ -33,13 +54,19 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
+
+    /* ⭐ 新增：html.light-theme 一落即生效 */
+    html.light-theme,
+    html.light-theme body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
 </style>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約成功 | 八五折的士 | 24小時網約車預約確認</title>
 
@@ -95,246 +122,246 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- ⭐ 由 black-translucent 改為 default -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="theme.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="theme.css">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-yellow': '#FFF200',
-                        'brand-dark': '#0B0B0B',
-                        'brand-gray': '#161616',
-                        'brand-card': '#1E1E1E'
-                    }
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'brand-yellow': '#FFF200',
+                    'brand-dark': '#0B0B0B',
+                    'brand-gray': '#161616',
+                    'brand-card': '#1E1E1E'
                 }
             }
         }
-    </script>
-    <style>
-        /* ✅ 反黑閃：body 背景由 html[data-theme] 控制 */
-        body { 
-            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        }
+    }
+</script>
 
-        /* ===== 成功標題（emoji + 文字垂直居中） ===== */
-        .success-title {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            line-height: 1.3;
-            flex-wrap: wrap;
-        }
-        .success-title__emoji {
-            font-size: 1em;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-        }
-        .success-desc {
-            line-height: 1.6;
-        }
+<style>
+    body { 
+        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+    }
 
-        /* ===== 成功預約彈窗 ===== */
-        .booking-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, .75);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity .3s ease, visibility .3s ease;
-        }
+    /* ===== 成功標題（emoji + 文字垂直居中） ===== */
+    .success-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        line-height: 1.3;
+        flex-wrap: wrap;
+    }
+    .success-title__emoji {
+        font-size: 1em;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+    }
+    .success-desc {
+        line-height: 1.6;
+    }
 
-        .booking-modal.is-open {
-            opacity: 1;
-            visibility: visible;
-        }
+    /* ===== 成功預約彈窗 ===== */
+    .booking-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, .75);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .3s ease, visibility .3s ease;
+    }
 
-        .booking-modal__box {
-            width: 100%;
-            max-width: 400px;
-            padding: 36px 28px 28px;
-            background: #161616;
-            border: 2px solid #22c55e;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, .5);
-            transform: translateY(24px) scale(.95);
-            transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
-        }
+    .booking-modal.is-open {
+        opacity: 1;
+        visibility: visible;
+    }
 
-        .booking-modal.is-open .booking-modal__box {
-            transform: translateY(0) scale(1);
-        }
+    .booking-modal__box {
+        width: 100%;
+        max-width: 400px;
+        padding: 36px 28px 28px;
+        background: #161616;
+        border: 2px solid #22c55e;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, .5);
+        transform: translateY(24px) scale(.95);
+        transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+    }
 
-        .booking-modal__icon {
-            width: 76px;
-            height: 76px;
-            margin: 0 auto 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 38px;
-            color: #fff;
-            background: #22c55e;
-            border-radius: 50%;
-            animation: bookingPop .5s ease .15s both;
-        }
+    .booking-modal.is-open .booking-modal__box {
+        transform: translateY(0) scale(1);
+    }
 
-        @keyframes bookingPop {
-            0% { transform: scale(0); }
-            70% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
+    .booking-modal__icon {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+        color: #fff;
+        background: #22c55e;
+        border-radius: 50%;
+        animation: bookingPop .5s ease .15s both;
+    }
 
-        .booking-modal__title {
-            margin: 0 0 14px;
-            font-size: 27px;
-            font-weight: 700;
-            color: #4ade80;
-            line-height: 1.4;
-        }
+    @keyframes bookingPop {
+        0% { transform: scale(0); }
+        70% { transform: scale(1.15); }
+        100% { transform: scale(1); }
+    }
 
-        .booking-modal__text {
-            margin: 0 0 28px;
-            font-size: 21px;
-            line-height: 1.7;
-            color: #d1d5db;
-        }
+    .booking-modal__title {
+        margin: 0 0 14px;
+        font-size: 27px;
+        font-weight: 700;
+        color: #4ade80;
+        line-height: 1.4;
+    }
 
-        .booking-modal__btn {
-            width: 100%;
-            padding: 16px;
-            font-size: 22px;
-            font-weight: 700;
-            color: #000;
-            background: #FFF200;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: opacity .2s ease;
-        }
+    .booking-modal__text {
+        margin: 0 0 28px;
+        font-size: 21px;
+        line-height: 1.7;
+        color: #d1d5db;
+    }
 
-        .booking-modal__btn:active {
-            opacity: .85;
-        }
+    .booking-modal__btn {
+        width: 100%;
+        padding: 16px;
+        font-size: 22px;
+        font-weight: 700;
+        color: #000;
+        background: #FFF200;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: opacity .2s ease;
+    }
 
-        body.modal-lock {
-            overflow: hidden;
-        }
+    .booking-modal__btn:active {
+        opacity: .85;
+    }
 
-        @media (max-width: 380px) {
-            .booking-modal__title { font-size: 24px; }
-            .booking-modal__text  { font-size: 19px; }
-            .booking-modal__btn   { font-size: 20px; }
-        }
+    body.modal-lock {
+        overflow: hidden;
+    }
 
-        /* =========================================================
-           ✅ 修正 1：收合鍵必須可點擊
-           （因為收合鍵放喺 #mini-float 裏面，會繼承 pointer-events: none）
-           ========================================================= */
-        body.booking-success-page .mini-float-toggle {
-            pointer-events: auto !important;
-            cursor: pointer !important;
-        }
+    @media (max-width: 380px) {
+        .booking-modal__title { font-size: 24px; }
+        .booking-modal__text  { font-size: 19px; }
+        .booking-modal__btn   { font-size: 20px; }
+    }
 
-        /* =========================================================
-           ✅ 修正 2：WeChat 查詢按鈕用微信專用色（深淺主題都保持）
-           ========================================================= */
-        .wechat-query-btn {
-            background-color: #07C160 !important;
-            color: #FFFFFF !important;
-            border: none !important;
-        }
-        .wechat-query-btn:hover {
-            background-color: #06AD56 !important;
-            opacity: 1 !important;
-        }
-        body.light-theme .wechat-query-btn {
-            background-color: #07C160 !important;
-            color: #FFFFFF !important;
-        }
-        body.light-theme .wechat-query-btn:hover {
-            background-color: #06AD56 !important;
-        }
+    /* =========================================================
+       ✅ 修正 1：收合鍵必須可點擊
+       ========================================================= */
+    body.booking-success-page .mini-float-toggle {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+    }
 
-        /* ===== 淺色主題：成功卡片 ===== */
-        body.light-theme .bg-green-600\/20 {
-            background-color: rgba(34, 197, 94, 0.12) !important;
-        }
-        body.light-theme .border-green-500 {
-            border-color: #16A34A !important;
-        }
-        body.light-theme .text-green-300 {
-            color: #15803D !important;
-            font-weight: bold !important;
-        }
-        body.light-theme .text-green-400 {
-            color: #16A34A !important;
-        }
-        body.light-theme .bg-black\/60 {
-            background-color: #F9FAFB !important;
-            border-color: #E5E7EB !important;
-        }
-        body.light-theme #booking-details {
-            color: #000000 !important;
-        }
-        body.light-theme button[onclick="goBackToHome()"] {
-            background-color: #E5E7EB !important;
-            color: #000000 !important;
-        }
-        body.light-theme button[onclick="goBackToHome()"]:hover {
-            background-color: #D1D5DB !important;
-        }
-        body.light-theme a[href^="tel:"] {
-            background-color: #3B82F6 !important;
-            color: #FFFFFF !important;
-        }
-        /* WhatsApp 查詢按鈕 */
-        body.light-theme a[href*="wa.me"] {
-            background-color: #FFF200 !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-        /* WeCom 彈窗 */
-        body.light-theme #wecom-modal > div {
-            background-color: #FFFFFF !important;
-        }
-        body.light-theme #wecom-modal h3 {
-            color: #000000 !important;
-        }
-        body.light-theme #wecom-modal p {
-            color: #4B5563 !important;
-        }
-        /* 成功彈窗 */
-        body.light-theme .booking-modal {
-            background: rgba(0, 0, 0, .6);
-        }
-        body.light-theme .booking-modal__box {
-            background: #FFFFFF !important;
-            border-color: #16A34A !important;
-        }
-        body.light-theme .booking-modal__title {
-            color: #15803D !important;
-        }
-        body.light-theme .booking-modal__text {
-            color: #374151 !important;
-        }
-        body.light-theme .booking-modal__btn {
-            border: 1px solid #000000 !important;
-        }
-    </style>
+    /* =========================================================
+       ✅ 修正 2：WeChat 查詢按鈕用微信專用色
+       ========================================================= */
+    .wechat-query-btn {
+        background-color: #07C160 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+    }
+    .wechat-query-btn:hover {
+        background-color: #06AD56 !important;
+        opacity: 1 !important;
+    }
+    html.light-theme body .wechat-query-btn {
+        background-color: #07C160 !important;
+        color: #FFFFFF !important;
+    }
+    html.light-theme body .wechat-query-btn:hover {
+        background-color: #06AD56 !important;
+    }
+
+    /* ===== 淺色主題：成功卡片（body.light-theme → html.light-theme body）===== */
+    html.light-theme body .bg-green-600\/20 {
+        background-color: rgba(34, 197, 94, 0.12) !important;
+    }
+    html.light-theme body .border-green-500 {
+        border-color: #16A34A !important;
+    }
+    html.light-theme body .text-green-300 {
+        color: #15803D !important;
+        font-weight: bold !important;
+    }
+    html.light-theme body .text-green-400 {
+        color: #16A34A !important;
+    }
+    html.light-theme body .bg-black\/60 {
+        background-color: #F9FAFB !important;
+        border-color: #E5E7EB !important;
+    }
+    html.light-theme body #booking-details {
+        color: #000000 !important;
+    }
+    html.light-theme body button[onclick="goBackToHome()"] {
+        background-color: #E5E7EB !important;
+        color: #000000 !important;
+    }
+    html.light-theme body button[onclick="goBackToHome()"]:hover {
+        background-color: #D1D5DB !important;
+    }
+    html.light-theme body a[href^="tel:"] {
+        background-color: #3B82F6 !important;
+        color: #FFFFFF !important;
+    }
+    /* WhatsApp 查詢按鈕 */
+    html.light-theme body a[href*="wa.me"] {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+    /* WeCom 彈窗 */
+    html.light-theme body #wecom-modal > div {
+        background-color: #FFFFFF !important;
+    }
+    html.light-theme body #wecom-modal h3 {
+        color: #000000 !important;
+    }
+    html.light-theme body #wecom-modal p {
+        color: #4B5563 !important;
+    }
+    /* 成功彈窗 */
+    html.light-theme body .booking-modal {
+        background: rgba(0, 0, 0, .6);
+    }
+    html.light-theme body .booking-modal__box {
+        background: #FFFFFF !important;
+        border-color: #16A34A !important;
+    }
+    html.light-theme body .booking-modal__title {
+        color: #15803D !important;
+    }
+    html.light-theme body .booking-modal__text {
+        color: #374151 !important;
+    }
+    html.light-theme body .booking-modal__btn {
+        border: 1px solid #000000 !important;
+    }
+</style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-4 relative booking-success-page">
 

@@ -1,6 +1,9 @@
 /* =========================================================
    theme.js — 共用主題 / 浮標 / 安裝指南腳本
    適用：index / result / fleet / booking / booking-success
+   修正重點：
+   1) applyTheme 同步 toggle html + body 的 light-theme class
+   2) 初始化唔再等 DOMContentLoaded，即刻跑（防閃黑）
    ========================================================= */
 
 // ============================================
@@ -9,17 +12,24 @@
 const systemThemeQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
 
 function applyTheme(isLight) {
-    if (isLight) document.body.classList.add('light-theme');
-    else document.body.classList.remove('light-theme');
+    const root = document.documentElement;
 
-    // ✅ 反黑閃：同步更新 html data-theme + inline style
-    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
-    document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
-    document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
+    // ⭐ 關鍵：html 同 body 都同步 toggle
+    root.classList.toggle('light-theme', isLight);
+    if (document.body) {
+        document.body.classList.toggle('light-theme', isLight);
+    }
+
+    // 同步 data-theme + inline style
+    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+    root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+    root.style.color           = isLight ? '#000000' : '#FFFFFF';
+    root.style.colorScheme     = isLight ? 'light' : 'dark';
 }
 
 function toggleTheme() {
-    const isCurrentlyLight = document.body.classList.contains('light-theme');
+    // 以 html 為準（inline script 可能已經幫 html 加咗 class）
+    const isCurrentlyLight = document.documentElement.classList.contains('light-theme');
     const newIsLight = !isCurrentlyLight;
     applyTheme(newIsLight);
     localStorage.setItem('taxiTheme', newIsLight ? 'light' : 'dark');
@@ -175,13 +185,22 @@ function closeInstallGuide() {
 
 // ============================================
 // 自動初始化
+// script 喺 </body> 前，DOM 已 ready，唔使等 DOMContentLoaded
 // ============================================
+
+// 1) 主題：立即套用（最重要，防閃黑）
+initTheme();
+setupSystemThemeListener();
+
+// 2) 浮標 toggle：DOM 已 ready
+setupMiniFloatToggleButton();
+initMiniFloat();
+
+// 3) header 高度相關：等 layout 穩定後再校正
+adjustBodyPaddingForHeader();
+
+// 4) 依賴 DOMContentLoaded 的收尾
 document.addEventListener('DOMContentLoaded', function() {
-    initTheme();
-    setupSystemThemeListener();
-    initMiniFloat();
-    setupMiniFloatToggleButton();
-    adjustBodyPaddingForHeader();
     setupHeaderResizeObserver();
 });
 

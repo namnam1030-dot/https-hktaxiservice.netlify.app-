@@ -1,8 +1,21 @@
 /* =========================================================
-   theme.css — 共用主題樣式
+   theme.css — 共用主題樣式（防淺色閃黑修正版）
    桌面：hover 縮小
    手機：按下（active）縮小，放手回復
+   修正重點：
+   1) 所有淺色 override 改用 html.light-theme body（class 落 html 即生效）
+   2) html.light-theme 自身亦設底色（防 document 交接空檔）
    ========================================================= */
+
+/* ===== 主題根：inline script 一落 class 即生效 ===== */
+html.light-theme {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
+html.light-theme body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
 
 @keyframes themeBlink {
     0%, 100% { opacity: 1; }
@@ -92,9 +105,10 @@
 .mini-float-btn.apps:hover { background-color: #00E5A0; color: #000000; }
 .mini-float-btn.theme { color: #FFFFFF; border-color: #FFFFFF; }
 .mini-float-btn.theme:hover { background-color: #FFFFFF; color: #000000; }
-body.light-theme .mini-float-btn.lang { background-color: #000000; color: #FFF200; border-color: #FFF200; }
-body.light-theme .mini-float-btn.apps { background-color: #000000; color: #00E5A0; border-color: #00E5A0; }
-body.light-theme .mini-float-btn.theme { background-color: #000000; color: #FFFFFF; border-color: #FFFFFF; }
+
+html.light-theme body .mini-float-btn.lang { background-color: #000000; color: #FFF200; border-color: #FFF200; }
+html.light-theme body .mini-float-btn.apps { background-color: #000000; color: #00E5A0; border-color: #00E5A0; }
+html.light-theme body .mini-float-btn.theme { background-color: #000000; color: #FFFFFF; border-color: #FFFFFF; }
 
 body.booking-success-page #mini-float {
     position: relative;
@@ -129,69 +143,37 @@ button[onclick*="removeStopoverField"]:hover {
 }
 
 /* =========================================================
-   ✅ 黃色按鈕縮小效果
-   - 桌面（支援 hover）：移上去縮小
-   - 手機 / 平板：按下（active）縮小，放手回復
+   ✅ 黃色按鈕縮小效果（桌面 hover / 全裝置 active）
    ========================================================= */
 
 /* 1) 桌面 hover 縮小 */
 @media (hover: hover) and (pointer: fine) {
-
-    body:not(.light-theme) #voice-btn:hover,
-    body:not(.light-theme) button[onclick*="clearAllInputs"]:hover,
-    body:not(.light-theme) button[onclick*="swapLocations"]:hover,
-    body:not(.light-theme) #add-stop-btn:hover,
-    body:not(.light-theme) button[onclick*="removeStopoverField"]:hover,
-    body:not(.light-theme) button[onclick*="calculateAndGoToResult"]:hover,
-    body:not(.light-theme) button.bg-brand-yellow:hover,
-    body:not(.light-theme) a.bg-brand-yellow:not(#whatsapp-btn):hover,
-    body:not(.light-theme) .order-type-btn.selected:hover,
-    body:not(.light-theme) .booking-modal__btn:hover {
+    #voice-btn:hover,
+    button[onclick*="clearAllInputs"]:hover,
+    button[onclick*="swapLocations"]:hover,
+    #add-stop-btn:hover,
+    button[onclick*="removeStopoverField"]:hover,
+    button[onclick*="calculateAndGoToResult"]:hover,
+    button.bg-brand-yellow:hover,
+    a.bg-brand-yellow:not(#whatsapp-btn):hover,
+    .order-type-btn.selected:hover,
+    .booking-modal__btn:hover {
         transform: scale(0.96) !important;
         transition: transform 0.15s ease !important;
     }
-
-    body.light-theme #voice-btn:hover,
-    body.light-theme button[onclick*="clearAllInputs"]:hover,
-    body.light-theme button[onclick*="swapLocations"]:hover,
-    body.light-theme #add-stop-btn:hover,
-    body.light-theme button[onclick*="removeStopoverField"]:hover,
-    body.light-theme button[onclick*="calculateAndGoToResult"]:hover,
-    body.light-theme button.bg-brand-yellow:hover,
-    body.light-theme a.bg-brand-yellow:not(#whatsapp-btn):hover,
-    body.light-theme .order-type-btn.selected:hover,
-    body.light-theme .booking-modal__btn:hover {
-        transform: scale(0.96) !important;
-        transition: transform 0.15s ease !important;
-    }
-
 }
 
 /* 2) 所有裝置：按下（active）縮小，放手回復 */
-body:not(.light-theme) #voice-btn:active,
-body:not(.light-theme) button[onclick*="clearAllInputs"]:active,
-body:not(.light-theme) button[onclick*="swapLocations"]:active,
-body:not(.light-theme) #add-stop-btn:active,
-body:not(.light-theme) button[onclick*="removeStopoverField"]:active,
-body:not(.light-theme) button[onclick*="calculateAndGoToResult"]:active,
-body:not(.light-theme) button.bg-brand-yellow:active,
-body:not(.light-theme) a.bg-brand-yellow:not(#whatsapp-btn):active,
-body:not(.light-theme) .order-type-btn.selected:active,
-body:not(.light-theme) .booking-modal__btn:active {
-    transform: scale(0.96) !important;
-    transition: transform 0.1s ease !important;
-}
-
-body.light-theme #voice-btn:active,
-body.light-theme button[onclick*="clearAllInputs"]:active,
-body.light-theme button[onclick*="swapLocations"]:active,
-body.light-theme #add-stop-btn:active,
-body.light-theme button[onclick*="removeStopoverField"]:active,
-body.light-theme button[onclick*="calculateAndGoToResult"]:active,
-body.light-theme button.bg-brand-yellow:active,
-body.light-theme a.bg-brand-yellow:not(#whatsapp-btn):active,
-body.light-theme .order-type-btn.selected:active,
-body.light-theme .booking-modal__btn:active {
+#voice-btn:active,
+button[onclick*="clearAllInputs"]:active,
+button[onclick*="swapLocations"]:active,
+#add-stop-btn:active,
+button[onclick*="removeStopoverField"]:active,
+button[onclick*="calculateAndGoToResult"]:active,
+button.bg-brand-yellow:active,
+a.bg-brand-yellow:not(#whatsapp-btn):active,
+.order-type-btn.selected:active,
+.booking-modal__btn:active {
     transform: scale(0.96) !important;
     transition: transform 0.1s ease !important;
 }
@@ -219,12 +201,12 @@ body.light-theme .booking-modal__btn:active {
     border-color: #06AD56 !important;
     opacity: 1;
 }
-body.light-theme .wechat-cta-btn {
+html.light-theme body .wechat-cta-btn {
     background-color: #07C160 !important;
     color: #FFFFFF !important;
     border-color: #07C160 !important;
 }
-body.light-theme .wechat-cta-btn:hover {
+html.light-theme body .wechat-cta-btn:hover {
     background-color: #06AD56 !important;
     border-color: #06AD56 !important;
 }
@@ -238,11 +220,11 @@ body.light-theme .wechat-cta-btn:hover {
     background-color: #06AD56 !important;
     color: #FFFFFF !important;
 }
-body.light-theme .wechat-query-btn {
+html.light-theme body .wechat-query-btn {
     background-color: #07C160 !important;
     color: #FFFFFF !important;
 }
-body.light-theme .wechat-query-btn:hover {
+html.light-theme body .wechat-query-btn:hover {
     background-color: #06AD56 !important;
     color: #FFFFFF !important;
 }
@@ -257,12 +239,12 @@ body.light-theme .wechat-query-btn:hover {
     color: #FFFFFF !important;
     border-color: #06AD56 !important;
 }
-body.light-theme #wechat-btn {
+html.light-theme body #wechat-btn {
     background-color: #07C160 !important;
     color: #FFFFFF !important;
     border-color: #07C160 !important;
 }
-body.light-theme #wechat-btn:hover {
+html.light-theme body #wechat-btn:hover {
     background-color: #06AD56 !important;
     color: #FFFFFF !important;
     border-color: #06AD56 !important;
@@ -279,12 +261,12 @@ body.light-theme #wechat-btn:hover {
     color: #FFFFFF !important;
     border-color: #1EBE5D !important;
 }
-body.light-theme #whatsapp-btn {
+html.light-theme body #whatsapp-btn {
     background-color: #25D366 !important;
     color: #FFFFFF !important;
     border-color: #25D366 !important;
 }
-body.light-theme #whatsapp-btn:hover {
+html.light-theme body #whatsapp-btn:hover {
     background-color: #1EBE5D !important;
     color: #FFFFFF !important;
     border-color: #1EBE5D !important;
@@ -293,75 +275,87 @@ body.light-theme #whatsapp-btn:hover {
 /* =========================================================
    淺色主題
    ========================================================= */
-body.light-theme {
+html.light-theme body {
     background-color: #FFFFFF !important;
     color: #000000 !important;
 }
-body.light-theme .bg-brand-dark,
-body.light-theme .bg-brand-gray,
-body.light-theme .bg-brand-card {
+html.light-theme body .bg-brand-dark,
+html.light-theme body .bg-brand-gray,
+html.light-theme body .bg-brand-card {
     background-color: #FFFFFF !important;
 }
-body.light-theme .text-white { color: #000000 !important; }
-body.light-theme .text-gray-300,
-body.light-theme .text-gray-400 { color: #374151 !important; }
-body.light-theme .text-gray-500 { color: #6B7280 !important; }
-body.light-theme .text-gray-600 { color: #4B5563 !important; }
-body.light-theme .text-brand-yellow { color: #000000 !important; font-weight: bold !important; }
-body.light-theme .border-gray-800,
-body.light-theme .border-gray-800\/80,
-body.light-theme .border-gray-700 { border-color: #D1D5DB !important; }
+html.light-theme body .text-white { color: #000000 !important; }
+html.light-theme body .text-gray-300,
+html.light-theme body .text-gray-400 { color: #374151 !important; }
+html.light-theme body .text-gray-500 { color: #6B7280 !important; }
+html.light-theme body .text-gray-600 { color: #4B5563 !important; }
+html.light-theme body .text-brand-yellow { color: #000000 !important; font-weight: bold !important; }
+html.light-theme body .border-gray-800,
+html.light-theme body .border-gray-800\/80,
+html.light-theme body .border-gray-700 { border-color: #D1D5DB !important; }
 
-body.light-theme .bg-gray-900\/90,
-body.light-theme .bg-gray-900\/80 {
+html.light-theme body .bg-gray-900\/90,
+html.light-theme body .bg-gray-900\/80 {
     background-color: #F9FAFB !important;
     border-color: #D1D5DB !important;
     color: #000000 !important;
 }
-body.light-theme .bg-gray-900\/90 .text-white,
-body.light-theme .bg-gray-900\/80 .text-white {
+html.light-theme body .bg-gray-900\/90 .text-white,
+html.light-theme body .bg-gray-900\/80 .text-white {
     color: #000000 !important;
 }
 
-body.light-theme input[type="text"],
-body.light-theme input[type="tel"],
-body.light-theme input[type="date"],
-body.light-theme input[type="time"],
-body.light-theme select {
+html.light-theme body input[type="text"],
+html.light-theme body input[type="tel"],
+html.light-theme body input[type="date"],
+html.light-theme body input[type="time"],
+html.light-theme body select {
     background-color: rgba(255, 242, 0, 0.35) !important;
     border-color: rgba(0, 0, 0, 0.3) !important;
     color: #000000 !important;
 }
-body.light-theme input[type="text"]:focus,
-body.light-theme input[type="tel"]:focus,
-body.light-theme input[type="date"]:focus,
-body.light-theme input[type="time"]:focus,
-body.light-theme select:focus {
+html.light-theme body input[type="text"]:focus,
+html.light-theme body input[type="tel"]:focus,
+html.light-theme body input[type="date"]:focus,
+html.light-theme body input[type="time"]:focus,
+html.light-theme body select:focus {
     background-color: rgba(255, 242, 0, 0.5) !important;
     border-color: #000000 !important;
 }
-body.light-theme input[type="date"],
-body.light-theme input[type="time"] { color-scheme: light !important; }
+html.light-theme body input[type="date"],
+html.light-theme body input[type="time"] { color-scheme: light !important; }
 
-body.light-theme .bg-brand-yellow\/10 { background-color: rgba(255, 242, 0, 0.3) !important; }
-body.light-theme .bg-black\/50 { background-color: rgba(255, 242, 0, 0.15) !important; }
-body.light-theme .bg-black\/60 { background-color: #F9FAFB !important; }
+html.light-theme body .bg-brand-yellow\/10 { background-color: rgba(255, 242, 0, 0.3) !important; }
+html.light-theme body .bg-black\/50 { background-color: rgba(255, 242, 0, 0.15) !important; }
+html.light-theme body .bg-black\/60 { background-color: #F9FAFB !important; }
 
-body.light-theme #install-guide-content {
+html.light-theme body #install-guide-content {
     background-color: #F9FAFB !important;
     border-color: #E5E7EB !important;
     color: #374151 !important;
 }
-body.light-theme #install-guide-content .text-brand-yellow { color: #000000 !important; }
+html.light-theme body #install-guide-content .text-brand-yellow { color: #000000 !important; }
 
 /* 淺色主題：頁面專屬按鈕（統一 1px 黑框） */
-body.light-theme #voice-btn,
-body.light-theme button[onclick*="clearAllInputs"],
-body.light-theme button[onclick*="swapLocations"],
-body.light-theme #add-stop-btn,
-body.light-theme button[onclick*="removeStopoverField"],
-body.light-theme button[onclick*="calculateAndGoToResult"] {
+html.light-theme body #voice-btn,
+html.light-theme body button[onclick*="clearAllInputs"],
+html.light-theme body button[onclick*="swapLocations"],
+html.light-theme body #add-stop-btn,
+html.light-theme body button[onclick*="removeStopoverField"],
+html.light-theme body button[onclick*="calculateAndGoToResult"] {
     background-color: #FFF200 !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
+}
+
+/* =========================================================
+   View Transitions（可選）：MPA 轉頁自動 cross-fade
+   Chrome 126+ / Safari 18+ 支援，其他瀏覽器無副作用
+   ========================================================= */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.18s;
+    animation-timing-function: ease-out;
 }
