@@ -57,6 +57,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="theme.css">
+
     <script>
         tailwind.config = {
             theme: {
@@ -76,6 +78,26 @@
             background-color: #0B0B0B; 
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        /* ===== 成功標題（emoji + 文字垂直居中） ===== */
+        .success-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            line-height: 1.3;
+            flex-wrap: wrap;
+        }
+        .success-title__emoji {
+            font-size: 1em;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+        .success-desc {
+            line-height: 1.6;
         }
 
         /* ===== 成功預約彈窗 ===== */
@@ -171,30 +193,162 @@
             overflow: hidden;
         }
 
-        /* 細螢幕微調 */
         @media (max-width: 380px) {
             .booking-modal__title { font-size: 24px; }
             .booking-modal__text  { font-size: 19px; }
             .booking-modal__btn   { font-size: 20px; }
         }
+
+        /* =========================================================
+           ✅ 修正 1：收合鍵必須可點擊
+           （因為收合鍵放喺 #mini-float 裏面，會繼承 pointer-events: none）
+           ========================================================= */
+        body.booking-success-page .mini-float-toggle {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        /* =========================================================
+           ✅ 修正 2：WeChat 查詢按鈕用微信專用色（深淺主題都保持）
+           ========================================================= */
+        .wechat-query-btn {
+            background-color: #07C160 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+        }
+        .wechat-query-btn:hover {
+            background-color: #06AD56 !important;
+            opacity: 1 !important;
+        }
+        body.light-theme .wechat-query-btn {
+            background-color: #07C160 !important;
+            color: #FFFFFF !important;
+        }
+        body.light-theme .wechat-query-btn:hover {
+            background-color: #06AD56 !important;
+        }
+
+        /* ===== 淺色主題：成功卡片 ===== */
+        body.light-theme .bg-green-600\/20 {
+            background-color: rgba(34, 197, 94, 0.12) !important;
+        }
+        body.light-theme .border-green-500 {
+            border-color: #16A34A !important;
+        }
+        body.light-theme .text-green-300 {
+            color: #15803D !important;
+            font-weight: bold !important;
+        }
+        body.light-theme .text-green-400 {
+            color: #16A34A !important;
+        }
+        body.light-theme .bg-black\/60 {
+            background-color: #F9FAFB !important;
+            border-color: #E5E7EB !important;
+        }
+        body.light-theme #booking-details {
+            color: #000000 !important;
+        }
+        body.light-theme button[onclick="goBackToHome()"] {
+            background-color: #E5E7EB !important;
+            color: #000000 !important;
+        }
+        body.light-theme button[onclick="goBackToHome()"]:hover {
+            background-color: #D1D5DB !important;
+        }
+        body.light-theme a[href^="tel:"] {
+            background-color: #3B82F6 !important;
+            color: #FFFFFF !important;
+        }
+        /* WhatsApp 查詢按鈕 */
+        body.light-theme a[href*="wa.me"] {
+            background-color: #FFF200 !important;
+            color: #000000 !important;
+            border: 1px solid #000000 !important;
+        }
+        /* WeCom 彈窗 */
+        body.light-theme #wecom-modal > div {
+            background-color: #FFFFFF !important;
+        }
+        body.light-theme #wecom-modal h3 {
+            color: #000000 !important;
+        }
+        body.light-theme #wecom-modal p {
+            color: #4B5563 !important;
+        }
+        /* 成功彈窗 */
+        body.light-theme .booking-modal {
+            background: rgba(0, 0, 0, .6);
+        }
+        body.light-theme .booking-modal__box {
+            background: #FFFFFF !important;
+            border-color: #16A34A !important;
+        }
+        body.light-theme .booking-modal__title {
+            color: #15803D !important;
+        }
+        body.light-theme .booking-modal__text {
+            color: #374151 !important;
+        }
+        body.light-theme .booking-modal__btn {
+            border: 1px solid #000000 !important;
+        }
     </style>
 </head>
-<body class="antialiased min-h-screen flex items-center justify-center p-4 relative">
-    
-    <!-- 右上角語言切換按鈕 -->
-    <button onclick="toggleLanguage()" id="lang-toggle-btn" class="fixed top-4 right-4 bg-black text-white px-3 py-1.5 rounded font-bold text-sm hover:opacity-80 transition cursor-pointer z-50 border border-gray-700">
-        EN
-    </button>
+<body class="antialiased min-h-screen flex items-center justify-center p-4 relative booking-success-page">
+
+    <!-- ===== 安裝指南彈窗 ===== -->
+    <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-brand-yellow text-3xl mb-3">
+                <i class="fa-solid fa-circle-down animate-bounce"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
+                為了方便下次叫車，您可以將本服務加到手機主畫面：
+            </p>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
+            </div>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+                了解，關閉
+            </button>
+        </div>
+    </div>
 
     <div class="w-full max-w-2xl">
+
+        <!-- ===== 收合鍵（喺綠色框外面上方，右對齊） ===== -->
+        <div class="flex justify-end mb-2">
+            <div id="mini-float" class="minimized">
+                <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
+                    <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
+                </button>
+                <div class="mini-float-btns">
+                    <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
+                    <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </button>
+                    <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色">
+                        <i class="fa-solid fa-circle-half-stroke"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 綠色大方框 -->
         <div class="bg-green-600/20 border-2 border-green-500 rounded-2xl p-6">
+
             <div class="text-center mb-6">
                 <i class="fa-solid fa-check-circle text-green-400 text-5xl mb-3"></i>
-                <h1 class="text-green-300 font-bold text-3xl mb-2">
-                    <span>✅</span> <span data-i18n="success_title">預約訂單已成功送出！</span>
+                <h1 class="text-green-300 font-bold text-3xl mb-2 success-title">
+                    <span class="success-title__emoji">✅</span>
+                    <span data-i18n="success_title">預約訂單已成功送出！</span>
                 </h1>
-                <p class="text-gray-300 text-xl mt-2" data-i18n-html="success_desc">
-                    我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認
+                <p class="text-gray-300 text-xl mt-2 success-desc" data-i18n-html="success_desc">
+                    我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
                 </p>
             </div>
             
@@ -211,7 +365,7 @@
                     <i class="fa-brands fa-whatsapp text-xl"></i> <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
                 </a>
                 
-                <button onclick="showWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                <button onclick="showWeComQR()" class="wechat-query-btn w-full font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                     <i class="fa-brands fa-weixin text-xl"></i> <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
                 </button>
 
@@ -263,138 +417,147 @@
         </div>
     </div>
 
-    <script>
-        let currentLang = localStorage.getItem('taxiLang') || 'zh';
+<script>
+// ============================================
+// 語言系統（頁面專屬）
+// ============================================
+let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
-        const translations = {
-            zh: {
-                success_title: "預約訂單已成功送出！",
-                success_desc: "我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認",
-                success_contact_prompt: "如有急需，可以直接聯絡我哋：",
-                btn_whatsapp_inquiry: "WhatsApp 查詢",
-                btn_wechat_inquiry: "WeChat 查詢",
-                btn_call_now: "致電 6881 5441",
-                btn_back_home: "返回主頁",
-                wecom_modal_title: "掃描二維碼添加企業微信",
-                wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
-                btn_close: "關閉",
-                no_booking_data: "冇訂單資料",
-                popup_title: "預約訂單已成功送出！",
-                popup_desc: "我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認",
-                popup_btn: "知道喇"
-            },
-            en: {
-                success_title: "Booking Submitted Successfully!",
-                success_desc: "We will confirm via <br>WhatsApp or phone within 5-10 minutes",
-                success_contact_prompt: "For urgent matters, contact us directly:",
-                btn_whatsapp_inquiry: "WhatsApp Enquiry",
-                btn_wechat_inquiry: "WeChat Enquiry",
-                btn_call_now: "Call 6881 5441",
-                btn_back_home: "Back to Home",
-                wecom_modal_title: "Scan QR Code to Add WeCom",
-                wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
-                btn_close: "Close",
-                no_booking_data: "No booking data",
-                popup_title: "Booking Submitted Successfully!",
-                popup_desc: "We will confirm via<br>WhatsApp or phone within 5-10 minutes",
-                popup_btn: "Got it"
-            }
-        };
+const translations = {
+    zh: {
+        success_title: "預約訂單已成功送出！",
+        success_desc: "我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認",
+        success_contact_prompt: "如有急需，可以直接聯絡我哋：",
+        btn_whatsapp_inquiry: "WhatsApp 查詢",
+        btn_wechat_inquiry: "WeChat 查詢",
+        btn_call_now: "致電 6881 5441",
+        btn_back_home: "返回主頁",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        btn_close: "關閉",
+        no_booking_data: "冇訂單資料",
+        popup_title: "預約訂單已成功送出！",
+        popup_desc: "我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認",
+        popup_btn: "知道喇",
+        modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
+        btn_close_guide: "了解，關閉"
+    },
+    en: {
+        success_title: "Booking Submitted Successfully!",
+        success_desc: "We will confirm via <br>WhatsApp or phone within 5-10 minutes",
+        success_contact_prompt: "For urgent matters, contact us directly:",
+        btn_whatsapp_inquiry: "WhatsApp Enquiry",
+        btn_wechat_inquiry: "WeChat Enquiry",
+        btn_call_now: "Call 6881 5441",
+        btn_back_home: "Back to Home",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        btn_close: "Close",
+        no_booking_data: "No booking data",
+        popup_title: "Booking Submitted Successfully!",
+        popup_desc: "We will confirm via<br>WhatsApp or phone within 5-10 minutes",
+        popup_btn: "Got it",
+        modal_title: "Add to Home Screen",
+        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
+        btn_close_guide: "Got it, Close"
+    }
+};
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'zh' ? 'en' : 'zh';
-            localStorage.setItem('taxiLang', currentLang);
-            applyLanguage();
+function toggleLanguage() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    localStorage.setItem('taxiLang', currentLang);
+    applyLanguage();
+}
+
+function applyLanguage() {
+    const btn = document.getElementById('lang-toggle-btn');
+    if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
         }
+    });
 
-        function applyLanguage() {
-            const btn = document.getElementById('lang-toggle-btn');
-            if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
-
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[currentLang] && translations[currentLang][key]) {
-                    el.textContent = translations[currentLang][key];
-                }
-            });
-
-            document.querySelectorAll('[data-i18n-html]').forEach(el => {
-                const key = el.getAttribute('data-i18n-html');
-                if (translations[currentLang] && translations[currentLang][key]) {
-                    el.innerHTML = translations[currentLang][key];
-                }
-            });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.innerHTML = translations[currentLang][key];
         }
+    });
+}
 
-        // 從 URL 參數讀取訂單內容
-        const urlParams = new URLSearchParams(window.location.search);
-        const bookingData = urlParams.get('data');
-        
-        if (bookingData) {
-            const decodedData = decodeURIComponent(bookingData);
-            document.getElementById('booking-details').textContent = decodedData;
-        } else {
-            document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
-        }
-        
-        function showWeComQR() {
-            document.getElementById('wecom-modal').classList.remove('hidden');
-        }
-        
-        function closeWeComQR() {
-            document.getElementById('wecom-modal').classList.add('hidden');
-        }
-        
-        function goBackToHome() {
-            localStorage.removeItem('taxiRouteData');
-            localStorage.removeItem('taxiBookingData');
-            window.location.href = 'index.html';
-        }
+// 從 URL 參數讀取訂單內容
+const urlParams = new URLSearchParams(window.location.search);
+const bookingData = urlParams.get('data');
 
-        // ===== 成功預約彈窗控制 =====
-        (function () {
-            var modal = document.getElementById('bookingModal');
-            if (!modal) return;
+if (bookingData) {
+    const decodedData = decodeURIComponent(bookingData);
+    document.getElementById('booking-details').textContent = decodedData;
+} else {
+    document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
+}
 
-            var closeBtn = document.getElementById('bookingModalClose');
+function showWeComQR() {
+    document.getElementById('wecom-modal').classList.remove('hidden');
+}
 
-            function openModal() {
-                modal.classList.add('is-open');
-                modal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('modal-lock');
-            }
+function closeWeComQR() {
+    document.getElementById('wecom-modal').classList.add('hidden');
+}
 
-            function closeModal() {
-                modal.classList.remove('is-open');
-                modal.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('modal-lock');
-            }
+function goBackToHome() {
+    localStorage.removeItem('taxiRouteData');
+    localStorage.removeItem('taxiBookingData');
+    window.location.href = 'index.html';
+}
 
-            // 只彈一次（避免刷新重複見到）
-            if (sessionStorage.getItem('bookingPopupShown') !== '1') {
-                window.addEventListener('load', function () {
-                    setTimeout(function () {
-                        openModal();
-                        sessionStorage.setItem('bookingPopupShown', '1');
-                    }, 200);
-                });
-            }
+// ===== 成功預約彈窗控制 =====
+(function () {
+    var modal = document.getElementById('bookingModal');
+    if (!modal) return;
 
-            closeBtn.addEventListener('click', closeModal);
+    var closeBtn = document.getElementById('bookingModalClose');
 
-            modal.addEventListener('click', function (e) {
-                if (e.target === modal) closeModal();
-            });
+    function openModal() {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-lock');
+    }
 
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
-            });
-        })();
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-lock');
+    }
 
-        // 頁面初始化時套用語言
-        document.addEventListener('DOMContentLoaded', function() {
-            applyLanguage();
+    if (sessionStorage.getItem('bookingPopupShown') !== '1') {
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                openModal();
+                sessionStorage.setItem('bookingPopupShown', '1');
+            }, 200);
         });
-    </script>
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    });
+})();
+
+// 頁面初始化
+document.addEventListener('DOMContentLoaded', function() {
+    applyLanguage();
+});
+</script>
+<script src="theme.js"></script>
 </body>
 </html>

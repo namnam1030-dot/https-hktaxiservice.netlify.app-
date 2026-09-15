@@ -85,7 +85,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
+    <link rel="stylesheet" href="theme.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -139,6 +141,7 @@
             background-color: #0B0B0B; 
             color: #ffffff; 
             font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
         .text-xs, .text-\[11px\] {
             font-size: 18px !important;
@@ -187,6 +190,46 @@
             background-color: rgba(255, 242, 0, 0.1);
             border-radius: 0.5rem;
         }
+
+        /* 淺色主題下的 pac-container */
+        body.light-theme .pac-container {
+            background-color: #FFFFFF;
+            color: #000000;
+            border-color: #D1D5DB;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+        }
+        body.light-theme .pac-item {
+            color: #374151;
+            border-top-color: #E5E7EB;
+        }
+        body.light-theme .pac-item:hover {
+            background-color: #F3F4F6;
+        }
+        body.light-theme .pac-item-query {
+            color: #000000;
+            font-weight: 700;
+        }
+
+        /* 淺色主題下的按鈕（頁面專屬） */
+        body.light-theme #voice-btn,
+        body.light-theme button[onclick*="clearAllInputs"],
+        body.light-theme button[onclick*="swapLocations"],
+        body.light-theme #add-stop-btn,
+        body.light-theme button[onclick*="removeStopoverField"],
+        body.light-theme button[onclick*="calculateAndGoToResult"] {
+            background-color: #FFF200 !important;
+            color: #000000 !important;
+            border-color: #000000 !important;
+        }
+        body.light-theme #voice-btn:hover,
+        body.light-theme button[onclick*="clearAllInputs"]:hover,
+        body.light-theme button[onclick*="swapLocations"]:hover,
+        body.light-theme #add-stop-btn:hover,
+        body.light-theme button[onclick*="removeStopoverField"]:hover,
+        body.light-theme button[onclick*="calculateAndGoToResult"]:hover {
+            background-color: #000000 !important;
+            color: #FFF200 !important;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -208,16 +251,25 @@
                 </a>
             </div>
 
-            <div class="flex flex-col items-end gap-1.5">
-                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
-                    EN
-                </button>
-                <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
-                    <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
+            <div class="flex items-center pr-1">
+                <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
+                    <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
                 </button>
             </div>
         </div>
     </header>
+
+    <div id="mini-float" class="minimized">
+        <div class="mini-float-btns">
+            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
+            <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </button>
+            <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色">
+                <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+        </div>
+    </div>
 
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
@@ -241,11 +293,11 @@
 
     <div class="w-full px-0 bg-brand-dark border-b border-gray-800">
         <div class="max-w-4xl mx-auto px-4 py-3 text-center">
-            <h1 class="text-lg md:text-xl font-extrabold text-white leading-relaxed">
+            <h1 class="text-lg md:text-xl font-extrabold text-white leading-relaxed" data-i18n-html="hero_title">
                 長途跨區・機場口岸接送<br>
                 <span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>
             </h1>
-            <p class="text-[11px] font-extrabold text-white mt-1.5 leading-relaxed">
+            <p class="text-[11px] font-extrabold text-white mt-1.5 leading-relaxed" data-i18n-html="hero_desc">
                 機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士
             </p>
         </div>
@@ -367,7 +419,7 @@
 
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
-            <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+            <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
 
@@ -389,7 +441,7 @@
                     </button>
                 </div>
             </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
@@ -397,30 +449,6 @@
     </footer>
 
 <script>
-// ============================================
-// 動態計算頁首高度
-// ============================================
-function adjustBodyPaddingForHeader() {
-    const header = document.querySelector('header');
-    if (header) {
-        const headerHeight = header.offsetHeight;
-        document.body.style.paddingTop = headerHeight + 'px';
-        document.documentElement.style.scrollPaddingTop = headerHeight + 'px';
-    }
-}
-
-function setupHeaderResizeObserver() {
-    const header = document.querySelector('header');
-    if (!header) return;
-    
-    if (window.ResizeObserver) {
-        const observer = new ResizeObserver(() => {
-            adjustBodyPaddingForHeader();
-        });
-        observer.observe(header);
-    }
-}
-
 // ============================================
 // 跨頁面共享變數
 // ============================================
@@ -485,28 +513,19 @@ function clearAllInputs() {
     for (let i = 1; i <= 3; i++) {
         const stopInput = document.getElementById(`calc-stopover-${i}`);
         const stopContainer = document.getElementById(`stopover-container-${i}`);
-        if (stopInput) {
-            stopInput.value = '';
-        }
-        if (stopContainer) {
-            stopContainer.classList.add('hidden');
-        }
+        if (stopInput) stopInput.value = '';
+        if (stopContainer) stopContainer.classList.add('hidden');
     }
     currentStopCount = 0;
     const addStopBtn = document.getElementById('add-stop-btn');
-    if (addStopBtn) {
-        addStopBtn.classList.remove('hidden');
-    }
+    if (addStopBtn) addStopBtn.classList.remove('hidden');
     
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
     
-    if (pickupEl) {
-        pickupEl.focus();
-    }
+    if (pickupEl) pickupEl.focus();
 }
 
-// ✅ 計算並跳轉去 result.html（每次清走舊車款）
 function calculateAndGoToResult() {
     const pickupVal = document.getElementById('calc-pickup')?.value.trim() || '';
     const dropoffVal = document.getElementById('calc-dropoff')?.value.trim() || '';
@@ -516,9 +535,7 @@ function calculateAndGoToResult() {
         return;
     }
     
-    // ✅ 每次重新規劃路線，清走舊車款資料，避免 result 頁記住舊車款
     localStorage.removeItem('taxiBookingData');
-    
     saveRouteDataToLocalStorage();
     window.location.href = 'result.html';
 }
@@ -585,7 +602,6 @@ function setupStopoverDragging() {
         container.addEventListener('drop', function(e) {
             e.preventDefault();
             container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
-            
             if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
                 swapStopoverValues(draggedStopoverIndex, i);
             }
@@ -596,12 +612,10 @@ function setupStopoverDragging() {
 function swapStopoverValues(fromIndex, toIndex) {
     const fromInput = document.getElementById(`calc-stopover-${fromIndex}`);
     const toInput = document.getElementById(`calc-stopover-${toIndex}`);
-    
     if (fromInput && toInput) {
         const temp = fromInput.value;
         fromInput.value = toInput.value;
         toInput.value = temp;
-        
         toggleClearBtn(`calc-stopover-${fromIndex}`, `clear-stop-${fromIndex}-btn`);
         toggleClearBtn(`calc-stopover-${toIndex}`, `clear-stop-${toIndex}-btn`);
     }
@@ -611,9 +625,6 @@ function swapStopoverValues(fromIndex, toIndex) {
 // 頁面初始化
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
-    adjustBodyPaddingForHeader();
-    setupHeaderResizeObserver();
-    
     const referrer = document.referrer || '';
     const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
     
@@ -648,18 +659,6 @@ window.addEventListener('DOMContentLoaded', () => {
         pickupInput.addEventListener('blur', checkShowFlightField);
     }
 });
-
-window.addEventListener('load', () => {
-    adjustBodyPaddingForHeader();
-    setTimeout(adjustBodyPaddingForHeader, 100);
-    setTimeout(adjustBodyPaddingForHeader, 500);
-});
-
-window.addEventListener('resize', adjustBodyPaddingForHeader);
-
-if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(adjustBodyPaddingForHeader);
-}
 
 // ============================================
 // 語言系統
@@ -704,6 +703,8 @@ const translations = {
         badge_selected: "已選擇",
         btn_reselect_route: "重新選擇路線",
         btn_clear: "重設",
+        hero_title: '長途跨區・機場口岸接送<br><span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>',
+        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士',
         calc_title: "智能規劃路線與預計車費",
         calc_tip_title: "預計車費使用說明：",
         calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
@@ -756,6 +757,8 @@ const translations = {
         badge_selected: "Selected",
         btn_reselect_route: "Re-select Route",
         btn_clear: "Reset",
+        hero_title: 'Long Distance &amp; Cross-District · Airport &amp; Border Transfers<br><span class="text-brand-yellow">15% Off Taxi | 6-Seater Luxury Taxi</span>',
+        hero_desc: 'Airport &amp; Major Border Crossings · N.T. to HK Island &amp; Kowloon<br>Airport · HZMB · Shenzhen Bay · Lok Ma Chau · Heung Yuen Wai<br>Tuen Mun · Yuen Long · Tin Shui Wai · Sheung Shui · Fanling<br>Luxury 6-Seater · Hybrid Taxi · Wheelchair Taxi',
         calc_title: "Smart Route & Fare Estimator",
         calc_tip_title: "Fare Estimation Instructions:",
         calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Airport to ShenZhen Bay Port"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
@@ -782,49 +785,36 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt = e;
 });
 
-function showInstallGuide() {
-    const modal = document.getElementById('install-modal');
-    const content = document.getElementById('install-guide-content');
-    
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('用戶接受安裝');
-            }
-            deferredPrompt = null;
-        });
-        return;
-    }
-
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    
-    if (isIOS) {
-        content.innerHTML = currentLang === 'en' ? `
-            <p><strong>1.</strong> Tap the Share button <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i> at the bottom of Safari.</p>
-            <p class="mt-1"><strong>2.</strong> Scroll down and tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span>.</p>
-            <p class="mt-1"><strong>3.</strong> Tap "Add" in the top right corner to complete!</p>
-        ` : `
-            <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
-            <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
-            <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
-        `;
-    } else {
-        content.innerHTML = currentLang === 'en' ? `
-            <p><strong>1.</strong> Tap the menu button <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i> in the top right corner of Chrome.</p>
-            <p class="mt-1"><strong>2.</strong> Tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span> or <span class="text-brand-yellow font-bold">"Install App"</span>.</p>
-            <p class="mt-1"><strong>3.</strong> Confirm to complete installation!</p>
-        ` : `
-            <p><strong>1.</strong> 點擊 Chrome 瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
-            <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 <span class="text-brand-yellow font-bold">「安裝應用程式」</span>。</p>
-            <p class="mt-1"><strong>3.</strong> 確認新增即可完成安裝！</p>
-        `;
-    }
-    modal.classList.remove('hidden');
+function toggleLanguage() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    localStorage.setItem('taxiLang', currentLang);
+    applyLanguage();
 }
 
-function closeInstallGuide() {
-    document.getElementById('install-modal').classList.add('hidden');
+function applyLanguage() {
+    const btn = document.getElementById('lang-toggle-btn');
+    if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.innerHTML = translations[currentLang][key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[currentLang] && translations[currentLang][key]) {
+            el.placeholder = translations[currentLang][key];
+        }
+    });
 }
 
 function initAutocomplete() {
@@ -947,24 +937,36 @@ function swapLocations() {
 
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    // 1. 檢查瀏覽器支援
     if (!SpeechRecognition) {
-        alert("您的瀏覽器暫不支援語音辨識，請直接使用輸入框填寫。");
+        alert("您的瀏覽器暫不支援語音辨識。\n\n建議使用：\n• iOS：Safari 瀏覽器\n• Android：Chrome 瀏覽器\n• 桌面：Chrome / Edge\n\n或直接使用輸入框填寫。");
+        return;
+    }
+
+    // 2. 檢查 HTTPS 安全連線
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        alert("語音辨識需要 HTTPS 安全連線。\n\n請使用 https:// 開頭的網址，例如：\nhttps://hktaxiservice.netlify.app/");
         return;
     }
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
     const micIcon = document.getElementById('mic-icon');
 
     micBtn.classList.add('bg-brand-yellow', 'text-black');
-    micText.innerText = "聆聽中...請講出完整行程";
+    micText.innerText = "正在啟動麥克風...";
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
-    recognition.start();
+    // 3. 麥克風開啟成功
+    recognition.onstart = () => {
+        micText.innerText = "🎤 請講出完整行程...";
+    };
 
     recognition.onresult = (event) => {
         recognition.stop();
@@ -973,7 +975,7 @@ function startVoiceRecognition() {
 
         let pickup = "", dropoff = "", stopover = "";
         let text = speechResult;
-        
+
         text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
         let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
@@ -981,9 +983,7 @@ function startVoiceRecognition() {
             pickup = fromMatch[1].trim();
         } else {
             let firstSplit = text.split(/經|途經|去|到|至/)[0];
-            if (firstSplit) {
-                pickup = firstSplit.trim();
-            }
+            if (firstSplit) pickup = firstSplit.trim();
         }
 
         let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
@@ -1000,9 +1000,7 @@ function startVoiceRecognition() {
             let parts = text.split(/經|途經/);
             if (parts.length >= 2) {
                 let lastPart = parts[parts.length - 1].trim();
-                if (lastPart && lastPart !== stopover) {
-                    dropoff = lastPart;
-                }
+                if (lastPart && lastPart !== stopover) dropoff = lastPart;
             } else if (!dropoff) {
                 let words = text.split(/\s+/);
                 if (words.length >= 2 && !pickup) {
@@ -1017,15 +1015,13 @@ function startVoiceRecognition() {
             toggleClearBtn('calc-pickup', 'clear-pickup-btn');
             checkShowFlightField();
         }
-        
+
         if (stopover) {
-            if (currentStopCount === 0) {
-                addStopoverField();
-            }
+            if (currentStopCount === 0) addStopoverField();
             document.getElementById('calc-stopover-1').value = stopover;
             toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
         }
-        
+
         if (dropoff) {
             document.getElementById('calc-dropoff').value = dropoff;
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
@@ -1039,60 +1035,59 @@ function startVoiceRecognition() {
         }, 1000);
     };
 
-    recognition.onerror = () => {
-        recognition.stop();
-        micText.innerText = "未能識別語音，請重試或以文字輸入";
+    // 4. 詳細錯誤提示
+    recognition.onerror = (event) => {
+        let errMsg = "未能識別語音，請重試或以文字輸入";
+        switch (event.error) {
+            case 'not-allowed':
+            case 'service-not-allowed':
+                errMsg = "❌ 麥克風權限被拒絕。\n\n請到瀏覽器設定允許麥克風權限，然後重新整理網頁。";
+                break;
+            case 'no-speech':
+                errMsg = "🔇 未偵測到語音，請再試一次。";
+                break;
+            case 'audio-capture':
+                errMsg = "🎤 找不到麥克風裝置，請檢查麥克風是否正常。";
+                break;
+            case 'network':
+                errMsg = "🌐 網絡錯誤，語音辨識需要連線至 Google 伺服器。";
+                break;
+            case 'aborted':
+                errMsg = "語音辨識已取消。";
+                break;
+            default:
+                errMsg = "語音辨識失敗：" + event.error;
+        }
+        micText.innerText = errMsg;
+        micIcon.className = "fa-solid fa-microphone-slash text-base";
+        micBtn.classList.remove('bg-brand-yellow', 'text-black');
+
         setTimeout(() => {
-            micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
             micIcon.className = "fa-solid fa-microphone text-base";
-        }, 2000);
+        }, 3000);
     };
 
+    // 5. 結束時復原按鈕
     recognition.onend = () => {
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
     };
-}
 
-function toggleLanguage() {
-    currentLang = currentLang === 'zh' ? 'en' : 'zh';
-    localStorage.setItem('taxiLang', currentLang);
-    applyLanguage();
-}
-
-function applyLanguage() {
-    const btn = document.getElementById('lang-toggle-btn');
-    if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
-
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.textContent = translations[currentLang][key];
-        }
-    });
-
-    document.querySelectorAll('[data-i18n-html]').forEach(el => {
-        const key = el.getAttribute('data-i18n-html');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.innerHTML = translations[currentLang][key];
-        }
-    });
-
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.placeholder = translations[currentLang][key];
-        }
-    });
+    // 6. 啟動，並捕捉同步錯誤
+    try {
+        recognition.start();
+    } catch (e) {
+        alert("語音辨識啟動失敗：" + e.message);
+        micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        micIcon.className = "fa-solid fa-microphone text-base";
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
-    adjustBodyPaddingForHeader();
-    setupHeaderResizeObserver();
 });
-
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

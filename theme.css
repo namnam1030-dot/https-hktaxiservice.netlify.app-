@@ -1,0 +1,279 @@
+/* =========================================================
+   theme.css — 共用主題樣式（最終版）
+   適用：index / result / fleet / booking / booking-success
+   ========================================================= */
+
+/* ===== 主題切換鍵閃爍動畫 ===== */
+@keyframes themeBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
+.theme-blink {
+    animation: themeBlink 1.3s ease-in-out infinite;
+}
+
+/* ===== 收合鍵（40px） ===== */
+.mini-float-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #000000;
+    color: #FFF200;
+    border: 2px solid #FFF200;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.mini-float-toggle:hover {
+    transform: scale(1.1) rotate(90deg);
+    background-color: #FFF200;
+    color: #000000;
+}
+
+/* ===== 三粒按鈕浮標（預設固定定位） ===== */
+#mini-float {
+    position: fixed;
+    right: 8px;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+#mini-float.minimized .mini-float-btns {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-12px) scale(0.8);
+}
+.mini-float-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s ease;
+    transform-origin: top right;
+    pointer-events: auto;
+}
+.mini-float-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2.5px solid;
+    background-color: #000000;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.mini-float-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+}
+.mini-float-btn.lang { color: #FFF200; border-color: #FFF200; }
+.mini-float-btn.lang:hover { background-color: #FFF200; color: #000000; }
+.mini-float-btn.apps { color: #00E5A0; border-color: #00E5A0; }
+.mini-float-btn.apps:hover { background-color: #00E5A0; color: #000000; }
+.mini-float-btn.theme { color: #FFFFFF; border-color: #FFFFFF; }
+.mini-float-btn.theme:hover { background-color: #FFFFFF; color: #000000; }
+body.light-theme .mini-float-btn.lang { background-color: #000000; color: #FFF200; border-color: #FFF200; }
+body.light-theme .mini-float-btn.apps { background-color: #000000; color: #00E5A0; border-color: #00E5A0; }
+body.light-theme .mini-float-btn.theme { background-color: #000000; color: #FFFFFF; border-color: #FFFFFF; }
+
+/* ===== 成功頁專用：浮標改為相對定位（喺綠色框外面上方） ===== */
+body.booking-success-page #mini-float {
+    position: relative;
+    right: auto;
+}
+body.booking-success-page .mini-float-btns {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+}
+/* 成功頁收合鍵必須可點擊（因為放喺 #mini-float 裏面，會繼承 pointer-events: none） */
+body.booking-success-page .mini-float-toggle {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* =========================================================
+   微信 / WhatsApp 按鈕專用色
+   ========================================================= */
+
+/* 「立即加微信」按鈕（預約頁表單內） */
+.wechat-cta-btn {
+    background-color: #07C160 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #07C160 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 700;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+.wechat-cta-btn:hover {
+    background-color: #06AD56 !important;
+    border-color: #06AD56 !important;
+    opacity: 1;
+}
+body.light-theme .wechat-cta-btn {
+    background-color: #07C160 !important;
+    color: #FFFFFF !important;
+    border-color: #07C160 !important;
+}
+body.light-theme .wechat-cta-btn:hover {
+    background-color: #06AD56 !important;
+    border-color: #06AD56 !important;
+}
+
+/* 「WeChat 查詢」按鈕（成功頁卡片內） */
+.wechat-query-btn {
+    background-color: #07C160 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+}
+.wechat-query-btn:hover {
+    background-color: #06AD56 !important;
+    color: #FFFFFF !important;
+}
+body.light-theme .wechat-query-btn {
+    background-color: #07C160 !important;
+    color: #FFFFFF !important;
+}
+body.light-theme .wechat-query-btn:hover {
+    background-color: #06AD56 !important;
+}
+
+/* ===== 頁尾大 WeChat 按鈕（id="wechat-btn"）→ 微信專用綠 + 白字 ===== */
+#wechat-btn {
+    background-color: #07C160 !important;
+    color: #FFFFFF !important;
+    border-color: #07C160 !important;
+}
+#wechat-btn:hover {
+    background-color: #06AD56 !important;
+    color: #FFFFFF !important;
+    border-color: #06AD56 !important;
+}
+body.light-theme #wechat-btn {
+    background-color: #07C160 !important;
+    color: #FFFFFF !important;
+    border-color: #07C160 !important;
+}
+body.light-theme #wechat-btn:hover {
+    background-color: #06AD56 !important;
+    color: #FFFFFF !important;
+    border-color: #06AD56 !important;
+}
+
+/* ===== 頁尾大 WhatsApp 按鈕（id="whatsapp-btn"）→ WhatsApp 專用綠 + 白字 ===== */
+#whatsapp-btn {
+    background-color: #25D366 !important;
+    color: #FFFFFF !important;
+    border-color: #25D366 !important;
+}
+#whatsapp-btn:hover {
+    background-color: #1EBE5D !important;
+    color: #FFFFFF !important;
+    border-color: #1EBE5D !important;
+}
+body.light-theme #whatsapp-btn {
+    background-color: #25D366 !important;
+    color: #FFFFFF !important;
+    border-color: #25D366 !important;
+}
+body.light-theme #whatsapp-btn:hover {
+    background-color: #1EBE5D !important;
+    color: #FFFFFF !important;
+    border-color: #1EBE5D !important;
+}
+
+/* =========================================================
+   淺色主題（白底黑字）
+   ========================================================= */
+body.light-theme {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
+body.light-theme .bg-brand-dark,
+body.light-theme .bg-brand-gray,
+body.light-theme .bg-brand-card {
+    background-color: #FFFFFF !important;
+}
+body.light-theme .text-white { color: #000000 !important; }
+body.light-theme .text-gray-300,
+body.light-theme .text-gray-400 { color: #374151 !important; }
+body.light-theme .text-gray-500 { color: #6B7280 !important; }
+body.light-theme .text-gray-600 { color: #4B5563 !important; }
+body.light-theme .text-brand-yellow { color: #000000 !important; font-weight: bold !important; }
+body.light-theme .border-gray-800,
+body.light-theme .border-gray-800\/80,
+body.light-theme .border-gray-700 { border-color: #D1D5DB !important; }
+
+/* ===== 淺色主題：深底卡片（用於「預計車費使用說明」等） ===== */
+body.light-theme .bg-gray-900\/90,
+body.light-theme .bg-gray-900\/80 {
+    background-color: #F9FAFB !important;
+    border-color: #D1D5DB !important;
+    color: #000000 !important;
+}
+body.light-theme .bg-gray-900\/90 .text-white,
+body.light-theme .bg-gray-900\/80 .text-white {
+    color: #000000 !important;
+}
+
+/* ===== 淺色主題：輸入格 = 半透明黃底 ===== */
+body.light-theme input[type="text"],
+body.light-theme input[type="tel"],
+body.light-theme input[type="date"],
+body.light-theme input[type="time"],
+body.light-theme select {
+    background-color: rgba(255, 242, 0, 0.35) !important;
+    border-color: rgba(0, 0, 0, 0.3) !important;
+    color: #000000 !important;
+}
+body.light-theme input[type="text"]:focus,
+body.light-theme input[type="tel"]:focus,
+body.light-theme input[type="date"]:focus,
+body.light-theme input[type="time"]:focus,
+body.light-theme select:focus {
+    background-color: rgba(255, 242, 0, 0.5) !important;
+    border-color: #000000 !important;
+}
+body.light-theme input[type="date"],
+body.light-theme input[type="time"] { color-scheme: light !important; }
+
+/* ===== 淺色主題：其他背景色 ===== */
+body.light-theme .bg-brand-yellow\/10 { background-color: rgba(255, 242, 0, 0.3) !important; }
+body.light-theme .bg-black\/50 { background-color: rgba(255, 242, 0, 0.15) !important; }
+body.light-theme .bg-black\/60 { background-color: #F9FAFB !important; }
+
+/* 安裝提示彈窗內容區 */
+body.light-theme #install-guide-content {
+    background-color: #F9FAFB !important;
+    border-color: #E5E7EB !important;
+    color: #374151 !important;
+}
+body.light-theme #install-guide-content .text-brand-yellow { color: #000000 !important; }
