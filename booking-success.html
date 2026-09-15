@@ -1,8 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+
+    <!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
+    <script>
+    (function() {
+        var isLight = false;
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+        } catch(e) {}
+        document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+        document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
+        if (isLight) document.documentElement.classList.add('preload-light');
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+        html.preload-light body,
+        html.preload-light body * {
+            transition: none !important;
+        }
+        html:not(.preload-light) body {
+            background-color: #0B0B0B;
+            color: #FFFFFF;
+        }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約成功 | 八五折的士 | 24小時網約車預約確認</title>
 
@@ -54,6 +92,36 @@
   }
 }
 </script>
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.jpeg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FFF200">
+
+    <!-- ✅ 反黑閃：搶先判斷主題 -->
+    <script>
+    (function() {
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            var isLight;
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+            if (isLight) document.documentElement.classList.add('preload-light');
+        } catch (e) {}
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+    </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -312,7 +380,7 @@
             </p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
             </div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
         </div>
@@ -361,7 +429,7 @@
                     如有急需，可以直接聯絡我哋：
                 </p>
                              
-                <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                     <i class="fa-brands fa-whatsapp text-xl"></i> <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
                 </a>
                 
@@ -369,12 +437,12 @@
                     <i class="fa-brands fa-weixin text-xl"></i> <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
                 </button>
 
-                <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+                <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                     <i class="fa-solid fa-phone text-xl"></i> <span data-i18n="btn_call_now">致電 6881 5441</span>
                 </a>
             </div>
             
-            <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+            <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-solid fa-arrow-left text-xl"></i> <span data-i18n="btn_back_home">返回主頁</span>
             </button>
         </div>
@@ -393,7 +461,7 @@
             <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                 <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
             </div>
-            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl hover:opacity-90" data-i18n="btn_close">
+            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl" data-i18n="btn_close">
                 關閉
             </button>
         </div>
@@ -485,6 +553,14 @@ function applyLanguage() {
         const key = el.getAttribute('data-i18n-html');
         if (translations[currentLang] && translations[currentLang][key]) {
             el.innerHTML = translations[currentLang][key];
+        }
+    });
+
+    // ✅ 新增：處理 placeholder（與其他頁面一致）
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+            el.placeholder = translations[currentLang][key];
         }
     });
 }

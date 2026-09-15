@@ -1,10 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<link rel="preconnect" href="https://maps.googleapis.com">
 <head>
+
+    <!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
+    <script>
+    (function() {
+        var isLight = false;
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+        } catch(e) {}
+        document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+        document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
+        if (isLight) document.documentElement.classList.add('preload-light');
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+        html.preload-light body,
+        html.preload-light body * {
+            transition: none !important;
+        }
+        html:not(.preload-light) body {
+            background-color: #0B0B0B;
+            color: #FFFFFF;
+        }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>選擇車款 | 八五折的士 | 豪華六座位的士 | 輪椅的士 | 機場口岸接送</title>
 
@@ -61,6 +97,31 @@
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FFF200">
+
+    <!-- ✅ 反黑閃：搶先判斷主題 -->
+    <script>
+    (function() {
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            var isLight;
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+            if (isLight) document.documentElement.classList.add('preload-light');
+        } catch (e) {}
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+    </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -80,36 +141,6 @@
             }
         }
     </script>
-
-    <script>
-        (function() {
-            const manifestData = {
-                "name": "24小時八五折的士預約服務",
-                "short_name": "網約車TAXI",
-                "start_url": "https://hktaxiservice.netlify.app/",
-                "display": "standalone",
-                "background_color": "#0B0B0B",
-                "theme_color": "#FFF200",
-                "orientation": "portrait",
-                "icons": [
-                    { "src": "icon192.jpeg", "sizes": "192x192", "type": "image/jpeg" },
-                    { "src": "icon512.jpeg", "sizes": "512x512", "type": "image/jpeg" }
-                ]
-            };
-            const stringManifest = JSON.stringify(manifestData);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
-            document.head.appendChild(link);
-        })();
-    </script>
-
-    <link rel="apple-touch-icon" href="icon.jpeg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#FFF200">
 
     <style>
         html { font-size: 130%; }
@@ -206,10 +237,6 @@
             color: #000000 !important;
             border: 1px solid #000000 !important;
         }
-        body.light-theme button[onclick="backToBooking()"]:hover {
-            background-color: #000000 !important;
-            color: #FFF200 !important;
-        }
         body.light-theme button[onclick^="selectCarAndGoToBooking"],
         body.light-theme button[onclick="selectToyotaCar()"] {
             background-color: #FFF200 !important;
@@ -271,7 +298,7 @@
             </p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
             </div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
         </div>
@@ -284,7 +311,7 @@
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
             </h3>
             <!-- ✅ 返回預約頁面：改成黃底黑字（跟選定車款一樣） -->
-            <button type="button" onclick="backToBooking()" class="inline-flex items-center gap-2 bg-brand-yellow text-black transition text-sm font-bold hover:opacity-90 px-4 py-1.5 rounded-full cursor-pointer shadow-md">
+            <button type="button" onclick="backToBooking()" class="inline-flex items-center gap-2 bg-brand-yellow text-black transition text-sm font-bold px-4 py-1.5 rounded-full cursor-pointer shadow-md">
                 <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_booking">返回預約頁面</span>
             </button>
         </div>
@@ -329,7 +356,7 @@
                                 <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Taxi'">
                             </div>
                         </div>
-                        <button type="button" onclick="selectToyotaCar()" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                        <button type="button" onclick="selectToyotaCar()" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
                             <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
                         </button>
                     </div>
@@ -368,7 +395,7 @@
                                 <img src="m7.jpeg" alt="MAXUS MIFA 7" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=MAXUS'">
                             </div>
                         </div>
-                        <button type="button" onclick="selectCarAndGoToBooking('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                        <button type="button" onclick="selectCarAndGoToBooking('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
                             <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
                         </button>
                     </div>
@@ -398,7 +425,7 @@
                                 <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=GAC'">
                             </div>
                         </div>
-                        <button type="button" onclick="selectCarAndGoToBooking('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                        <button type="button" onclick="selectCarAndGoToBooking('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
                             <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
                         </button>
                     </div>
@@ -428,7 +455,7 @@
                                 <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Geely'">
                             </div>
                         </div>
-                        <button type="button" onclick="selectCarAndGoToBooking('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                        <button type="button" onclick="selectCarAndGoToBooking('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
                             <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
                         </button>
                     </div>
@@ -458,7 +485,7 @@
                                 <img src="NOAH.jpeg" alt="豐田 NOAH 輪椅的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=NOAH'">
                             </div>
                         </div>
-                        <button type="button" onclick="selectCarAndGoToBooking('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-0.5">
+                        <button type="button" onclick="selectCarAndGoToBooking('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
                             <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_car">選定車款</span>
                         </button>
                     </div>
@@ -497,12 +524,12 @@
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
-                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                         關閉
                     </button>
                 </div>
             </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>

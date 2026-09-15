@@ -1,9 +1,9 @@
 /* =========================================================
-   theme.css — 共用主題樣式（統一黃按鈕黑框 - 1px 版）
-   適用：index / result / fleet / booking / booking-success
+   theme.css — 共用主題樣式
+   桌面：hover 縮小
+   手機：按下（active）縮小，放手回復
    ========================================================= */
 
-/* ===== 主題切換鍵閃爍動畫 ===== */
 @keyframes themeBlink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.55; }
@@ -12,7 +12,6 @@
     animation: themeBlink 1.3s ease-in-out infinite;
 }
 
-/* ===== 收合鍵（40px） ===== */
 .mini-float-toggle {
     width: 40px;
     height: 40px;
@@ -41,7 +40,6 @@
     color: #000000;
 }
 
-/* ===== 三粒按鈕浮標（預設固定定位） ===== */
 #mini-float {
     position: fixed;
     right: 8px;
@@ -98,7 +96,6 @@ body.light-theme .mini-float-btn.lang { background-color: #000000; color: #FFF20
 body.light-theme .mini-float-btn.apps { background-color: #000000; color: #00E5A0; border-color: #00E5A0; }
 body.light-theme .mini-float-btn.theme { background-color: #000000; color: #FFFFFF; border-color: #FFFFFF; }
 
-/* ===== 成功頁專用：浮標改為相對定位 ===== */
 body.booking-success-page #mini-float {
     position: relative;
     right: auto;
@@ -114,7 +111,7 @@ body.booking-success-page .mini-float-toggle {
 }
 
 /* =========================================================
-   ✅ 統一所有黃底按鈕：黑框 1px（深淺主題都適用）
+   統一所有黃底按鈕：黑框 1px
    ========================================================= */
 button.bg-brand-yellow,
 a.bg-brand-yellow:not(#whatsapp-btn),
@@ -123,7 +120,6 @@ a.bg-brand-yellow:not(#whatsapp-btn),
     border: 1px solid #000000 !important;
 }
 
-/* 語音按鈕 hover 變黃時也加黑框 */
 #voice-btn:hover,
 button[onclick*="clearAllInputs"]:hover,
 button[onclick*="swapLocations"]:hover,
@@ -133,10 +129,77 @@ button[onclick*="removeStopoverField"]:hover {
 }
 
 /* =========================================================
+   ✅ 黃色按鈕縮小效果
+   - 桌面（支援 hover）：移上去縮小
+   - 手機 / 平板：按下（active）縮小，放手回復
+   ========================================================= */
+
+/* 1) 桌面 hover 縮小 */
+@media (hover: hover) and (pointer: fine) {
+
+    body:not(.light-theme) #voice-btn:hover,
+    body:not(.light-theme) button[onclick*="clearAllInputs"]:hover,
+    body:not(.light-theme) button[onclick*="swapLocations"]:hover,
+    body:not(.light-theme) #add-stop-btn:hover,
+    body:not(.light-theme) button[onclick*="removeStopoverField"]:hover,
+    body:not(.light-theme) button[onclick*="calculateAndGoToResult"]:hover,
+    body:not(.light-theme) button.bg-brand-yellow:hover,
+    body:not(.light-theme) a.bg-brand-yellow:not(#whatsapp-btn):hover,
+    body:not(.light-theme) .order-type-btn.selected:hover,
+    body:not(.light-theme) .booking-modal__btn:hover {
+        transform: scale(0.96) !important;
+        transition: transform 0.15s ease !important;
+    }
+
+    body.light-theme #voice-btn:hover,
+    body.light-theme button[onclick*="clearAllInputs"]:hover,
+    body.light-theme button[onclick*="swapLocations"]:hover,
+    body.light-theme #add-stop-btn:hover,
+    body.light-theme button[onclick*="removeStopoverField"]:hover,
+    body.light-theme button[onclick*="calculateAndGoToResult"]:hover,
+    body.light-theme button.bg-brand-yellow:hover,
+    body.light-theme a.bg-brand-yellow:not(#whatsapp-btn):hover,
+    body.light-theme .order-type-btn.selected:hover,
+    body.light-theme .booking-modal__btn:hover {
+        transform: scale(0.96) !important;
+        transition: transform 0.15s ease !important;
+    }
+
+}
+
+/* 2) 所有裝置：按下（active）縮小，放手回復 */
+body:not(.light-theme) #voice-btn:active,
+body:not(.light-theme) button[onclick*="clearAllInputs"]:active,
+body:not(.light-theme) button[onclick*="swapLocations"]:active,
+body:not(.light-theme) #add-stop-btn:active,
+body:not(.light-theme) button[onclick*="removeStopoverField"]:active,
+body:not(.light-theme) button[onclick*="calculateAndGoToResult"]:active,
+body:not(.light-theme) button.bg-brand-yellow:active,
+body:not(.light-theme) a.bg-brand-yellow:not(#whatsapp-btn):active,
+body:not(.light-theme) .order-type-btn.selected:active,
+body:not(.light-theme) .booking-modal__btn:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+body.light-theme #voice-btn:active,
+body.light-theme button[onclick*="clearAllInputs"]:active,
+body.light-theme button[onclick*="swapLocations"]:active,
+body.light-theme #add-stop-btn:active,
+body.light-theme button[onclick*="removeStopoverField"]:active,
+body.light-theme button[onclick*="calculateAndGoToResult"]:active,
+body.light-theme button.bg-brand-yellow:active,
+body.light-theme a.bg-brand-yellow:not(#whatsapp-btn):active,
+body.light-theme .order-type-btn.selected:active,
+body.light-theme .booking-modal__btn:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* =========================================================
    微信 / WhatsApp 按鈕專用色
    ========================================================= */
 
-/* 「立即加微信」按鈕（預約頁表單內） */
 .wechat-cta-btn {
     background-color: #07C160 !important;
     color: #FFFFFF !important;
@@ -166,7 +229,6 @@ body.light-theme .wechat-cta-btn:hover {
     border-color: #06AD56 !important;
 }
 
-/* 「WeChat 查詢」按鈕（成功頁卡片內） */
 .wechat-query-btn {
     background-color: #07C160 !important;
     color: #FFFFFF !important;
@@ -182,9 +244,9 @@ body.light-theme .wechat-query-btn {
 }
 body.light-theme .wechat-query-btn:hover {
     background-color: #06AD56 !important;
+    color: #FFFFFF !important;
 }
 
-/* ===== 頁尾大 WeChat 按鈕 → 微信專用綠 + 白字 ===== */
 #wechat-btn {
     background-color: #07C160 !important;
     color: #FFFFFF !important;
@@ -206,7 +268,6 @@ body.light-theme #wechat-btn:hover {
     border-color: #06AD56 !important;
 }
 
-/* ===== 頁尾大 WhatsApp 按鈕 → WhatsApp 專用綠 + 白字 ===== */
 #whatsapp-btn {
     background-color: #25D366 !important;
     color: #FFFFFF !important;
@@ -226,10 +287,11 @@ body.light-theme #whatsapp-btn {
 body.light-theme #whatsapp-btn:hover {
     background-color: #1EBE5D !important;
     color: #FFFFFF !important;
+    border-color: #1EBE5D !important;
 }
 
 /* =========================================================
-   淺色主題（白底黑字）
+   淺色主題
    ========================================================= */
 body.light-theme {
     background-color: #FFFFFF !important;
@@ -250,7 +312,6 @@ body.light-theme .border-gray-800,
 body.light-theme .border-gray-800\/80,
 body.light-theme .border-gray-700 { border-color: #D1D5DB !important; }
 
-/* 深底卡片 */
 body.light-theme .bg-gray-900\/90,
 body.light-theme .bg-gray-900\/80 {
     background-color: #F9FAFB !important;
@@ -262,7 +323,6 @@ body.light-theme .bg-gray-900\/80 .text-white {
     color: #000000 !important;
 }
 
-/* 輸入格 = 半透明黃底 */
 body.light-theme input[type="text"],
 body.light-theme input[type="tel"],
 body.light-theme input[type="date"],
@@ -283,12 +343,10 @@ body.light-theme select:focus {
 body.light-theme input[type="date"],
 body.light-theme input[type="time"] { color-scheme: light !important; }
 
-/* 其他背景色 */
 body.light-theme .bg-brand-yellow\/10 { background-color: rgba(255, 242, 0, 0.3) !important; }
 body.light-theme .bg-black\/50 { background-color: rgba(255, 242, 0, 0.15) !important; }
 body.light-theme .bg-black\/60 { background-color: #F9FAFB !important; }
 
-/* 安裝提示彈窗內容區 */
 body.light-theme #install-guide-content {
     background-color: #F9FAFB !important;
     border-color: #E5E7EB !important;
@@ -306,13 +364,4 @@ body.light-theme button[onclick*="calculateAndGoToResult"] {
     background-color: #FFF200 !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
-}
-body.light-theme #voice-btn:hover,
-body.light-theme button[onclick*="clearAllInputs"]:hover,
-body.light-theme button[onclick*="swapLocations"]:hover,
-body.light-theme #add-stop-btn:hover,
-body.light-theme button[onclick*="removeStopoverField"]:hover,
-body.light-theme button[onclick*="calculateAndGoToResult"]:hover {
-    background-color: #000000 !important;
-    color: #FFF200 !important;
 }

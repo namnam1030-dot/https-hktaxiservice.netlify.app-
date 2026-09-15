@@ -1,10 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<link rel="preconnect" href="https://maps.googleapis.com">
 <head>
+
+    <!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
+    <script>
+    (function() {
+        var isLight = false;
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+        } catch(e) {}
+        document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+        document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
+        if (isLight) document.documentElement.classList.add('preload-light');
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+        html.preload-light body,
+        html.preload-light body * {
+            transition: none !important;
+        }
+        html:not(.preload-light) body {
+            background-color: #0B0B0B;
+            color: #FFFFFF;
+        }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約的士 | 八五折的士 | 24小時網約車預約 | 機場口岸接送</title>
 
@@ -62,6 +98,31 @@
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FFF200">
+
+    <!-- ✅ 反黑閃：搶先判斷主題 -->
+    <script>
+    (function() {
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            var isLight;
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+            if (isLight) document.documentElement.classList.add('preload-light');
+        } catch (e) {}
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+    </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -81,36 +142,6 @@
             }
         }
     </script>
-
-    <script>
-        (function() {
-            const manifestData = {
-                "name": "24小時八五折的士預約服務",
-                "short_name": "網約車TAXI",
-                "start_url": "https://hktaxiservice.netlify.app/",
-                "display": "standalone",
-                "background_color": "#0B0B0B",
-                "theme_color": "#FFF200",
-                "orientation": "portrait",
-                "icons": [
-                    { "src": "icon192.jpeg", "sizes": "192x192", "type": "image/jpeg" },
-                    { "src": "icon512.jpeg", "sizes": "512x512", "type": "image/jpeg" }
-                ]
-            };
-            const stringManifest = JSON.stringify(manifestData);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
-            document.head.appendChild(link);
-        })();
-    </script>
-
-    <link rel="apple-touch-icon" href="icon.jpeg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#FFF200">
 
     <style>
         html { font-size: 130%; }
@@ -225,7 +256,9 @@
 
         /* ===== 淺色主題：預約頁面專屬 ===== */
         body.light-theme #booking-section a[href="index.html"],
-        body.light-theme #booking-section a[href="fleet.html"] {
+        body.light-theme #booking-section a[href="fleet.html"],
+        body.light-theme #booking-section button[onclick*="index.html"],
+        body.light-theme #booking-section button[onclick*="fleet.html"] {
             background-color: #FFF200 !important;
             color: #000000 !important;
             border: 1px solid #000000 !important;
@@ -365,7 +398,7 @@
             </p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
             </div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
         </div>
@@ -377,9 +410,9 @@
             <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
-                    <a href="index.html" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg hover:opacity-90 transition cursor-pointer">
+                    <button type="button" onclick="window.location.href='index.html'" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
                         <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
-                    </a>
+                    </button>
                 </div>
                 <div class="text-xs text-gray-300 space-y-1">
                     <div><span class="text-gray-400" data-i18n="pickup_label">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>
@@ -402,9 +435,9 @@
                         <span class="text-gray-400 block mb-0.5" data-i18n="fee_mode_label">收費模式</span>
                         <span id="selected-fare-mode-text" class="text-brand-yellow font-bold text-sm">-</span>
                     </div>
-                    <a href="fleet.html" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg hover:opacity-90 cursor-pointer flex items-center gap-1">
+                    <button type="button" onclick="window.location.href='fleet.html'" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg cursor-pointer flex items-center gap-1">
                         <i class="fa-solid fa-car"></i> <span data-i18n="btn_change_car">選擇其他車款</span>
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -569,10 +602,10 @@
             <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
             <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
             <div class="flex flex-col gap-3">
-                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg hover:opacity-90 transition">
+                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">
                     ✅ 接受免費升級
                 </button>
-                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base hover:opacity-90 transition">
+                <button onclick="confirmUpgrade(false)" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-base transition">
                     ❌ 不用，謝謝
                 </button>
             </div>
@@ -606,12 +639,12 @@
                         <span data-i18n="wecom_qr_hint">手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取</span>
                     </p>
 
-                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                         關閉
                     </button>
                 </div>
             </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
@@ -844,11 +877,17 @@ function updateCarDisplay() {
         else carTextEl.innerText = currentLang === 'en' ? 'Please Select Vehicle' : '請選擇車款';
     }
     
-    if (fareModeTextEl) {
-        if (selectedFareMode === 'discount') fareModeTextEl.innerText = currentLang === 'en' ? '15% Discount' : '八五折優惠';
-        else if (selectedFareMode === 'normal') fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
-        else fareModeTextEl.innerText = '-';
+if (fareModeTextEl) {
+    if (isMinimumCharge()) {
+        fareModeTextEl.innerText = currentLang === 'en' ? 'Minimum Fare' : '最低消費';
+    } else if (selectedFareMode === 'discount') {
+        fareModeTextEl.innerText = currentLang === 'en' ? '15% Discount' : '八五折優惠';
+    } else if (selectedFareMode === 'normal') {
+        fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
+    } else {
+        fareModeTextEl.innerText = '-';
     }
+}
     
     if (priceTextEl) {
         if (currentBaseFare > 0) priceTextEl.innerText = `HK$ ${calculateTotalFare()}`;

@@ -1,10 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<link rel="preconnect" href="https://maps.googleapis.com">
 <head>
+
+    <!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
+    <script>
+    (function() {
+        var isLight = false;
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+        } catch(e) {}
+        document.documentElement.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
+        document.documentElement.style.color = isLight ? '#000000' : '#FFFFFF';
+        if (isLight) document.documentElement.classList.add('preload-light');
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+        html.preload-light body,
+        html.preload-light body * {
+            transition: none !important;
+        }
+        html:not(.preload-light) body {
+            background-color: #0B0B0B;
+            color: #FFFFFF;
+        }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士</title>
 
@@ -61,6 +97,31 @@
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#FFF200">
+
+    <!-- ✅ 反黑閃：搶先判斷主題 -->
+    <script>
+    (function() {
+        try {
+            var saved = localStorage.getItem('taxiTheme');
+            var override = localStorage.getItem('taxiThemeUserOverride') === '1';
+            var isLight;
+            if (override && (saved === 'light' || saved === 'dark')) {
+                isLight = saved === 'light';
+            } else {
+                isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            }
+            if (isLight) document.documentElement.classList.add('preload-light');
+        } catch (e) {}
+    })();
+    </script>
+    <style>
+        html.preload-light,
+        html.preload-light body {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+    </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -81,36 +142,6 @@
             }
         }
     </script>
-
-    <script>
-        (function() {
-            const manifestData = {
-                "name": "24小時八五折的士預約服務",
-                "short_name": "網約車TAXI",
-                "start_url": "https://hktaxiservice.netlify.app/",
-                "display": "standalone",
-                "background_color": "#0B0B0B",
-                "theme_color": "#FFF200",
-                "orientation": "portrait",
-                "icons": [
-                    { "src": "icon192.jpeg", "sizes": "192x192", "type": "image/jpeg" },
-                    { "src": "icon512.jpeg", "sizes": "512x512", "type": "image/jpeg" }
-                ]
-            };
-            const stringManifest = JSON.stringify(manifestData);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
-            document.head.appendChild(link);
-        })();
-    </script>
-
-    <link rel="apple-touch-icon" href="icon.jpeg">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#FFF200">
 
     <style>
         html { 
@@ -167,16 +198,7 @@
         body.light-theme button[onclick*="calculateAndGoToResult"] {
             background-color: #FFF200 !important;
             color: #000000 !important;
-            border-color: #000000 !important;
-        }
-        body.light-theme #voice-btn:hover,
-        body.light-theme button[onclick*="clearAllInputs"]:hover,
-        body.light-theme button[onclick*="swapLocations"]:hover,
-        body.light-theme #add-stop-btn:hover,
-        body.light-theme button[onclick*="removeStopoverField"]:hover,
-        body.light-theme button[onclick*="calculateAndGoToResult"]:hover {
-            background-color: #000000 !important;
-            color: #FFF200 !important;
+            border: 1px solid #000000 !important;
         }
 
         /* 淺色主題下動態路線選項按鈕 */
@@ -891,7 +913,7 @@
             </p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
             </div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                 了解，關閉
             </button>
         </div>
@@ -904,7 +926,7 @@
                 <h3 class="text-lg font-bold flex items-center gap-2 text-white">
                     <i class="fa-solid fa-route text-brand-yellow"></i> <span data-i18n="result_title">路線規劃結果</span>
                 </h3>
-                <button type="button" onclick="goBackToInput()" class="text-xs font-extrabold text-black bg-brand-yellow py-2 px-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md whitespace-nowrap">
+                <button type="button" onclick="goBackToInput()" class="text-xs font-extrabold text-black bg-brand-yellow py-2 px-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md whitespace-nowrap">
                     <i class="fa-solid fa-route"></i> <span data-i18n="btn_reselect_route">重新規劃路線</span>
                 </button>
             </div>
@@ -1022,12 +1044,11 @@
                     </div>
                 </div>
 
-                <!-- ✅ 選擇六人車款（左） + 立即預約（右，注解在內、同尺寸） -->
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    <button type="button" onclick="goToFleetPage()" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl hover:opacity-95 transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                    <button type="button" onclick="goToFleetPage()" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-car"></i> <span data-i18n="btn_select_6seater">選擇六人車款</span>
                     </button>
-                    <button type="button" onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-4 py-3 rounded-xl font-bold hover:opacity-95 transition cursor-pointer inline-flex flex-col items-center justify-center gap-0.5 shadow-md">
+                    <button type="button" onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-4 py-3 rounded-xl font-bold transition cursor-pointer inline-flex flex-col items-center justify-center gap-0.5 shadow-md">
                         <span class="flex items-center gap-1.5 text-base font-extrabold">
                             <i class="fa-solid fa-calendar-check"></i> <span data-i18n="btn_quick_query">立即預約</span>
                         </span>
@@ -1040,7 +1061,7 @@
 
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
-            <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+            <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
 
@@ -1057,12 +1078,12 @@
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
-                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
+                    <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                         關閉
                     </button>
                 </div>
             </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
