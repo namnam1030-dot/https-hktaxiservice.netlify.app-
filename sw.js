@@ -1,8 +1,10 @@
-// ✅ 完整版（網路優先，離線可用）
-const CACHE_NAME = 'taxi-service-v2'; // 更新版本號，強制更新快取
+// ✅ 完整版（HTML / CSS / JS 網路優先，圖片快取優先，離線可用）
+const CACHE_NAME = 'taxi-service-v3'; // ⭐ 版本號 bump 咗，強制清舊 cache
 const urlsToCache = [
   '/',
   '/index.html',
+  '/theme.css',
+  '/theme.js',
   '/logo.jpeg',
   '/icon.jpeg',
   '/icon192.jpeg',
@@ -16,26 +18,26 @@ const urlsToCache = [
   '/hotline.jpeg'
 ];
 
-// 安裝 Service Worker 時緩存所有重要檔案
+// =========================================================
+// 安裝：預緩存核心檔案 + 即刻接管
+// =========================================================
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+      .then(cache => cache.addAll(urlsToCache))
       .then(() => self.skipWaiting())
   );
 });
 
-// 啟動時清理舊版緩存
+// =========================================================
+// 啟動：清舊 cache + 接管所有 client
+// =========================================================
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -44,65 +46,96 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 攔截請求：HTML 使用網路優先，其他檔案使用緩存優先
+// =========================================================
+// 判斷請求類型
+// =========================================================
+function isHTML(request) {
+  return request.mode === 'navigate' ||
+         (request.headers.get('accept') || '').includes('text/html');
+}
+
+function isCSSorJS(url) {
+  return /\.(css|js)(\?.*)?$/i.test(url.pathname);
+}
+
+function isStaticAsset(url) {
+  return /\.(jpe?g|png|gif|webp|svg|ico|woff2?|ttf|otf)(\?.*)?$/i.test(url.pathname);
+}
+
+// =========================================================
+// Fetch 攔截
+// =========================================================
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  
-  // 如果是 HTML 頁面（導航請求），使用網路優先策略
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+
+  // 只處理同源請求（Google Maps / FontAwesome / Tailwind CDN 等跳過，交返俾瀏覽器）
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // ── 1) HTML：網路優先，失敗先 fallback cache ──
+  if (isHTML(event.request)) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // 更新緩存
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
           return response;
         })
-        .catch(() => {
-          // 網路失敗時，回傳緩存
-          return caches.match(event.request)
-            .then(response => {
-              return response || caches.match('/index.html');
-            });
-        })
+        .catch(() =>
+          caches.match(event.request).then(r => r || caches.match('/index.html'))
+        )
     );
     return;
   }
-  
-  // 其他檔案（圖片、CSS、JS）使用緩存優先
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
+
+  // ── 2) CSS / JS：網路優先（⭐ 呢個係斷尾關鍵）──
+  if (isCSSorJS(url)) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
           return response;
-        }
-        
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // ── 3) 圖片 / 字體：快取優先（快，唔常變）──
+  if (isStaticAsset(url)) {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
         return fetch(event.request).then(response => {
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
-          
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
           return response;
         });
       })
-      .catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
+    );
+    return;
+  }
+
+  // ── 4) 其他同源請求：network-first fallback cache ──
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        return response;
       })
+      .catch(() => caches.match(event.request))
   );
 });
 
-// 監聽訊息，允許手動更新
+// =========================================================
+// 手動更新
+// =========================================================
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
