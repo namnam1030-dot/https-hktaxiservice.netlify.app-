@@ -228,6 +228,52 @@
     html.light-theme body .hover\:border-brand-yellow:hover {
         border-color: #000000 !important;
     }
+
+    /* =========================================================
+       🔧 深→淺切換殘留修復（result 專屬）
+       ========================================================= */
+
+    /* ── 1) 隧道偵測框：整個框 + 所有子元素強制深藍 ── */
+    html.light-theme body #detected-tunnels-container,
+    html.light-theme body #detected-tunnels-container *,
+    html.light-theme body #detected-tunnels-container .text-sky-200,
+    html.light-theme body #detected-tunnels-container .text-sky-300,
+    html.light-theme body #detected-tunnels-container .text-sky-400,
+    html.light-theme body #detected-tunnels-container .text-white,
+    html.light-theme body #detected-tunnels-container #detected-tunnels-list {
+        color: #0369A1 !important;
+    }
+
+    /* ── 2) 隧道費用行：整行 + 所有子元素強制深藍 ── */
+    html.light-theme body #res-tunnel-row,
+    html.light-theme body #res-tunnel-row *,
+    html.light-theme body #res-tunnel-row .text-sky-300 {
+        color: #0369A1 !important;
+    }
+
+    /* ── 3) 收費模式兩個方格：強制白底 + 淺灰邊 ── */
+    html.light-theme body #discount-option-container,
+    html.light-theme body .space-y-3 > label.bg-brand-dark,
+    html.light-theme body label.bg-brand-dark,
+    html.light-theme body .bg-brand-dark {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        border-color: #D1D5DB !important;
+    }
+
+    /* ── 4) 收費模式複選框：強制淺色渲染（避免黑方塊）── */
+    html.light-theme body input[type="checkbox"],
+    html.light-theme body .fare-mode-checkbox {
+        color-scheme: light !important;
+        accent-color: #000000 !important;
+        background-color: #FFFFFF !important;
+    }
+
+    /* ── 5) hover 時保持黑框 ── */
+    html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
+    html.light-theme body #discount-option-container:hover {
+        border-color: #000000 !important;
+    }
 </style>
 
     <script>
