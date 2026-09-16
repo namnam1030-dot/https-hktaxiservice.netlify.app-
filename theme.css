@@ -5,6 +5,7 @@
    修正重點：
    1) 所有淺色 override 改用 html.light-theme body（class 落 html 即生效）
    2) html.light-theme 自身亦設底色（防 document 交接空檔）
+   3) 移除 footer 上方空隙（同時解決轉色過渡 bug）
    ========================================================= */
 
 /* ===== 主題根：inline script 一落 class 即生效 ===== */
@@ -358,4 +359,11 @@ html.light-theme body button[onclick*="calculateAndGoToResult"] {
 ::view-transition-new(root) {
     animation-duration: 0.18s;
     animation-timing-function: ease-out;
+}
+
+/* =========================================================
+   ⭐ 移除 footer 上方空隙（同時解決轉色過渡時嘅顏色 bug）
+   ========================================================= */
+footer {
+    margin-top: 0 !important;
 }
