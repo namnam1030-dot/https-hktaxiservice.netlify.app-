@@ -910,5 +910,16 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script src="theme.js"></script>
+<script>
+// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
+if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+}
+</script>
 </body>
 </html>

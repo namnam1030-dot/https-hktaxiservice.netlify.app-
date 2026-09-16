@@ -1,5 +1,5 @@
 // ✅ 完整版（HTML / CSS / JS 網路優先，圖片快取優先，離線可用）
-const CACHE_NAME = 'taxi-service-v4'; // ⭐ bump 到 v4
+const CACHE_NAME = 'taxi-service-__BUILD_VERSION__';
 const urlsToCache = [
   '/',
   '/index.html',

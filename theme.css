@@ -6,6 +6,7 @@
    1) 所有淺色 override 改用 html.light-theme body（class 落 html 即生效）
    2) html.light-theme 自身亦設底色（防 document 交接空檔）
    3) 移除 footer 上方空隙（同時解決轉色過渡 bug）
+   4) 移除 View Transitions（加快轉頁速度）
    ========================================================= */
 
 /* ===== 主題根：inline script 一落 class 即生效 ===== */
@@ -347,18 +348,6 @@ html.light-theme body button[onclick*="calculateAndGoToResult"] {
     background-color: #FFF200 !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
-}
-
-/* =========================================================
-   View Transitions（可選）：MPA 轉頁自動 cross-fade
-   Chrome 126+ / Safari 18+ 支援，其他瀏覽器無副作用
-   ========================================================= */
-@view-transition { navigation: auto; }
-
-::view-transition-old(root),
-::view-transition-new(root) {
-    animation-duration: 0.18s;
-    animation-timing-function: ease-out;
 }
 
 /* =========================================================
