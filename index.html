@@ -144,8 +144,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<!-- ⭐ 只 defer，唔用 async（避免 callback 早過 DOM 執行） -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
 
 <script>
     tailwind.config = {
@@ -249,7 +248,7 @@
 </head>
 <body class="antialiased">
 
-    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md min-h-[92px]">
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md" style="min-height: 92px;">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
@@ -468,6 +467,7 @@
 // 跨頁面共享函數
 // ============================================
 
+// ⭐ 改動 #2：加入 placeId 欄
 function saveRouteDataToLocalStorage() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -493,6 +493,7 @@ function saveRouteDataToLocalStorage() {
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
+// ⭐ 改動 #2：同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
@@ -536,6 +537,7 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
+// ⭐ 改動 #2：清 placeId
 function clearAllInputs() {
     const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
     ids.forEach(id => {
@@ -664,7 +666,7 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識
+// 語音辨識（⭐ 完全保留你第一次嘅版本，冇改過）
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -680,9 +682,9 @@ function startVoiceRecognition() {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'zh-HK';                 // ⭐ 改返 zh-HK（yue-Hant-HK 唔係所有瀏覽器支援，會被當成 not-allowed）
+    recognition.lang = 'zh-HK';
     recognition.interimResults = false;
-    recognition.maxAlternatives = 3;
+    recognition.maxAlternatives = 1;
 
     const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
@@ -698,42 +700,39 @@ function startVoiceRecognition() {
 
     recognition.onresult = (event) => {
         recognition.stop();
-
-        const alts = [...event.results[0]].map(a => a.transcript);
-        console.log('語音辨識 alternatives:', alts);
-        const speechResult = alts[0];
-
+        const speechResult = event.results[0][0].transcript;
         micText.innerText = "聽到：「" + speechResult + "」";
 
+        let pickup = "", dropoff = "", stopover = "";
         let text = speechResult;
+
         text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
-        // 抽多個中途站
-        const viaMatches = [...text.matchAll(/(?:經|途經)([^經途去到至]+)/g)];
-        const stopovers = viaMatches.map(m => m[1].trim()).filter(Boolean).slice(0, 3);
-
-        // 抽起點
-        let pickup = "";
-        const fromMatch = text.match(/(?:由|從)([^經途去到至]+)/);
+        let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
         if (fromMatch && fromMatch[1]) {
             pickup = fromMatch[1].trim();
         } else {
-            const firstSplit = text.split(/經|途經|去|到|至/)[0];
+            let firstSplit = text.split(/經|途經|去|到|至/)[0];
             if (firstSplit) pickup = firstSplit.trim();
         }
 
-        // 抽終點
-        let dropoff = "";
-        const toMatch = text.match(/(?:去|到|至)([^經途去到至]+)$/);
+        let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
+        if (viaMatch && viaMatch[1]) {
+            let viaText = viaMatch[1].trim();
+            let subToSplit = viaText.split(/去|到|至/);
+            stopover = subToSplit[0].trim();
+        }
+
+        let toMatch = text.match(/(?:去|到|至)(.+)$/);
         if (toMatch && toMatch[1]) {
             dropoff = toMatch[1].trim();
         } else {
-            const parts = text.split(/經|途經/);
+            let parts = text.split(/經|途經/);
             if (parts.length >= 2) {
-                const lastPart = parts[parts.length - 1].trim();
-                if (lastPart) dropoff = lastPart;
+                let lastPart = parts[parts.length - 1].trim();
+                if (lastPart && lastPart !== stopover) dropoff = lastPart;
             } else if (!dropoff) {
-                const words = text.split(/\s+/);
+                let words = text.split(/\s+/);
                 if (words.length >= 2 && !pickup) {
                     pickup = words[0];
                     dropoff = words[words.length - 1];
@@ -745,22 +744,21 @@ function startVoiceRecognition() {
             const el = document.getElementById('calc-pickup');
             if (el) {
                 el.value = pickup;
-                delete el.dataset.placeId;              // 語音填入冇 placeId
+                delete el.dataset.placeId;
                 toggleClearBtn('calc-pickup', 'clear-pickup-btn');
             }
         }
-
-        stopovers.forEach((stopText, idx) => {
-            const i = idx + 1;
-            if (i > currentStopCount) addStopoverField();
-            const input = document.getElementById(`calc-stopover-${i}`);
-            if (input) {
-                input.value = stopText;
-                delete input.dataset.placeId;
-                toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+        
+        if (stopover) {
+            if (currentStopCount === 0) addStopoverField();
+            const el = document.getElementById('calc-stopover-1');
+            if (el) {
+                el.value = stopover;
+                delete el.dataset.placeId;
+                toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
             }
-        });
-
+        }
+        
         if (dropoff) {
             const el = document.getElementById('calc-dropoff');
             if (el) {
@@ -781,9 +779,6 @@ function startVoiceRecognition() {
     recognition.onerror = (event) => {
         let errMsg = "未能識別語音，請重試或以文字輸入";
         switch (event.error) {
-            case 'language-not-supported':
-                errMsg = "🌐 此瀏覽器不支援所選語言，已改回預設。";
-                break;
             case 'not-allowed':
             case 'service-not-allowed':
                 errMsg = "❌ 麥克風權限被拒絕。請到瀏覽器設定允許麥克風權限。";
@@ -986,7 +981,7 @@ function applyLanguage() {
 }
 
 // ============================================
-// Autocomplete 保護 + place_changed 擷取 place_id
+// ⭐ 改動 #1 + #2：Autocomplete（readyState 保護 + place_id 擷取）
 // ============================================
 function initAutocomplete() {
     if (document.readyState === 'loading') {
@@ -1002,6 +997,7 @@ function _attachAutocompletes() {
         new google.maps.LatLng(22.58, 114.50)
     );
 
+    // ⭐ 移除 types 限制，等 Google 自己揀最合適嘅結果
     const options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
@@ -1052,7 +1048,7 @@ function addStopoverField() {
     }
 }
 
-// 移除中途站時，後面嘅中途站會上移，唔會跳號
+// ⭐ 改動 #7：移除中途站時，後面嘅上移，唔跳號
 function removeStopoverField(index) {
     const values = [];
     for (let i = 1; i <= 3; i++) {
@@ -1138,10 +1134,10 @@ function swapLocations() {
 // ============================================
 // 頁面初始化
 // ============================================
+// ⭐ 改動 #3：用 sessionStorage flag 判斷「由 result.html 返嚟」
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
 
-    // 由 result.html「重新規劃路線」返嚟 → 恢復舊資料
     const returning = sessionStorage.getItem('returningFromResult') === '1';
     sessionStorage.removeItem('returningFromResult');
 
