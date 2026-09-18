@@ -144,7 +144,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<!-- ⭐ #8：只 defer，唔用 async（避免 callback 早過 DOM 執行） -->
+<!-- ⭐ 只 defer，唔用 async（避免 callback 早過 DOM 執行） -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
 
 <script>
@@ -249,7 +249,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- ⭐ #13：min-h-[92px] Tailwind class 取代 inline style -->
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md min-h-[92px]">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
@@ -469,7 +468,6 @@
 // 跨頁面共享函數
 // ============================================
 
-// ⭐ #2：saveRouteDataToLocalStorage 加入 placeId 欄
 function saveRouteDataToLocalStorage() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -495,7 +493,6 @@ function saveRouteDataToLocalStorage() {
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
-// ⭐ #2：loadRouteDataFromLocalStorage 同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
@@ -539,7 +536,6 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
-// ⭐ #2：clearAllInputs 同步清 placeId
 function clearAllInputs() {
     const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
     ids.forEach(id => {
@@ -668,7 +664,7 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識（⭐ #4 支援多中途站、#5 maxAlternatives=3、#11 用 yue-Hant-HK）
+// 語音辨識
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -684,9 +680,9 @@ function startVoiceRecognition() {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'yue-Hant-HK';           // ⭐ #11
+    recognition.lang = 'zh-HK';                 // ⭐ 改返 zh-HK（yue-Hant-HK 唔係所有瀏覽器支援，會被當成 not-allowed）
     recognition.interimResults = false;
-    recognition.maxAlternatives = 3;            // ⭐ #5
+    recognition.maxAlternatives = 3;
 
     const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
@@ -703,7 +699,6 @@ function startVoiceRecognition() {
     recognition.onresult = (event) => {
         recognition.stop();
 
-        // ⭐ #5：攞晒所有 alternatives，方便 debug
         const alts = [...event.results[0]].map(a => a.transcript);
         console.log('語音辨識 alternatives:', alts);
         const speechResult = alts[0];
@@ -713,7 +708,7 @@ function startVoiceRecognition() {
         let text = speechResult;
         text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
-        // ⭐ #4：抽多個中途站
+        // 抽多個中途站
         const viaMatches = [...text.matchAll(/(?:經|途經)([^經途去到至]+)/g)];
         const stopovers = viaMatches.map(m => m[1].trim()).filter(Boolean).slice(0, 3);
 
@@ -750,12 +745,11 @@ function startVoiceRecognition() {
             const el = document.getElementById('calc-pickup');
             if (el) {
                 el.value = pickup;
-                delete el.dataset.placeId;              // ⭐ 語音填入冇 placeId
+                delete el.dataset.placeId;              // 語音填入冇 placeId
                 toggleClearBtn('calc-pickup', 'clear-pickup-btn');
             }
         }
 
-        // ⭐ #4：填多個中途站
         stopovers.forEach((stopText, idx) => {
             const i = idx + 1;
             if (i > currentStopCount) addStopoverField();
@@ -776,7 +770,6 @@ function startVoiceRecognition() {
             }
         }
 
-        // ⭐ #6 保留原狀：1 秒後自動跳去 result.html
         setTimeout(() => {
             micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
@@ -788,6 +781,9 @@ function startVoiceRecognition() {
     recognition.onerror = (event) => {
         let errMsg = "未能識別語音，請重試或以文字輸入";
         switch (event.error) {
+            case 'language-not-supported':
+                errMsg = "🌐 此瀏覽器不支援所選語言，已改回預設。";
+                break;
             case 'not-allowed':
             case 'service-not-allowed':
                 errMsg = "❌ 麥克風權限被拒絕。請到瀏覽器設定允許麥克風權限。";
@@ -990,7 +986,7 @@ function applyLanguage() {
 }
 
 // ============================================
-// ⭐ #1 + #2：Autocomplete 保護 + place_changed 擷取 place_id
+// Autocomplete 保護 + place_changed 擷取 place_id
 // ============================================
 function initAutocomplete() {
     if (document.readyState === 'loading') {
@@ -1006,7 +1002,6 @@ function _attachAutocompletes() {
         new google.maps.LatLng(22.58, 114.50)
     );
 
-    // ⭐ #10：唔再用過窄嘅 types，等 Google 自己揀最合適嘅結果
     const options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
@@ -1027,7 +1022,6 @@ function _attachAutocompletes() {
 
         const ac = new google.maps.places.Autocomplete(el, options);
 
-        // ⭐ #2：用戶從下拉列表揀地點 → 記低 place_id
         ac.addListener('place_changed', () => {
             const place = ac.getPlace();
             if (place && place.formatted_address) {
@@ -1039,7 +1033,6 @@ function _attachAutocompletes() {
             toggleClearBtn(inputId, btnId);
         });
 
-        // ⭐ #2：用戶手動編輯 → 即清 place_id（免用舊 place_id）
         el.addEventListener('input', () => {
             delete el.dataset.placeId;
         });
@@ -1059,9 +1052,8 @@ function addStopoverField() {
     }
 }
 
-// ⭐ #7：移除中途站時，後面嘅中途站會上移，唔會跳號
+// 移除中途站時，後面嘅中途站會上移，唔會跳號
 function removeStopoverField(index) {
-    // 收集目前所有「可見」中途站嘅值
     const values = [];
     for (let i = 1; i <= 3; i++) {
         const el = document.getElementById(`calc-stopover-${i}`);
@@ -1074,10 +1066,8 @@ function removeStopoverField(index) {
         }
     }
 
-    // 移除指定 index（index 係 1-based，values 係 0-based）
     values.splice(index - 1, 1);
 
-    // 重新填入
     for (let i = 1; i <= 3; i++) {
         const el = document.getElementById(`calc-stopover-${i}`);
         const container = document.getElementById(`stopover-container-${i}`);
@@ -1114,7 +1104,6 @@ function toggleClearBtn(inputId, btnId) {
     }
 }
 
-// ⭐ #2：清單一 input 時同步清 place_id
 function clearInput(inputId, btnId) {
     const input = document.getElementById(inputId);
     if (input) {
@@ -1125,7 +1114,6 @@ function clearInput(inputId, btnId) {
     }
 }
 
-// ⭐ #2：對調起終點時同步對調 place_id
 function swapLocations() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -1150,11 +1138,10 @@ function swapLocations() {
 // ============================================
 // 頁面初始化
 // ============================================
-// ⭐ #3 + #12：改用 sessionStorage flag，document.addEventListener
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
 
-    // ⭐ #3：由 result.html「重新規劃路線」返嚟 → 恢復舊資料
+    // 由 result.html「重新規劃路線」返嚟 → 恢復舊資料
     const returning = sessionStorage.getItem('returningFromResult') === '1';
     sessionStorage.removeItem('returningFromResult');
 
