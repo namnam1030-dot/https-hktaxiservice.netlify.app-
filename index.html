@@ -21,16 +21,12 @@
 
     var root = document.documentElement;
 
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
-
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -44,7 +40,6 @@
 </script>
 
 <style>
-    /* html + body 用同一組 data-theme 控制，一 parse 即生效 */
     html[data-theme="light"],
     html[data-theme="light"] body {
         background-color: #FFFFFF !important;
@@ -56,7 +51,6 @@
         color: #FFFFFF !important;
     }
 
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -144,14 +138,14 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
+<!-- ⭐ #8：只 defer，唔用 async（避免 callback 早過 DOM 執行） -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
 
 <script>
     tailwind.config = {
@@ -223,7 +217,6 @@
         border-radius: 0.5rem;
     }
 
-    /* ===== 淺色主題（body.light-theme → html.light-theme body）===== */
     html.light-theme body .pac-container {
         background-color: #FFFFFF;
         color: #000000;
@@ -242,7 +235,6 @@
         font-weight: 700;
     }
 
-    /* 淺色主題下的按鈕（頁面專屬） */
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
@@ -257,7 +249,8 @@
 </head>
 <body class="antialiased">
 
-    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md" style="min-height: 92px;">
+    <!-- ⭐ #13：min-h-[92px] Tailwind class 取代 inline style -->
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md min-h-[92px]">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
@@ -363,7 +356,7 @@
                             </div>
                         </div>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
+                            <input type="text" id="calc-pickup" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
                             <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -382,7 +375,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
+                            <input type="text" id="calc-stopover-1" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
                             <button type="button" id="clear-stop-1-btn" onclick="clearInput('calc-stopover-1', 'clear-stop-1-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -397,7 +390,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
+                            <input type="text" id="calc-stopover-2" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
                             <button type="button" id="clear-stop-2-btn" onclick="clearInput('calc-stopover-2', 'clear-stop-2-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -412,7 +405,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
+                            <input type="text" id="calc-stopover-3" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
                             <button type="button" id="clear-stop-3-btn" onclick="clearInput('calc-stopover-3', 'clear-stop-3-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -425,7 +418,7 @@
                     <div>
                         <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
+                            <input type="text" id="calc-dropoff" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
                             <button type="button" id="clear-dropoff-btn" onclick="clearInput('calc-dropoff', 'clear-dropoff-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -476,77 +469,102 @@
 // 跨頁面共享函數
 // ============================================
 
+// ⭐ #2：saveRouteDataToLocalStorage 加入 placeId 欄
 function saveRouteDataToLocalStorage() {
+    const pickupEl = document.getElementById('calc-pickup');
+    const dropoffEl = document.getElementById('calc-dropoff');
+
     const data = {
-        pickup: document.getElementById('calc-pickup')?.value.trim() || '',
-        dropoff: document.getElementById('calc-dropoff')?.value.trim() || '',
-        stopovers: []
+        pickup: pickupEl?.value.trim() || '',
+        pickupPlaceId: pickupEl?.dataset.placeId || '',
+        dropoff: dropoffEl?.value.trim() || '',
+        dropoffPlaceId: dropoffEl?.dataset.placeId || '',
+        stopovers: [],
+        stopoverPlaceIds: []
     };
-    
+
     for (let i = 1; i <= 3; i++) {
-        const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim() || '';
-        if (stopVal) data.stopovers.push(stopVal);
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const v = el?.value.trim() || '';
+        if (v) {
+            data.stopovers.push(v);
+            data.stopoverPlaceIds.push(el.dataset.placeId || '');
+        }
     }
-    
+
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
+// ⭐ #2：loadRouteDataFromLocalStorage 同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
-    if (saved) {
-        try {
-            const data = JSON.parse(saved);
-            if (data.pickup && document.getElementById('calc-pickup')) {
-                document.getElementById('calc-pickup').value = data.pickup;
-                toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-            }
-            if (data.dropoff && document.getElementById('calc-dropoff')) {
-                document.getElementById('calc-dropoff').value = data.dropoff;
-                toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-            }
-            data.stopovers.forEach((stop, index) => {
-                const container = document.getElementById(`stopover-container-${index + 1}`);
-                const input = document.getElementById(`calc-stopover-${index + 1}`);
-                if (container && input) {
-                    container.classList.remove('hidden');
-                    input.value = stop;
-                    toggleClearBtn(`calc-stopover-${index + 1}`, `clear-stop-${index + 1}-btn`);
-                    currentStopCount = Math.max(currentStopCount, index + 1);
-                }
-            });
-        } catch(e) {
-            console.log('No saved route data');
+    if (!saved) return;
+
+    try {
+        const data = JSON.parse(saved);
+
+        const pickupEl = document.getElementById('calc-pickup');
+        if (pickupEl && data.pickup) {
+            pickupEl.value = data.pickup;
+            if (data.pickupPlaceId) pickupEl.dataset.placeId = data.pickupPlaceId;
+            toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         }
+
+        const dropoffEl = document.getElementById('calc-dropoff');
+        if (dropoffEl && data.dropoff) {
+            dropoffEl.value = data.dropoff;
+            if (data.dropoffPlaceId) dropoffEl.dataset.placeId = data.dropoffPlaceId;
+            toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+        }
+
+        (data.stopovers || []).forEach((stop, index) => {
+            const i = index + 1;
+            const container = document.getElementById(`stopover-container-${i}`);
+            const input = document.getElementById(`calc-stopover-${i}`);
+            if (container && input) {
+                container.classList.remove('hidden');
+                input.value = stop;
+                const pid = (data.stopoverPlaceIds || [])[index];
+                if (pid) input.dataset.placeId = pid;
+                toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+                currentStopCount = Math.max(currentStopCount, i);
+            }
+        });
+
+        if (currentStopCount >= 3) {
+            document.getElementById('add-stop-btn')?.classList.add('hidden');
+        }
+    } catch(e) {
+        console.log('No saved route data');
     }
 }
 
+// ⭐ #2：clearAllInputs 同步清 placeId
 function clearAllInputs() {
-    const pickupEl = document.getElementById('calc-pickup');
-    if (pickupEl) {
-        pickupEl.value = '';
-        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-    }
-    
-    const dropoffEl = document.getElementById('calc-dropoff');
-    if (dropoffEl) {
-        dropoffEl.value = '';
-        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-    }
-    
+    const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = '';
+            delete el.dataset.placeId;
+        }
+    });
+
     for (let i = 1; i <= 3; i++) {
-        const stopInput = document.getElementById(`calc-stopover-${i}`);
-        const stopContainer = document.getElementById(`stopover-container-${i}`);
-        if (stopInput) stopInput.value = '';
-        if (stopContainer) stopContainer.classList.add('hidden');
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (container) container.classList.add('hidden');
     }
     currentStopCount = 0;
     const addStopBtn = document.getElementById('add-stop-btn');
     if (addStopBtn) addStopBtn.classList.remove('hidden');
-    
+
+    toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+    toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
-    
-    if (pickupEl) pickupEl.focus();
+
+    document.getElementById('calc-pickup')?.focus();
 }
 
 function calculateAndGoToResult() {
@@ -635,16 +653,22 @@ function swapStopoverValues(fromIndex, toIndex) {
     const fromInput = document.getElementById(`calc-stopover-${fromIndex}`);
     const toInput = document.getElementById(`calc-stopover-${toIndex}`);
     if (fromInput && toInput) {
-        const temp = fromInput.value;
+        const tempVal = fromInput.value;
+        const tempId = fromInput.dataset.placeId || '';
         fromInput.value = toInput.value;
-        toInput.value = temp;
+        toInput.value = tempVal;
+        if (toInput.dataset.placeId) fromInput.dataset.placeId = toInput.dataset.placeId;
+        else delete fromInput.dataset.placeId;
+        if (tempId) toInput.dataset.placeId = tempId;
+        else delete toInput.dataset.placeId;
+
         toggleClearBtn(`calc-stopover-${fromIndex}`, `clear-stop-${fromIndex}-btn`);
         toggleClearBtn(`calc-stopover-${toIndex}`, `clear-stop-${toIndex}-btn`);
     }
 }
 
 // ============================================
-// 語音辨識
+// 語音辨識（⭐ #4 支援多中途站、#5 maxAlternatives=3、#11 用 yue-Hant-HK）
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -660,9 +684,9 @@ function startVoiceRecognition() {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'zh-HK';
+    recognition.lang = 'yue-Hant-HK';           // ⭐ #11
     recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.maxAlternatives = 3;            // ⭐ #5
 
     const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
@@ -678,39 +702,43 @@ function startVoiceRecognition() {
 
     recognition.onresult = (event) => {
         recognition.stop();
-        const speechResult = event.results[0][0].transcript;
+
+        // ⭐ #5：攞晒所有 alternatives，方便 debug
+        const alts = [...event.results[0]].map(a => a.transcript);
+        console.log('語音辨識 alternatives:', alts);
+        const speechResult = alts[0];
+
         micText.innerText = "聽到：「" + speechResult + "」";
 
-        let pickup = "", dropoff = "", stopover = "";
         let text = speechResult;
-
         text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
-        let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
+        // ⭐ #4：抽多個中途站
+        const viaMatches = [...text.matchAll(/(?:經|途經)([^經途去到至]+)/g)];
+        const stopovers = viaMatches.map(m => m[1].trim()).filter(Boolean).slice(0, 3);
+
+        // 抽起點
+        let pickup = "";
+        const fromMatch = text.match(/(?:由|從)([^經途去到至]+)/);
         if (fromMatch && fromMatch[1]) {
             pickup = fromMatch[1].trim();
         } else {
-            let firstSplit = text.split(/經|途經|去|到|至/)[0];
+            const firstSplit = text.split(/經|途經|去|到|至/)[0];
             if (firstSplit) pickup = firstSplit.trim();
         }
 
-        let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
-        if (viaMatch && viaMatch[1]) {
-            let viaText = viaMatch[1].trim();
-            let subToSplit = viaText.split(/去|到|至/);
-            stopover = subToSplit[0].trim();
-        }
-
-        let toMatch = text.match(/(?:去|到|至)(.+)$/);
+        // 抽終點
+        let dropoff = "";
+        const toMatch = text.match(/(?:去|到|至)([^經途去到至]+)$/);
         if (toMatch && toMatch[1]) {
             dropoff = toMatch[1].trim();
         } else {
-            let parts = text.split(/經|途經/);
+            const parts = text.split(/經|途經/);
             if (parts.length >= 2) {
-                let lastPart = parts[parts.length - 1].trim();
-                if (lastPart && lastPart !== stopover) dropoff = lastPart;
+                const lastPart = parts[parts.length - 1].trim();
+                if (lastPart) dropoff = lastPart;
             } else if (!dropoff) {
-                let words = text.split(/\s+/);
+                const words = text.split(/\s+/);
                 if (words.length >= 2 && !pickup) {
                     pickup = words[0];
                     dropoff = words[words.length - 1];
@@ -719,21 +747,36 @@ function startVoiceRecognition() {
         }
 
         if (pickup) {
-            document.getElementById('calc-pickup').value = pickup;
-            toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-        }
-        
-        if (stopover) {
-            if (currentStopCount === 0) addStopoverField();
-            document.getElementById('calc-stopover-1').value = stopover;
-            toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
-        }
-        
-        if (dropoff) {
-            document.getElementById('calc-dropoff').value = dropoff;
-            toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+            const el = document.getElementById('calc-pickup');
+            if (el) {
+                el.value = pickup;
+                delete el.dataset.placeId;              // ⭐ 語音填入冇 placeId
+                toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+            }
         }
 
+        // ⭐ #4：填多個中途站
+        stopovers.forEach((stopText, idx) => {
+            const i = idx + 1;
+            if (i > currentStopCount) addStopoverField();
+            const input = document.getElementById(`calc-stopover-${i}`);
+            if (input) {
+                input.value = stopText;
+                delete input.dataset.placeId;
+                toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+            }
+        });
+
+        if (dropoff) {
+            const el = document.getElementById('calc-dropoff');
+            if (el) {
+                el.value = dropoff;
+                delete el.dataset.placeId;
+                toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+            }
+        }
+
+        // ⭐ #6 保留原狀：1 秒後自動跳去 result.html
         setTimeout(() => {
             micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
@@ -946,33 +989,61 @@ function applyLanguage() {
     });
 }
 
+// ============================================
+// ⭐ #1 + #2：Autocomplete 保護 + place_changed 擷取 place_id
+// ============================================
 function initAutocomplete() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _attachAutocompletes);
+    } else {
+        _attachAutocompletes();
+    }
+}
+
+function _attachAutocompletes() {
     const hkBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(22.15, 113.83),
         new google.maps.LatLng(22.58, 114.50)
     );
 
+    // ⭐ #10：唔再用過窄嘅 types，等 Google 自己揀最合適嘅結果
     const options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
-        fields: ["formatted_address", "geometry", "name"],
-        types: ['geocode', 'establishment']
+        fields: ["place_id", "formatted_address", "geometry", "name"]
     };
 
-    const pickupEl = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
-    const stop1 = document.getElementById('calc-stopover-1');
-    const stop2 = document.getElementById('calc-stopover-2');
-    const stop3 = document.getElementById('calc-stopover-3');
+    const inputMap = [
+        ['calc-pickup',     'clear-pickup-btn'],
+        ['calc-dropoff',    'clear-dropoff-btn'],
+        ['calc-stopover-1', 'clear-stop-1-btn'],
+        ['calc-stopover-2', 'clear-stop-2-btn'],
+        ['calc-stopover-3', 'clear-stop-3-btn']
+    ];
 
-    if (pickupEl) {
-        new google.maps.places.Autocomplete(pickupEl, options);
-    }
-    
-    if (dropoffEl) new google.maps.places.Autocomplete(dropoffEl, options);
-    if (stop1) new google.maps.places.Autocomplete(stop1, options);
-    if (stop2) new google.maps.places.Autocomplete(stop2, options);
-    if (stop3) new google.maps.places.Autocomplete(stop3, options);
+    inputMap.forEach(([inputId, btnId]) => {
+        const el = document.getElementById(inputId);
+        if (!el) return;
+
+        const ac = new google.maps.places.Autocomplete(el, options);
+
+        // ⭐ #2：用戶從下拉列表揀地點 → 記低 place_id
+        ac.addListener('place_changed', () => {
+            const place = ac.getPlace();
+            if (place && place.formatted_address) {
+                el.value = place.formatted_address;
+            }
+            if (place && place.place_id) {
+                el.dataset.placeId = place.place_id;
+            }
+            toggleClearBtn(inputId, btnId);
+        });
+
+        // ⭐ #2：用戶手動編輯 → 即清 place_id（免用舊 place_id）
+        el.addEventListener('input', () => {
+            delete el.dataset.placeId;
+        });
+    });
 }
 
 function addStopoverField() {
@@ -988,14 +1059,45 @@ function addStopoverField() {
     }
 }
 
+// ⭐ #7：移除中途站時，後面嘅中途站會上移，唔會跳號
 function removeStopoverField(index) {
-    const container = document.getElementById(`stopover-container-${index}`);
-    const input = document.getElementById(`calc-stopover-${index}`);
-    if (input) input.value = '';
-    toggleClearBtn(`calc-stopover-${index}`, `clear-stop-${index}-btn`);
-    if (container) container.classList.add('hidden');
+    // 收集目前所有「可見」中途站嘅值
+    const values = [];
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (el && container && !container.classList.contains('hidden')) {
+            values.push({
+                value: el.value,
+                placeId: el.dataset.placeId || ''
+            });
+        }
+    }
 
-    currentStopCount = Math.max(0, currentStopCount - 1);
+    // 移除指定 index（index 係 1-based，values 係 0-based）
+    values.splice(index - 1, 1);
+
+    // 重新填入
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (!el || !container) continue;
+
+        const v = values[i - 1];
+        if (v) {
+            el.value = v.value;
+            if (v.placeId) el.dataset.placeId = v.placeId;
+            else delete el.dataset.placeId;
+            container.classList.remove('hidden');
+        } else {
+            el.value = '';
+            delete el.dataset.placeId;
+            container.classList.add('hidden');
+        }
+        toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+    }
+
+    currentStopCount = values.length;
     const btn = document.getElementById('add-stop-btn');
     if (btn) btn.classList.remove('hidden');
 }
@@ -1012,22 +1114,33 @@ function toggleClearBtn(inputId, btnId) {
     }
 }
 
+// ⭐ #2：清單一 input 時同步清 place_id
 function clearInput(inputId, btnId) {
     const input = document.getElementById(inputId);
     if (input) {
         input.value = '';
+        delete input.dataset.placeId;
         toggleClearBtn(inputId, btnId);
         input.focus();
     }
 }
 
+// ⭐ #2：對調起終點時同步對調 place_id
 function swapLocations() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
     if (pickupEl && dropoffEl) {
-        const temp = pickupEl.value;
+        const tempVal = pickupEl.value;
+        const tempId = pickupEl.dataset.placeId || '';
+
         pickupEl.value = dropoffEl.value;
-        dropoffEl.value = temp;
+        dropoffEl.value = tempVal;
+
+        if (dropoffEl.dataset.placeId) pickupEl.dataset.placeId = dropoffEl.dataset.placeId;
+        else delete pickupEl.dataset.placeId;
+
+        if (tempId) dropoffEl.dataset.placeId = tempId;
+        else delete dropoffEl.dataset.placeId;
 
         toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
@@ -1037,23 +1150,25 @@ function swapLocations() {
 // ============================================
 // 頁面初始化
 // ============================================
-window.addEventListener('DOMContentLoaded', () => {
+// ⭐ #3 + #12：改用 sessionStorage flag，document.addEventListener
+document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
-    
-    const referrer = document.referrer || '';
-    const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
-    
-    if (fromResultOrBooking) {
+
+    // ⭐ #3：由 result.html「重新規劃路線」返嚟 → 恢復舊資料
+    const returning = sessionStorage.getItem('returningFromResult') === '1';
+    sessionStorage.removeItem('returningFromResult');
+
+    if (returning) {
         loadRouteDataFromLocalStorage();
     } else {
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
-        
+
         const pickupEl = document.getElementById('calc-pickup');
         const dropoffEl = document.getElementById('calc-dropoff');
         if (pickupEl) pickupEl.value = '';
         if (dropoffEl) dropoffEl.value = '';
-        
+
         for (let i = 1; i <= 3; i++) {
             const stopInput = document.getElementById(`calc-stopover-${i}`);
             const stopContainer = document.getElementById(`stopover-container-${i}`);
@@ -1064,13 +1179,13 @@ window.addEventListener('DOMContentLoaded', () => {
         const addStopBtn = document.getElementById('add-stop-btn');
         if (addStopBtn) addStopBtn.classList.remove('hidden');
     }
-    
+
     setupStopoverDragging();
 });
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
+// ⭐ 偵測到新 SW 接管時，自動 reload 一次
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {

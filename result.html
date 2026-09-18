@@ -21,16 +21,12 @@
 
     var root = document.documentElement;
 
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
-
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -44,7 +40,6 @@
 </script>
 
 <style>
-    /* 原本 html[data-theme] 規則（雙重保險） */
     html[data-theme="light"],
     html[data-theme="light"] body {
         background-color: #FFFFFF !important;
@@ -56,7 +51,6 @@
         color: #FFFFFF !important;
     }
 
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -123,14 +117,13 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" defer></script>
 
 <script>
     tailwind.config = {
@@ -176,7 +169,6 @@
     .pac-item:hover { background-color: #333; }
     .pac-item-query { color: #FFF200; font-size: 17px; }
 
-    /* ===== 淺色主題（全部由 body.light-theme → html.light-theme body）===== */
     html.light-theme body .pac-container {
         background-color: #FFFFFF;
         color: #000000;
@@ -190,7 +182,6 @@
     html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
     html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
 
-    /* 淺色主題下頁面專屬按鈕 */
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
@@ -202,7 +193,6 @@
         border: 1px solid #000000 !important;
     }
 
-    /* 淺色主題下動態路線選項按鈕 */
     html.light-theme body #route-options-list button {
         background-color: #F3F4F6 !important;
         border-color: #D1D5DB !important;
@@ -213,7 +203,6 @@
         border-color: #000000 !important;
         color: #000000 !important;
     }
-    /* 淺色主題下隧道偵測框 */
     html.light-theme body .bg-sky-900\/30 {
         background-color: rgba(14, 165, 233, 0.1) !important;
     }
@@ -229,11 +218,6 @@
         border-color: #000000 !important;
     }
 
-    /* =========================================================
-       🔧 深→淺切換殘留修復（result 專屬）
-       ========================================================= */
-
-    /* ── 1) 隧道偵測框：整個框 + 所有子元素強制深藍 ── */
     html.light-theme body #detected-tunnels-container,
     html.light-theme body #detected-tunnels-container *,
     html.light-theme body #detected-tunnels-container .text-sky-200,
@@ -244,14 +228,12 @@
         color: #0369A1 !important;
     }
 
-    /* ── 2) 隧道費用行：整行 + 所有子元素強制深藍 ── */
     html.light-theme body #res-tunnel-row,
     html.light-theme body #res-tunnel-row *,
     html.light-theme body #res-tunnel-row .text-sky-300 {
         color: #0369A1 !important;
     }
 
-    /* ── 3) 收費模式兩個方格：強制白底 + 淺灰邊 ── */
     html.light-theme body #discount-option-container,
     html.light-theme body .space-y-3 > label.bg-brand-dark,
     html.light-theme body label.bg-brand-dark,
@@ -261,7 +243,6 @@
         border-color: #D1D5DB !important;
     }
 
-    /* ── 4) 收費模式複選框：強制淺色渲染（避免黑方塊）── */
     html.light-theme body input[type="checkbox"],
     html.light-theme body .fare-mode-checkbox {
         color-scheme: light !important;
@@ -269,7 +250,6 @@
         background-color: #FFFFFF !important;
     }
 
-    /* ── 5) hover 時保持黑框 ── */
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
     html.light-theme body #discount-option-container:hover {
         border-color: #000000 !important;
@@ -420,7 +400,11 @@
         localStorage.setItem('taxiBookingData', JSON.stringify(data));
     }
 
+    // ⭐ #3：返回 index.html 前設 sessionStorage flag
     function goBackToInput() {
+        try {
+            sessionStorage.setItem('returningFromResult', '1');
+        } catch(e) {}
         window.location.href = 'index.html';
     }
 
@@ -494,6 +478,65 @@
         if (trimmed.includes("深圳灣")) return new google.maps.LatLng(22.475889, 113.955944);
         if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) return "香港國際機場";
         return trimmed;
+    }
+
+    // ============================================
+    // ⭐ 香港範圍 + 文字地址解析（兩層 fallback）
+    // ============================================
+    const HK_BOUNDS = { north: 22.56, south: 22.15, east: 114.44, west: 113.83 };
+
+    function isInHK(latLng) {
+        if (!latLng) return false;
+        return latLng.lat() >= HK_BOUNDS.south && latLng.lat() <= HK_BOUNDS.north &&
+               latLng.lng() >= HK_BOUNDS.west  && latLng.lng() <= HK_BOUNDS.east;
+    }
+
+    function resolveLocation(text) {
+        if (!text) return Promise.resolve(text);
+        if (text instanceof google.maps.LatLng) return Promise.resolve(text);
+        if (typeof text === 'object' && 'lat' in text && 'lng' in text) {
+            return Promise.resolve(new google.maps.LatLng(text.lat, text.lng));
+        }
+
+        return new Promise((resolve) => {
+            const geocoder = new google.maps.Geocoder();
+
+            geocoder.geocode(
+                {
+                    address: text,
+                    region: 'HK',
+                    language: 'zh-HK',
+                    componentRestrictions: { country: 'HK' }
+                },
+                (results, status) => {
+                    if (status === 'OK' && results && results[0]) {
+                        const loc = results[0].geometry.location;
+                        if (isInHK(loc)) return resolve(loc);
+                    }
+
+                    const dummyDiv = document.createElement('div');
+                    const service = new google.maps.places.PlacesService(dummyDiv);
+                    service.textSearch(
+                        {
+                            query: text,
+                            language: 'zh-HK',
+                            region: 'HK',
+                            bounds: new google.maps.LatLngBounds(
+                                new google.maps.LatLng(HK_BOUNDS.south, HK_BOUNDS.west),
+                                new google.maps.LatLng(HK_BOUNDS.north, HK_BOUNDS.east)
+                            )
+                        },
+                        (places, s2) => {
+                            if (s2 === 'OK' && places && places[0] && places[0].geometry) {
+                                const loc = places[0].geometry.location;
+                                if (isInHK(loc)) return resolve(loc);
+                            }
+                            resolve(text);
+                        }
+                    );
+                }
+            );
+        });
     }
 
     function processRoutes(routes, isShenzhenBay) {
@@ -584,11 +627,26 @@
         document.getElementById('confirm-dropoff').innerText = dropoffVal;
 
         if (!directionsService) directionsService = new google.maps.DirectionsService();
+
         let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
-        let targetPickup = normalizeLocation(pickupVal);
-        let targetDropoff = normalizeLocation(dropoffVal);
+
+        // ⭐ 優先使用 placeId；冇先 fallback 落文字
+        let targetPickup = routeData.pickupPlaceId
+            ? { placeId: routeData.pickupPlaceId }
+            : normalizeLocation(pickupVal);
+
+        let targetDropoff = routeData.dropoffPlaceId
+            ? { placeId: routeData.dropoffPlaceId }
+            : normalizeLocation(dropoffVal);
+
         let waypoints = [];
-        stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s), stopover: true }); });
+        stopoverTexts.forEach((s, idx) => {
+            const placeId = (routeData.stopoverPlaceIds || [])[idx];
+            waypoints.push({
+                location: placeId ? { placeId: placeId } : normalizeLocation(s),
+                stopover: true
+            });
+        });
 
         const request = {
             origin: targetPickup,
@@ -598,7 +656,10 @@
             provideRouteAlternatives: true
         };
 
-        directionsService.route(request, (result, status) => {
+        console.log('[Directions] request =', request);
+
+        function handleRouteResult(result, status, req, isRetry) {
+
             if (status === google.maps.DirectionsStatus.OK) {
                 routesData = processRoutes(result.routes, isShenzhenBay);
                 result.routes = routesData;
@@ -633,10 +694,47 @@
                 }
 
                 displaySelectedRoute(result, 0, isShenzhenBay);
-            } else {
-                alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
-                window.location.href = 'index.html';
+                return;
             }
+
+            if (status === google.maps.DirectionsStatus.ZERO_RESULTS && !isRetry) {
+                console.warn('[Directions] ZERO_RESULTS，嘗試解析地址後重試…', req);
+
+                const originText = req.origin;
+                const destText   = req.destination;
+                const wpTexts    = (req.waypoints || []).map(w => w.location);
+
+                Promise.all([
+                    resolveLocation(originText),
+                    resolveLocation(destText),
+                    ...wpTexts.map(t => resolveLocation(t))
+                ]).then(resolved => {
+                    const newRequest = {
+                        origin: resolved[0],
+                        destination: resolved[1],
+                        waypoints: wpTexts.map((_, i) => ({
+                            location: resolved[2 + i],
+                            stopover: true
+                        })),
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        provideRouteAlternatives: true
+                    };
+
+                    directionsService.route(newRequest, (r2, s2) => {
+                        handleRouteResult(r2, s2, newRequest, true);
+                    });
+                });
+                return;
+            }
+
+            alert(currentLang === 'en'
+                ? "Failed to calculate route. Please check input addresses."
+                : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+            window.location.href = 'index.html';
+        }
+
+        directionsService.route(request, (result, status) => {
+            handleRouteResult(result, status, request, false);
         });
     }
 
@@ -1141,7 +1239,7 @@
 // ============================================
 // 頁面初始化（theme.js 已自動初始化主題 / 浮標）
 // ============================================
-window.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 });
 </script>
