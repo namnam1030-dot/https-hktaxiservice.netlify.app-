@@ -644,6 +644,41 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
+// 語音狀態管理（全局）
+// ============================================
+let activeRecognition    = null;   // 目前活躍嘅 recognition 實例
+let isRecognizing        = false;  // 鎖：防止重複啟動
+let lastRecognitionEnd   = 0;      // 上次結束時間（冷卻用）
+const RECOGNITION_COOLDOWN = 400;  // 冷卻毫秒數（iOS 建議 400ms 以上）
+
+// 統一清理函數：任何路徑（onend / onerror / abort / pageshow）都經呢度
+function cleanupRecognition() {
+    isRecognizing = false;
+    lastRecognitionEnd = Date.now();
+
+    const micBtn  = document.getElementById('voice-btn');
+    const micText = document.getElementById('mic-text');
+    const micIcon = document.getElementById('mic-icon');
+
+    if (micBtn)  micBtn.classList.remove('bg-brand-yellow', 'text-black');
+    if (micIcon) micIcon.className = 'fa-solid fa-microphone text-base';
+    if (micText && typeof translations !== 'undefined' && translations[currentLang]) {
+        micText.innerText = translations[currentLang].voice_btn_text;
+    }
+}
+
+// ⭐ 頁面由 bfcache 恢復（例如：由 result.html 按返回）時重置語音狀態
+window.addEventListener('pageshow', () => {
+    if (activeRecognition) {
+        try { activeRecognition.abort(); } catch(e) {}
+        activeRecognition = null;
+    }
+    isRecognizing = false;
+    lastRecognitionEnd = 0;
+    cleanupRecognition();
+});
+
+// ============================================
 // 語音結果解析（抽出來方便重用）
 // ============================================
 function processSpeechResult(speechResult) {
@@ -715,6 +750,20 @@ function processSpeechResult(speechResult) {
 // 語音辨識
 // ============================================
 function startVoiceRecognition() {
+    // ① 防重複點擊（第一次未結束前，唔好再開）
+    if (isRecognizing) {
+        console.log('⏳ 語音辨識進行中，請等佢完成');
+        return;
+    }
+
+    // ② 冷卻檢查：上次結束後要等 RECOGNITION_COOLDOWN 毫秒
+    const now = Date.now();
+    if (now - lastRecognitionEnd < RECOGNITION_COOLDOWN) {
+        const wait = RECOGNITION_COOLDOWN - (now - lastRecognitionEnd);
+        console.log(`⏳ 語音辨識冷卻中，請等 ${wait}ms`);
+        return;
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
@@ -727,9 +776,18 @@ function startVoiceRecognition() {
         return;
     }
 
+    // ③ 保險：如果仲有舊實例，先 abort 佢
+    if (activeRecognition) {
+        try { activeRecognition.abort(); } catch(e) {}
+        activeRecognition = null;
+    }
+
     const recognition = new SpeechRecognition();
+    activeRecognition = recognition;
+    isRecognizing = true;
+
     recognition.lang = 'zh-HK';
-    recognition.interimResults = true;   // ⭐ 關鍵：開啟即時結果
+    recognition.interimResults = true;
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
@@ -741,10 +799,16 @@ function startVoiceRecognition() {
     micText.innerText = "正在啟動麥克風...";
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
-    // ⭐ 本次辨識 session 的狀態
-    let speechHandled  = false;   // 已處理過，避免重覆
-    let lastInterim    = '';      // 最後一次 interim 文字（後備用）
-    let autoStopTimer  = null;    // 自動停止計時器
+    let speechHandled  = false;
+    let lastInterim    = '';
+    let autoStopTimer  = null;
+
+    // ⭐ 統一收尾：避免 onend / onerror 重複觸發
+    function finalize() {
+        clearTimeout(autoStopTimer);
+        activeRecognition = null;
+        cleanupRecognition();
+    }
 
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
@@ -761,11 +825,9 @@ function startVoiceRecognition() {
         }
 
         const text = (final || interim).trim();
-        if (text) {
-            micText.innerText = "🎤 " + text;
-        }
+        if (text) micText.innerText = "🎤 " + text;
 
-        // ① 有 final 結果 → 立即處理並停止
+        // ① 有 final → 立即處理
         if (final && !speechHandled) {
             speechHandled = true;
             clearTimeout(autoStopTimer);
@@ -774,15 +836,12 @@ function startVoiceRecognition() {
             return;
         }
 
-        // ② 未 final，但 interim 已偵測到「目的地」 → 自動停止
+        // ② interim 偵測到目的地 → 1000ms 後自動停
         if (interim && !speechHandled) {
             lastInterim = interim;
-
-            // 目的地模式：去 / 到 / 至 後面至少有 2 個字（中英文皆可）
             const hasDestination = /(?:去|到|至)[^\s，。？！,.\?!]{2,}$/.test(interim);
 
             if (hasDestination) {
-                // ⭐ 延遲 1000ms，等埋可能緊接嘅補充內容（例如「機場一號客運大樓」）
                 clearTimeout(autoStopTimer);
                 autoStopTimer = setTimeout(() => {
                     if (speechHandled) return;
@@ -794,7 +853,6 @@ function startVoiceRecognition() {
         }
     };
 
-    // ⭐ 後備：用戶講完靜咗，都自動停
     recognition.onspeechend = () => {
         setTimeout(() => {
             try { recognition.stop(); } catch(e) {}
@@ -823,36 +881,38 @@ function startVoiceRecognition() {
             default:
                 errMsg = "語音辨識失敗：" + event.error;
         }
+
         micText.innerText = errMsg;
         micIcon.className = "fa-solid fa-microphone-slash text-base";
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         clearTimeout(autoStopTimer);
         speechHandled = true; // 唔好再由 onend 觸發處理
 
+        // ⭐ 3 秒後恢復按鈕文字（但鎖會由 finalize 立即釋放）
         setTimeout(() => {
-            micText.innerText = translations[currentLang].voice_btn_text;
-            micIcon.className = "fa-solid fa-microphone text-base";
+            if (!isRecognizing) {
+                micText.innerText = translations[currentLang].voice_btn_text;
+                micIcon.className = "fa-solid fa-microphone text-base";
+            }
         }, 3000);
     };
 
     recognition.onend = () => {
-        micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        micIcon.className = "fa-solid fa-microphone text-base";
-        clearTimeout(autoStopTimer);
-
-        // ⭐ 最後防線：如果一直冇 final 又冇處理，用最後 interim 照樣解析
+        // ⭐ 最後防線：冇 final 又冇處理 → 用 lastInterim
         if (!speechHandled && lastInterim) {
             speechHandled = true;
             processSpeechResult(lastInterim);
         }
+        finalize(); // ⭐ 一定要行，解鎖 + 冷卻計時
     };
 
     try {
         recognition.start();
     } catch (e) {
         alert("語音辨識啟動失敗：" + e.message);
-        micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
+        micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        finalize();
     }
 }
 
