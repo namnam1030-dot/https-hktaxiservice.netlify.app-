@@ -21,16 +21,12 @@
 
     var root = document.documentElement;
 
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
-
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -44,7 +40,6 @@
 </script>
 
 <style>
-    /* html + body 用同一組 data-theme 控制，一 parse 即生效 */
     html[data-theme="light"],
     html[data-theme="light"] body {
         background-color: #FFFFFF !important;
@@ -55,8 +50,6 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
-
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -151,7 +144,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
 
 <script>
     tailwind.config = {
@@ -644,8 +637,12 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識
+// ⭐ 語音辨識（修復版：onresult 唔 stop，跳頁交 onend 處理）
 // ============================================
+let _activeRecognition = null;
+let _voiceTimeout = null;
+let _voiceHasResult = false;
+
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -659,10 +656,23 @@ function startVoiceRecognition() {
         return;
     }
 
+    // ⭐ 清舊 instance（防止返 index 時舊 instance 卡住麥克風）
+    if (_activeRecognition) {
+        try { _activeRecognition.abort(); } catch(e) {}
+        _activeRecognition = null;
+    }
+    if (_voiceTimeout) {
+        clearTimeout(_voiceTimeout);
+        _voiceTimeout = null;
+    }
+    _voiceHasResult = false;
+
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
+
+    _activeRecognition = recognition;
 
     const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
@@ -674,10 +684,15 @@ function startVoiceRecognition() {
 
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
+        // ⭐ 15 秒 timeout 保險
+        _voiceTimeout = setTimeout(() => {
+            try { recognition.abort(); } catch(e) {}
+        }, 15000);
     };
 
     recognition.onresult = (event) => {
-        recognition.stop();
+        if (_voiceTimeout) { clearTimeout(_voiceTimeout); _voiceTimeout = null; }
+
         const speechResult = event.results[0][0].transcript;
         micText.innerText = "聽到：「" + speechResult + "」";
 
@@ -734,15 +749,14 @@ function startVoiceRecognition() {
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        setTimeout(() => {
-            micBtn.classList.remove('bg-brand-yellow', 'text-black');
-            micText.innerText = translations[currentLang].voice_btn_text;
-            micIcon.className = "fa-solid fa-microphone text-base";
-            calculateAndGoToResult();
-        }, 1000);
+        // ⭐ 只標記有結果，唔 call recognition.stop()，跳頁交俾 onend 處理
+        _voiceHasResult = true;
     };
 
     recognition.onerror = (event) => {
+        if (_voiceTimeout) { clearTimeout(_voiceTimeout); _voiceTimeout = null; }
+        _voiceHasResult = false;
+
         let errMsg = "未能識別語音，請重試或以文字輸入";
         switch (event.error) {
             case 'not-allowed':
@@ -775,8 +789,22 @@ function startVoiceRecognition() {
     };
 
     recognition.onend = () => {
+        if (_voiceTimeout) { clearTimeout(_voiceTimeout); _voiceTimeout = null; }
+        _activeRecognition = null;
+
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
+
+        // ⭐ recognition 完整結束（提示音已播）→ 等 500ms 先跳頁
+        if (_voiceHasResult) {
+            _voiceHasResult = false;
+            setTimeout(() => {
+                micText.innerText = translations[currentLang].voice_btn_text;
+                calculateAndGoToResult();
+            }, 500);
+        } else {
+            micText.innerText = translations[currentLang].voice_btn_text;
+        }
     };
 
     try {
