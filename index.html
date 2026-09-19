@@ -644,6 +644,74 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
+// 語音結果解析（抽出來方便重用）
+// ============================================
+function processSpeechResult(speechResult) {
+    let pickup = "", dropoff = "", stopover = "";
+    let text = speechResult;
+
+    text = text.replace(/我想/g, "").replace(/查詢/g, "")
+               .replace(/車費/g, "").replace(/價錢/g, "")
+               .replace(/預約/g, "").replace(/的士/g, "");
+
+    let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
+    if (fromMatch && fromMatch[1]) {
+        pickup = fromMatch[1].trim();
+    } else {
+        let firstSplit = text.split(/經|途經|去|到|至/)[0];
+        if (firstSplit) pickup = firstSplit.trim();
+    }
+
+    let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
+    if (viaMatch && viaMatch[1]) {
+        let viaText = viaMatch[1].trim();
+        let subToSplit = viaText.split(/去|到|至/);
+        stopover = subToSplit[0].trim();
+    }
+
+    let toMatch = text.match(/(?:去|到|至)(.+)$/);
+    if (toMatch && toMatch[1]) {
+        dropoff = toMatch[1].trim();
+    } else {
+        let parts = text.split(/經|途經/);
+        if (parts.length >= 2) {
+            let lastPart = parts[parts.length - 1].trim();
+            if (lastPart && lastPart !== stopover) dropoff = lastPart;
+        } else if (!dropoff) {
+            let words = text.split(/\s+/);
+            if (words.length >= 2 && !pickup) {
+                pickup = words[0];
+                dropoff = words[words.length - 1];
+            }
+        }
+    }
+
+    if (pickup) {
+        document.getElementById('calc-pickup').value = pickup;
+        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+    }
+    if (stopover) {
+        if (currentStopCount === 0) addStopoverField();
+        document.getElementById('calc-stopover-1').value = stopover;
+        toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
+    }
+    if (dropoff) {
+        document.getElementById('calc-dropoff').value = dropoff;
+        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+    }
+
+    setTimeout(() => {
+        const micBtn  = document.getElementById('voice-btn');
+        const micText = document.getElementById('mic-text');
+        const micIcon = document.getElementById('mic-icon');
+        micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        micText.innerText = translations[currentLang].voice_btn_text;
+        micIcon.className = "fa-solid fa-microphone text-base";
+        calculateAndGoToResult();
+    }, 1000);
+}
+
+// ============================================
 // 語音辨識
 // ============================================
 function startVoiceRecognition() {
@@ -661,10 +729,11 @@ function startVoiceRecognition() {
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
-    recognition.interimResults = false;
+    recognition.interimResults = true;   // ⭐ 關鍵：開啟即時結果
+    recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
-    const micBtn = document.getElementById('voice-btn');
+    const micBtn  = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
     const micIcon = document.getElementById('mic-icon');
 
@@ -672,74 +741,64 @@ function startVoiceRecognition() {
     micText.innerText = "正在啟動麥克風...";
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
+    // ⭐ 本次辨識 session 的狀態
+    let speechHandled  = false;   // 已處理過，避免重覆
+    let lastInterim    = '';      // 最後一次 interim 文字（後備用）
+    let autoStopTimer  = null;    // 自動停止計時器
+
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
     };
 
     recognition.onresult = (event) => {
-        recognition.stop();
-        const speechResult = event.results[0][0].transcript;
-        micText.innerText = "聽到：「" + speechResult + "」";
+        let interim = '';
+        let final   = '';
 
-        let pickup = "", dropoff = "", stopover = "";
-        let text = speechResult;
-
-        text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
-
-        let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
-        if (fromMatch && fromMatch[1]) {
-            pickup = fromMatch[1].trim();
-        } else {
-            let firstSplit = text.split(/經|途經|去|到|至/)[0];
-            if (firstSplit) pickup = firstSplit.trim();
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const t = event.results[i][0].transcript;
+            if (event.results[i].isFinal) final += t;
+            else interim += t;
         }
 
-        let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
-        if (viaMatch && viaMatch[1]) {
-            let viaText = viaMatch[1].trim();
-            let subToSplit = viaText.split(/去|到|至/);
-            stopover = subToSplit[0].trim();
+        const text = (final || interim).trim();
+        if (text) {
+            micText.innerText = "🎤 " + text;
         }
 
-        let toMatch = text.match(/(?:去|到|至)(.+)$/);
-        if (toMatch && toMatch[1]) {
-            dropoff = toMatch[1].trim();
-        } else {
-            let parts = text.split(/經|途經/);
-            if (parts.length >= 2) {
-                let lastPart = parts[parts.length - 1].trim();
-                if (lastPart && lastPart !== stopover) dropoff = lastPart;
-            } else if (!dropoff) {
-                let words = text.split(/\s+/);
-                if (words.length >= 2 && !pickup) {
-                    pickup = words[0];
-                    dropoff = words[words.length - 1];
-                }
+        // ① 有 final 結果 → 立即處理並停止
+        if (final && !speechHandled) {
+            speechHandled = true;
+            clearTimeout(autoStopTimer);
+            try { recognition.stop(); } catch(e) {}
+            processSpeechResult(final);
+            return;
+        }
+
+        // ② 未 final，但 interim 已偵測到「目的地」 → 自動停止
+        if (interim && !speechHandled) {
+            lastInterim = interim;
+
+            // 目的地模式：去 / 到 / 至 後面至少有 2 個字（中英文皆可）
+            const hasDestination = /(?:去|到|至)[^\s，。？！,.\?!]{2,}$/.test(interim);
+
+            if (hasDestination) {
+                // ⭐ 延遲 1000ms，等埋可能緊接嘅補充內容（例如「機場一號客運大樓」）
+                clearTimeout(autoStopTimer);
+                autoStopTimer = setTimeout(() => {
+                    if (speechHandled) return;
+                    speechHandled = true;
+                    try { recognition.stop(); } catch(e) {}
+                    processSpeechResult(lastInterim);
+                }, 1000);
             }
         }
+    };
 
-        if (pickup) {
-            document.getElementById('calc-pickup').value = pickup;
-            toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-        }
-        
-        if (stopover) {
-            if (currentStopCount === 0) addStopoverField();
-            document.getElementById('calc-stopover-1').value = stopover;
-            toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
-        }
-        
-        if (dropoff) {
-            document.getElementById('calc-dropoff').value = dropoff;
-            toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-        }
-
+    // ⭐ 後備：用戶講完靜咗，都自動停
+    recognition.onspeechend = () => {
         setTimeout(() => {
-            micBtn.classList.remove('bg-brand-yellow', 'text-black');
-            micText.innerText = translations[currentLang].voice_btn_text;
-            micIcon.className = "fa-solid fa-microphone text-base";
-            calculateAndGoToResult();
-        }, 1000);
+            try { recognition.stop(); } catch(e) {}
+        }, 500);
     };
 
     recognition.onerror = (event) => {
@@ -767,6 +826,8 @@ function startVoiceRecognition() {
         micText.innerText = errMsg;
         micIcon.className = "fa-solid fa-microphone-slash text-base";
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        clearTimeout(autoStopTimer);
+        speechHandled = true; // 唔好再由 onend 觸發處理
 
         setTimeout(() => {
             micText.innerText = translations[currentLang].voice_btn_text;
@@ -777,6 +838,13 @@ function startVoiceRecognition() {
     recognition.onend = () => {
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
+        clearTimeout(autoStopTimer);
+
+        // ⭐ 最後防線：如果一直冇 final 又冇處理，用最後 interim 照樣解析
+        if (!speechHandled && lastInterim) {
+            speechHandled = true;
+            processSpeechResult(lastInterim);
+        }
     };
 
     try {
@@ -1069,5 +1137,16 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script src="theme.js"></script>
+<script>
+// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
+if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+}
+</script>
 </body>
 </html>
