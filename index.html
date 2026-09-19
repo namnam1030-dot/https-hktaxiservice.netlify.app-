@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
-<!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -20,7 +18,6 @@
     } catch(e) {}
 
     var root = document.documentElement;
-
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
@@ -161,26 +158,15 @@
 </script>
 
 <style>
-    html { 
-        font-size: 130%; 
-    }
-    body { 
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-    }
-    .text-xs, .text-\[11px\] {
-        font-size: 18px !important;
-        line-height: 1.5;
-    }
+    html { font-size: 130%; }
+    body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
+    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
     button[onclick*="swapLocations"], 
     button[onclick*="addStopoverField"], 
     button[onclick*="removeStopoverField"],
-    #add-stop-btn {
-        font-size: inherit !important;
-    }
+    #add-stop-btn { font-size: inherit !important; }
     #add-stop-btn span,
-    button[onclick*="swapLocations"] span {
-        font-size: 16px !important;
-    }
+    button[onclick*="swapLocations"] span { font-size: 16px !important; }
     .pac-container {
         background-color: #1E1E1E;
         color: #ffffff;
@@ -190,51 +176,23 @@
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         z-index: 9999;
     }
-    .pac-item {
-        color: #ccc;
-        border-top: 1px solid #333;
-        padding: 8px 12px;
-        cursor: pointer;
-    }
-    .pac-item:hover {
-        background-color: #333;
-    }
-    .pac-item-query {
-        color: #FFF200;
-        font-size: 17px;
-    }
-    .stopover-drag-handle {
-        cursor: grab;
-        user-select: none;
-    }
-    .stopover-drag-handle:active {
-        cursor: grabbing;
-    }
-    .stopover-drop-target {
-        background-color: rgba(255, 242, 0, 0.1);
-        border-radius: 0.5rem;
-    }
+    .pac-item { color: #ccc; border-top: 1px solid #333; padding: 8px 12px; cursor: pointer; }
+    .pac-item:hover { background-color: #333; }
+    .pac-item-query { color: #FFF200; font-size: 17px; }
+    .stopover-drag-handle { cursor: grab; user-select: none; }
+    .stopover-drag-handle:active { cursor: grabbing; }
+    .stopover-drop-target { background-color: rgba(255, 242, 0, 0.1); border-radius: 0.5rem; }
 
-    /* ===== 淺色主題（body.light-theme → html.light-theme body）===== */
     html.light-theme body .pac-container {
         background-color: #FFFFFF;
         color: #000000;
         border-color: #D1D5DB;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
     }
-    html.light-theme body .pac-item {
-        color: #374151;
-        border-top-color: #E5E7EB;
-    }
-    html.light-theme body .pac-item:hover {
-        background-color: #F3F4F6;
-    }
-    html.light-theme body .pac-item-query {
-        color: #000000;
-        font-weight: 700;
-    }
+    html.light-theme body .pac-item { color: #374151; border-top-color: #E5E7EB; }
+    html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
+    html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
 
-    /* 淺色主題下的按鈕（頁面專屬） */
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
@@ -256,7 +214,6 @@
                     <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
-
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
                     <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
@@ -265,7 +222,6 @@
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
             </div>
-
             <div class="flex items-center pr-1">
                 <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
                     <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
@@ -298,8 +254,7 @@
             <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
                 為了方便下次叫車，您可以將本服務加到手機主畫面：
             </p>
-            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
-            </div>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
             <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                 了解，關閉
             </button>
@@ -320,7 +275,6 @@
 
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
-            
             <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
                 <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
             </h3>
@@ -443,9 +397,7 @@
                     <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <div class="text-green-500 text-3xl mb-3">
-                        <i class="fa-brands fa-weixin"></i>
-                    </div>
+                    <div class="text-green-500 text-3xl mb-3"><i class="fa-brands fa-weixin"></i></div>
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
@@ -474,12 +426,10 @@ function saveRouteDataToLocalStorage() {
         dropoff: document.getElementById('calc-dropoff')?.value.trim() || '',
         stopovers: []
     };
-    
     for (let i = 1; i <= 3; i++) {
         const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim() || '';
         if (stopVal) data.stopovers.push(stopVal);
     }
-    
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
@@ -514,17 +464,9 @@ function loadRouteDataFromLocalStorage() {
 
 function clearAllInputs() {
     const pickupEl = document.getElementById('calc-pickup');
-    if (pickupEl) {
-        pickupEl.value = '';
-        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-    }
-    
+    if (pickupEl) { pickupEl.value = ''; toggleClearBtn('calc-pickup', 'clear-pickup-btn'); }
     const dropoffEl = document.getElementById('calc-dropoff');
-    if (dropoffEl) {
-        dropoffEl.value = '';
-        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-    }
-    
+    if (dropoffEl) { dropoffEl.value = ''; toggleClearBtn('calc-dropoff', 'clear-dropoff-btn'); }
     for (let i = 1; i <= 3; i++) {
         const stopInput = document.getElementById(`calc-stopover-${i}`);
         const stopContainer = document.getElementById(`stopover-container-${i}`);
@@ -534,34 +476,25 @@ function clearAllInputs() {
     currentStopCount = 0;
     const addStopBtn = document.getElementById('add-stop-btn');
     if (addStopBtn) addStopBtn.classList.remove('hidden');
-    
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
-    
     if (pickupEl) pickupEl.focus();
 }
 
 function calculateAndGoToResult() {
     const pickupVal = document.getElementById('calc-pickup')?.value.trim() || '';
     const dropoffVal = document.getElementById('calc-dropoff')?.value.trim() || '';
-    
     if (!pickupVal || !dropoffVal) {
         alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
         return;
     }
-    
     localStorage.removeItem('taxiBookingData');
     saveRouteDataToLocalStorage();
     window.location.href = 'result.html';
 }
 
-function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
-}
-
-function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
-}
+function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
+function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -582,17 +515,14 @@ function setupStopoverDragging() {
     for (let i = 1; i <= 3; i++) {
         const container = document.getElementById(`stopover-container-${i}`);
         if (!container) continue;
-        
         const handle = container.querySelector('.stopover-drag-handle');
         if (!handle) continue;
-        
         handle.addEventListener('dragstart', function(e) {
             draggedStopoverIndex = i;
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', i.toString());
             container.classList.add('opacity-50');
         });
-        
         handle.addEventListener('dragend', function(e) {
             container.classList.remove('opacity-50');
             document.querySelectorAll('[id^="stopover-container-"]').forEach(c => {
@@ -600,7 +530,6 @@ function setupStopoverDragging() {
             });
             draggedStopoverIndex = null;
         });
-        
         container.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -608,11 +537,9 @@ function setupStopoverDragging() {
                 container.classList.add('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
             }
         });
-        
         container.addEventListener('dragleave', function(e) {
             container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
         });
-        
         container.addEventListener('drop', function(e) {
             e.preventDefault();
             container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
@@ -636,14 +563,44 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// ⭐ 語音辨識（最終修復）
-//   核心：onresult 內 call stop() 釋放咪高峰；
-//        onend 後等 800ms 先跳頁，讓提示音播完
+// 語音辨識（onresult call stop + onend 800ms 後跳頁）
 // ============================================
 let _activeRecognition = null;
 let _voiceTimeout = null;
 let _voiceHasResult = false;
 let _isNavigating = false;
+
+// ⭐ 修復 iOS bfcache 導致麥克風卡住
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        console.log('[bfcache] 頁面從緩存恢復，清理語音狀態');
+        if (_activeRecognition) {
+            try { _activeRecognition.abort(); } catch(e) {}
+            _activeRecognition = null;
+        }
+        if (_voiceTimeout) {
+            clearTimeout(_voiceTimeout);
+            _voiceTimeout = null;
+        }
+        _voiceHasResult = false;
+        _isNavigating = false;
+
+        const micBtn = document.getElementById('voice-btn');
+        const micText = document.getElementById('mic-text');
+        const micIcon = document.getElementById('mic-icon');
+        if (micBtn) micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        if (micText) micText.innerText = (translations && translations[currentLang] && translations[currentLang].voice_btn_text) || '[起點] 經 [中途站] 去 [目的地]';
+        if (micIcon) micIcon.className = "fa-solid fa-microphone text-base";
+    }
+});
+
+// ⭐ 離開頁面時強制 abort
+window.addEventListener('pagehide', function() {
+    if (_activeRecognition) {
+        try { _activeRecognition.abort(); } catch(e) {}
+        _activeRecognition = null;
+    }
+});
 
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -658,10 +615,8 @@ function startVoiceRecognition() {
         return;
     }
 
-    // ⭐ 防止重複點擊
     if (_isNavigating) return;
 
-    // ⭐ 清舊 instance（用 abort 唔用 stop，確保即時中斷）
     if (_activeRecognition) {
         try { _activeRecognition.abort(); } catch(e) {}
         _activeRecognition = null;
@@ -689,7 +644,6 @@ function startVoiceRecognition() {
 
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
-        // ⭐ 15 秒無結果就 abort
         _voiceTimeout = setTimeout(() => {
             try { recognition.abort(); } catch(e) {}
         }, 15000);
@@ -742,19 +696,16 @@ function startVoiceRecognition() {
             document.getElementById('calc-pickup').value = pickup;
             toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         }
-        
         if (stopover) {
             if (currentStopCount === 0) addStopoverField();
             document.getElementById('calc-stopover-1').value = stopover;
             toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
         }
-        
         if (dropoff) {
             document.getElementById('calc-dropoff').value = dropoff;
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        // ⭐⭐⭐ 關鍵：明確 call stop()，讓 iOS 釋放咪高峰 + 播提示音
         _voiceHasResult = true;
         try { recognition.stop(); } catch(e) {}
     };
@@ -801,8 +752,6 @@ function startVoiceRecognition() {
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
 
-        // ⭐⭐⭐ 關鍵：onend（提示音應該已播）後，等 800ms 先跳頁
-        //          讓 iOS 有足夠時間完全釋放咪高峰
         if (_voiceHasResult) {
             _voiceHasResult = false;
             _isNavigating = true;
@@ -831,119 +780,56 @@ let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
 const translations = {
     zh: {
-        btn_more_payment: "更多付款方式",
-        label_verification: "電話驗證",
-        btn_get_code: "獲取驗證碼",
-        verification_code_label: "你嘅驗證碼係：",
-        btn_send_verify_whatsapp: "發送驗證碼到 WhatsApp",
-        verification_whatsapp_hint: "請先發送 WhatsApp 確認訊息，再提交預約",
-        alert_enter_phone: "請先輸入正確嘅電話號碼！",
-        alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
-        btn_confirm_booking: "確認預約",
-        btn_sending_booking: "正在送出預約...",
-        success_title: "✅ 預約訂單已成功送出！",
-        success_desc: "我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認",
-        success_contact_prompt: "如有急需，可以直接聯絡我哋：",
-        btn_call_now: "致電 6881 5441",
-        btn_whatsapp_inquiry: "WhatsApp 查詢",
-        btn_wechat_inquiry: "WeChat 查詢",
-        wecom_modal_title: "掃描二維碼添加企業微信",
-        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
-        swap_pickup: "起點",
-        swap_dropoff: "目的地",
-        estimated_fare_label: "預計車費",
-        btn_book_now: "立即預約",
-        fleet_title: "選擇車款類型",
-        fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
-        btn_close_guide: "了解，關閉",
-        fare_normal_label: "正價按錶收費",
-        fare_discount_label: "八五折優惠",
-        fare_discount_note: "(只限豐田混能的士)",
+        swap_pickup: "起點", swap_dropoff: "目的地",
+        fare_normal_label: "正價按錶收費", fare_discount_label: "八五折優惠", fare_discount_note: "(只限豐田混能的士)",
         btn_add_home: "APPS",
         modal_title: "一鍵加入主畫面",
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
-        btn_quick_query: "立即預約",
-        btn_view_fleet: "選擇車款類型",
-        badge_selected: "已選擇",
-        btn_reselect_route: "重新選擇路線",
-        btn_clear: "重設",
+        btn_quick_query: "立即預約", btn_view_fleet: "選擇車款類型", badge_selected: "已選擇",
+        btn_reselect_route: "重新選擇路線", btn_clear: "重設",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
         hero_title: '長途跨區・機場口岸接送<br><span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>',
         hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士',
         calc_title: "智能規劃路線與預計車費",
         calc_tip_title: "預計車費使用說明：",
         calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
         calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
-        calc_label_pickup: "起點 (出發地)",
-        calc_label_stopover: "中途站 (最多3個)",
-        calc_label_dropoff: "終點 (目的地)",
+        calc_label_pickup: "起點 (出發地)", calc_label_stopover: "中途站 (最多3個)", calc_label_dropoff: "終點 (目的地)",
         btn_add_stop: "增加中途站",
-        ph_pickup: "輸入起點...",
-        ph_stopover_opt: "輸入中途站...",
-        ph_dropoff_opt: "輸入終點...",
+        ph_pickup: "輸入起點...", ph_stopover_opt: "輸入中途站...", ph_dropoff_opt: "輸入終點...",
         voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
         btn_calc_fare: "立即預計車費",
         whatsapp_inquiry: "WhatsApp",
         footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
     },
     en: {
-        btn_more_payment: "More Options",
-        label_verification: "Phone Verification",
-        btn_get_code: "Get Code",
-        verification_code_label: "Your verification code:",
-        btn_send_verify_whatsapp: "Send Code via WhatsApp",
-        verification_whatsapp_hint: "Please send WhatsApp confirmation before submitting",
-        alert_enter_phone: "Please enter a valid phone number first!",
-        alert_need_whatsapp: "Please send WhatsApp confirmation first!",
-        btn_confirm_booking: "Confirm Booking",
-        btn_sending_booking: "Sending Booking...",
-        success_title: "✅ Booking Submitted Successfully!",
-        success_desc: "We will confirm via WhatsApp or phone within 5-10 minutes",
-        success_contact_prompt: "For urgent matters, contact us directly:",
-        btn_call_now: "Call 6881 5441",
-        btn_whatsapp_inquiry: "WhatsApp Enquiry",
-        btn_wechat_inquiry: "WeChat Enquiry",
-        wecom_modal_title: "Scan QR Code to Add WeCom",
-        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
-        swap_pickup: "Pickup",
-        swap_dropoff: "Destination",
-        estimated_fare_label: "Estimated Fare",
-        btn_book_now: "Book Now",
-        fleet_title: "Select Vehicle Type",
-        fleet_subtitle: "Click vehicle name to expand/collapse details",
-        btn_close_guide: "Got it, Close",
-        fare_discount_label: "15% Discount Offer",
-        fare_discount_note: "(Toyota Hybrid Taxi only)",
-        fare_normal_label: "Standard Metered Fare",
+        swap_pickup: "Pickup", swap_dropoff: "Destination",
+        fare_discount_label: "15% Discount Offer", fare_discount_note: "(Toyota Hybrid Taxi only)", fare_normal_label: "Standard Metered Fare",
         btn_add_home: "APPS",
         modal_title: "Add to Home Screen",
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
-        btn_quick_query: "BOOK NOW",
-        btn_view_fleet: "Select Vehicle Type",
-        badge_selected: "Selected",
-        btn_reselect_route: "Re-select Route",
-        btn_clear: "Reset",
+        btn_quick_query: "BOOK NOW", btn_view_fleet: "Select Vehicle Type", badge_selected: "Selected",
+        btn_reselect_route: "Re-select Route", btn_clear: "Reset",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
         hero_title: 'Long Distance &amp; Cross-District · Airport &amp; Border Transfers<br><span class="text-brand-yellow">15% Off Taxi | 6-Seater Luxury Taxi</span>',
         hero_desc: 'Airport &amp; Major Border Crossings · N.T. to HK Island &amp; Kowloon<br>Airport · HZMB · Shenzhen Bay · Lok Ma Chau · Heung Yuen Wai<br>Tuen Mun · Yuen Long · Tin Shui Wai · Sheung Shui · Fanling<br>Luxury 6-Seater · Hybrid Taxi · Wheelchair Taxi',
         calc_title: "Smart Route & Fare Estimator",
         calc_tip_title: "Fare Estimation Instructions:",
-        calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Airport to ShenZhen Bay Port"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
+        calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button and speak your trip.',
         calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below, then click calculate fare.',
-        calc_label_pickup: "Pickup Location",
-        calc_label_stopover: "Stopovers (Max 3)",
-        calc_label_dropoff: "Drop-off Location",
+        calc_label_pickup: "Pickup Location", calc_label_stopover: "Stopovers (Max 3)", calc_label_dropoff: "Drop-off Location",
         btn_add_stop: "Add Stopover",
-        ph_pickup: "Enter pickup...",
-        ph_stopover_opt: "Enter stopover...",
-        ph_dropoff_opt: "Enter destination...",
+        ph_pickup: "Enter pickup...", ph_stopover_opt: "Enter stopover...", ph_dropoff_opt: "Enter destination...",
         voice_btn_text: "Speak your trip...",
         btn_calc_fare: "Calculate Estimated Fare",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+        footer_copy: "© 2026 All Rights Reserved."
     }
 };
 
 let currentStopCount = 0;
-
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -966,14 +852,12 @@ function applyLanguage() {
             el.textContent = translations[currentLang][key];
         }
     });
-
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
             el.innerHTML = translations[currentLang][key];
         }
     });
-
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
@@ -987,24 +871,18 @@ function initAutocomplete() {
         new google.maps.LatLng(22.15, 113.83),
         new google.maps.LatLng(22.58, 114.50)
     );
-
     const options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
         fields: ["formatted_address", "geometry", "name"],
         types: ['geocode', 'establishment']
     };
-
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
     const stop1 = document.getElementById('calc-stopover-1');
     const stop2 = document.getElementById('calc-stopover-2');
     const stop3 = document.getElementById('calc-stopover-3');
-
-    if (pickupEl) {
-        new google.maps.places.Autocomplete(pickupEl, options);
-    }
-    
+    if (pickupEl) new google.maps.places.Autocomplete(pickupEl, options);
     if (dropoffEl) new google.maps.places.Autocomplete(dropoffEl, options);
     if (stop1) new google.maps.places.Autocomplete(stop1, options);
     if (stop2) new google.maps.places.Autocomplete(stop2, options);
@@ -1016,7 +894,6 @@ function addStopoverField() {
         currentStopCount++;
         const container = document.getElementById(`stopover-container-${currentStopCount}`);
         if (container) container.classList.remove('hidden');
-
         if (currentStopCount >= 3) {
             const btn = document.getElementById('add-stop-btn');
             if (btn) btn.classList.add('hidden');
@@ -1030,7 +907,6 @@ function removeStopoverField(index) {
     if (input) input.value = '';
     toggleClearBtn(`calc-stopover-${index}`, `clear-stop-${index}-btn`);
     if (container) container.classList.add('hidden');
-
     currentStopCount = Math.max(0, currentStopCount - 1);
     const btn = document.getElementById('add-stop-btn');
     if (btn) btn.classList.remove('hidden');
@@ -1040,11 +916,8 @@ function toggleClearBtn(inputId, btnId) {
     const input = document.getElementById(inputId);
     const btn = document.getElementById(btnId);
     if (input && btn) {
-        if (input.value.trim().length > 0) {
-            btn.classList.remove('hidden');
-        } else {
-            btn.classList.add('hidden');
-        }
+        if (input.value.trim().length > 0) btn.classList.remove('hidden');
+        else btn.classList.add('hidden');
     }
 }
 
@@ -1064,7 +937,6 @@ function swapLocations() {
         const temp = pickupEl.value;
         pickupEl.value = dropoffEl.value;
         dropoffEl.value = temp;
-
         toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
     }
@@ -1075,21 +947,21 @@ function swapLocations() {
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
-    
+
     const referrer = document.referrer || '';
     const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
-    
+
     if (fromResultOrBooking) {
         loadRouteDataFromLocalStorage();
     } else {
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
-        
+
         const pickupEl = document.getElementById('calc-pickup');
         const dropoffEl = document.getElementById('calc-dropoff');
         if (pickupEl) pickupEl.value = '';
         if (dropoffEl) dropoffEl.value = '';
-        
+
         for (let i = 1; i <= 3; i++) {
             const stopInput = document.getElementById(`calc-stopover-${i}`);
             const stopContainer = document.getElementById(`stopover-container-${i}`);
@@ -1100,13 +972,12 @@ window.addEventListener('DOMContentLoaded', () => {
         const addStopBtn = document.getElementById('add-stop-btn');
         if (addStopBtn) addStopBtn.classList.remove('hidden');
     }
-    
+
     setupStopoverDragging();
 });
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {

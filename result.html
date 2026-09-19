@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
-<!-- ✅✅✅ 反黑閃終極版（html 即落 class，body 出現即補）✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -20,17 +18,12 @@
     } catch(e) {}
 
     var root = document.documentElement;
-
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
-
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -44,7 +37,6 @@
 </script>
 
 <style>
-    /* 原本 html[data-theme] 規則（雙重保險） */
     html[data-theme="light"],
     html[data-theme="light"] body {
         background-color: #FFFFFF !important;
@@ -55,8 +47,6 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
-
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -123,13 +113,13 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
+<!-- ⭐ 改動：async defer → defer（避免 initMap 早於 DOM 執行）-->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" defer></script>
 
 <script>
@@ -148,16 +138,9 @@
 </script>
 
 <style>
-    html { 
-        font-size: 130%; 
-    }
-    body { 
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
-    }
-    .text-xs, .text-\[11px\] {
-        font-size: 18px !important;
-        line-height: 1.5;
-    }
+    html { font-size: 130%; }
+    body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
+    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
     .pac-container {
         background-color: #1E1E1E;
         color: #ffffff;
@@ -167,30 +150,20 @@
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         z-index: 9999;
     }
-    .pac-item {
-        color: #ccc;
-        border-top: 1px solid #333;
-        padding: 8px 12px;
-        cursor: pointer;
-    }
+    .pac-item { color: #ccc; border-top: 1px solid #333; padding: 8px 12px; cursor: pointer; }
     .pac-item:hover { background-color: #333; }
     .pac-item-query { color: #FFF200; font-size: 17px; }
 
-    /* ===== 淺色主題（全部由 body.light-theme → html.light-theme body）===== */
     html.light-theme body .pac-container {
         background-color: #FFFFFF;
         color: #000000;
         border-color: #D1D5DB;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
     }
-    html.light-theme body .pac-item {
-        color: #374151;
-        border-top-color: #E5E7EB;
-    }
+    html.light-theme body .pac-item { color: #374151; border-top-color: #E5E7EB; }
     html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
     html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
 
-    /* 淺色主題下頁面專屬按鈕 */
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
@@ -202,7 +175,6 @@
         border: 1px solid #000000 !important;
     }
 
-    /* 淺色主題下動態路線選項按鈕 */
     html.light-theme body #route-options-list button {
         background-color: #F3F4F6 !important;
         border-color: #D1D5DB !important;
@@ -213,7 +185,6 @@
         border-color: #000000 !important;
         color: #000000 !important;
     }
-    /* 淺色主題下隧道偵測框 */
     html.light-theme body .bg-sky-900\/30 {
         background-color: rgba(14, 165, 233, 0.1) !important;
     }
@@ -229,11 +200,6 @@
         border-color: #000000 !important;
     }
 
-    /* =========================================================
-       🔧 深→淺切換殘留修復（result 專屬）
-       ========================================================= */
-
-    /* ── 1) 隧道偵測框：整個框 + 所有子元素強制深藍 ── */
     html.light-theme body #detected-tunnels-container,
     html.light-theme body #detected-tunnels-container *,
     html.light-theme body #detected-tunnels-container .text-sky-200,
@@ -244,14 +210,12 @@
         color: #0369A1 !important;
     }
 
-    /* ── 2) 隧道費用行：整行 + 所有子元素強制深藍 ── */
     html.light-theme body #res-tunnel-row,
     html.light-theme body #res-tunnel-row *,
     html.light-theme body #res-tunnel-row .text-sky-300 {
         color: #0369A1 !important;
     }
 
-    /* ── 3) 收費模式兩個方格：強制白底 + 淺灰邊 ── */
     html.light-theme body #discount-option-container,
     html.light-theme body .space-y-3 > label.bg-brand-dark,
     html.light-theme body label.bg-brand-dark,
@@ -261,7 +225,6 @@
         border-color: #D1D5DB !important;
     }
 
-    /* ── 4) 收費模式複選框：強制淺色渲染（避免黑方塊）── */
     html.light-theme body input[type="checkbox"],
     html.light-theme body .fare-mode-checkbox {
         color-scheme: light !important;
@@ -269,7 +232,6 @@
         background-color: #FFFFFF !important;
     }
 
-    /* ── 5) hover 時保持黑框 ── */
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
     html.light-theme body #discount-option-container:hover {
         border-color: #000000 !important;
@@ -277,9 +239,6 @@
 </style>
 
     <script>
-    // ============================================
-    // 1. 變數宣告
-    // ============================================
     let selectedCarName = '';
     let selectedCarNameEn = '';
     let selectedSurcharge = 0;
@@ -295,41 +254,25 @@
     let currentTunnelFee = 0;
     let routeData = null;
 
-    // ============================================
-    // 2. 翻譯物件
-    // ============================================
     const translations = {
         zh: {
             result_title: "路線規劃結果",
             loading_text: "正在計算路線同車費...",
             route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
             confirm_route_label: "請確認查詢路線：",
-            pickup_label: "起點：",
-            stopover_label: "中途站：",
-            dropoff_label: "目的地：",
+            pickup_label: "起點：", stopover_label: "中途站：", dropoff_label: "目的地：",
             tunnel_detected_label: "系統自動偵測途經隧道：",
-            res_distance: "全程預計距離：",
-            res_duration: "預計行車時間：",
-            unit_km: "公里",
-            unit_min: "分鐘",
-            res_base_fee: "跳錶基本收費：",
-            res_tunnel_fee: "預計自動偵測隧道費：",
+            res_distance: "全程預計距離：", res_duration: "預計行車時間：",
+            unit_km: "公里", unit_min: "分鐘",
+            res_base_fee: "跳錶基本收費：", res_tunnel_fee: "預計自動偵測隧道費：",
             res_surcharge: "車款附加費：",
-            res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ",
-            res_min_note_post: ")",
+            res_min_note_pre: "*(已達該車型最低消費門檻 HK$ ", res_min_note_post: ")",
             res_total_title: "預計車費總額：",
             res_note: "以上預計車費已包含自動偵測途經隧道費；但並未包括任何停車場、行李、等候時間等其他法定收費，一切按實際情況為準。",
-            fee_mode_title: "收費模式",
-            required_mark: "* (必須選擇)",
-            min_fare_note: "所有行程最低消費$100",
-            fare_normal_label: "正價按錶收費",
-            fare_discount_label: "八五折優惠",
-            fare_discount_note: "(只限豐田混能的士)",
-            btn_reselect_route: "重新規劃路線",
-            btn_view_fleet: "選擇車款類型",
-            btn_select_6seater: "選擇六人車款",
-            btn_quick_query: "立即預約",
-            btn_quick_query_note: "預設豐田混能的士",
+            fee_mode_title: "收費模式", required_mark: "* (必須選擇)", min_fare_note: "所有行程最低消費$100",
+            fare_normal_label: "正價按錶收費", fare_discount_label: "八五折優惠", fare_discount_note: "(只限豐田混能的士)",
+            btn_reselect_route: "重新規劃路線", btn_select_6seater: "選擇六人車款",
+            btn_quick_query: "立即預約", btn_quick_query_note: "預設豐田混能的士",
             btn_add_home: "APPS",
             modal_title: "一鍵加入主畫面",
             modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
@@ -342,49 +285,31 @@
         en: {
             result_title: "Route Planning Result",
             loading_text: "Calculating route and fare...",
-            btn_back_input: "Back to Edit Route",
             route_select_title: "Select Route Option (Fastest / Shortest):",
             confirm_route_label: "Please confirm your route:",
-            pickup_label: "Pickup: ",
-            stopover_label: "Stopover: ",
-            dropoff_label: "Destination: ",
+            pickup_label: "Pickup: ", stopover_label: "Stopover: ", dropoff_label: "Destination: ",
             tunnel_detected_label: "System detected tunnels: ",
-            res_distance: "Estimated Distance: ",
-            res_duration: "Estimated Duration: ",
-            unit_km: "km",
-            unit_min: "mins",
-            res_base_fee: "Metered Base Fare: ",
-            res_tunnel_fee: "Estimated Tunnel Fee: ",
+            res_distance: "Estimated Distance: ", res_duration: "Estimated Duration: ",
+            unit_km: "km", unit_min: "mins",
+            res_base_fee: "Metered Base Fare: ", res_tunnel_fee: "Estimated Tunnel Fee: ",
             res_surcharge: "Vehicle Surcharge: ",
-            res_min_note_pre: "*(Minimum fare threshold of HK$ ",
-            res_min_note_post: ")",
+            res_min_note_pre: "*(Minimum fare threshold of HK$ ", res_min_note_post: ")",
             res_total_title: "Estimated Total Fare:",
-            res_note: "The estimated fare above includes route tunnel fees; but does not include any parking, luggage, or waiting time charges. Subject to actual conditions.",
-            fee_mode_title: "Pricing Mode",
-            required_mark: "* (Required)",
-            min_fare_note: "Minimum fare $100 for all trips",
-            fare_normal_label: "Standard Metered Fare",
-            fare_discount_label: "15% Discount Offer",
-            fare_discount_note: "(Toyota Hybrid Taxi only)",
-            btn_reselect_route: "Re-plan Route",
-            btn_view_fleet: "Select Vehicle Type",
-            btn_select_6seater: "Select 6-Seater",
-            btn_quick_query: "BOOK NOW",
-            btn_quick_query_note: "Default: Toyota Hybrid Taxi",
+            res_note: "The estimated fare above includes route tunnel fees; but does not include any parking, luggage, or waiting time charges.",
+            fee_mode_title: "Pricing Mode", required_mark: "* (Required)", min_fare_note: "Minimum fare $100 for all trips",
+            fare_normal_label: "Standard Metered Fare", fare_discount_label: "15% Discount Offer", fare_discount_note: "(Toyota Hybrid Taxi only)",
+            btn_reselect_route: "Re-plan Route", btn_select_6seater: "Select 6-Seater",
+            btn_quick_query: "BOOK NOW", btn_quick_query_note: "Default: Toyota Hybrid Taxi",
             btn_add_home: "APPS",
             modal_title: "Add to Home Screen",
             modal_desc: "For quick booking next time, add this service to your phone's home screen:",
             btn_close_guide: "Close",
             wecom_modal_title: "Scan QR Code to Add WeCom",
-            wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+            wecom_modal_desc: "Scan the QR code with WeChat to add our WeCom for inquiries",
             whatsapp_inquiry: "WhatsApp",
-            footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+            footer_copy: "© 2026 All Rights Reserved."
         }
     };
-
-    // ============================================
-    // 3. 所有函數定義
-    // ============================================
 
     function loadRouteDataFromLocalStorage() {
         const saved = localStorage.getItem('taxiRouteData');
@@ -404,15 +329,9 @@
 
     function saveBookingDataToLocalStorage() {
         const data = {
-            selectedCarName: selectedCarName,
-            selectedCarNameEn: selectedCarNameEn,
-            selectedSurcharge: selectedSurcharge,
-            selectedMinFare: selectedMinFare,
-            selectedFeeMode: selectedFeeMode,
-            selectedFeeModeEn: selectedFeeModeEn,
-            selectedFareMode: selectedFareMode,
-            currentBaseFare: currentBaseFare,
-            currentTunnelFee: currentTunnelFee,
+            selectedCarName, selectedCarNameEn, selectedSurcharge, selectedMinFare,
+            selectedFeeMode, selectedFeeModeEn, selectedFareMode,
+            currentBaseFare, currentTunnelFee,
             pickup: routeData ? routeData.pickup : '',
             dropoff: routeData ? routeData.dropoff : '',
             stopovers: routeData ? routeData.stopovers : []
@@ -420,8 +339,13 @@
         localStorage.setItem('taxiBookingData', JSON.stringify(data));
     }
 
+    // ⭐ 改動：用 history.back() 令 iOS 用 bfcache 返 index
     function goBackToInput() {
-        window.location.href = 'index.html';
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = 'index.html';
+        }
     }
 
     function goToFleetPage() {
@@ -439,7 +363,7 @@
 
     function goToBookingPage() {
         if (!selectedFareMode) {
-            alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
+            alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
             return;
         }
         if (!selectedCarName) {
@@ -449,13 +373,8 @@
         window.location.href = 'booking.html';
     }
 
-    function showWeComQR() {
-        document.getElementById('wecom-modal').classList.remove('hidden');
-    }
-
-    function closeWeComQR() {
-        document.getElementById('wecom-modal').classList.add('hidden');
-    }
+    function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
+    function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
     function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRecalculate = false) {
         selectedCarName = name;
@@ -496,9 +415,6 @@
         return trimmed;
     }
 
-    // ============================================
-    // ⭐ 新增：香港範圍 + 文字地址解析（ZERO_RESULTS fallback 用）
-    // ============================================
     const HK_BOUNDS = { north: 22.56, south: 22.15, east: 114.44, west: 113.83 };
 
     function isInHK(latLng) {
@@ -516,29 +432,18 @@
 
         return new Promise((resolve) => {
             const geocoder = new google.maps.Geocoder();
-
-            // 第 1 層：Geocoder（限制香港）
             geocoder.geocode(
-                {
-                    address: text,
-                    region: 'HK',
-                    language: 'zh-HK',
-                    componentRestrictions: { country: 'HK' }
-                },
+                { address: text, region: 'HK', language: 'zh-HK', componentRestrictions: { country: 'HK' } },
                 (results, status) => {
                     if (status === 'OK' && results && results[0]) {
                         const loc = results[0].geometry.location;
                         if (isInHK(loc)) return resolve(loc);
                     }
-
-                    // 第 2 層：Places.textSearch（限制香港）
                     const dummyDiv = document.createElement('div');
                     const service = new google.maps.places.PlacesService(dummyDiv);
                     service.textSearch(
                         {
-                            query: text,
-                            language: 'zh-HK',
-                            region: 'HK',
+                            query: text, language: 'zh-HK', region: 'HK',
                             bounds: new google.maps.LatLngBounds(
                                 new google.maps.LatLng(HK_BOUNDS.south, HK_BOUNDS.west),
                                 new google.maps.LatLng(HK_BOUNDS.north, HK_BOUNDS.east)
@@ -549,7 +454,6 @@
                                 const loc = places[0].geometry.location;
                                 if (isInHK(loc)) return resolve(loc);
                             }
-                            // 兩層都搵唔到，原樣交俾 Directions
                             resolve(text);
                         }
                     );
@@ -623,7 +527,7 @@
 
     function calculateFareWithGoogle() {
         if (!routeData) {
-            alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
+            alert(currentLang === 'en' ? "No route data found." : "未找到路線資料，請返回輸入起點同目的地。");
             window.location.href = 'index.html';
             return;
         }
@@ -660,9 +564,7 @@
             provideRouteAlternatives: true
         };
 
-        // ⭐⭐⭐ 只改動呢度：加入 ZERO_RESULTS 自動 retry ⭐⭐⭐
         function handleRouteResult(result, status, req, isRetry) {
-
             if (status === google.maps.DirectionsStatus.OK) {
                 routesData = processRoutes(result.routes, isShenzhenBay);
                 result.routes = routesData;
@@ -695,19 +597,15 @@
                 } else {
                     routeOptionsBox.classList.add('hidden');
                 }
-
                 displaySelectedRoute(result, 0, isShenzhenBay);
                 return;
             }
 
-            // ⭐ ZERO_RESULTS：第一次先試用 Geocoder / Places 解析文字，再 retry 一次
             if (status === google.maps.DirectionsStatus.ZERO_RESULTS && !isRetry) {
                 console.warn('[Directions] ZERO_RESULTS，嘗試解析地址後重試…', req);
-
                 const originText = req.origin;
                 const destText   = req.destination;
                 const wpTexts    = (req.waypoints || []).map(w => w.location);
-
                 Promise.all([
                     resolveLocation(originText),
                     resolveLocation(destText),
@@ -716,14 +614,10 @@
                     const newRequest = {
                         origin: resolved[0],
                         destination: resolved[1],
-                        waypoints: wpTexts.map((_, i) => ({
-                            location: resolved[2 + i],
-                            stopover: true
-                        })),
+                        waypoints: wpTexts.map((_, i) => ({ location: resolved[2 + i], stopover: true })),
                         travelMode: google.maps.TravelMode.DRIVING,
                         provideRouteAlternatives: true
                     };
-
                     directionsService.route(newRequest, (r2, s2) => {
                         handleRouteResult(r2, s2, newRequest, true);
                     });
@@ -731,8 +625,9 @@
                 return;
             }
 
-            // ❌ 真正失敗（保留原本行為）
-            alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+            alert(currentLang === 'en'
+                ? "Failed to calculate route. Please check input addresses."
+                : "無法計算路線，請檢查輸入的地點名稱是否正確。");
             window.location.href = 'index.html';
         }
 
@@ -835,7 +730,7 @@
             if (discountCheckbox.checked) {
                 let discountedBaseFare = Math.round(currentBaseFare * 0.85);
                 if (discountedBaseFare <= 100) {
-                    alert(currentLang === 'en' ? "15% discount is not applicable for this trip (minimum fare not reached)" : "此行程未達到八五折優惠的最低消費要求");
+                    alert(currentLang === 'en' ? "15% discount is not applicable." : "此行程未達到八五折優惠的最低消費要求");
                     discountCheckbox.checked = false;
                     return;
                 }
@@ -863,11 +758,9 @@
         if (normalFareVal) normalFareVal.innerText = normalFare;
 
         if (normalFareNote) {
-            if (currentBaseFare <= 100) {
-                normalFareNote.innerText = currentLang === 'en' ? 'Minimum fare HK$100 applied' : '已包含最低消費 HK$100';
-            } else {
-                normalFareNote.innerText = currentLang === 'en' ? 'Includes tunnel fee or minimum fare' : '已包含隧道費或最低消費';
-            }
+            normalFareNote.innerText = currentBaseFare <= 100
+                ? (currentLang === 'en' ? 'Minimum fare HK$100 applied' : '已包含最低消費 HK$100')
+                : (currentLang === 'en' ? 'Includes tunnel fee or minimum fare' : '已包含隧道費或最低消費');
         }
 
         let discountedBaseFare = Math.round(currentBaseFare * 0.85);
@@ -933,6 +826,14 @@
     }
 
     function initMap() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', _runInitMap);
+        } else {
+            _runInitMap();
+        }
+    }
+
+    function _runInitMap() {
         routeData = loadRouteDataFromLocalStorage();
         const bookingData = loadBookingDataFromLocalStorage();
         if (bookingData) {
@@ -950,14 +851,11 @@
         if (routeData && routeData.pickup && routeData.dropoff) {
             calculateFareWithGoogle();
         } else {
-            alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
+            alert(currentLang === 'en' ? "No route data found." : "未找到路線資料，請返回輸入起點同目的地。");
             window.location.href = 'index.html';
         }
     }
 
-    // ============================================
-    // 語言系統（頁面專屬）
-    // ============================================
     let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
     function toggleLanguage() {
@@ -969,21 +867,18 @@
     function applyLanguage() {
         const btn = document.getElementById('lang-toggle-btn');
         if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
-
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (translations[currentLang] && translations[currentLang][key]) {
                 el.textContent = translations[currentLang][key];
             }
         });
-
         document.querySelectorAll('[data-i18n-html]').forEach(el => {
             const key = el.getAttribute('data-i18n-html');
             if (translations[currentLang] && translations[currentLang][key]) {
                 el.innerHTML = translations[currentLang][key];
             }
         });
-
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const key = el.getAttribute('data-i18n-placeholder');
             if (translations[currentLang] && translations[currentLang][key]) {
@@ -1017,7 +912,6 @@
                     <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
-
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
                     <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
@@ -1026,7 +920,6 @@
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
             </div>
-
             <div class="flex items-center pr-1">
                 <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
                     <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
@@ -1059,8 +952,7 @@
             <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
                 為了方便下次叫車，您可以將本服務加到手機主畫面：
             </p>
-            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
-            </div>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
             <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                 了解，關閉
             </button>
@@ -1069,7 +961,6 @@
 
     <section id="result-section" class="w-full px-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
-            
             <div class="flex justify-between items-center mb-2 gap-2">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-white">
                     <i class="fa-solid fa-route text-brand-yellow"></i> <span data-i18n="result_title">路線規劃結果</span>
@@ -1085,7 +976,6 @@
             </div>
 
             <div id="result-content" class="hidden">
-                
                 <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
                         <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
@@ -1123,12 +1013,10 @@
                             <span data-i18n="res_base_fee">跳錶基本收費：</span>
                             <span class="text-white font-bold">HK$ <span id="res-base-fare">0</span></span>
                         </div>
-                        
                         <div id="res-tunnel-row" class="hidden flex justify-between items-center text-sky-300">
                             <span data-i18n="res_tunnel_fee">預計自動偵測隧道費：</span>
                             <span class="font-bold">+HK$ <span id="res-tunnel-val">0</span></span>
                         </div>
-
                         <div id="res-surcharge-row" class="hidden flex justify-between items-center text-brand-yellow">
                             <span data-i18n="res_surcharge">車款附加費：</span>
                             <span class="font-bold">+HK$ <span id="res-surcharge-val">0</span></span>
@@ -1160,7 +1048,7 @@
                         <span class="text-brand-yellow text-xs" data-i18n="required_mark">* (必須選擇)</span>
                     </p>
                     <p class="text-xs text-gray-400 mb-3" data-i18n="min_fare_note">所有行程最低消費$100</p>
-                    
+
                     <div class="space-y-3">
                         <label class="flex items-start gap-3 cursor-pointer bg-brand-dark border border-gray-800 rounded-xl p-3 hover:border-brand-yellow transition relative">
                             <input type="checkbox" id="fare-mode-normal" class="fare-mode-checkbox mt-1 rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4" onchange="handleFareModeSelection('normal')">
@@ -1218,11 +1106,9 @@
                     <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <div class="text-green-500 text-3xl mb-3">
-                        <i class="fa-brands fa-weixin"></i>
-                    </div>
+                    <div class="text-green-500 text-3xl mb-3"><i class="fa-brands fa-weixin"></i></div>
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
-                    <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
+                    <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
@@ -1239,16 +1125,12 @@
     </footer>
 
 <script>
-// ============================================
-// 頁面初始化（theme.js 已自動初始化主題 / 浮標）
-// ============================================
 window.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 });
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
