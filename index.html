@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
+<!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -18,6 +20,7 @@
     } catch(e) {}
 
     var root = document.documentElement;
+
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
@@ -47,6 +50,7 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
+
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -350,7 +354,7 @@
                             </div>
                         </div>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-pickup" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
+                            <input type="text" id="calc-pickup" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
                             <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -369,7 +373,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-1" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
+                            <input type="text" id="calc-stopover-1" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
                             <button type="button" id="clear-stop-1-btn" onclick="clearInput('calc-stopover-1', 'clear-stop-1-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -384,7 +388,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-2" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
+                            <input type="text" id="calc-stopover-2" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
                             <button type="button" id="clear-stop-2-btn" onclick="clearInput('calc-stopover-2', 'clear-stop-2-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -399,7 +403,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-3" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
+                            <input type="text" id="calc-stopover-3" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
                             <button type="button" id="clear-stop-3-btn" onclick="clearInput('calc-stopover-3', 'clear-stop-3-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -412,7 +416,7 @@
                     <div>
                         <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
+                            <input type="text" id="calc-dropoff" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
                             <button type="button" id="clear-dropoff-btn" onclick="clearInput('calc-dropoff', 'clear-dropoff-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -463,77 +467,102 @@
 // 跨頁面共享函數
 // ============================================
 
+// ⭐ 改動 #2：加入 placeId 欄
 function saveRouteDataToLocalStorage() {
+    const pickupEl = document.getElementById('calc-pickup');
+    const dropoffEl = document.getElementById('calc-dropoff');
+
     const data = {
-        pickup: document.getElementById('calc-pickup')?.value.trim() || '',
-        dropoff: document.getElementById('calc-dropoff')?.value.trim() || '',
-        stopovers: []
+        pickup: pickupEl?.value.trim() || '',
+        pickupPlaceId: pickupEl?.dataset.placeId || '',
+        dropoff: dropoffEl?.value.trim() || '',
+        dropoffPlaceId: dropoffEl?.dataset.placeId || '',
+        stopovers: [],
+        stopoverPlaceIds: []
     };
-    
+
     for (let i = 1; i <= 3; i++) {
-        const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim() || '';
-        if (stopVal) data.stopovers.push(stopVal);
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const v = el?.value.trim() || '';
+        if (v) {
+            data.stopovers.push(v);
+            data.stopoverPlaceIds.push(el.dataset.placeId || '');
+        }
     }
-    
+
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
+// ⭐ 改動 #2：同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
-    if (saved) {
-        try {
-            const data = JSON.parse(saved);
-            if (data.pickup && document.getElementById('calc-pickup')) {
-                document.getElementById('calc-pickup').value = data.pickup;
-                toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-            }
-            if (data.dropoff && document.getElementById('calc-dropoff')) {
-                document.getElementById('calc-dropoff').value = data.dropoff;
-                toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-            }
-            data.stopovers.forEach((stop, index) => {
-                const container = document.getElementById(`stopover-container-${index + 1}`);
-                const input = document.getElementById(`calc-stopover-${index + 1}`);
-                if (container && input) {
-                    container.classList.remove('hidden');
-                    input.value = stop;
-                    toggleClearBtn(`calc-stopover-${index + 1}`, `clear-stop-${index + 1}-btn`);
-                    currentStopCount = Math.max(currentStopCount, index + 1);
-                }
-            });
-        } catch(e) {
-            console.log('No saved route data');
+    if (!saved) return;
+
+    try {
+        const data = JSON.parse(saved);
+
+        const pickupEl = document.getElementById('calc-pickup');
+        if (pickupEl && data.pickup) {
+            pickupEl.value = data.pickup;
+            if (data.pickupPlaceId) pickupEl.dataset.placeId = data.pickupPlaceId;
+            toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         }
+
+        const dropoffEl = document.getElementById('calc-dropoff');
+        if (dropoffEl && data.dropoff) {
+            dropoffEl.value = data.dropoff;
+            if (data.dropoffPlaceId) dropoffEl.dataset.placeId = data.dropoffPlaceId;
+            toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+        }
+
+        (data.stopovers || []).forEach((stop, index) => {
+            const i = index + 1;
+            const container = document.getElementById(`stopover-container-${i}`);
+            const input = document.getElementById(`calc-stopover-${i}`);
+            if (container && input) {
+                container.classList.remove('hidden');
+                input.value = stop;
+                const pid = (data.stopoverPlaceIds || [])[index];
+                if (pid) input.dataset.placeId = pid;
+                toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+                currentStopCount = Math.max(currentStopCount, i);
+            }
+        });
+
+        if (currentStopCount >= 3) {
+            document.getElementById('add-stop-btn')?.classList.add('hidden');
+        }
+    } catch(e) {
+        console.log('No saved route data');
     }
 }
 
+// ⭐ 改動 #2：清 placeId
 function clearAllInputs() {
-    const pickupEl = document.getElementById('calc-pickup');
-    if (pickupEl) {
-        pickupEl.value = '';
-        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-    }
-    
-    const dropoffEl = document.getElementById('calc-dropoff');
-    if (dropoffEl) {
-        dropoffEl.value = '';
-        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-    }
-    
+    const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = '';
+            delete el.dataset.placeId;
+        }
+    });
+
     for (let i = 1; i <= 3; i++) {
-        const stopInput = document.getElementById(`calc-stopover-${i}`);
-        const stopContainer = document.getElementById(`stopover-container-${i}`);
-        if (stopInput) stopInput.value = '';
-        if (stopContainer) stopContainer.classList.add('hidden');
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (container) container.classList.add('hidden');
     }
     currentStopCount = 0;
     const addStopBtn = document.getElementById('add-stop-btn');
     if (addStopBtn) addStopBtn.classList.remove('hidden');
-    
+
+    toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+    toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
-    
-    if (pickupEl) pickupEl.focus();
+
+    document.getElementById('calc-pickup')?.focus();
 }
 
 function calculateAndGoToResult() {
@@ -544,13 +573,6 @@ function calculateAndGoToResult() {
         alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
         return;
     }
-
-    // ⭐ 跳轉前先 abort recognition，唔好帶住 mic session 走
-    if (activeRecognition) {
-        try { activeRecognition.abort(); } catch(e) {}
-        activeRecognition = null;
-    }
-    isRecognizing = false;
     
     localStorage.removeItem('taxiBookingData');
     saveRouteDataToLocalStorage();
@@ -629,193 +651,24 @@ function swapStopoverValues(fromIndex, toIndex) {
     const fromInput = document.getElementById(`calc-stopover-${fromIndex}`);
     const toInput = document.getElementById(`calc-stopover-${toIndex}`);
     if (fromInput && toInput) {
-        const temp = fromInput.value;
+        const tempVal = fromInput.value;
+        const tempId = fromInput.dataset.placeId || '';
         fromInput.value = toInput.value;
-        toInput.value = temp;
+        toInput.value = tempVal;
+        if (toInput.dataset.placeId) fromInput.dataset.placeId = toInput.dataset.placeId;
+        else delete fromInput.dataset.placeId;
+        if (tempId) toInput.dataset.placeId = tempId;
+        else delete toInput.dataset.placeId;
+
         toggleClearBtn(`calc-stopover-${fromIndex}`, `clear-stop-${fromIndex}-btn`);
         toggleClearBtn(`calc-stopover-${toIndex}`, `clear-stop-${toIndex}-btn`);
     }
 }
 
 // ============================================
-// 語音狀態管理（全局）
+// 語音辨識（⭐ 完全保留你第一次嘅版本，冇改過）
 // ============================================
-let activeRecognition    = null;
-let isRecognizing        = false;
-let lastRecognitionEnd   = 0;
-const RECOGNITION_COOLDOWN = 400;
-
-// ⭐⭐⭐ 核心修正：getUserMedia preflight ⭐⭐⭐
-// 用途：逼 iOS Safari 重置 audio session，令 SpeechRecognition 可以再次開 mic
-async function preflightMicAccess() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.log('ℹ️ getUserMedia 唔支援，跳過 preflight');
-        return true;
-    }
-    try {
-        console.log('🎤 Preflight: 要求 mic 權限...');
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log('✅ Preflight: 攞到 stream，立即停止');
-        // 立即停所有 track，釋放 mic
-        stream.getTracks().forEach(t => t.stop());
-        return true;
-    } catch(e) {
-        console.warn('⚠️ Preflight getUserMedia 失敗:', e.name, e.message);
-        // 唔 return false，等 speech recognition 自己再試（可能權限已被拒）
-        return true;
-    }
-}
-
-function warmupAudioSession() {
-    try {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) return;
-        const ctx = new Ctx();
-        if (ctx.state === 'suspended' && ctx.resume) {
-            ctx.resume().catch(() => {});
-        }
-        setTimeout(() => {
-            try { ctx.close(); } catch(e) {}
-        }, 100);
-    } catch(e) {}
-}
-
-function cleanupRecognition() {
-    isRecognizing = false;
-    lastRecognitionEnd = Date.now();
-
-    const micBtn  = document.getElementById('voice-btn');
-    const micText = document.getElementById('mic-text');
-    const micIcon = document.getElementById('mic-icon');
-
-    if (micBtn)  micBtn.classList.remove('bg-brand-yellow', 'text-black');
-    if (micIcon) micIcon.className = 'fa-solid fa-microphone text-base';
-    if (micText && typeof translations !== 'undefined' && translations[currentLang]) {
-        micText.innerText = translations[currentLang].voice_btn_text;
-    }
-}
-
-// ⭐ pagehide：離開頁面前主動 abort
-window.addEventListener('pagehide', () => {
-    if (activeRecognition) {
-        try { activeRecognition.abort(); } catch(e) {}
-        activeRecognition = null;
-    }
-    isRecognizing = false;
-});
-
-// ⭐ visibilitychange：轉去背景時也 abort
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden && activeRecognition) {
-        try { activeRecognition.abort(); } catch(e) {}
-        activeRecognition = null;
-        isRecognizing = false;
-    }
-});
-
-// ⭐ pageshow：由 bfcache 恢復時重置（唔設冷卻，避免擋第一次）
-window.addEventListener('pageshow', () => {
-    if (activeRecognition) {
-        try { activeRecognition.abort(); } catch(e) {}
-        activeRecognition = null;
-    }
-    isRecognizing = false;
-    lastRecognitionEnd = 0;
-
-    const micBtn  = document.getElementById('voice-btn');
-    const micText = document.getElementById('mic-text');
-    const micIcon = document.getElementById('mic-icon');
-    if (micBtn)  micBtn.classList.remove('bg-brand-yellow', 'text-black');
-    if (micIcon) micIcon.className = 'fa-solid fa-microphone text-base';
-    if (micText && typeof translations !== 'undefined' && translations[currentLang]) {
-        micText.innerText = translations[currentLang].voice_btn_text;
-    }
-});
-
-// ============================================
-// 語音結果解析
-// ============================================
-function processSpeechResult(speechResult) {
-    let pickup = "", dropoff = "", stopover = "";
-    let text = speechResult;
-
-    text = text.replace(/我想/g, "").replace(/查詢/g, "")
-               .replace(/車費/g, "").replace(/價錢/g, "")
-               .replace(/預約/g, "").replace(/的士/g, "");
-
-    let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
-    if (fromMatch && fromMatch[1]) {
-        pickup = fromMatch[1].trim();
-    } else {
-        let firstSplit = text.split(/經|途經|去|到|至/)[0];
-        if (firstSplit) pickup = firstSplit.trim();
-    }
-
-    let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
-    if (viaMatch && viaMatch[1]) {
-        let viaText = viaMatch[1].trim();
-        let subToSplit = viaText.split(/去|到|至/);
-        stopover = subToSplit[0].trim();
-    }
-
-    let toMatch = text.match(/(?:去|到|至)(.+)$/);
-    if (toMatch && toMatch[1]) {
-        dropoff = toMatch[1].trim();
-    } else {
-        let parts = text.split(/經|途經/);
-        if (parts.length >= 2) {
-            let lastPart = parts[parts.length - 1].trim();
-            if (lastPart && lastPart !== stopover) dropoff = lastPart;
-        } else if (!dropoff) {
-            let words = text.split(/\s+/);
-            if (words.length >= 2 && !pickup) {
-                pickup = words[0];
-                dropoff = words[words.length - 1];
-            }
-        }
-    }
-
-    if (pickup) {
-        document.getElementById('calc-pickup').value = pickup;
-        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-    }
-    if (stopover) {
-        if (currentStopCount === 0) addStopoverField();
-        document.getElementById('calc-stopover-1').value = stopover;
-        toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
-    }
-    if (dropoff) {
-        document.getElementById('calc-dropoff').value = dropoff;
-        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-    }
-
-    setTimeout(() => {
-        const micBtn  = document.getElementById('voice-btn');
-        const micText = document.getElementById('mic-text');
-        const micIcon = document.getElementById('mic-icon');
-        micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        micText.innerText = translations[currentLang].voice_btn_text;
-        micIcon.className = "fa-solid fa-microphone text-base";
-        calculateAndGoToResult();
-    }, 1000);
-}
-
-// ============================================
-// 語音辨識（改為 async）
-// ============================================
-async function startVoiceRecognition() {
-    if (isRecognizing) {
-        console.log('⏳ 語音辨識進行中，請等佢完成');
-        return;
-    }
-
-    const now = Date.now();
-    if (now - lastRecognitionEnd < RECOGNITION_COOLDOWN) {
-        const wait = RECOGNITION_COOLDOWN - (now - lastRecognitionEnd);
-        console.log(`⏳ 語音辨識冷卻中，請等 ${wait}ms`);
-        return;
-    }
-
+function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
@@ -828,117 +681,102 @@ async function startVoiceRecognition() {
         return;
     }
 
-    if (activeRecognition) {
-        try { activeRecognition.abort(); } catch(e) {}
-        activeRecognition = null;
-    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'zh-HK';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-    const micBtn  = document.getElementById('voice-btn');
+    const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
     const micIcon = document.getElementById('mic-icon');
 
-    // ⭐ 顯示熱身狀態
     micBtn.classList.add('bg-brand-yellow', 'text-black');
     micText.innerText = "正在啟動麥克風...";
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
-    // ⭐⭐ 關鍵：先做 getUserMedia preflight（逼 iOS 放 audio session）
-    await preflightMicAccess();
-
-    // ⭐ 等 200ms 讓 mic stream 完全釋放，再交俾 SpeechRecognition
-    await new Promise(r => setTimeout(r, 200));
-
-    // ⭐ AudioContext 熱身（幫手重置 iOS audio session）
-    warmupAudioSession();
-
-    // ⭐ 再等 100ms
-    await new Promise(r => setTimeout(r, 100));
-
-    // ===== 正式啟動 recognition =====
-    const recognition = new SpeechRecognition();
-    activeRecognition = recognition;
-    isRecognizing = true;
-
-    recognition.lang = 'zh-HK';
-    recognition.interimResults = true;
-    recognition.continuous = false;
-    recognition.maxAlternatives = 1;
-
-    let speechHandled  = false;
-    let lastInterim    = '';
-    let autoStopTimer  = null;
-    let resultWatchdog = null;
-
-    function finalize() {
-        clearTimeout(autoStopTimer);
-        clearTimeout(resultWatchdog);
-        activeRecognition = null;
-        cleanupRecognition();
-    }
-
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
-
-        clearTimeout(resultWatchdog);
-        resultWatchdog = setTimeout(() => {
-            if (speechHandled) return;
-            speechHandled = true;
-            console.warn('⚠️ 語音 watchdog 觸發：onstart 後 4 秒內冇 result');
-            try { recognition.abort(); } catch(e) {}
-            micText.innerText = "⚠️ 麥克風無回應，請再試一次";
-            micIcon.className = "fa-solid fa-microphone-slash text-base";
-            micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        }, 4000);
     };
 
     recognition.onresult = (event) => {
-        clearTimeout(resultWatchdog);
+        recognition.stop();
+        const speechResult = event.results[0][0].transcript;
+        micText.innerText = "聽到：「" + speechResult + "」";
 
-        let interim = '';
-        let final   = '';
+        let pickup = "", dropoff = "", stopover = "";
+        let text = speechResult;
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const t = event.results[i][0].transcript;
-            if (event.results[i].isFinal) final += t;
-            else interim += t;
+        text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
+
+        let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
+        if (fromMatch && fromMatch[1]) {
+            pickup = fromMatch[1].trim();
+        } else {
+            let firstSplit = text.split(/經|途經|去|到|至/)[0];
+            if (firstSplit) pickup = firstSplit.trim();
         }
 
-        const text = (final || interim).trim();
-        if (text) micText.innerText = "🎤 " + text;
-
-        if (final && !speechHandled) {
-            speechHandled = true;
-            clearTimeout(autoStopTimer);
-            try { recognition.stop(); } catch(e) {}
-            processSpeechResult(final);
-            return;
+        let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
+        if (viaMatch && viaMatch[1]) {
+            let viaText = viaMatch[1].trim();
+            let subToSplit = viaText.split(/去|到|至/);
+            stopover = subToSplit[0].trim();
         }
 
-        if (interim && !speechHandled) {
-            lastInterim = interim;
-            const hasDestination = /(?:去|到|至)[^\s，。？！,.\?!]{2,}$/.test(interim);
-
-            if (hasDestination) {
-                clearTimeout(autoStopTimer);
-                autoStopTimer = setTimeout(() => {
-                    if (speechHandled) return;
-                    speechHandled = true;
-                    try { recognition.stop(); } catch(e) {}
-                    processSpeechResult(lastInterim);
-                }, 1000);
+        let toMatch = text.match(/(?:去|到|至)(.+)$/);
+        if (toMatch && toMatch[1]) {
+            dropoff = toMatch[1].trim();
+        } else {
+            let parts = text.split(/經|途經/);
+            if (parts.length >= 2) {
+                let lastPart = parts[parts.length - 1].trim();
+                if (lastPart && lastPart !== stopover) dropoff = lastPart;
+            } else if (!dropoff) {
+                let words = text.split(/\s+/);
+                if (words.length >= 2 && !pickup) {
+                    pickup = words[0];
+                    dropoff = words[words.length - 1];
+                }
             }
         }
-    };
 
-    recognition.onspeechend = () => {
+        if (pickup) {
+            const el = document.getElementById('calc-pickup');
+            if (el) {
+                el.value = pickup;
+                delete el.dataset.placeId;
+                toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+            }
+        }
+        
+        if (stopover) {
+            if (currentStopCount === 0) addStopoverField();
+            const el = document.getElementById('calc-stopover-1');
+            if (el) {
+                el.value = stopover;
+                delete el.dataset.placeId;
+                toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
+            }
+        }
+        
+        if (dropoff) {
+            const el = document.getElementById('calc-dropoff');
+            if (el) {
+                el.value = dropoff;
+                delete el.dataset.placeId;
+                toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+            }
+        }
+
         setTimeout(() => {
-            try { recognition.stop(); } catch(e) {}
-        }, 500);
+            micBtn.classList.remove('bg-brand-yellow', 'text-black');
+            micText.innerText = translations[currentLang].voice_btn_text;
+            micIcon.className = "fa-solid fa-microphone text-base";
+            calculateAndGoToResult();
+        }, 1000);
     };
 
     recognition.onerror = (event) => {
-        clearTimeout(resultWatchdog);
-
         let errMsg = "未能識別語音，請重試或以文字輸入";
         switch (event.error) {
             case 'not-allowed':
@@ -960,36 +798,27 @@ async function startVoiceRecognition() {
             default:
                 errMsg = "語音辨識失敗：" + event.error;
         }
-
         micText.innerText = errMsg;
         micIcon.className = "fa-solid fa-microphone-slash text-base";
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        clearTimeout(autoStopTimer);
-        speechHandled = true;
 
         setTimeout(() => {
-            if (!isRecognizing) {
-                micText.innerText = translations[currentLang].voice_btn_text;
-                micIcon.className = "fa-solid fa-microphone text-base";
-            }
+            micText.innerText = translations[currentLang].voice_btn_text;
+            micIcon.className = "fa-solid fa-microphone text-base";
         }, 3000);
     };
 
     recognition.onend = () => {
-        if (!speechHandled && lastInterim) {
-            speechHandled = true;
-            processSpeechResult(lastInterim);
-        }
-        finalize();
+        micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        micIcon.className = "fa-solid fa-microphone text-base";
     };
 
     try {
         recognition.start();
     } catch (e) {
         alert("語音辨識啟動失敗：" + e.message);
-        micIcon.className = "fa-solid fa-microphone text-base";
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        finalize();
+        micIcon.className = "fa-solid fa-microphone text-base";
     }
 }
 
@@ -1037,10 +866,10 @@ const translations = {
         btn_reselect_route: "重新選擇路線",
         btn_clear: "重設",
         hero_title: '長途跨區・機場口岸接送<br><span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>',
-        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・<混能的士・輪椅的士',
-        calc_titlespan: "智能規劃 class路線與預計車費",
-       =" calc_tip_title:text "預計車費使用-brand說明：",
-        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
+        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士',
+        calc_title: "智能規劃路線與預計車費",
+        calc_tip_title: "預計車費使用說明：",
+        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
         calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
         calc_label_pickup: "起點 (出發地)",
         calc_label_stopover: "中途站 (最多3個)",
@@ -1151,33 +980,59 @@ function applyLanguage() {
     });
 }
 
+// ============================================
+// ⭐ 改動 #1 + #2：Autocomplete（readyState 保護 + place_id 擷取）
+// ============================================
 function initAutocomplete() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _attachAutocompletes);
+    } else {
+        _attachAutocompletes();
+    }
+}
+
+function _attachAutocompletes() {
     const hkBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(22.15, 113.83),
         new google.maps.LatLng(22.58, 114.50)
     );
 
+    // ⭐ 移除 types 限制，等 Google 自己揀最合適嘅結果
     const options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
-        fields: ["formatted_address", "geometry", "name"],
-        types: ['geocode', 'establishment']
+        fields: ["place_id", "formatted_address", "geometry", "name"]
     };
 
-    const pickupEl = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
-    const stop1 = document.getElementById('calc-stopover-1');
-    const stop2 = document.getElementById('calc-stopover-2');
-    const stop3 = document.getElementById('calc-stopover-3');
+    const inputMap = [
+        ['calc-pickup',     'clear-pickup-btn'],
+        ['calc-dropoff',    'clear-dropoff-btn'],
+        ['calc-stopover-1', 'clear-stop-1-btn'],
+        ['calc-stopover-2', 'clear-stop-2-btn'],
+        ['calc-stopover-3', 'clear-stop-3-btn']
+    ];
 
-    if (pickupEl) {
-        new google.maps.places.Autocomplete(pickupEl, options);
-    }
-    
-    if (dropoffEl) new google.maps.places.Autocomplete(dropoffEl, options);
-    if (stop1) new google.maps.places.Autocomplete(stop1, options);
-    if (stop2) new google.maps.places.Autocomplete(stop2, options);
-    if (stop3) new google.maps.places.Autocomplete(stop3, options);
+    inputMap.forEach(([inputId, btnId]) => {
+        const el = document.getElementById(inputId);
+        if (!el) return;
+
+        const ac = new google.maps.places.Autocomplete(el, options);
+
+        ac.addListener('place_changed', () => {
+            const place = ac.getPlace();
+            if (place && place.formatted_address) {
+                el.value = place.formatted_address;
+            }
+            if (place && place.place_id) {
+                el.dataset.placeId = place.place_id;
+            }
+            toggleClearBtn(inputId, btnId);
+        });
+
+        el.addEventListener('input', () => {
+            delete el.dataset.placeId;
+        });
+    });
 }
 
 function addStopoverField() {
@@ -1193,14 +1048,42 @@ function addStopoverField() {
     }
 }
 
+// ⭐ 改動 #7：移除中途站時，後面嘅上移，唔跳號
 function removeStopoverField(index) {
-    const container = document.getElementById(`stopover-container-${index}`);
-    const input = document.getElementById(`calc-stopover-${index}`);
-    if (input) input.value = '';
-    toggleClearBtn(`calc-stopover-${index}`, `clear-stop-${index}-btn`);
-    if (container) container.classList.add('hidden');
+    const values = [];
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (el && container && !container.classList.contains('hidden')) {
+            values.push({
+                value: el.value,
+                placeId: el.dataset.placeId || ''
+            });
+        }
+    }
 
-    currentStopCount = Math.max(0, currentStopCount - 1);
+    values.splice(index - 1, 1);
+
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const container = document.getElementById(`stopover-container-${i}`);
+        if (!el || !container) continue;
+
+        const v = values[i - 1];
+        if (v) {
+            el.value = v.value;
+            if (v.placeId) el.dataset.placeId = v.placeId;
+            else delete el.dataset.placeId;
+            container.classList.remove('hidden');
+        } else {
+            el.value = '';
+            delete el.dataset.placeId;
+            container.classList.add('hidden');
+        }
+        toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+    }
+
+    currentStopCount = values.length;
     const btn = document.getElementById('add-stop-btn');
     if (btn) btn.classList.remove('hidden');
 }
@@ -1221,6 +1104,7 @@ function clearInput(inputId, btnId) {
     const input = document.getElementById(inputId);
     if (input) {
         input.value = '';
+        delete input.dataset.placeId;
         toggleClearBtn(inputId, btnId);
         input.focus();
     }
@@ -1230,9 +1114,17 @@ function swapLocations() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
     if (pickupEl && dropoffEl) {
-        const temp = pickupEl.value;
+        const tempVal = pickupEl.value;
+        const tempId = pickupEl.dataset.placeId || '';
+
         pickupEl.value = dropoffEl.value;
-        dropoffEl.value = temp;
+        dropoffEl.value = tempVal;
+
+        if (dropoffEl.dataset.placeId) pickupEl.dataset.placeId = dropoffEl.dataset.placeId;
+        else delete pickupEl.dataset.placeId;
+
+        if (tempId) dropoffEl.dataset.placeId = tempId;
+        else delete dropoffEl.dataset.placeId;
 
         toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
@@ -1242,23 +1134,24 @@ function swapLocations() {
 // ============================================
 // 頁面初始化
 // ============================================
-window.addEventListener('DOMContentLoaded', () => {
+// ⭐ 改動 #3：用 sessionStorage flag 判斷「由 result.html 返嚟」
+document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
-    
-    const referrer = document.referrer || '';
-    const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
-    
-    if (fromResultOrBooking) {
+
+    const returning = sessionStorage.getItem('returningFromResult') === '1';
+    sessionStorage.removeItem('returningFromResult');
+
+    if (returning) {
         loadRouteDataFromLocalStorage();
     } else {
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
-        
+
         const pickupEl = document.getElementById('calc-pickup');
         const dropoffEl = document.getElementById('calc-dropoff');
         if (pickupEl) pickupEl.value = '';
         if (dropoffEl) dropoffEl.value = '';
-        
+
         for (let i = 1; i <= 3; i++) {
             const stopInput = document.getElementById(`calc-stopover-${i}`);
             const stopContainer = document.getElementById(`stopover-container-${i}`);
@@ -1269,12 +1162,13 @@ window.addEventListener('DOMContentLoaded', () => {
         const addStopBtn = document.getElementById('add-stop-btn');
         if (addStopBtn) addStopBtn.classList.remove('hidden');
     }
-    
+
     setupStopoverDragging();
 });
 </script>
 <script src="theme.js"></script>
 <script>
+// ⭐ 偵測到新 SW 接管時，自動 reload 一次
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {

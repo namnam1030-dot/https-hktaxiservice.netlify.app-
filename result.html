@@ -228,6 +228,52 @@
     html.light-theme body .hover\:border-brand-yellow:hover {
         border-color: #000000 !important;
     }
+
+    /* =========================================================
+       🔧 深→淺切換殘留修復（result 專屬）
+       ========================================================= */
+
+    /* ── 1) 隧道偵測框：整個框 + 所有子元素強制深藍 ── */
+    html.light-theme body #detected-tunnels-container,
+    html.light-theme body #detected-tunnels-container *,
+    html.light-theme body #detected-tunnels-container .text-sky-200,
+    html.light-theme body #detected-tunnels-container .text-sky-300,
+    html.light-theme body #detected-tunnels-container .text-sky-400,
+    html.light-theme body #detected-tunnels-container .text-white,
+    html.light-theme body #detected-tunnels-container #detected-tunnels-list {
+        color: #0369A1 !important;
+    }
+
+    /* ── 2) 隧道費用行：整行 + 所有子元素強制深藍 ── */
+    html.light-theme body #res-tunnel-row,
+    html.light-theme body #res-tunnel-row *,
+    html.light-theme body #res-tunnel-row .text-sky-300 {
+        color: #0369A1 !important;
+    }
+
+    /* ── 3) 收費模式兩個方格：強制白底 + 淺灰邊 ── */
+    html.light-theme body #discount-option-container,
+    html.light-theme body .space-y-3 > label.bg-brand-dark,
+    html.light-theme body label.bg-brand-dark,
+    html.light-theme body .bg-brand-dark {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        border-color: #D1D5DB !important;
+    }
+
+    /* ── 4) 收費模式複選框：強制淺色渲染（避免黑方塊）── */
+    html.light-theme body input[type="checkbox"],
+    html.light-theme body .fare-mode-checkbox {
+        color-scheme: light !important;
+        accent-color: #000000 !important;
+        background-color: #FFFFFF !important;
+    }
+
+    /* ── 5) hover 時保持黑框 ── */
+    html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
+    html.light-theme body #discount-option-container:hover {
+        border-color: #000000 !important;
+    }
 </style>
 
     <script>
@@ -450,6 +496,68 @@
         return trimmed;
     }
 
+    // ============================================
+    // ⭐ 新增：香港範圍 + 文字地址解析（ZERO_RESULTS fallback 用）
+    // ============================================
+    const HK_BOUNDS = { north: 22.56, south: 22.15, east: 114.44, west: 113.83 };
+
+    function isInHK(latLng) {
+        if (!latLng) return false;
+        return latLng.lat() >= HK_BOUNDS.south && latLng.lat() <= HK_BOUNDS.north &&
+               latLng.lng() >= HK_BOUNDS.west  && latLng.lng() <= HK_BOUNDS.east;
+    }
+
+    function resolveLocation(text) {
+        if (!text) return Promise.resolve(text);
+        if (text instanceof google.maps.LatLng) return Promise.resolve(text);
+        if (typeof text === 'object' && 'lat' in text && 'lng' in text) {
+            return Promise.resolve(new google.maps.LatLng(text.lat, text.lng));
+        }
+
+        return new Promise((resolve) => {
+            const geocoder = new google.maps.Geocoder();
+
+            // 第 1 層：Geocoder（限制香港）
+            geocoder.geocode(
+                {
+                    address: text,
+                    region: 'HK',
+                    language: 'zh-HK',
+                    componentRestrictions: { country: 'HK' }
+                },
+                (results, status) => {
+                    if (status === 'OK' && results && results[0]) {
+                        const loc = results[0].geometry.location;
+                        if (isInHK(loc)) return resolve(loc);
+                    }
+
+                    // 第 2 層：Places.textSearch（限制香港）
+                    const dummyDiv = document.createElement('div');
+                    const service = new google.maps.places.PlacesService(dummyDiv);
+                    service.textSearch(
+                        {
+                            query: text,
+                            language: 'zh-HK',
+                            region: 'HK',
+                            bounds: new google.maps.LatLngBounds(
+                                new google.maps.LatLng(HK_BOUNDS.south, HK_BOUNDS.west),
+                                new google.maps.LatLng(HK_BOUNDS.north, HK_BOUNDS.east)
+                            )
+                        },
+                        (places, s2) => {
+                            if (s2 === 'OK' && places && places[0] && places[0].geometry) {
+                                const loc = places[0].geometry.location;
+                                if (isInHK(loc)) return resolve(loc);
+                            }
+                            // 兩層都搵唔到，原樣交俾 Directions
+                            resolve(text);
+                        }
+                    );
+                }
+            );
+        });
+    }
+
     function processRoutes(routes, isShenzhenBay) {
         if (!routes || routes.length === 0) return [];
         if (routes.length === 1) {
@@ -552,7 +660,9 @@
             provideRouteAlternatives: true
         };
 
-        directionsService.route(request, (result, status) => {
+        // ⭐⭐⭐ 只改動呢度：加入 ZERO_RESULTS 自動 retry ⭐⭐⭐
+        function handleRouteResult(result, status, req, isRetry) {
+
             if (status === google.maps.DirectionsStatus.OK) {
                 routesData = processRoutes(result.routes, isShenzhenBay);
                 result.routes = routesData;
@@ -587,10 +697,47 @@
                 }
 
                 displaySelectedRoute(result, 0, isShenzhenBay);
-            } else {
-                alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
-                window.location.href = 'index.html';
+                return;
             }
+
+            // ⭐ ZERO_RESULTS：第一次先試用 Geocoder / Places 解析文字，再 retry 一次
+            if (status === google.maps.DirectionsStatus.ZERO_RESULTS && !isRetry) {
+                console.warn('[Directions] ZERO_RESULTS，嘗試解析地址後重試…', req);
+
+                const originText = req.origin;
+                const destText   = req.destination;
+                const wpTexts    = (req.waypoints || []).map(w => w.location);
+
+                Promise.all([
+                    resolveLocation(originText),
+                    resolveLocation(destText),
+                    ...wpTexts.map(t => resolveLocation(t))
+                ]).then(resolved => {
+                    const newRequest = {
+                        origin: resolved[0],
+                        destination: resolved[1],
+                        waypoints: wpTexts.map((_, i) => ({
+                            location: resolved[2 + i],
+                            stopover: true
+                        })),
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        provideRouteAlternatives: true
+                    };
+
+                    directionsService.route(newRequest, (r2, s2) => {
+                        handleRouteResult(r2, s2, newRequest, true);
+                    });
+                });
+                return;
+            }
+
+            // ❌ 真正失敗（保留原本行為）
+            alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+            window.location.href = 'index.html';
+        }
+
+        directionsService.route(request, (result, status) => {
+            handleRouteResult(result, status, request, false);
         });
     }
 
@@ -1100,5 +1247,16 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="theme.js"></script>
+<script>
+// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
+if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+}
+</script>
 </body>
 </html>
