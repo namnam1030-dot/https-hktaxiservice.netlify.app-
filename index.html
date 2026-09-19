@@ -144,8 +144,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-
-<!-- ⭐⭐⭐ 關鍵修改：async defer → defer ⭐⭐⭐ -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
 
 <script>
@@ -195,9 +193,8 @@
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
         z-index: 999999 !important;
         max-width: calc(100% - 16px) !important;
-        margin-top: 4px !important;
+        margin-top: 8px !important;
         pointer-events: auto !important;
-        display: block !important;
     }
     .pac-item {
         color: #ccc !important;
@@ -221,6 +218,29 @@
         margin-right: 8px !important;
     }
 
+    /* ⭐⭐⭐ 淡化 powered by Google ⭐⭐⭐ */
+    .pac-container::after {
+        opacity: 0.15 !important;
+        transform: scale(0.65) !important;
+        transform-origin: right bottom !important;
+        padding: 1px 6px !important;
+        pointer-events: none !important;
+        user-select: none !important;
+    }
+    .pac-container .pac-logo::after,
+    .pac-container .pac-branding {
+        opacity: 0.15 !important;
+        transform: scale(0.65) !important;
+        transform-origin: right bottom !important;
+        pointer-events: none !important;
+        user-select: none !important;
+    }
+
+    /* ⭐ 動態推開：pac-container 出現時，容器加 margin-bottom */
+    .pac-pushed {
+        transition: margin-bottom 0.15s ease !important;
+    }
+
     .stopover-drag-handle {
         cursor: grab;
         user-select: none;
@@ -233,7 +253,6 @@
         border-radius: 0.5rem;
     }
 
-    /* 淺色主題 pac */
     html.light-theme body .pac-container {
         background-color: #FFFFFF !important;
         color: #000000 !important;
@@ -485,6 +504,7 @@
 // 跨頁面共享函數
 // ============================================
 
+// ⭐ 加入 placeId 欄
 function saveRouteDataToLocalStorage() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -510,6 +530,7 @@ function saveRouteDataToLocalStorage() {
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
+// ⭐ 同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
@@ -553,6 +574,7 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
+// ⭐ 清 placeId
 function clearAllInputs() {
     const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
     ids.forEach(id => {
@@ -581,7 +603,7 @@ function clearAllInputs() {
 }
 
 // ============================================
-// 零打擾版：冇 placeId 就靜默 geocode 補返
+// ⭐ 零打擾版：冇 placeId 就靜默 geocode 補返（唔彈 confirm）
 // ============================================
 function calculateAndGoToResult() {
     const pickupEl  = document.getElementById('calc-pickup');
@@ -596,6 +618,7 @@ function calculateAndGoToResult() {
         return;
     }
 
+    // ⭐ 收集所有要補 placeId 嘅欄位
     const fields = [
         { el: pickupEl,  val: pickupVal },
         { el: dropoffEl, val: dropoffVal }
@@ -606,6 +629,7 @@ function calculateAndGoToResult() {
         if (v) fields.push({ el, val: v });
     }
 
+    // ⭐ 邊個冇 placeId 就背景 geocode（冇 popup、冇 confirm）
     const tasks = [];
     fields.forEach(f => {
         if (!f.el.dataset.placeId) {
@@ -617,6 +641,7 @@ function calculateAndGoToResult() {
         }
     });
 
+    // ⭐ 顯示 loading（避免用戶連撳）
     const btn = document.getElementById('calc-fare-btn');
     if (btn) {
         btn.disabled = true;
@@ -627,18 +652,20 @@ function calculateAndGoToResult() {
         }</span>`;
     }
 
+    // ⭐ 全部補完（或者 timeout）就跳頁
     Promise.all(tasks).then(() => {
         localStorage.removeItem('taxiBookingData');
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     }).catch(() => {
+        // 就算出錯都照跳（result.html 有 fallback）
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     });
 }
 
 // ============================================
-// 靜默 geocode
+// ⭐ 靜默 geocode：補 placeId，失敗就當冇，唔會 throw
 // ============================================
 function geocodeSilently(text) {
     return new Promise(resolve => {
@@ -647,6 +674,7 @@ function geocodeSilently(text) {
         let settled = false;
         const done = v => { if (!settled) { settled = true; resolve(v); } };
 
+        // ⏰ 4 秒硬 timeout，唔想拖慢用戶
         const timeout = setTimeout(() => done(''), 4000);
 
         try {
@@ -663,7 +691,7 @@ function geocodeSilently(text) {
                     if (status === 'OK' && results && results[0] && results[0].place_id) {
                         done(results[0].place_id);
                     } else {
-                        done('');
+                        done('');   // 搵唔到就當冇，result.html 有 fallback
                     }
                 }
             );
@@ -761,7 +789,7 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識
+// 語音辨識（完全保留原版，冇改過）
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1076,13 +1104,88 @@ function applyLanguage() {
 }
 
 // ============================================
-// ⭐ Autocomplete：suppressInput 保護 + Android 強化
+// ⭐⭐⭐ pac-container 動態處理（隱藏空、推開有建議）
+// ============================================
+const pushedMap = new Map();
+
+function setupPacWatcher() {
+    console.log('[TaxiRoute] setupPacWatcher 已啟動');
+
+    setInterval(() => {
+        const allPacs = document.querySelectorAll('.pac-container');
+        const seenPacs = new Set();
+
+        allPacs.forEach(pc => {
+            const items = pc.querySelectorAll('.pac-item');
+            const hasItems = items.length > 0;
+            const rect = pc.getBoundingClientRect();
+
+            // ⭐ 如果冇建議（空 pac-container），完全隱藏
+            if (!hasItems || rect.height < 40) {
+                pc.style.setProperty('display', 'none', 'important');
+                return;
+            }
+
+            // 有建議，正常顯示
+            pc.style.removeProperty('display');
+            seenPacs.add(pc);
+
+            // 搵對應 input
+            const input = findInputForPac(pc);
+            if (!input) return;
+
+            const container = input.closest('.relative');
+            if (!container) return;
+
+            const pushAmount = Math.ceil(rect.height) + 16;
+            container.style.marginBottom = pushAmount + 'px';
+            container.classList.add('pac-pushed');
+            pushedMap.set(container, pc);
+        });
+
+        // 清理唔再需要推開嘅
+        pushedMap.forEach((pc, container) => {
+            if (!seenPacs.has(pc)) {
+                container.style.marginBottom = '';
+                container.classList.remove('pac-pushed');
+                pushedMap.delete(container);
+            }
+        });
+    }, 150);
+}
+
+// ⭐ 用位置搵對應 input
+function findInputForPac(pc) {
+    const pcRect = pc.getBoundingClientRect();
+    let bestInput = null;
+    let bestDist = Infinity;
+
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        const iRect = input.getBoundingClientRect();
+        if (iRect.height === 0) return;
+        const dist = Math.abs(pcRect.top - iRect.bottom);
+        if (dist < bestDist && dist < 120) {
+            bestDist = dist;
+            bestInput = input;
+        }
+    });
+
+    return bestInput;
+}
+
+// ============================================
+// ⭐ Autocomplete（保留用戶輸入）
 // ============================================
 function initAutocomplete() {
+    console.log('[TaxiRoute] initAutocomplete 已觸發');
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', _attachAutocompletes);
+        document.addEventListener('DOMContentLoaded', () => {
+            _attachAutocompletes();
+            setupPacWatcher();
+        });
     } else {
         _attachAutocompletes();
+        setupPacWatcher();
     }
 }
 
@@ -1118,7 +1221,7 @@ function _attachAutocompletes() {
         ac.addListener('place_changed', () => {
             const place = ac.getPlace();
             suppressInput = true;
-            if (place && place.formatted_address) el.value = place.formatted_address;
+            // ⭐ 保留用戶打嘅字，唔覆蓋 el.value
             if (place && place.place_id) el.dataset.placeId = place.place_id;
             toggleClearBtn(inputId, btnId);
             setTimeout(() => { suppressInput = false; }, 400);
@@ -1129,7 +1232,6 @@ function _attachAutocompletes() {
             delete el.dataset.placeId;
         });
 
-        // ⭐ Android 強化：focus 時強制提升 pac-container 層級
         el.addEventListener('focus', () => {
             setTimeout(() => {
                 document.querySelectorAll('.pac-container').forEach(pc => {
@@ -1139,7 +1241,6 @@ function _attachAutocompletes() {
             }, 100);
         });
 
-        // ⭐ Android 強化：click 時再檢查一次
         el.addEventListener('click', () => {
             setTimeout(() => {
                 document.querySelectorAll('.pac-container').forEach(pc => {
