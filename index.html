@@ -137,7 +137,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
@@ -637,11 +636,14 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// ⭐ 語音辨識（修復版：onresult 唔 stop，跳頁交 onend 處理）
+// ⭐ 語音辨識（最終修復）
+//   核心：onresult 內 call stop() 釋放咪高峰；
+//        onend 後等 800ms 先跳頁，讓提示音播完
 // ============================================
 let _activeRecognition = null;
 let _voiceTimeout = null;
 let _voiceHasResult = false;
+let _isNavigating = false;
 
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -656,7 +658,10 @@ function startVoiceRecognition() {
         return;
     }
 
-    // ⭐ 清舊 instance（防止返 index 時舊 instance 卡住麥克風）
+    // ⭐ 防止重複點擊
+    if (_isNavigating) return;
+
+    // ⭐ 清舊 instance（用 abort 唔用 stop，確保即時中斷）
     if (_activeRecognition) {
         try { _activeRecognition.abort(); } catch(e) {}
         _activeRecognition = null;
@@ -684,7 +689,7 @@ function startVoiceRecognition() {
 
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
-        // ⭐ 15 秒 timeout 保險
+        // ⭐ 15 秒無結果就 abort
         _voiceTimeout = setTimeout(() => {
             try { recognition.abort(); } catch(e) {}
         }, 15000);
@@ -749,8 +754,9 @@ function startVoiceRecognition() {
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        // ⭐ 只標記有結果，唔 call recognition.stop()，跳頁交俾 onend 處理
+        // ⭐⭐⭐ 關鍵：明確 call stop()，讓 iOS 釋放咪高峰 + 播提示音
         _voiceHasResult = true;
+        try { recognition.stop(); } catch(e) {}
     };
 
     recognition.onerror = (event) => {
@@ -795,13 +801,15 @@ function startVoiceRecognition() {
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
 
-        // ⭐ recognition 完整結束（提示音已播）→ 等 500ms 先跳頁
+        // ⭐⭐⭐ 關鍵：onend（提示音應該已播）後，等 800ms 先跳頁
+        //          讓 iOS 有足夠時間完全釋放咪高峰
         if (_voiceHasResult) {
             _voiceHasResult = false;
+            _isNavigating = true;
+            micText.innerText = "✅ 已收到，正在計算路線...";
             setTimeout(() => {
-                micText.innerText = translations[currentLang].voice_btn_text;
                 calculateAndGoToResult();
-            }, 500);
+            }, 800);
         } else {
             micText.innerText = translations[currentLang].voice_btn_text;
         }
