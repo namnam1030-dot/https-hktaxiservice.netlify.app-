@@ -1,63 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
-<head>
-<meta charset="UTF-8">
-<meta name="color-scheme" content="dark light">
-
-<script>
-(function() {
-    var isLight = false;
-    try {
-        var saved = localStorage.getItem('taxiTheme');
-        var override = localStorage.getItem('taxiThemeUserOverride') === '1';
-        if (override && (saved === 'light' || saved === 'dark')) {
-            isLight = saved === 'light';
-        } else {
-            isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-        }
-    } catch(e) {}
-
-    var root = document.documentElement;
-    root.classList.toggle('light-theme', isLight);
-    root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
-    root.style.color           = isLight ? '#000000' : '#FFFFFF';
-    root.style.colorScheme     = isLight ? 'light' : 'dark';
-    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
-
-    if (isLight) {
-        var obs = new MutationObserver(function() {
-            if (document.body) {
-                document.body.classList.add('light-theme');
-                obs.disconnect();
-            }
-        });
-        obs.observe(root, { childList: true });
-    }
-})();
-</script>
-
-<style>
-    html[data-theme="light"],
-    html[data-theme="light"] body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-    html[data-theme="dark"],
-    html[data-theme="dark"] body {
-        background-color: #0B0B0B !important;
-        color: #FFFFFF !important;
-    }
-    html.light-theme,
-    html.light-theme body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-</style>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>八五折的士 | 長途跨區・機場口岸接送 | 豪華六座位的士 | 24小時網約的士</title>
 
@@ -134,76 +81,113 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#FFF200">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="theme.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
-
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    'brand-yellow': '#FFF200',
-                    'brand-dark': '#0B0B0B',
-                    'brand-gray': '#161616',
-                    'brand-card': '#1E1E1E'
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-yellow': '#FFF200',
+                        'brand-dark': '#0B0B0B',
+                        'brand-gray': '#161616',
+                        'brand-card': '#1E1E1E'
+                    }
                 }
             }
         }
-    }
-</script>
+    </script>
 
-<style>
-    html { font-size: 130%; }
-    body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
-    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
-    button[onclick*="swapLocations"], 
-    button[onclick*="addStopoverField"], 
-    button[onclick*="removeStopoverField"],
-    #add-stop-btn { font-size: inherit !important; }
-    #add-stop-btn span,
-    button[onclick*="swapLocations"] span { font-size: 16px !important; }
-    .pac-container {
-        background-color: #1E1E1E;
-        color: #ffffff;
-        border: 1px solid #333;
-        border-radius: 0.5rem;
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-    }
-    .pac-item { color: #ccc; border-top: 1px solid #333; padding: 8px 12px; cursor: pointer; }
-    .pac-item:hover { background-color: #333; }
-    .pac-item-query { color: #FFF200; font-size: 17px; }
-    .stopover-drag-handle { cursor: grab; user-select: none; }
-    .stopover-drag-handle:active { cursor: grabbing; }
-    .stopover-drop-target { background-color: rgba(255, 242, 0, 0.1); border-radius: 0.5rem; }
+    <script>
+        (function() {
+            const manifestData = {
+                "name": "24小時八五折的士預約服務",
+                "short_name": "網約車TAXI",
+                "start_url": "https://hktaxiservice.netlify.app/",
+                "display": "standalone",
+                "background_color": "#0B0B0B",
+                "theme_color": "#FFF200",
+                "orientation": "portrait",
+                "icons": [
+                    { "src": "icon192.jpeg", "sizes": "192x192", "type": "image/jpeg" },
+                    { "src": "icon512.jpeg", "sizes": "512x512", "type": "image/jpeg" }
+                ]
+            };
+            const stringManifest = JSON.stringify(manifestData);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+        })();
+    </script>
 
-    html.light-theme body .pac-container {
-        background-color: #FFFFFF;
-        color: #000000;
-        border-color: #D1D5DB;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-    }
-    html.light-theme body .pac-item { color: #374151; border-top-color: #E5E7EB; }
-    html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
-    html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
+    <link rel="apple-touch-icon" href="icon.jpeg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FFF200">
 
-    html.light-theme body #voice-btn,
-    html.light-theme body button[onclick*="clearAllInputs"],
-    html.light-theme body button[onclick*="swapLocations"],
-    html.light-theme body #add-stop-btn,
-    html.light-theme body button[onclick*="removeStopoverField"],
-    html.light-theme body button[onclick*="calculateAndGoToResult"] {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-    }
-</style>
+    <style>
+        html { 
+            font-size: 130%; 
+        }
+        body { 
+            background-color: #0B0B0B; 
+            color: #ffffff; 
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
+        }
+        .text-xs, .text-\[11px\] {
+            font-size: 18px !important;
+            line-height: 1.5;
+        }
+        button[onclick*="swapLocations"], 
+        button[onclick*="addStopoverField"], 
+        button[onclick*="removeStopoverField"],
+        #add-stop-btn {
+            font-size: inherit !important;
+        }
+        #add-stop-btn span,
+        button[onclick*="swapLocations"] span {
+            font-size: 16px !important;
+        }
+        .pac-container {
+            background-color: #1E1E1E;
+            color: #ffffff;
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+        .pac-item {
+            color: #ccc;
+            border-top: 1px solid #333;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .pac-item:hover {
+            background-color: #333;
+        }
+        .pac-item-query {
+            color: #FFF200;
+            font-size: 17px;
+        }
+        .stopover-drag-handle {
+            cursor: grab;
+            user-select: none;
+        }
+        .stopover-drag-handle:active {
+            cursor: grabbing;
+        }
+        .stopover-drop-target {
+            background-color: rgba(255, 242, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+    </style>
 </head>
 <body class="antialiased">
 
@@ -214,6 +198,7 @@
                     <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
+
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
                     <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
@@ -222,25 +207,17 @@
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
             </div>
-            <div class="flex items-center pr-1">
-                <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
-                    <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
+
+            <div class="flex flex-col items-end gap-1.5">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="bg-black text-white px-2.5 py-1 rounded font-bold text-[15px] hover:opacity-80 transition cursor-pointer">
+                    EN
+                </button>
+                <button onclick="showInstallGuide()" class="bg-black text-brand-yellow border border-brand-yellow px-2 py-1 rounded font-bold text-[15px] hover:bg-brand-yellow hover:text-black transition cursor-pointer flex items-center gap-1 shadow-lg animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="btn_add_home">APPS</span>
                 </button>
             </div>
         </div>
     </header>
-
-    <div id="mini-float" class="minimized">
-        <div class="mini-float-btns">
-            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
-            <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
-                <i class="fa-solid fa-mobile-screen-button"></i>
-            </button>
-            <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色">
-                <i class="fa-solid fa-circle-half-stroke"></i>
-            </button>
-        </div>
-    </div>
 
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
@@ -254,8 +231,9 @@
             <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
                 為了方便下次叫車，您可以將本服務加到手機主畫面：
             </p>
-            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
+            </div>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
         </div>
@@ -263,11 +241,11 @@
 
     <div class="w-full px-0 bg-brand-dark border-b border-gray-800">
         <div class="max-w-4xl mx-auto px-4 py-3 text-center">
-            <h1 class="text-lg md:text-xl font-extrabold text-white leading-relaxed" data-i18n-html="hero_title">
+            <h1 class="text-lg md:text-xl font-extrabold text-white leading-relaxed">
                 長途跨區・機場口岸接送<br>
                 <span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>
             </h1>
-            <p class="text-[11px] font-extrabold text-white mt-1.5 leading-relaxed" data-i18n-html="hero_desc">
+            <p class="text-[11px] font-extrabold text-white mt-1.5 leading-relaxed">
                 機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士
             </p>
         </div>
@@ -275,6 +253,7 @@
 
     <section id="calculator-section" class="w-full px-0" style="margin-top: 0px; margin-bottom: 0px;">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
+            
             <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-white">
                 <i class="fa-solid fa-calculator text-brand-yellow"></i> <span data-i18n="calc_title">智能路線規劃與預計車費</span>
             </h3>
@@ -298,13 +277,13 @@
                 <div class="space-y-2">
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點 (出發地)</label>
+                            <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_pickup">起點</label>
                             <div class="flex items-center gap-2">
                                 <button type="button" onclick="clearAllInputs()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
                                     <i class="fa-solid fa-rotate-left"></i> <span data-i18n="btn_clear">重設</span>
                                 </button>
                                 <button type="button" onclick="swapLocations()" title="對調起點與終點" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
-                                    <span data-i18n="swap_pickup">起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span data-i18n="swap_dropoff">目的地</span>
+                                    <span>起點</span> <i class="fa-solid fa-arrow-right-arrow-left"></i> <span>目的地</span>
                                 </button>
                             </div>
                         </div>
@@ -317,7 +296,7 @@
                     </div>
 
                     <div class="flex justify-between items-center pt-1">
-                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (最多3個)</label>
+                        <label class="block text-[17px] font-bold text-gray-400" data-i18n="calc_label_stopover">中途站 (選填，最多3個)</label>
                         <button type="button" id="add-stop-btn" onclick="addStopoverField()" class="bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-2.5 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> <span data-i18n="btn_add_stop">增加中途站</span>
                         </button>
@@ -369,7 +348,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
+                        <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">目的地</label>
                         <div class="relative flex items-center">
                             <input type="text" id="calc-dropoff" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
                             <button type="button" id="clear-dropoff-btn" onclick="clearInput('calc-dropoff', 'clear-dropoff-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
@@ -380,7 +359,7 @@
                 </div>
             </div>
 
-            <button type="button" onclick="calculateAndGoToResult()" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl transition cursor-pointer text-[20px] shadow-md">
+            <button type="button" onclick="calculateAndGoToResult()" class="w-full bg-brand-yellow hover:opacity-90 text-black font-bold py-3 rounded-xl transition cursor-pointer text-[20px] shadow-md">
                 <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即預計車費</span>
             </button>
         </div>
@@ -388,7 +367,7 @@
 
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
-            <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+            <button onclick="showWeComQR()" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
 
@@ -397,18 +376,20 @@
                     <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <div class="text-green-500 text-3xl mb-3"><i class="fa-brands fa-weixin"></i></div>
+                    <div class="text-green-500 text-3xl mb-3">
+                        <i class="fa-brands fa-weixin"></i>
+                    </div>
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
-                    <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
+                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer hover:opacity-90" data-i18n="btn_close_guide">
                         關閉
                     </button>
                 </div>
             </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-44 py-2 rounded-full bg-brand-yellow text-black hover:opacity-90 transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
@@ -417,7 +398,31 @@
 
 <script>
 // ============================================
-// 跨頁面共享函數
+// 動態計算頁首高度
+// ============================================
+function adjustBodyPaddingForHeader() {
+    const header = document.querySelector('header');
+    if (header) {
+        const headerHeight = header.offsetHeight;
+        document.body.style.paddingTop = headerHeight + 'px';
+        document.documentElement.style.scrollPaddingTop = headerHeight + 'px';
+    }
+}
+
+function setupHeaderResizeObserver() {
+    const header = document.querySelector('header');
+    if (!header) return;
+    
+    if (window.ResizeObserver) {
+        const observer = new ResizeObserver(() => {
+            adjustBodyPaddingForHeader();
+        });
+        observer.observe(header);
+    }
+}
+
+// ============================================
+// 跨頁面共享變數
 // ============================================
 
 function saveRouteDataToLocalStorage() {
@@ -426,10 +431,12 @@ function saveRouteDataToLocalStorage() {
         dropoff: document.getElementById('calc-dropoff')?.value.trim() || '',
         stopovers: []
     };
+    
     for (let i = 1; i <= 3; i++) {
         const stopVal = document.getElementById(`calc-stopover-${i}`)?.value.trim() || '';
         if (stopVal) data.stopovers.push(stopVal);
     }
+    
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
@@ -464,37 +471,65 @@ function loadRouteDataFromLocalStorage() {
 
 function clearAllInputs() {
     const pickupEl = document.getElementById('calc-pickup');
-    if (pickupEl) { pickupEl.value = ''; toggleClearBtn('calc-pickup', 'clear-pickup-btn'); }
+    if (pickupEl) {
+        pickupEl.value = '';
+        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+    }
+    
     const dropoffEl = document.getElementById('calc-dropoff');
-    if (dropoffEl) { dropoffEl.value = ''; toggleClearBtn('calc-dropoff', 'clear-dropoff-btn'); }
+    if (dropoffEl) {
+        dropoffEl.value = '';
+        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+    }
+    
     for (let i = 1; i <= 3; i++) {
         const stopInput = document.getElementById(`calc-stopover-${i}`);
         const stopContainer = document.getElementById(`stopover-container-${i}`);
-        if (stopInput) stopInput.value = '';
-        if (stopContainer) stopContainer.classList.add('hidden');
+        if (stopInput) {
+            stopInput.value = '';
+        }
+        if (stopContainer) {
+            stopContainer.classList.add('hidden');
+        }
     }
     currentStopCount = 0;
     const addStopBtn = document.getElementById('add-stop-btn');
-    if (addStopBtn) addStopBtn.classList.remove('hidden');
+    if (addStopBtn) {
+        addStopBtn.classList.remove('hidden');
+    }
+    
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
-    if (pickupEl) pickupEl.focus();
+    
+    if (pickupEl) {
+        pickupEl.focus();
+    }
 }
 
+// ✅ 計算並跳轉去 result.html（每次清走舊車款）
 function calculateAndGoToResult() {
     const pickupVal = document.getElementById('calc-pickup')?.value.trim() || '';
     const dropoffVal = document.getElementById('calc-dropoff')?.value.trim() || '';
+    
     if (!pickupVal || !dropoffVal) {
         alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
         return;
     }
+    
+    // ✅ 每次重新規劃路線，清走舊車款資料，避免 result 頁記住舊車款
     localStorage.removeItem('taxiBookingData');
+    
     saveRouteDataToLocalStorage();
     window.location.href = 'result.html';
 }
 
-function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
-function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
+function showWeComQR() {
+    document.getElementById('wecom-modal').classList.remove('hidden');
+}
+
+function closeWeComQR() {
+    document.getElementById('wecom-modal').classList.add('hidden');
+}
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -509,20 +544,24 @@ if ('serviceWorker' in navigator) {
 // ============================================
 // 中途站拖動重新排序
 // ============================================
+
 let draggedStopoverIndex = null;
 
 function setupStopoverDragging() {
     for (let i = 1; i <= 3; i++) {
         const container = document.getElementById(`stopover-container-${i}`);
         if (!container) continue;
+        
         const handle = container.querySelector('.stopover-drag-handle');
         if (!handle) continue;
+        
         handle.addEventListener('dragstart', function(e) {
             draggedStopoverIndex = i;
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', i.toString());
             container.classList.add('opacity-50');
         });
+        
         handle.addEventListener('dragend', function(e) {
             container.classList.remove('opacity-50');
             document.querySelectorAll('[id^="stopover-container-"]').forEach(c => {
@@ -530,6 +569,7 @@ function setupStopoverDragging() {
             });
             draggedStopoverIndex = null;
         });
+        
         container.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -537,12 +577,15 @@ function setupStopoverDragging() {
                 container.classList.add('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
             }
         });
+        
         container.addEventListener('dragleave', function(e) {
             container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
         });
+        
         container.addEventListener('drop', function(e) {
             e.preventDefault();
             container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+            
             if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
                 swapStopoverValues(draggedStopoverIndex, i);
             }
@@ -553,111 +596,384 @@ function setupStopoverDragging() {
 function swapStopoverValues(fromIndex, toIndex) {
     const fromInput = document.getElementById(`calc-stopover-${fromIndex}`);
     const toInput = document.getElementById(`calc-stopover-${toIndex}`);
+    
     if (fromInput && toInput) {
         const temp = fromInput.value;
         fromInput.value = toInput.value;
         toInput.value = temp;
+        
         toggleClearBtn(`calc-stopover-${fromIndex}`, `clear-stop-${fromIndex}-btn`);
         toggleClearBtn(`calc-stopover-${toIndex}`, `clear-stop-${toIndex}-btn`);
     }
 }
 
 // ============================================
-// 語音辨識（onresult call stop + onend 800ms 後跳頁）
+// 頁面初始化
 // ============================================
-let _activeRecognition = null;
-let _voiceTimeout = null;
-let _voiceHasResult = false;
-let _isNavigating = false;
-
-// ⭐ 修復 iOS bfcache 導致麥克風卡住
-window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-        console.log('[bfcache] 頁面從緩存恢復，清理語音狀態');
-        if (_activeRecognition) {
-            try { _activeRecognition.abort(); } catch(e) {}
-            _activeRecognition = null;
+window.addEventListener('DOMContentLoaded', () => {
+    adjustBodyPaddingForHeader();
+    setupHeaderResizeObserver();
+    
+    const referrer = document.referrer || '';
+    const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
+    
+    if (fromResultOrBooking) {
+        loadRouteDataFromLocalStorage();
+    } else {
+        localStorage.removeItem('taxiRouteData');
+        localStorage.removeItem('taxiBookingData');
+        
+        const pickupEl = document.getElementById('calc-pickup');
+        const dropoffEl = document.getElementById('calc-dropoff');
+        if (pickupEl) pickupEl.value = '';
+        if (dropoffEl) dropoffEl.value = '';
+        
+        for (let i = 1; i <= 3; i++) {
+            const stopInput = document.getElementById(`calc-stopover-${i}`);
+            const stopContainer = document.getElementById(`stopover-container-${i}`);
+            if (stopInput) stopInput.value = '';
+            if (stopContainer) stopContainer.classList.add('hidden');
         }
-        if (_voiceTimeout) {
-            clearTimeout(_voiceTimeout);
-            _voiceTimeout = null;
-        }
-        _voiceHasResult = false;
-        _isNavigating = false;
-
-        const micBtn = document.getElementById('voice-btn');
-        const micText = document.getElementById('mic-text');
-        const micIcon = document.getElementById('mic-icon');
-        if (micBtn) micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        if (micText) micText.innerText = (translations && translations[currentLang] && translations[currentLang].voice_btn_text) || '[起點] 經 [中途站] 去 [目的地]';
-        if (micIcon) micIcon.className = "fa-solid fa-microphone text-base";
+        currentStopCount = 0;
+        const addStopBtn = document.getElementById('add-stop-btn');
+        if (addStopBtn) addStopBtn.classList.remove('hidden');
+    }
+    
+    setupStopoverDragging();
+    
+    const pickupInput = document.getElementById('calc-pickup');
+    if (pickupInput) {
+        pickupInput.addEventListener('input', checkShowFlightField);
+        pickupInput.addEventListener('change', checkShowFlightField);
+        pickupInput.addEventListener('blur', checkShowFlightField);
     }
 });
 
-// ⭐ 離開頁面時強制 abort
-window.addEventListener('pagehide', function() {
-    if (_activeRecognition) {
-        try { _activeRecognition.abort(); } catch(e) {}
-        _activeRecognition = null;
-    }
+window.addEventListener('load', () => {
+    adjustBodyPaddingForHeader();
+    setTimeout(adjustBodyPaddingForHeader, 100);
+    setTimeout(adjustBodyPaddingForHeader, 500);
 });
+
+window.addEventListener('resize', adjustBodyPaddingForHeader);
+
+if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(adjustBodyPaddingForHeader);
+}
+
+// ============================================
+// 語言系統
+// ============================================
+
+let currentLang = localStorage.getItem('taxiLang') || 'zh';
+
+const translations = {
+    zh: {
+        btn_more_payment: "更多付款方式",
+        label_verification: "電話驗證",
+        btn_get_code: "獲取驗證碼",
+        verification_code_label: "你嘅驗證碼係：",
+        btn_send_verify_whatsapp: "發送驗證碼到 WhatsApp",
+        verification_whatsapp_hint: "請先發送 WhatsApp 確認訊息，再提交預約",
+        alert_enter_phone: "請先輸入正確嘅電話號碼！",
+        alert_need_whatsapp: "請先發送 WhatsApp 確認訊息！",
+        btn_confirm_booking: "確認預約",
+        btn_sending_booking: "正在送出預約...",
+        success_title: "✅ 預約訂單已成功送出！",
+        success_desc: "我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認",
+        success_contact_prompt: "如有急需，可以直接聯絡我哋：",
+        btn_call_now: "致電 6881 5441",
+        btn_whatsapp_inquiry: "WhatsApp 查詢",
+        btn_wechat_inquiry: "WeChat 查詢",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        swap_locations: "起點🔃目的地",
+        estimated_fare_label: "預計車費",
+        btn_book_now: "立即預約",
+        fleet_title: "選擇車款類型",
+        fleet_subtitle: "點擊車型名稱可展開/收合詳細介紹與規格",
+        btn_close_guide: "了解，關閉",
+        fare_normal_label: "正價按錶收費",
+        fare_discount_label: "八五折優惠",
+        fare_discount_note: "(只限豐田混能的士)",
+        btn_add_home: "APPS",
+        modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
+        btn_quick_query: "立即預約",
+        btn_view_fleet: "選擇車款類型",
+        badge_selected: "已選擇",
+        btn_reselect_route: "重新選擇路線",
+        btn_clear: "重設",
+        calc_title: "智能規劃路線與預計車費",
+        calc_tip_title: "預計車費使用說明：",
+        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
+        calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
+        calc_label_pickup: "起點 (出發地)",
+        calc_label_stopover: "中途站 (最多3個)",
+        calc_label_dropoff: "終點 (目的地)",
+        btn_add_stop: "增加中途站",
+        ph_pickup: "輸入起點...",
+        ph_stopover_opt: "輸入中途站...",
+        ph_dropoff_opt: "輸入終點...",
+        voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
+        btn_calc_fare: "立即預計車費",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+    },
+    en: {
+        btn_more_payment: "More Options",
+        label_verification: "Phone Verification",
+        btn_get_code: "Get Code",
+        verification_code_label: "Your verification code:",
+        btn_send_verify_whatsapp: "Send Code via WhatsApp",
+        verification_whatsapp_hint: "Please send WhatsApp confirmation before submitting",
+        alert_enter_phone: "Please enter a valid phone number first!",
+        alert_need_whatsapp: "Please send WhatsApp confirmation first!",
+        btn_confirm_booking: "Confirm Booking",
+        btn_sending_booking: "Sending Booking...",
+        success_title: "✅ Booking Submitted Successfully!",
+        success_desc: "We will confirm via WhatsApp or phone within 5-10 minutes",
+        success_contact_prompt: "For urgent matters, contact us directly:",
+        btn_call_now: "Call 6881 5441",
+        btn_whatsapp_inquiry: "WhatsApp Enquiry",
+        btn_wechat_inquiry: "WeChat Enquiry",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        swap_locations: "Swap Pickup🔃Destination",
+        estimated_fare_label: "Estimated Fare",
+        btn_book_now: "Book Now",
+        fleet_title: "Select Vehicle Type",
+        fleet_subtitle: "Click vehicle name to expand/collapse details",
+        btn_close_guide: "Got it, Close",
+        fare_discount_label: "15% Discount Offer",
+        fare_discount_note: "(Toyota Hybrid Taxi only)",
+        fare_normal_label: "Standard Metered Fare",
+        btn_add_home: "APPS",
+        modal_title: "Add to Home Screen",
+        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
+        btn_quick_query: "BOOK NOW",
+        btn_view_fleet: "Select Vehicle Type",
+        badge_selected: "Selected",
+        btn_reselect_route: "Re-select Route",
+        btn_clear: "Reset",
+        calc_title: "Smart Route & Fare Estimator",
+        calc_tip_title: "Fare Estimation Instructions:",
+        calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button below and speak your trip, e.g., <span class="text-brand-yellow font-medium">"Kwun Tong via Airport to ShenZhen Bay Port"</span> or <span class="text-brand-yellow font-medium">"Central to Airport"</span>.',
+        calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below, then click calculate fare.',
+        calc_label_pickup: "Pickup Location",
+        calc_label_stopover: "Stopovers (Max 3)",
+        calc_label_dropoff: "Drop-off Location",
+        btn_add_stop: "Add Stopover",
+        ph_pickup: "Enter pickup...",
+        ph_stopover_opt: "Enter stopover...",
+        ph_dropoff_opt: "Enter destination...",
+        voice_btn_text: "Speak your trip...",
+        btn_calc_fare: "Calculate Estimated Fare",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+    }
+};
+
+let currentStopCount = 0;
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+});
+
+function showInstallGuide() {
+    const modal = document.getElementById('install-modal');
+    const content = document.getElementById('install-guide-content');
+    
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('用戶接受安裝');
+            }
+            deferredPrompt = null;
+        });
+        return;
+    }
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOS) {
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the Share button <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i> at the bottom of Safari.</p>
+            <p class="mt-1"><strong>2.</strong> Scroll down and tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Tap "Add" in the top right corner to complete!</p>
+        ` : `
+            <p><strong>1.</strong> 點擊 Safari 瀏覽器下方的分享按鈕 <i class="fa-solid fa-arrow-up-from-bracket text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 向下捲動並點選 <span class="text-brand-yellow font-bold">「加入主畫面」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 點擊右上角的「新增」即可完成！</p>
+        `;
+    } else {
+        content.innerHTML = currentLang === 'en' ? `
+            <p><strong>1.</strong> Tap the menu button <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i> in the top right corner of Chrome.</p>
+            <p class="mt-1"><strong>2.</strong> Tap <span class="text-brand-yellow font-bold">"Add to Home Screen"</span> or <span class="text-brand-yellow font-bold">"Install App"</span>.</p>
+            <p class="mt-1"><strong>3.</strong> Confirm to complete installation!</p>
+        ` : `
+            <p><strong>1.</strong> 點擊 Chrome 瀏覽器右上角的選單按鈕 <i class="fa-solid fa-ellipsis-vertical text-brand-yellow"></i>。</p>
+            <p class="mt-1"><strong>2.</strong> 點選 <span class="text-brand-yellow font-bold">「加到主畫面」</span> 或 <span class="text-brand-yellow font-bold">「安裝應用程式」</span>。</p>
+            <p class="mt-1"><strong>3.</strong> 確認新增即可完成安裝！</p>
+        `;
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeInstallGuide() {
+    document.getElementById('install-modal').classList.add('hidden');
+}
+
+function initAutocomplete() {
+    const hkBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(22.15, 113.83),
+        new google.maps.LatLng(22.58, 114.50)
+    );
+
+    const options = {
+        bounds: hkBounds,
+        componentRestrictions: { country: "hk" },
+        fields: ["formatted_address", "geometry", "name"],
+        types: ['geocode', 'establishment']
+    };
+
+    const pickupEl = document.getElementById('calc-pickup');
+    const dropoffEl = document.getElementById('calc-dropoff');
+    const stop1 = document.getElementById('calc-stopover-1');
+    const stop2 = document.getElementById('calc-stopover-2');
+    const stop3 = document.getElementById('calc-stopover-3');
+
+    if (pickupEl) {
+        const pickupAutocomplete = new google.maps.places.Autocomplete(pickupEl, options);
+        pickupAutocomplete.addListener('place_changed', function() {
+            setTimeout(checkShowFlightField, 100);
+        });
+        pickupEl.addEventListener('input', checkShowFlightField);
+        pickupEl.addEventListener('change', checkShowFlightField);
+    }
+    
+    if (dropoffEl) new google.maps.places.Autocomplete(dropoffEl, options);
+    if (stop1) new google.maps.places.Autocomplete(stop1, options);
+    if (stop2) new google.maps.places.Autocomplete(stop2, options);
+    if (stop3) new google.maps.places.Autocomplete(stop3, options);
+}
+
+function checkShowFlightField() {
+    const pickupInput = document.getElementById('calc-pickup');
+    const flightContainer = document.getElementById('field-flight-container');
+    
+    if (pickupInput && flightContainer) {
+        const pickupValue = pickupInput.value.trim().toLowerCase();
+        const airportKeywords = ['機場', 'airport', '香港國際機場', 'hkg', 'hong kong international'];
+        const isAirport = airportKeywords.some(keyword => pickupValue.includes(keyword));
+        
+        if (isAirport) {
+            flightContainer.style.display = 'block';
+            flightContainer.classList.remove('hidden');
+        } else {
+            flightContainer.style.display = 'none';
+            flightContainer.classList.add('hidden');
+        }
+    }
+}
+
+function addStopoverField() {
+    if (currentStopCount < 3) {
+        currentStopCount++;
+        const container = document.getElementById(`stopover-container-${currentStopCount}`);
+        if (container) container.classList.remove('hidden');
+
+        if (currentStopCount >= 3) {
+            const btn = document.getElementById('add-stop-btn');
+            if (btn) btn.classList.add('hidden');
+        }
+    }
+}
+
+function removeStopoverField(index) {
+    const container = document.getElementById(`stopover-container-${index}`);
+    const input = document.getElementById(`calc-stopover-${index}`);
+    if (input) input.value = '';
+    toggleClearBtn(`calc-stopover-${index}`, `clear-stop-${index}-btn`);
+    if (container) container.classList.add('hidden');
+
+    currentStopCount = Math.max(0, currentStopCount - 1);
+    const btn = document.getElementById('add-stop-btn');
+    if (btn) btn.classList.remove('hidden');
+}
+
+function toggleClearBtn(inputId, btnId) {
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    if (input && btn) {
+        if (input.value.trim().length > 0) {
+            btn.classList.remove('hidden');
+        } else {
+            btn.classList.add('hidden');
+        }
+    }
+}
+
+function clearInput(inputId, btnId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = '';
+        toggleClearBtn(inputId, btnId);
+        input.focus();
+        
+        if (inputId === 'calc-pickup') {
+            checkShowFlightField();
+        }
+    }
+}
+
+function swapLocations() {
+    const pickupEl = document.getElementById('calc-pickup');
+    const dropoffEl = document.getElementById('calc-dropoff');
+    if (pickupEl && dropoffEl) {
+        const temp = pickupEl.value;
+        pickupEl.value = dropoffEl.value;
+        dropoffEl.value = temp;
+
+        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
+        
+        checkShowFlightField();
+    }
+}
 
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
     if (!SpeechRecognition) {
-        alert("您的瀏覽器暫不支援語音辨識。\n\n建議使用：\n• iOS：Safari 瀏覽器\n• Android：Chrome 瀏覽器\n• 桌面：Chrome / Edge\n\n或直接使用輸入框填寫。");
+        alert("您的瀏覽器暫不支援語音辨識，請直接使用輸入框填寫。");
         return;
     }
-
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        alert("語音辨識需要 HTTPS 安全連線。\n\n請使用 https:// 開頭的網址。");
-        return;
-    }
-
-    if (_isNavigating) return;
-
-    if (_activeRecognition) {
-        try { _activeRecognition.abort(); } catch(e) {}
-        _activeRecognition = null;
-    }
-    if (_voiceTimeout) {
-        clearTimeout(_voiceTimeout);
-        _voiceTimeout = null;
-    }
-    _voiceHasResult = false;
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    _activeRecognition = recognition;
 
     const micBtn = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
     const micIcon = document.getElementById('mic-icon');
 
     micBtn.classList.add('bg-brand-yellow', 'text-black');
-    micText.innerText = "正在啟動麥克風...";
+    micText.innerText = "聆聽中...請講出完整行程";
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
-    recognition.onstart = () => {
-        micText.innerText = "🎤 請講出完整行程...";
-        _voiceTimeout = setTimeout(() => {
-            try { recognition.abort(); } catch(e) {}
-        }, 15000);
-    };
+    recognition.start();
 
     recognition.onresult = (event) => {
-        if (_voiceTimeout) { clearTimeout(_voiceTimeout); _voiceTimeout = null; }
-
+        recognition.stop();
         const speechResult = event.results[0][0].transcript;
         micText.innerText = "聽到：「" + speechResult + "」";
 
         let pickup = "", dropoff = "", stopover = "";
         let text = speechResult;
-
+        
         text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
         let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
@@ -665,7 +981,9 @@ function startVoiceRecognition() {
             pickup = fromMatch[1].trim();
         } else {
             let firstSplit = text.split(/經|途經|去|到|至/)[0];
-            if (firstSplit) pickup = firstSplit.trim();
+            if (firstSplit) {
+                pickup = firstSplit.trim();
+            }
         }
 
         let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
@@ -682,7 +1000,9 @@ function startVoiceRecognition() {
             let parts = text.split(/經|途經/);
             if (parts.length >= 2) {
                 let lastPart = parts[parts.length - 1].trim();
-                if (lastPart && lastPart !== stopover) dropoff = lastPart;
+                if (lastPart && lastPart !== stopover) {
+                    dropoff = lastPart;
+                }
             } else if (!dropoff) {
                 let words = text.split(/\s+/);
                 if (words.length >= 2 && !pickup) {
@@ -695,146 +1015,45 @@ function startVoiceRecognition() {
         if (pickup) {
             document.getElementById('calc-pickup').value = pickup;
             toggleClearBtn('calc-pickup', 'clear-pickup-btn');
+            checkShowFlightField();
         }
+        
         if (stopover) {
-            if (currentStopCount === 0) addStopoverField();
+            if (currentStopCount === 0) {
+                addStopoverField();
+            }
             document.getElementById('calc-stopover-1').value = stopover;
             toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
         }
+        
         if (dropoff) {
             document.getElementById('calc-dropoff').value = dropoff;
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        _voiceHasResult = true;
-        try { recognition.stop(); } catch(e) {}
-    };
-
-    recognition.onerror = (event) => {
-        if (_voiceTimeout) { clearTimeout(_voiceTimeout); _voiceTimeout = null; }
-        _voiceHasResult = false;
-
-        let errMsg = "未能識別語音，請重試或以文字輸入";
-        switch (event.error) {
-            case 'not-allowed':
-            case 'service-not-allowed':
-                errMsg = "❌ 麥克風權限被拒絕。請到瀏覽器設定允許麥克風權限。";
-                break;
-            case 'no-speech':
-                errMsg = "🔇 未偵測到語音，請再試一次。";
-                break;
-            case 'audio-capture':
-                errMsg = "🎤 找不到麥克風裝置，請檢查麥克風。";
-                break;
-            case 'network':
-                errMsg = "🌐 網絡錯誤，語音辨識需要連線至 Google。";
-                break;
-            case 'aborted':
-                errMsg = "語音辨識已取消。";
-                break;
-            default:
-                errMsg = "語音辨識失敗：" + event.error;
-        }
-        micText.innerText = errMsg;
-        micIcon.className = "fa-solid fa-microphone-slash text-base";
-        micBtn.classList.remove('bg-brand-yellow', 'text-black');
-
         setTimeout(() => {
+            micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
             micIcon.className = "fa-solid fa-microphone text-base";
-        }, 3000);
+            calculateAndGoToResult();
+        }, 1000);
+    };
+
+    recognition.onerror = () => {
+        recognition.stop();
+        micText.innerText = "未能識別語音，請重試或以文字輸入";
+        setTimeout(() => {
+            micBtn.classList.remove('bg-brand-yellow', 'text-black');
+            micText.innerText = translations[currentLang].voice_btn_text;
+            micIcon.className = "fa-solid fa-microphone text-base";
+        }, 2000);
     };
 
     recognition.onend = () => {
-        if (_voiceTimeout) { clearTimeout(_voiceTimeout); _voiceTimeout = null; }
-        _activeRecognition = null;
-
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
-
-        if (_voiceHasResult) {
-            _voiceHasResult = false;
-            _isNavigating = true;
-            micText.innerText = "✅ 已收到，正在計算路線...";
-            setTimeout(() => {
-                calculateAndGoToResult();
-            }, 800);
-        } else {
-            micText.innerText = translations[currentLang].voice_btn_text;
-        }
     };
-
-    try {
-        recognition.start();
-    } catch (e) {
-        alert("語音辨識啟動失敗：" + e.message);
-        micBtn.classList.remove('bg-brand-yellow', 'text-black');
-        micIcon.className = "fa-solid fa-microphone text-base";
-    }
 }
-
-// ============================================
-// 語言系統
-// ============================================
-let currentLang = localStorage.getItem('taxiLang') || 'zh';
-
-const translations = {
-    zh: {
-        swap_pickup: "起點", swap_dropoff: "目的地",
-        fare_normal_label: "正價按錶收費", fare_discount_label: "八五折優惠", fare_discount_note: "(只限豐田混能的士)",
-        btn_add_home: "APPS",
-        modal_title: "一鍵加入主畫面",
-        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
-        btn_quick_query: "立即預約", btn_view_fleet: "選擇車款類型", badge_selected: "已選擇",
-        btn_reselect_route: "重新選擇路線", btn_clear: "重設",
-        wecom_modal_title: "掃描二維碼添加企業微信",
-        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
-        hero_title: '長途跨區・機場口岸接送<br><span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>',
-        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士',
-        calc_title: "智能規劃路線與預計車費",
-        calc_tip_title: "預計車費使用說明：",
-        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
-        calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
-        calc_label_pickup: "起點 (出發地)", calc_label_stopover: "中途站 (最多3個)", calc_label_dropoff: "終點 (目的地)",
-        btn_add_stop: "增加中途站",
-        ph_pickup: "輸入起點...", ph_stopover_opt: "輸入中途站...", ph_dropoff_opt: "輸入終點...",
-        voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
-        btn_calc_fare: "立即預計車費",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
-    },
-    en: {
-        swap_pickup: "Pickup", swap_dropoff: "Destination",
-        fare_discount_label: "15% Discount Offer", fare_discount_note: "(Toyota Hybrid Taxi only)", fare_normal_label: "Standard Metered Fare",
-        btn_add_home: "APPS",
-        modal_title: "Add to Home Screen",
-        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
-        btn_quick_query: "BOOK NOW", btn_view_fleet: "Select Vehicle Type", badge_selected: "Selected",
-        btn_reselect_route: "Re-select Route", btn_clear: "Reset",
-        wecom_modal_title: "Scan QR Code to Add WeCom",
-        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
-        hero_title: 'Long Distance &amp; Cross-District · Airport &amp; Border Transfers<br><span class="text-brand-yellow">15% Off Taxi | 6-Seater Luxury Taxi</span>',
-        hero_desc: 'Airport &amp; Major Border Crossings · N.T. to HK Island &amp; Kowloon<br>Airport · HZMB · Shenzhen Bay · Lok Ma Chau · Heung Yuen Wai<br>Tuen Mun · Yuen Long · Tin Shui Wai · Sheung Shui · Fanling<br>Luxury 6-Seater · Hybrid Taxi · Wheelchair Taxi',
-        calc_title: "Smart Route & Fare Estimator",
-        calc_tip_title: "Fare Estimation Instructions:",
-        calc_tip_1: '<strong class="text-white">Cantonese Voice:</strong> Click the yellow button and speak your trip.',
-        calc_tip_2: '<strong class="text-white">Input Locations:</strong> Fill in pickup, stopovers, and destination below, then click calculate fare.',
-        calc_label_pickup: "Pickup Location", calc_label_stopover: "Stopovers (Max 3)", calc_label_dropoff: "Drop-off Location",
-        btn_add_stop: "Add Stopover",
-        ph_pickup: "Enter pickup...", ph_stopover_opt: "Enter stopover...", ph_dropoff_opt: "Enter destination...",
-        voice_btn_text: "Speak your trip...",
-        btn_calc_fare: "Calculate Estimated Fare",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved."
-    }
-};
-
-let currentStopCount = 0;
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-});
 
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -844,148 +1063,36 @@ function toggleLanguage() {
 
 function applyLanguage() {
     const btn = document.getElementById('lang-toggle-btn');
-    if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+    if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁體';
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+        if (translations[currentLang] && translations[currentLang][key]) {
             el.textContent = translations[currentLang][key];
         }
     });
+
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
-        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+        if (translations[currentLang] && translations[currentLang][key]) {
             el.innerHTML = translations[currentLang][key];
         }
     });
+
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+        if (translations[currentLang] && translations[currentLang][key]) {
             el.placeholder = translations[currentLang][key];
         }
     });
 }
 
-function initAutocomplete() {
-    const hkBounds = new google.maps.LatLngBounds(
-        new google.maps.LatLng(22.15, 113.83),
-        new google.maps.LatLng(22.58, 114.50)
-    );
-    const options = {
-        bounds: hkBounds,
-        componentRestrictions: { country: "hk" },
-        fields: ["formatted_address", "geometry", "name"],
-        types: ['geocode', 'establishment']
-    };
-    const pickupEl = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
-    const stop1 = document.getElementById('calc-stopover-1');
-    const stop2 = document.getElementById('calc-stopover-2');
-    const stop3 = document.getElementById('calc-stopover-3');
-    if (pickupEl) new google.maps.places.Autocomplete(pickupEl, options);
-    if (dropoffEl) new google.maps.places.Autocomplete(dropoffEl, options);
-    if (stop1) new google.maps.places.Autocomplete(stop1, options);
-    if (stop2) new google.maps.places.Autocomplete(stop2, options);
-    if (stop3) new google.maps.places.Autocomplete(stop3, options);
-}
-
-function addStopoverField() {
-    if (currentStopCount < 3) {
-        currentStopCount++;
-        const container = document.getElementById(`stopover-container-${currentStopCount}`);
-        if (container) container.classList.remove('hidden');
-        if (currentStopCount >= 3) {
-            const btn = document.getElementById('add-stop-btn');
-            if (btn) btn.classList.add('hidden');
-        }
-    }
-}
-
-function removeStopoverField(index) {
-    const container = document.getElementById(`stopover-container-${index}`);
-    const input = document.getElementById(`calc-stopover-${index}`);
-    if (input) input.value = '';
-    toggleClearBtn(`calc-stopover-${index}`, `clear-stop-${index}-btn`);
-    if (container) container.classList.add('hidden');
-    currentStopCount = Math.max(0, currentStopCount - 1);
-    const btn = document.getElementById('add-stop-btn');
-    if (btn) btn.classList.remove('hidden');
-}
-
-function toggleClearBtn(inputId, btnId) {
-    const input = document.getElementById(inputId);
-    const btn = document.getElementById(btnId);
-    if (input && btn) {
-        if (input.value.trim().length > 0) btn.classList.remove('hidden');
-        else btn.classList.add('hidden');
-    }
-}
-
-function clearInput(inputId, btnId) {
-    const input = document.getElementById(inputId);
-    if (input) {
-        input.value = '';
-        toggleClearBtn(inputId, btnId);
-        input.focus();
-    }
-}
-
-function swapLocations() {
-    const pickupEl = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
-    if (pickupEl && dropoffEl) {
-        const temp = pickupEl.value;
-        pickupEl.value = dropoffEl.value;
-        dropoffEl.value = temp;
-        toggleClearBtn('calc-pickup', 'clear-pickup-btn');
-        toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
-    }
-}
-
-// ============================================
-// 頁面初始化
-// ============================================
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
-
-    const referrer = document.referrer || '';
-    const fromResultOrBooking = referrer.includes('result.html') || referrer.includes('booking.html');
-
-    if (fromResultOrBooking) {
-        loadRouteDataFromLocalStorage();
-    } else {
-        localStorage.removeItem('taxiRouteData');
-        localStorage.removeItem('taxiBookingData');
-
-        const pickupEl = document.getElementById('calc-pickup');
-        const dropoffEl = document.getElementById('calc-dropoff');
-        if (pickupEl) pickupEl.value = '';
-        if (dropoffEl) dropoffEl.value = '';
-
-        for (let i = 1; i <= 3; i++) {
-            const stopInput = document.getElementById(`calc-stopover-${i}`);
-            const stopContainer = document.getElementById(`stopover-container-${i}`);
-            if (stopInput) stopInput.value = '';
-            if (stopContainer) stopContainer.classList.add('hidden');
-        }
-        currentStopCount = 0;
-        const addStopBtn = document.getElementById('add-stop-btn');
-        if (addStopBtn) addStopBtn.classList.remove('hidden');
-    }
-
-    setupStopoverDragging();
+    adjustBodyPaddingForHeader();
+    setupHeaderResizeObserver();
 });
-</script>
-<script src="theme.js"></script>
-<script>
-if ('serviceWorker' in navigator) {
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-    });
-}
+
 </script>
 </body>
 </html>
