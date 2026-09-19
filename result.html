@@ -496,6 +496,68 @@
         return trimmed;
     }
 
+    // ============================================
+    // ⭐ 新增：香港範圍 + 文字地址解析（ZERO_RESULTS fallback 用）
+    // ============================================
+    const HK_BOUNDS = { north: 22.56, south: 22.15, east: 114.44, west: 113.83 };
+
+    function isInHK(latLng) {
+        if (!latLng) return false;
+        return latLng.lat() >= HK_BOUNDS.south && latLng.lat() <= HK_BOUNDS.north &&
+               latLng.lng() >= HK_BOUNDS.west  && latLng.lng() <= HK_BOUNDS.east;
+    }
+
+    function resolveLocation(text) {
+        if (!text) return Promise.resolve(text);
+        if (text instanceof google.maps.LatLng) return Promise.resolve(text);
+        if (typeof text === 'object' && 'lat' in text && 'lng' in text) {
+            return Promise.resolve(new google.maps.LatLng(text.lat, text.lng));
+        }
+
+        return new Promise((resolve) => {
+            const geocoder = new google.maps.Geocoder();
+
+            // 第 1 層：Geocoder（限制香港）
+            geocoder.geocode(
+                {
+                    address: text,
+                    region: 'HK',
+                    language: 'zh-HK',
+                    componentRestrictions: { country: 'HK' }
+                },
+                (results, status) => {
+                    if (status === 'OK' && results && results[0]) {
+                        const loc = results[0].geometry.location;
+                        if (isInHK(loc)) return resolve(loc);
+                    }
+
+                    // 第 2 層：Places.textSearch（限制香港）
+                    const dummyDiv = document.createElement('div');
+                    const service = new google.maps.places.PlacesService(dummyDiv);
+                    service.textSearch(
+                        {
+                            query: text,
+                            language: 'zh-HK',
+                            region: 'HK',
+                            bounds: new google.maps.LatLngBounds(
+                                new google.maps.LatLng(HK_BOUNDS.south, HK_BOUNDS.west),
+                                new google.maps.LatLng(HK_BOUNDS.north, HK_BOUNDS.east)
+                            )
+                        },
+                        (places, s2) => {
+                            if (s2 === 'OK' && places && places[0] && places[0].geometry) {
+                                const loc = places[0].geometry.location;
+                                if (isInHK(loc)) return resolve(loc);
+                            }
+                            // 兩層都搵唔到，原樣交俾 Directions
+                            resolve(text);
+                        }
+                    );
+                }
+            );
+        });
+    }
+
     function processRoutes(routes, isShenzhenBay) {
         if (!routes || routes.length === 0) return [];
         if (routes.length === 1) {
@@ -598,7 +660,9 @@
             provideRouteAlternatives: true
         };
 
-        directionsService.route(request, (result, status) => {
+        // ⭐⭐⭐ 只改動呢度：加入 ZERO_RESULTS 自動 retry ⭐⭐⭐
+        function handleRouteResult(result, status, req, isRetry) {
+
             if (status === google.maps.DirectionsStatus.OK) {
                 routesData = processRoutes(result.routes, isShenzhenBay);
                 result.routes = routesData;
@@ -633,10 +697,47 @@
                 }
 
                 displaySelectedRoute(result, 0, isShenzhenBay);
-            } else {
-                alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
-                window.location.href = 'index.html';
+                return;
             }
+
+            // ⭐ ZERO_RESULTS：第一次先試用 Geocoder / Places 解析文字，再 retry 一次
+            if (status === google.maps.DirectionsStatus.ZERO_RESULTS && !isRetry) {
+                console.warn('[Directions] ZERO_RESULTS，嘗試解析地址後重試…', req);
+
+                const originText = req.origin;
+                const destText   = req.destination;
+                const wpTexts    = (req.waypoints || []).map(w => w.location);
+
+                Promise.all([
+                    resolveLocation(originText),
+                    resolveLocation(destText),
+                    ...wpTexts.map(t => resolveLocation(t))
+                ]).then(resolved => {
+                    const newRequest = {
+                        origin: resolved[0],
+                        destination: resolved[1],
+                        waypoints: wpTexts.map((_, i) => ({
+                            location: resolved[2 + i],
+                            stopover: true
+                        })),
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        provideRouteAlternatives: true
+                    };
+
+                    directionsService.route(newRequest, (r2, s2) => {
+                        handleRouteResult(r2, s2, newRequest, true);
+                    });
+                });
+                return;
+            }
+
+            // ❌ 真正失敗（保留原本行為）
+            alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+            window.location.href = 'index.html';
+        }
+
+        directionsService.route(request, (result, status) => {
+            handleRouteResult(result, status, request, false);
         });
     }
 
