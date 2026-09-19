@@ -144,7 +144,9 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" async defer></script>
+
+<!-- ⭐⭐⭐ 關鍵修改：async defer → defer ⭐⭐⭐ -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
 
 <script>
     tailwind.config = {
@@ -182,28 +184,43 @@
     button[onclick*="swapLocations"] span {
         font-size: 16px !important;
     }
+
+    /* ⭐⭐⭐ Android 強化版 pac-container ⭐⭐⭐ */
     .pac-container {
-        background-color: #1E1E1E;
-        color: #ffffff;
-        border: 1px solid #333;
-        border-radius: 0.5rem;
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        z-index: 9999;
+        background-color: #1E1E1E !important;
+        color: #ffffff !important;
+        border: 1px solid #333 !important;
+        border-radius: 0.5rem !important;
+        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+        z-index: 999999 !important;
+        max-width: calc(100% - 16px) !important;
+        margin-top: 4px !important;
+        pointer-events: auto !important;
+        display: block !important;
     }
     .pac-item {
-        color: #ccc;
-        border-top: 1px solid #333;
-        padding: 8px 12px;
-        cursor: pointer;
+        color: #ccc !important;
+        border-top: 1px solid #333 !important;
+        padding: 14px 16px !important;
+        cursor: pointer !important;
+        min-height: 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        font-size: 16px !important;
     }
     .pac-item:hover {
-        background-color: #333;
+        background-color: #333 !important;
     }
     .pac-item-query {
-        color: #FFF200;
-        font-size: 17px;
+        color: #FFF200 !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
     }
+    .pac-icon {
+        margin-right: 8px !important;
+    }
+
     .stopover-drag-handle {
         cursor: grab;
         user-select: none;
@@ -216,22 +233,23 @@
         border-radius: 0.5rem;
     }
 
+    /* 淺色主題 pac */
     html.light-theme body .pac-container {
-        background-color: #FFFFFF;
-        color: #000000;
-        border-color: #D1D5DB;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        border-color: #D1D5DB !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
     }
     html.light-theme body .pac-item {
-        color: #374151;
-        border-top-color: #E5E7EB;
+        color: #374151 !important;
+        border-top-color: #E5E7EB !important;
     }
     html.light-theme body .pac-item:hover {
-        background-color: #F3F4F6;
+        background-color: #F3F4F6 !important;
     }
     html.light-theme body .pac-item-query {
-        color: #000000;
-        font-weight: 700;
+        color: #000000 !important;
+        font-weight: 700 !important;
     }
 
     html.light-theme body #voice-btn,
@@ -354,7 +372,7 @@
                             </div>
                         </div>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-pickup" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
+                            <input type="text" id="calc-pickup" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
                             <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -373,7 +391,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-1" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
+                            <input type="text" id="calc-stopover-1" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 1..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn')">
                             <button type="button" id="clear-stop-1-btn" onclick="clearInput('calc-stopover-1', 'clear-stop-1-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -388,7 +406,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-2" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
+                            <input type="text" id="calc-stopover-2" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 2..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-2', 'clear-stop-2-btn')">
                             <button type="button" id="clear-stop-2-btn" onclick="clearInput('calc-stopover-2', 'clear-stop-2-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -403,7 +421,7 @@
                             <i class="fa-solid fa-grip-vertical"></i>
                         </div>
                         <div class="relative flex items-center w-full">
-                            <input type="text" id="calc-stopover-3" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
+                            <input type="text" id="calc-stopover-3" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_stopover_opt" placeholder="輸入中途站 3..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-stopover-3', 'clear-stop-3-btn')">
                             <button type="button" id="clear-stop-3-btn" onclick="clearInput('calc-stopover-3', 'clear-stop-3-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -416,7 +434,7 @@
                     <div>
                         <label class="block text-[17px] font-bold text-gray-400 mb-1" data-i18n="calc_label_dropoff">終點 (目的地)</label>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-dropoff" autocomplete="off" autocorrect="off" spellcheck="false" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
+                            <input type="text" id="calc-dropoff" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_dropoff_opt" placeholder="輸入目的地..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-dropoff', 'clear-dropoff-btn')">
                             <button type="button" id="clear-dropoff-btn" onclick="clearInput('calc-dropoff', 'clear-dropoff-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -467,7 +485,6 @@
 // 跨頁面共享函數
 // ============================================
 
-// ⭐ 加入 placeId 欄
 function saveRouteDataToLocalStorage() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -493,7 +510,6 @@ function saveRouteDataToLocalStorage() {
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
-// ⭐ 同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
@@ -537,7 +553,6 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
-// ⭐ 清 placeId
 function clearAllInputs() {
     const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
     ids.forEach(id => {
@@ -566,7 +581,7 @@ function clearAllInputs() {
 }
 
 // ============================================
-// ⭐ 零打擾版：冇 placeId 就靜默 geocode 補返（唔彈 confirm）
+// 零打擾版：冇 placeId 就靜默 geocode 補返
 // ============================================
 function calculateAndGoToResult() {
     const pickupEl  = document.getElementById('calc-pickup');
@@ -581,7 +596,6 @@ function calculateAndGoToResult() {
         return;
     }
 
-    // ⭐ 收集所有要補 placeId 嘅欄位
     const fields = [
         { el: pickupEl,  val: pickupVal },
         { el: dropoffEl, val: dropoffVal }
@@ -592,7 +606,6 @@ function calculateAndGoToResult() {
         if (v) fields.push({ el, val: v });
     }
 
-    // ⭐ 邊個冇 placeId 就背景 geocode（冇 popup、冇 confirm）
     const tasks = [];
     fields.forEach(f => {
         if (!f.el.dataset.placeId) {
@@ -604,7 +617,6 @@ function calculateAndGoToResult() {
         }
     });
 
-    // ⭐ 顯示 loading（避免用戶連撳）
     const btn = document.getElementById('calc-fare-btn');
     if (btn) {
         btn.disabled = true;
@@ -615,20 +627,18 @@ function calculateAndGoToResult() {
         }</span>`;
     }
 
-    // ⭐ 全部補完（或者 timeout）就跳頁
     Promise.all(tasks).then(() => {
         localStorage.removeItem('taxiBookingData');
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     }).catch(() => {
-        // 就算出錯都照跳（result.html 有 fallback）
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     });
 }
 
 // ============================================
-// ⭐ 靜默 geocode：補 placeId，失敗就當冇，唔會 throw
+// 靜默 geocode
 // ============================================
 function geocodeSilently(text) {
     return new Promise(resolve => {
@@ -637,7 +647,6 @@ function geocodeSilently(text) {
         let settled = false;
         const done = v => { if (!settled) { settled = true; resolve(v); } };
 
-        // ⏰ 4 秒硬 timeout，唔想拖慢用戶
         const timeout = setTimeout(() => done(''), 4000);
 
         try {
@@ -654,7 +663,7 @@ function geocodeSilently(text) {
                     if (status === 'OK' && results && results[0] && results[0].place_id) {
                         done(results[0].place_id);
                     } else {
-                        done('');   // 搵唔到就當冇，result.html 有 fallback
+                        done('');
                     }
                 }
             );
@@ -752,7 +761,7 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識（完全保留原版，冇改過）
+// 語音辨識
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1067,7 +1076,7 @@ function applyLanguage() {
 }
 
 // ============================================
-// ⭐ 必改：Autocomplete 加 suppressInput 保護
+// ⭐ Autocomplete：suppressInput 保護 + Android 強化
 // ============================================
 function initAutocomplete() {
     if (document.readyState === 'loading') {
@@ -1108,7 +1117,7 @@ function _attachAutocompletes() {
 
         ac.addListener('place_changed', () => {
             const place = ac.getPlace();
-            suppressInput = true;   // ⭐ 關鍵：暫時停用 input listener
+            suppressInput = true;
             if (place && place.formatted_address) el.value = place.formatted_address;
             if (place && place.place_id) el.dataset.placeId = place.place_id;
             toggleClearBtn(inputId, btnId);
@@ -1116,8 +1125,27 @@ function _attachAutocompletes() {
         });
 
         el.addEventListener('input', () => {
-            if (suppressInput) return;   // ⭐ 關鍵：place_changed 之後嘅 input event 唔好刪 placeId
+            if (suppressInput) return;
             delete el.dataset.placeId;
+        });
+
+        // ⭐ Android 強化：focus 時強制提升 pac-container 層級
+        el.addEventListener('focus', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.pac-container').forEach(pc => {
+                    pc.style.zIndex = '999999';
+                    pc.style.position = 'fixed';
+                });
+            }, 100);
+        });
+
+        // ⭐ Android 強化：click 時再檢查一次
+        el.addEventListener('click', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.pac-container').forEach(pc => {
+                    pc.style.zIndex = '999999';
+                });
+            }, 100);
         });
     });
 }
