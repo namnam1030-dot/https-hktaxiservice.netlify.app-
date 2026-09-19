@@ -21,16 +21,13 @@
 
     var root = document.documentElement;
 
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
 
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -44,7 +41,6 @@
 </script>
 
 <style>
-    /* html + body 用同一組 data-theme 控制，一 parse 即生效 */
     html[data-theme="light"],
     html[data-theme="light"] body {
         background-color: #FFFFFF !important;
@@ -55,8 +51,6 @@
         background-color: #0B0B0B !important;
         color: #FFFFFF !important;
     }
-
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -144,7 +138,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
@@ -223,7 +216,6 @@
         border-radius: 0.5rem;
     }
 
-    /* ===== 淺色主題（body.light-theme → html.light-theme body）===== */
     html.light-theme body .pac-container {
         background-color: #FFFFFF;
         color: #000000;
@@ -242,7 +234,6 @@
         font-weight: 700;
     }
 
-    /* 淺色主題下的按鈕（頁面專屬） */
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
@@ -649,9 +640,28 @@ function swapStopoverValues(fromIndex, toIndex) {
 let activeRecognition    = null;   // 目前活躍嘅 recognition 實例
 let isRecognizing        = false;  // 鎖：防止重複啟動
 let lastRecognitionEnd   = 0;      // 上次結束時間（冷卻用）
-const RECOGNITION_COOLDOWN = 400;  // 冷卻毫秒數（iOS 建議 400ms 以上）
+const RECOGNITION_COOLDOWN = 400;  // 冷卻毫秒數
 
-// 統一清理函數：任何路徑（onend / onerror / abort / pageshow）都經呢度
+// ⭐ iOS audio session 熱身（唔用 getUserMedia）
+// 快速創建並關閉 AudioContext，幫 iOS 重置 audio session
+function warmupAudioSession() {
+    try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        const ctx = new Ctx();
+        if (ctx.state === 'suspended' && ctx.resume) {
+            ctx.resume().catch(() => {});
+        }
+        // 100ms 後關閉，唔會影響 speech recognition
+        setTimeout(() => {
+            try { ctx.close(); } catch(e) {}
+        }, 100);
+    } catch(e) {
+        console.warn('AudioContext warmup 失敗（唔影響）:', e);
+    }
+}
+
+// 統一清理函數
 function cleanupRecognition() {
     isRecognizing = false;
     lastRecognitionEnd = Date.now();
@@ -667,15 +677,28 @@ function cleanupRecognition() {
     }
 }
 
-// ⭐ 頁面由 bfcache 恢復（例如：由 result.html 按返回）時重置語音狀態
-window.addEventListener('pageshow', () => {
+// ⭐ 只喺 bfcache 恢復時才重置（避免第一次載入亂設冷卻）
+window.addEventListener('pageshow', (event) => {
     if (activeRecognition) {
         try { activeRecognition.abort(); } catch(e) {}
         activeRecognition = null;
     }
     isRecognizing = false;
-    lastRecognitionEnd = 0;
-    cleanupRecognition();
+
+    // 只有 bfcache 恢復時才設冷卻，第一次載入唔理
+    if (event.persisted) {
+        lastRecognitionEnd = 0;  // 重設為 0，唔會擋住用戶
+    }
+
+    // 恢復按鈕 UI
+    const micBtn  = document.getElementById('voice-btn');
+    const micText = document.getElementById('mic-text');
+    const micIcon = document.getElementById('mic-icon');
+    if (micBtn)  micBtn.classList.remove('bg-brand-yellow', 'text-black');
+    if (micIcon) micIcon.className = 'fa-solid fa-microphone text-base';
+    if (micText && typeof translations !== 'undefined' && translations[currentLang]) {
+        micText.innerText = translations[currentLang].voice_btn_text;
+    }
 });
 
 // ============================================
@@ -750,13 +773,13 @@ function processSpeechResult(speechResult) {
 // 語音辨識
 // ============================================
 function startVoiceRecognition() {
-    // ① 防重複點擊（第一次未結束前，唔好再開）
+    // ① 防重複點擊
     if (isRecognizing) {
         console.log('⏳ 語音辨識進行中，請等佢完成');
         return;
     }
 
-    // ② 冷卻檢查：上次結束後要等 RECOGNITION_COOLDOWN 毫秒
+    // ② 冷卻檢查
     const now = Date.now();
     if (now - lastRecognitionEnd < RECOGNITION_COOLDOWN) {
         const wait = RECOGNITION_COOLDOWN - (now - lastRecognitionEnd);
@@ -776,11 +799,14 @@ function startVoiceRecognition() {
         return;
     }
 
-    // ③ 保險：如果仲有舊實例，先 abort 佢
+    // ③ 保險：先 abort 舊實例
     if (activeRecognition) {
         try { activeRecognition.abort(); } catch(e) {}
         activeRecognition = null;
     }
+
+    // ⭐ ④ iOS audio session 熱身（關鍵！幫重置 audio session）
+    warmupAudioSession();
 
     const recognition = new SpeechRecognition();
     activeRecognition = recognition;
@@ -802,19 +828,35 @@ function startVoiceRecognition() {
     let speechHandled  = false;
     let lastInterim    = '';
     let autoStopTimer  = null;
+    let resultWatchdog = null;  // ⭐ watchdog
 
-    // ⭐ 統一收尾：避免 onend / onerror 重複觸發
+    // ⭐ 統一收尾
     function finalize() {
         clearTimeout(autoStopTimer);
+        clearTimeout(resultWatchdog);
         activeRecognition = null;
         cleanupRecognition();
     }
 
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
+
+        // ⭐ Watchdog：onstart 後 4 秒內冇任何 result → 判定失敗
+        clearTimeout(resultWatchdog);
+        resultWatchdog = setTimeout(() => {
+            if (speechHandled) return;
+            speechHandled = true;
+            console.warn('⚠️ 語音 watchdog 觸發：onstart 後 4 秒內冇 result');
+            try { recognition.abort(); } catch(e) {}
+            micText.innerText = "⚠️ 麥克風無回應，請再試一次";
+            micIcon.className = "fa-solid fa-microphone-slash text-base";
+            micBtn.classList.remove('bg-brand-yellow', 'text-black');
+        }, 4000);
     };
 
     recognition.onresult = (event) => {
+        clearTimeout(resultWatchdog);  // ⭐ 收到 result 即取消 watchdog
+
         let interim = '';
         let final   = '';
 
@@ -860,6 +902,8 @@ function startVoiceRecognition() {
     };
 
     recognition.onerror = (event) => {
+        clearTimeout(resultWatchdog);
+
         let errMsg = "未能識別語音，請重試或以文字輸入";
         switch (event.error) {
             case 'not-allowed':
@@ -886,9 +930,8 @@ function startVoiceRecognition() {
         micIcon.className = "fa-solid fa-microphone-slash text-base";
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         clearTimeout(autoStopTimer);
-        speechHandled = true; // 唔好再由 onend 觸發處理
+        speechHandled = true;
 
-        // ⭐ 3 秒後恢復按鈕文字（但鎖會由 finalize 立即釋放）
         setTimeout(() => {
             if (!isRecognizing) {
                 micText.innerText = translations[currentLang].voice_btn_text;
@@ -898,12 +941,11 @@ function startVoiceRecognition() {
     };
 
     recognition.onend = () => {
-        // ⭐ 最後防線：冇 final 又冇處理 → 用 lastInterim
         if (!speechHandled && lastInterim) {
             speechHandled = true;
             processSpeechResult(lastInterim);
         }
-        finalize(); // ⭐ 一定要行，解鎖 + 冷卻計時
+        finalize();
     };
 
     try {
