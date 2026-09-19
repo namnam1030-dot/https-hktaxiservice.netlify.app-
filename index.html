@@ -425,7 +425,7 @@
                 </div>
             </div>
 
-            <button type="button" onclick="calculateAndGoToResult()" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl transition cursor-pointer text-[20px] shadow-md">
+            <button type="button" id="calc-fare-btn" onclick="calculateAndGoToResult()" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl transition cursor-pointer text-[20px] shadow-md">
                 <i class="fa-solid fa-route mr-1"></i> <span data-i18n="btn_calc_fare">立即預計車費</span>
             </button>
         </div>
@@ -467,7 +467,7 @@
 // 跨頁面共享函數
 // ============================================
 
-// ⭐ 改動 #2：加入 placeId 欄
+// ⭐ 加入 placeId 欄
 function saveRouteDataToLocalStorage() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -493,7 +493,7 @@ function saveRouteDataToLocalStorage() {
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
-// ⭐ 改動 #2：同步恢復 placeId
+// ⭐ 同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
@@ -537,7 +537,7 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
-// ⭐ 改動 #2：清 placeId
+// ⭐ 清 placeId
 function clearAllInputs() {
     const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
     ids.forEach(id => {
@@ -565,18 +565,104 @@ function clearAllInputs() {
     document.getElementById('calc-pickup')?.focus();
 }
 
+// ============================================
+// ⭐ 零打擾版：冇 placeId 就靜默 geocode 補返（唔彈 confirm）
+// ============================================
 function calculateAndGoToResult() {
-    const pickupVal = document.getElementById('calc-pickup')?.value.trim() || '';
-    const dropoffVal = document.getElementById('calc-dropoff')?.value.trim() || '';
-    
+    const pickupEl  = document.getElementById('calc-pickup');
+    const dropoffEl = document.getElementById('calc-dropoff');
+    const pickupVal  = pickupEl?.value.trim()  || '';
+    const dropoffVal = dropoffEl?.value.trim() || '';
+
     if (!pickupVal || !dropoffVal) {
-        alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
+        alert(currentLang === 'en'
+            ? "Please enter both Pickup and Destination locations."
+            : "請先輸入起點及目的地！");
         return;
     }
-    
-    localStorage.removeItem('taxiBookingData');
-    saveRouteDataToLocalStorage();
-    window.location.href = 'result.html';
+
+    // ⭐ 收集所有要補 placeId 嘅欄位
+    const fields = [
+        { el: pickupEl,  val: pickupVal },
+        { el: dropoffEl, val: dropoffVal }
+    ];
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`calc-stopover-${i}`);
+        const v = el?.value.trim();
+        if (v) fields.push({ el, val: v });
+    }
+
+    // ⭐ 邊個冇 placeId 就背景 geocode（冇 popup、冇 confirm）
+    const tasks = [];
+    fields.forEach(f => {
+        if (!f.el.dataset.placeId) {
+            tasks.push(
+                geocodeSilently(f.val).then(pid => {
+                    if (pid) f.el.dataset.placeId = pid;
+                })
+            );
+        }
+    });
+
+    // ⭐ 顯示 loading（避免用戶連撳）
+    const btn = document.getElementById('calc-fare-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'wait';
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> <span>${
+            currentLang === 'en' ? 'Processing...' : '正在處理...'
+        }</span>`;
+    }
+
+    // ⭐ 全部補完（或者 timeout）就跳頁
+    Promise.all(tasks).then(() => {
+        localStorage.removeItem('taxiBookingData');
+        saveRouteDataToLocalStorage();
+        window.location.href = 'result.html';
+    }).catch(() => {
+        // 就算出錯都照跳（result.html 有 fallback）
+        saveRouteDataToLocalStorage();
+        window.location.href = 'result.html';
+    });
+}
+
+// ============================================
+// ⭐ 靜默 geocode：補 placeId，失敗就當冇，唔會 throw
+// ============================================
+function geocodeSilently(text) {
+    return new Promise(resolve => {
+        if (!text || !window.google || !google.maps.Geocoder) return resolve('');
+
+        let settled = false;
+        const done = v => { if (!settled) { settled = true; resolve(v); } };
+
+        // ⏰ 4 秒硬 timeout，唔想拖慢用戶
+        const timeout = setTimeout(() => done(''), 4000);
+
+        try {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode(
+                {
+                    address: text,
+                    region: 'HK',
+                    language: 'zh-HK',
+                    componentRestrictions: { country: 'HK' }
+                },
+                (results, status) => {
+                    clearTimeout(timeout);
+                    if (status === 'OK' && results && results[0] && results[0].place_id) {
+                        done(results[0].place_id);
+                    } else {
+                        done('');   // 搵唔到就當冇，result.html 有 fallback
+                    }
+                }
+            );
+        } catch (e) {
+            clearTimeout(timeout);
+            done('');
+        }
+    });
 }
 
 function showWeComQR() {
@@ -666,7 +752,7 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識（⭐ 完全保留你第一次嘅版本，冇改過）
+// 語音辨識（完全保留原版，冇改過）
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -981,7 +1067,7 @@ function applyLanguage() {
 }
 
 // ============================================
-// ⭐ 改動 #1 + #2：Autocomplete（readyState 保護 + place_id 擷取）
+// ⭐ 必改：Autocomplete 加 suppressInput 保護
 // ============================================
 function initAutocomplete() {
     if (document.readyState === 'loading') {
@@ -997,7 +1083,6 @@ function _attachAutocompletes() {
         new google.maps.LatLng(22.58, 114.50)
     );
 
-    // ⭐ 移除 types 限制，等 Google 自己揀最合適嘅結果
     const options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
@@ -1016,20 +1101,22 @@ function _attachAutocompletes() {
         const el = document.getElementById(inputId);
         if (!el) return;
 
+        // ⭐ 每個 input 一個 suppress flag
+        let suppressInput = false;
+
         const ac = new google.maps.places.Autocomplete(el, options);
 
         ac.addListener('place_changed', () => {
             const place = ac.getPlace();
-            if (place && place.formatted_address) {
-                el.value = place.formatted_address;
-            }
-            if (place && place.place_id) {
-                el.dataset.placeId = place.place_id;
-            }
+            suppressInput = true;   // ⭐ 關鍵：暫時停用 input listener
+            if (place && place.formatted_address) el.value = place.formatted_address;
+            if (place && place.place_id) el.dataset.placeId = place.place_id;
             toggleClearBtn(inputId, btnId);
+            setTimeout(() => { suppressInput = false; }, 400);
         });
 
         el.addEventListener('input', () => {
+            if (suppressInput) return;   // ⭐ 關鍵：place_changed 之後嘅 input event 唔好刪 placeId
             delete el.dataset.placeId;
         });
     });
@@ -1048,7 +1135,6 @@ function addStopoverField() {
     }
 }
 
-// ⭐ 改動 #7：移除中途站時，後面嘅上移，唔跳號
 function removeStopoverField(index) {
     const values = [];
     for (let i = 1; i <= 3; i++) {
@@ -1134,7 +1220,6 @@ function swapLocations() {
 // ============================================
 // 頁面初始化
 // ============================================
-// ⭐ 改動 #3：用 sessionStorage flag 判斷「由 result.html 返嚟」
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
 
