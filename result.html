@@ -119,7 +119,9 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" async defer></script>
+
+<!-- ⭐⭐⭐ 關鍵修改：async defer → defer ⭐⭐⭐ -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" defer></script>
 
 <script>
     tailwind.config = {
@@ -514,17 +516,13 @@ function resolveLocation(text) {
                                 clearTimeout(hardTimeout);
                                 if (s2 === 'OK' && places && places[0] && places[0].geometry) {
                                     const loc = places[0].geometry.location;
- }
-                                    if (isInHK(loc)) return    done });
-(loc);
+                                    if (isInHK(loc)) return done(loc);
                                 }
-                                done(text}
-
-);
+                                done(text);
                             }
                         );
-function                    } catch (e) {
-                        console process.warn('[resolveLocation] Places throw:', e);
+                    } catch (e) {
+                        console.warn('[resolveLocation] Places throw:', e);
                         clearTimeout(hardTimeout);
                         done(text);
                     }
@@ -534,7 +532,11 @@ function                    } catch (e) {
             console.warn('[resolveLocation] Geocoder throw:', e);
             clearTimeout(hardTimeout);
             done(text);
-       Routes(routes, isShenzhenBay) {
+        }
+    });
+}
+
+function processRoutes(routes, isShenzhenBay) {
     if (!routes || routes.length === 0) return [];
     if (routes.length === 1) {
         routes[0].customLabel = "最佳路線";
@@ -667,7 +669,6 @@ function calculateFareWithGoogle() {
             });
         });
 
-        // ⭐ 已移除 departureTime
         const request = {
             origin: targetPickup,
             destination: targetDropoff,
@@ -755,7 +756,6 @@ function calculateFareWithGoogle() {
                 resolveLocation(destAddr),
                 ...wpAddrs.map(t => resolveLocation(t))
             ]).then(resolved => {
-                // ⭐ 已移除 departureTime
                 const newRequest = {
                     origin: resolved[0],
                     destination: resolved[1],
@@ -983,6 +983,7 @@ function updateFareModeAvailability() {
     updateFareModeDisplay();
 }
 
+// ⭐ initMap 加 fallback：如果 callback 冇被 call，就用 window.load 檢查
 function initMap() {
     const run = () => {
         try {
@@ -1030,6 +1031,23 @@ function initMap() {
         run();
     }
 }
+
+// ⭐ 保險：如果 initMap 冇被 callback 觸發（罕見情況），用 load event 補上
+window.addEventListener('load', function() {
+    // 如果 200ms 後 loading-indicator 仲係顯示中（未被隱藏），表示 initMap 可能未執行
+    setTimeout(function() {
+        const li = document.getElementById('loading-indicator');
+        if (li && !li.classList.contains('hidden')) {
+            // 檢查係咪已經有錯誤信息顯示（showError 換過 innerHTML）
+            const hasSpinner = li.querySelector('.fa-spinner');
+            const googleReady = window.google && window.google.maps && window.google.maps.DirectionsService;
+            if (hasSpinner && googleReady) {
+                console.log('[TaxiRoute] initMap 未被 callback 觸發，手動呼叫');
+                try { initMap(); } catch(e) { console.error('[TaxiRoute] Manual initMap error:', e); }
+            }
+        }
+    }, 500);
+});
 
 // ============================================
 // 語言系統
