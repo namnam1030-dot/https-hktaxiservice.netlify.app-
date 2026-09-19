@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
-<!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -20,9 +18,7 @@
     } catch(e) {}
 
     var root = document.documentElement;
-
     root.classList.toggle('light-theme', isLight);
-
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
@@ -548,6 +544,13 @@ function calculateAndGoToResult() {
         alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
         return;
     }
+
+    // ⭐ 跳轉前先 abort recognition，唔好帶住 mic session 走
+    if (activeRecognition) {
+        try { activeRecognition.abort(); } catch(e) {}
+        activeRecognition = null;
+    }
+    isRecognizing = false;
     
     localStorage.removeItem('taxiBookingData');
     saveRouteDataToLocalStorage();
@@ -637,13 +640,32 @@ function swapStopoverValues(fromIndex, toIndex) {
 // ============================================
 // 語音狀態管理（全局）
 // ============================================
-let activeRecognition    = null;   // 目前活躍嘅 recognition 實例
-let isRecognizing        = false;  // 鎖：防止重複啟動
-let lastRecognitionEnd   = 0;      // 上次結束時間（冷卻用）
-const RECOGNITION_COOLDOWN = 400;  // 冷卻毫秒數
+let activeRecognition    = null;
+let isRecognizing        = false;
+let lastRecognitionEnd   = 0;
+const RECOGNITION_COOLDOWN = 400;
 
-// ⭐ iOS audio session 熱身（唔用 getUserMedia）
-// 快速創建並關閉 AudioContext，幫 iOS 重置 audio session
+// ⭐⭐⭐ 核心修正：getUserMedia preflight ⭐⭐⭐
+// 用途：逼 iOS Safari 重置 audio session，令 SpeechRecognition 可以再次開 mic
+async function preflightMicAccess() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.log('ℹ️ getUserMedia 唔支援，跳過 preflight');
+        return true;
+    }
+    try {
+        console.log('🎤 Preflight: 要求 mic 權限...');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('✅ Preflight: 攞到 stream，立即停止');
+        // 立即停所有 track，釋放 mic
+        stream.getTracks().forEach(t => t.stop());
+        return true;
+    } catch(e) {
+        console.warn('⚠️ Preflight getUserMedia 失敗:', e.name, e.message);
+        // 唔 return false，等 speech recognition 自己再試（可能權限已被拒）
+        return true;
+    }
+}
+
 function warmupAudioSession() {
     try {
         const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -652,16 +674,12 @@ function warmupAudioSession() {
         if (ctx.state === 'suspended' && ctx.resume) {
             ctx.resume().catch(() => {});
         }
-        // 100ms 後關閉，唔會影響 speech recognition
         setTimeout(() => {
             try { ctx.close(); } catch(e) {}
         }, 100);
-    } catch(e) {
-        console.warn('AudioContext warmup 失敗（唔影響）:', e);
-    }
+    } catch(e) {}
 }
 
-// 統一清理函數
 function cleanupRecognition() {
     isRecognizing = false;
     lastRecognitionEnd = Date.now();
@@ -677,20 +695,33 @@ function cleanupRecognition() {
     }
 }
 
-// ⭐ 只喺 bfcache 恢復時才重置（避免第一次載入亂設冷卻）
-window.addEventListener('pageshow', (event) => {
+// ⭐ pagehide：離開頁面前主動 abort
+window.addEventListener('pagehide', () => {
     if (activeRecognition) {
         try { activeRecognition.abort(); } catch(e) {}
         activeRecognition = null;
     }
     isRecognizing = false;
+});
 
-    // 只有 bfcache 恢復時才設冷卻，第一次載入唔理
-    if (event.persisted) {
-        lastRecognitionEnd = 0;  // 重設為 0，唔會擋住用戶
+// ⭐ visibilitychange：轉去背景時也 abort
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && activeRecognition) {
+        try { activeRecognition.abort(); } catch(e) {}
+        activeRecognition = null;
+        isRecognizing = false;
     }
+});
 
-    // 恢復按鈕 UI
+// ⭐ pageshow：由 bfcache 恢復時重置（唔設冷卻，避免擋第一次）
+window.addEventListener('pageshow', () => {
+    if (activeRecognition) {
+        try { activeRecognition.abort(); } catch(e) {}
+        activeRecognition = null;
+    }
+    isRecognizing = false;
+    lastRecognitionEnd = 0;
+
     const micBtn  = document.getElementById('voice-btn');
     const micText = document.getElementById('mic-text');
     const micIcon = document.getElementById('mic-icon');
@@ -702,7 +733,7 @@ window.addEventListener('pageshow', (event) => {
 });
 
 // ============================================
-// 語音結果解析（抽出來方便重用）
+// 語音結果解析
 // ============================================
 function processSpeechResult(speechResult) {
     let pickup = "", dropoff = "", stopover = "";
@@ -770,16 +801,14 @@ function processSpeechResult(speechResult) {
 }
 
 // ============================================
-// 語音辨識
+// 語音辨識（改為 async）
 // ============================================
-function startVoiceRecognition() {
-    // ① 防重複點擊
+async function startVoiceRecognition() {
     if (isRecognizing) {
         console.log('⏳ 語音辨識進行中，請等佢完成');
         return;
     }
 
-    // ② 冷卻檢查
     const now = Date.now();
     if (now - lastRecognitionEnd < RECOGNITION_COOLDOWN) {
         const wait = RECOGNITION_COOLDOWN - (now - lastRecognitionEnd);
@@ -799,15 +828,33 @@ function startVoiceRecognition() {
         return;
     }
 
-    // ③ 保險：先 abort 舊實例
     if (activeRecognition) {
         try { activeRecognition.abort(); } catch(e) {}
         activeRecognition = null;
     }
 
-    // ⭐ ④ iOS audio session 熱身（關鍵！幫重置 audio session）
+    const micBtn  = document.getElementById('voice-btn');
+    const micText = document.getElementById('mic-text');
+    const micIcon = document.getElementById('mic-icon');
+
+    // ⭐ 顯示熱身狀態
+    micBtn.classList.add('bg-brand-yellow', 'text-black');
+    micText.innerText = "正在啟動麥克風...";
+    micIcon.className = "fa-solid fa-spinner fa-spin text-base";
+
+    // ⭐⭐ 關鍵：先做 getUserMedia preflight（逼 iOS 放 audio session）
+    await preflightMicAccess();
+
+    // ⭐ 等 200ms 讓 mic stream 完全釋放，再交俾 SpeechRecognition
+    await new Promise(r => setTimeout(r, 200));
+
+    // ⭐ AudioContext 熱身（幫手重置 iOS audio session）
     warmupAudioSession();
 
+    // ⭐ 再等 100ms
+    await new Promise(r => setTimeout(r, 100));
+
+    // ===== 正式啟動 recognition =====
     const recognition = new SpeechRecognition();
     activeRecognition = recognition;
     isRecognizing = true;
@@ -817,20 +864,11 @@ function startVoiceRecognition() {
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
-    const micBtn  = document.getElementById('voice-btn');
-    const micText = document.getElementById('mic-text');
-    const micIcon = document.getElementById('mic-icon');
-
-    micBtn.classList.add('bg-brand-yellow', 'text-black');
-    micText.innerText = "正在啟動麥克風...";
-    micIcon.className = "fa-solid fa-spinner fa-spin text-base";
-
     let speechHandled  = false;
     let lastInterim    = '';
     let autoStopTimer  = null;
-    let resultWatchdog = null;  // ⭐ watchdog
+    let resultWatchdog = null;
 
-    // ⭐ 統一收尾
     function finalize() {
         clearTimeout(autoStopTimer);
         clearTimeout(resultWatchdog);
@@ -841,7 +879,6 @@ function startVoiceRecognition() {
     recognition.onstart = () => {
         micText.innerText = "🎤 請講出完整行程...";
 
-        // ⭐ Watchdog：onstart 後 4 秒內冇任何 result → 判定失敗
         clearTimeout(resultWatchdog);
         resultWatchdog = setTimeout(() => {
             if (speechHandled) return;
@@ -855,7 +892,7 @@ function startVoiceRecognition() {
     };
 
     recognition.onresult = (event) => {
-        clearTimeout(resultWatchdog);  // ⭐ 收到 result 即取消 watchdog
+        clearTimeout(resultWatchdog);
 
         let interim = '';
         let final   = '';
@@ -869,7 +906,6 @@ function startVoiceRecognition() {
         const text = (final || interim).trim();
         if (text) micText.innerText = "🎤 " + text;
 
-        // ① 有 final → 立即處理
         if (final && !speechHandled) {
             speechHandled = true;
             clearTimeout(autoStopTimer);
@@ -878,7 +914,6 @@ function startVoiceRecognition() {
             return;
         }
 
-        // ② interim 偵測到目的地 → 1000ms 後自動停
         if (interim && !speechHandled) {
             lastInterim = interim;
             const hasDestination = /(?:去|到|至)[^\s，。？！,.\?!]{2,}$/.test(interim);
@@ -1002,10 +1037,10 @@ const translations = {
         btn_reselect_route: "重新選擇路線",
         btn_clear: "重設",
         hero_title: '長途跨區・機場口岸接送<br><span class="text-brand-yellow">八五折(85折)的士 | 六座豪華的士</span>',
-        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士',
-        calc_title: "智能規劃路線與預計車費",
-        calc_tip_title: "預計車費使用說明：",
-        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：<span class="text-brand-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
+        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・<混能的士・輪椅的士',
+        calc_titlespan: "智能規劃 class路線與預計車費",
+       =" calc_tip_title:text "預計車費使用-brand說明：",
+        calc_tip_1: '<strong class="text-white">廣東話語音：</strong>點擊下方黃色按鈕，講出行程，例如：-yellow font-medium">「觀塘經機場去深圳灣」</span>或<span class="text-brand-yellow font-medium">「中環去機場」</span>。',
         calc_tip_2: '<strong class="text-white">輸入地點：</strong>分別於下方填寫起點、中途站及終點，再按立即計算車費。',
         calc_label_pickup: "起點 (出發地)",
         calc_label_stopover: "中途站 (最多3個)",
@@ -1240,7 +1275,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
