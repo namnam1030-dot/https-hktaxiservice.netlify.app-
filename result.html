@@ -216,13 +216,12 @@
 
 <script>
 // ============================================
-// ⭐ 新增：統一錯誤顯示（唔彈 alert、唔跳頁）
+// ⭐ 統一錯誤顯示（唔彈 alert、唔跳頁）
 // ============================================
 function showError(title, detail) {
     console.error('[TaxiRoute Error]', title, detail || '');
     const el = document.getElementById('loading-indicator');
     if (!el) {
-        // fallback：如果連 loading-indicator 都搵唔到（極端情況）
         alert(title);
         return;
     }
@@ -240,7 +239,7 @@ function showError(title, detail) {
     `;
 }
 
-// ⭐ 全局 error handler（防止任何未捕捉嘅錯誤靜靜雞失敗）
+// ⭐ 全局 error handler
 window.addEventListener('error', function(e) {
     console.error('[TaxiRoute Global Error]', e.message, e.error);
 });
@@ -460,9 +459,6 @@ function isInHK(latLng) {
            latLng.lng() >= HK_BOUNDS.west  && latLng.lng() <= HK_BOUNDS.east;
 }
 
-// ============================================
-// resolveLocation：6 秒 timeout + try/catch（防 Android 卡死）
-// ============================================
 function resolveLocation(text) {
     if (!text) return Promise.resolve(text);
     if (text instanceof google.maps.LatLng) return Promise.resolve(text);
@@ -497,7 +493,6 @@ function resolveLocation(text) {
                         }
                     }
 
-                    // 第二層：Places.textSearch
                     try {
                         if (!google.maps.places || !google.maps.places.PlacesService) {
                             clearTimeout(hardTimeout);
@@ -519,13 +514,17 @@ function resolveLocation(text) {
                                 clearTimeout(hardTimeout);
                                 if (s2 === 'OK' && places && places[0] && places[0].geometry) {
                                     const loc = places[0].geometry.location;
-                                    if (isInHK(loc)) return done(loc);
+ }
+                                    if (isInHK(loc)) return    done });
+(loc);
                                 }
-                                done(text);
+                                done(text}
+
+);
                             }
                         );
-                    } catch (e) {
-                        console.warn('[resolveLocation] Places throw:', e);
+function                    } catch (e) {
+                        console process.warn('[resolveLocation] Places throw:', e);
                         clearTimeout(hardTimeout);
                         done(text);
                     }
@@ -535,11 +534,7 @@ function resolveLocation(text) {
             console.warn('[resolveLocation] Geocoder throw:', e);
             clearTimeout(hardTimeout);
             done(text);
-        }
-    });
-}
-
-function processRoutes(routes, isShenzhenBay) {
+       Routes(routes, isShenzhenBay) {
     if (!routes || routes.length === 0) return [];
     if (routes.length === 1) {
         routes[0].customLabel = "最佳路線";
@@ -602,9 +597,6 @@ function checkTunnelsForRoute(route, isDiscount = false) {
     return { matchedTunnels, totalTunnelFee };
 }
 
-// ============================================
-// routeWithTimeout：Directions 12 秒硬 timeout
-// ============================================
 function routeWithTimeout(req, isRetry, cb) {
     if (directionsTimeoutId) { clearTimeout(directionsTimeoutId); directionsTimeoutId = null; }
 
@@ -620,9 +612,6 @@ function routeWithTimeout(req, isRetry, cb) {
     });
 }
 
-// ============================================
-// calculateFareWithGoogle：⭐ 已加 showError + departureTime
-// ============================================
 function calculateFareWithGoogle() {
     try {
         if (!routeData) {
@@ -637,7 +626,6 @@ function calculateFareWithGoogle() {
             return;
         }
 
-        // ⭐ 檢查 Google API 已載入
         if (!window.google || !google.maps || !google.maps.DirectionsService) {
             showError('地圖服務未能載入', '請檢查網絡後重試。');
             return;
@@ -665,7 +653,6 @@ function calculateFareWithGoogle() {
 
         let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
 
-        // ⭐ 用 placeId 優先
         const toLoc = (text, pid) => pid ? { placeId: pid } : normalizeLocation(text);
 
         let targetPickup  = toLoc(pickupVal,  routeData.pickupPlaceId);
@@ -680,19 +667,18 @@ function calculateFareWithGoogle() {
             });
         });
 
+        // ⭐ 已移除 departureTime
         const request = {
             origin: targetPickup,
             destination: targetDropoff,
             waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING,
             provideRouteAlternatives: false,
-            optimizeWaypoints: false,
-            departureTime: new Date()   // ⭐ 改用實時交通模型
+            optimizeWaypoints: false
         };
 
         function handleRouteResult(result, status, req, isRetry) {
             try {
-                // ⭐ TIMEOUT 處理
                 if (status === 'TIMEOUT') {
                     if (!isRetry) {
                         console.warn('[Directions] TIMEOUT，嘗試 resolveLocation 後重試…');
@@ -742,14 +728,12 @@ function calculateFareWithGoogle() {
                     return;
                 }
 
-                // ZERO_RESULTS：第一次先試用 Geocoder / Places 解析文字，再 retry 一次
                 if (status === google.maps.DirectionsStatus.ZERO_RESULTS && !isRetry) {
                     console.warn('[Directions] ZERO_RESULTS，嘗試解析地址後重試…', req);
                     doRetryWithResolve(req, request, isShenzhenBay);
                     return;
                 }
 
-                // 真正失敗
                 showError('無法計算路線', '請檢查輸入的地點名稱是否正確。');
             } catch (e) {
                 console.error('[TaxiRoute] handleRouteResult error:', e);
@@ -757,7 +741,6 @@ function calculateFareWithGoogle() {
             }
         }
 
-        // ⭐ 共用重試邏輯
         function doRetryWithResolve(req, fallbackRequest, isShenzhenBay) {
             const originText = (typeof req.origin === 'string') ? req.origin : null;
             const destText   = (typeof req.destination === 'string') ? req.destination : null;
@@ -772,6 +755,7 @@ function calculateFareWithGoogle() {
                 resolveLocation(destAddr),
                 ...wpAddrs.map(t => resolveLocation(t))
             ]).then(resolved => {
+                // ⭐ 已移除 departureTime
                 const newRequest = {
                     origin: resolved[0],
                     destination: resolved[1],
@@ -781,8 +765,7 @@ function calculateFareWithGoogle() {
                     })),
                     travelMode: google.maps.TravelMode.DRIVING,
                     provideRouteAlternatives: false,
-                    optimizeWaypoints: false,
-                    departureTime: new Date()   // ⭐ 重試都要加
+                    optimizeWaypoints: false
                 };
 
                 routeWithTimeout(newRequest, true, (r2, s2, rq2, retry2) => {
@@ -794,7 +777,6 @@ function calculateFareWithGoogle() {
             });
         }
 
-        // ⭐ 首次用 timeout 包
         routeWithTimeout(request, false, (r, s, rq, retry) => {
             handleRouteResult(r, s, rq, retry);
         });
@@ -1001,9 +983,6 @@ function updateFareModeAvailability() {
     updateFareModeDisplay();
 }
 
-// ============================================
-// ⭐ initMap：加 try/catch + 錯誤顯示
-// ============================================
 function initMap() {
     const run = () => {
         try {
@@ -1022,7 +1001,6 @@ function initMap() {
             }
             applyLanguage();
 
-            // ⭐ 如果第一次讀唔到，延遲 150ms 再讀多一次（防 Android 慢）
             if (!routeData || !routeData.pickup || !routeData.dropoff) {
                 setTimeout(() => {
                     try {
