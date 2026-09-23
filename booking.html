@@ -1208,6 +1208,17 @@ function submitBooking(event) {
             alert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！"); 
             return; 
         }
+
+        // ⭐ 新增規則：預約時間必須在15分鐘之後
+        if (!time) { alert(currentLang === 'en' ? "Please select a time!" : "請選擇預約時間！"); return; }
+        const targetDateTime = new Date(`${date}T${time}`);
+        const diffMinutes = (targetDateTime.getTime() - Date.now()) / (1000 * 60);
+        if (diffMinutes < 15) {
+            alert(currentLang === 'en'
+                ? "⚠️ Booking time must be at least 15 minutes later.\nPlease use Instant Order instead."
+                : "⚠️ 預約時間必須在15分鐘之後！\n如少於15分鐘，請使用「即時訂單」。");
+            return;
+        }
     }
 
     const passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
