@@ -492,15 +492,8 @@
         if (trimmed.includes("愉景灣")) return "愉景灣的士站";
         if (trimmed.includes("落馬洲")) return "落馬洲支線出入境管制站";
         if (trimmed.includes("深圳灣")) return new google.maps.LatLng(22.475889, 113.955944);
-
-        if (trimmed.includes("機場"))
-|| trimmed.includes("機場一號客運大樓") || trimmed.includes("機場T1")) || trimmed.includes("機場1號客運大樓") || trimmed.includes("赤鱲角機場 (1 號客運大樓)")) 
-return new google.maps.LatLng(22.3155, 113.936361);
-
-        if (trimmed.includes("香港赤鱲角機場站T2"))
-|| trimmed.includes("機場二號客運大樓") || trimmed.includes("機場T2")) || trimmed.includes("機場2號客運大樓") || trimmed.includes("赤鱲角機場 (2 號客運大樓)")) 
-return new google.maps.LatLng(22.316333, 113.937611);
-
+        if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) return "香港國際機場";
+        return trimmed;
     }
 
     function processRoutes(routes, isShenzhenBay) {
