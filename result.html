@@ -484,15 +484,74 @@
         return Math.round(fare);
     }
 
-    function normalizeLocation(loc) {
+    // =========================================================
+    // ⭐ normalizeLocation —— 支援起點 / 終點不同座標
+    // =========================================================
+    // 參數 isPickup：
+    //   true  → 起點（機場的士站接客）22.312861, 113.936500
+    //   false → 終點（T1 離境大堂落客）22.315500, 113.936361
+    //
+    // 規則：
+    //   1. T2 具體關鍵字 → T2 座標
+    //   2. T1 具體關鍵字 → T1 座標
+    //   3. 純機場輸入：
+    //      - 起點 → 22.312861, 113.936500
+    //      - 終點 → 22.315500, 113.936361
+    //   4. 其他一律交返俾 Google
+    //
+    // T1: 22°18'55.8"N 113°56'10.9"E → 22.315500, 113.936361（終點落客）
+    // T2: 22°18'58.8"N 113°56'15.4"E → 22.316333, 113.937611
+    // 機場的士站（起點）: 22°18'46.3"N 113°56'11.4"E → 22.312861, 113.936500
+    // =========================================================
+    function normalizeLocation(loc, isPickup = false) {
         if (!loc) return "";
         let trimmed = loc.trim();
+
+        // T2：先檢查（避免「機場T2」被之後嘅 T1 攔截）
+        if (/二號客運大樓|二号客运大楼|機場t2|机场t2|terminal\s*2/i.test(trimmed)) {
+            return new google.maps.LatLng(22.316333, 113.937611);
+        }
+
+        // T1：具體關鍵字
+        if (/一號客運大樓|一号客运大楼|機場t1|机场t1|terminal\s*1|hkia/i.test(trimmed)) {
+            return new google.maps.LatLng(22.315500, 113.936361);
+        }
+
+        // ⭐ 純機場輸入（忽略空格、標點）才 fallback
+        let cleaned = trimmed.replace(/[\s\-\(\)（）,，。\.、]/g, "");
+
+        // 起點：機場的士站（接客）
+        const airportPickupKeywords = [
+            "機場", "机场",
+            "香港國際機場", "香港国际机场",
+            "赤鱲角機場", "赤鱲角机场", "赤腊角机场",
+            "機場1號停車場", "机场1号停车场",
+            "機場一號停車場", "机场一号停车场",
+            "機場2號停車場", "机场2号停车场",
+            "機場二號停車場", "机场二号停车场"
+        ];
+        if (isPickup && airportPickupKeywords.includes(cleaned)) {
+            return new google.maps.LatLng(22.312861, 113.936500);
+        }
+
+        // 終點：T1 離境大堂（落客）
+        const airportDropoffKeywords = [
+            "機場", "机场",
+            "香港國際機場", "香港国际机场",
+            "赤鱲角機場", "赤鱲角机场", "赤腊角机场"
+        ];
+        if (!isPickup && airportDropoffKeywords.includes(cleaned)) {
+            return new google.maps.LatLng(22.315500, 113.936361);
+        }
+
+        // 其他既有地點
         if (trimmed.includes("迪士尼")) return "迪士尼樂園度假區的士站";
         if (trimmed.includes("蓮塘") || trimmed.includes("香園圍") || trimmed.includes("香園圍口岸")) return new google.maps.LatLng(22.553780, 114.153662);
         if (trimmed.includes("愉景灣")) return "愉景灣的士站";
         if (trimmed.includes("落馬洲")) return "落馬洲支線出入境管制站";
         if (trimmed.includes("深圳灣")) return new google.maps.LatLng(22.475889, 113.955944);
-        if (trimmed.includes("機場") && !trimmed.includes("香港國際機場")) return "香港國際機場";
+
+        // 其他一律交返俾 Google
         return trimmed;
     }
 
@@ -585,10 +644,12 @@
 
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
-        let targetPickup = normalizeLocation(pickupVal);
-        let targetDropoff = normalizeLocation(dropoffVal);
+
+        // ⭐ 起點用 isPickup=true，終點及中途站用 isPickup=false
+        let targetPickup = normalizeLocation(pickupVal, true);
+        let targetDropoff = normalizeLocation(dropoffVal, false);
         let waypoints = [];
-        stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s), stopover: true }); });
+        stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
 
         const request = {
             origin: targetPickup,
