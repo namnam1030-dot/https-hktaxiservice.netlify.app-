@@ -437,17 +437,20 @@
         window.location.href = 'fleet.html';
     }
 
-    function goToBookingPage() {
-        if (!selectedFareMode) {
-            alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
-            return;
-        }
-        if (!selectedCarName) {
-            selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
-        }
-        saveBookingDataToLocalStorage();
-        window.location.href = 'booking.html';
+function goToBookingPage() {
+    if (!selectedFareMode) {
+        alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
+        return;
     }
+    if (!selectedCarName) {
+        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+    }
+    saveBookingDataToLocalStorage();
+    // ⭐ PART 2：修改模式下帶返 edit 參數
+    const editId = sessionStorage.getItem('taxiEditingBookingId');
+    const suffix = editId ? `?edit=${encodeURIComponent(editId)}` : '';
+    window.location.href = 'booking.html' + suffix;
+}
 
     function showWeComQR() {
         document.getElementById('wecom-modal').classList.remove('hidden');

@@ -1355,7 +1355,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const returning = sessionStorage.getItem('returningFromResult') === '1';
     sessionStorage.removeItem('returningFromResult');
 
-    if (returning) {
+    // ⭐ PART 2：檢查係咪修改模式
+    const isEditMode = !!sessionStorage.getItem('taxiEditingBookingId');
+
+    if (returning || isEditMode) {
+        // 修改模式：保留路線資料，唔清走
         loadRouteDataFromLocalStorage();
     } else {
         localStorage.removeItem('taxiRouteData');

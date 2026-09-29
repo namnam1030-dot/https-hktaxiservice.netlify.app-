@@ -21,16 +21,13 @@
 
     var root = document.documentElement;
 
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
 
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -55,7 +52,6 @@
         color: #FFFFFF !important;
     }
 
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -122,7 +118,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
@@ -202,7 +197,7 @@
         line-height: 1.5;
     }
 
-    /* ===== 選中效果（方案 B：深色黃框、淺色黑框） ===== */
+    /* ===== 選中效果 ===== */
     .car-card.selected-car {
         outline: 2px solid #FFF200;
         outline-offset: 0;
@@ -211,7 +206,7 @@
         outline: 2px solid #000000;
     }
 
-    /* ===== 淺色主題專屬覆蓋（body.light-theme → html.light-theme body）===== */
+    /* ===== 淺色主題專屬覆蓋 ===== */
     html.light-theme body .car-card {
         background-color: #FFFFFF !important;
         border-color: #D1D5DB !important;
@@ -231,7 +226,6 @@
         color: #000000 !important;
         border: 1px solid #000000 !important;
     }
-    /* 返回預約頁面（淺色主題下保持黃底黑字+黑邊） */
     html.light-theme body button[onclick="backToBooking()"] {
         background-color: #FFF200 !important;
         color: #000000 !important;
@@ -242,6 +236,20 @@
         background-color: #FFF200 !important;
         color: #000000 !important;
         border: 1px solid #000000 !important;
+    }
+
+    /* ⭐ 修改模式橫幅 */
+    #edit-mode-banner {
+        background-color: #F59E0B;
+        color: #000000;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 </style>
 </head>
@@ -305,12 +313,18 @@
     </div>
 
     <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
-        
+
+        <!-- ⭐ PART 2：修改模式橫幅 -->
+        <div id="edit-mode-banner" class="hidden mt-2 mb-2">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span data-i18n="edit_mode_text">修改模式：正在修改預約</span>
+            <strong id="edit-mode-id"></strong>
+        </div>
+
         <div class="flex justify-between items-center mb-4 pt-2">
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-taxi text-brand-yellow"></i> <span data-i18n="fleet_title">選擇車款類型</span>
             </h3>
-            <!-- ✅ 返回預約頁面：改成黃底黑字（跟選定車款一樣） -->
             <button type="button" onclick="backToBooking()" class="inline-flex items-center gap-2 bg-brand-yellow text-black transition text-sm font-bold px-4 py-1.5 rounded-full cursor-pointer shadow-md">
                 <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btn_back_booking">返回預約頁面</span>
             </button>
@@ -589,7 +603,8 @@ const translations = {
         wecom_modal_title: "掃描二維碼添加企業微信",
         wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
+        edit_mode_text: "修改模式：正在修改預約"
     },
     en: {
         fleet_title: "Select Vehicle Type",
@@ -624,9 +639,33 @@ const translations = {
         wecom_modal_title: "Scan QR Code to Add WeCom",
         wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
+        edit_mode_text: "Edit Mode: Editing booking"
     }
 };
+
+// ============================================
+// ⭐ PART 2：修改模式 helper
+// ============================================
+function goToBookingPage() {
+    const editId = sessionStorage.getItem('taxiEditingBookingId');
+    const suffix = editId ? `?edit=${encodeURIComponent(editId)}` : '';
+    window.location.href = 'booking.html' + suffix;
+}
+
+function isEditMode() {
+    return !!sessionStorage.getItem('taxiEditingBookingId');
+}
+
+function initEditMode() {
+    const editId = sessionStorage.getItem('taxiEditingBookingId');
+    if (!editId) return;
+
+    const banner = document.getElementById('edit-mode-banner');
+    const idDisplay = document.getElementById('edit-mode-id');
+    if (banner) banner.classList.remove('hidden');
+    if (idDisplay) idDisplay.textContent = ' ' + editId;
+}
 
 // ============================================
 // 頁面專屬函數
@@ -673,7 +712,7 @@ function backToBooking() {
         }
         saveBookingDataToLocalStorage();
     }
-    window.location.href = 'booking.html';
+    goToBookingPage();   // ⭐ PART 2
 }
 
 function setToyotaFareMode(mode) {
@@ -723,7 +762,7 @@ function selectToyotaCar() {
     selectedFeeModeEn = 'Standard Fare · No Surcharge';
     selectedFareMode = previewFareMode;
     saveBookingDataToLocalStorage();
-    window.location.href = 'booking.html';
+    goToBookingPage();   // ⭐ PART 2
 }
 
 function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
@@ -735,7 +774,7 @@ function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeT
     selectedFeeModeEn = feeTextEn;
     selectedFareMode = 'normal';
     saveBookingDataToLocalStorage();
-    window.location.href = 'booking.html';
+    goToBookingPage();   // ⭐ PART 2
 }
 
 function renderCarCardsVisual(activeName) {
@@ -887,9 +926,11 @@ function closeWeComQR() {
 }
 
 // ============================================
-// 頁面初始化（theme.js 已自動初始化主題 / 浮標）
+// 頁面初始化
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
+    initEditMode();   // ⭐ PART 2
+
     const bookingData = loadBookingDataFromLocalStorage();
     if (bookingData) {
         selectedCarName = bookingData.selectedCarName || '';
@@ -911,7 +952,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
