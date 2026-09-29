@@ -340,6 +340,15 @@
         border: 1px solid #000000 !important;
     }
 
+    /* ⭐ PART 2：預約編號區塊（淺色主題） */
+    html.light-theme body #booking-id-row {
+        background-color: #FFF200 !important;
+        border-color: #000000 !important;
+    }
+    html.light-theme body #booking-id-display {
+        color: #000000 !important;
+    }
+
     /* ⭐ PART 1：返回鍵提示 Toast */
     #back-toast {
         position: fixed;
@@ -424,7 +433,18 @@
             <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
                 <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
             </div>
-            
+
+            <!-- ⭐ PART 2：預約編號 + 修改按鈕 -->
+            <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-3 mb-3 text-center">
+                <div class="text-xs text-gray-400 mb-1" data-i18n="booking_id_label">你的預約編號</div>
+                <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-lg tracking-wider">—</div>
+                <button type="button" id="edit-booking-btn" onclick="goEditBooking()"
+                    class="mt-2 w-full bg-brand-yellow text-black font-bold py-2 rounded-lg text-base flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span data-i18n="btn_edit_booking">修改資料</span>
+                </button>
+            </div>
+
             <div class="flex flex-col gap-2 mb-4">
                 <p class="text-gray-400 text-xl font-bold text-center mb-1" data-i18n="success_contact_prompt">
                     如有急需，可以直接聯絡我哋：
@@ -490,7 +510,7 @@
 
 <script>
 // ============================================
-// 語言系統（頁面專屬）
+// 語言系統
 // ============================================
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
@@ -512,7 +532,9 @@ const translations = {
         popup_btn: "知道喇",
         modal_title: "一鍵加入主畫面",
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
-        btn_close_guide: "了解，關閉"
+        btn_close_guide: "了解，關閉",
+        booking_id_label: "你的預約編號",
+        btn_edit_booking: "修改資料"
     },
     en: {
         success_title: "Booking Submitted Successfully!",
@@ -531,7 +553,9 @@ const translations = {
         popup_btn: "Got it",
         modal_title: "Add to Home Screen",
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
-        btn_close_guide: "Got it, Close"
+        btn_close_guide: "Got it, Close",
+        booking_id_label: "Your Booking ID",
+        btn_edit_booking: "Edit Booking"
     }
 };
 
@@ -589,15 +613,38 @@ function closeWeComQR() {
 function goBackToHome() {
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
+    sessionStorage.removeItem('taxiLastBookingId');
+    sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiLastSubmission');
     window.location.href = 'index.html';
 }
 
 // ============================================
+// ⭐ PART 2：預約編號 + 修改功能
+// ============================================
+(function () {
+    const urlParams = new URLSearchParams(location.search);
+    const bookingId = urlParams.get('id') || sessionStorage.getItem('taxiLastBookingId');
+
+    if (!bookingId) return;
+
+    try { sessionStorage.setItem('taxiLastBookingId', bookingId); } catch(e) {}
+
+    const row = document.getElementById('booking-id-row');
+    const display = document.getElementById('booking-id-display');
+    if (row) row.classList.remove('hidden');
+    if (display) display.textContent = bookingId;
+
+    window.goEditBooking = function () {
+        try { sessionStorage.setItem('taxiEditingBookingId', bookingId); } catch(e) {}
+        location.href = `booking.html?edit=${encodeURIComponent(bookingId)}`;
+    };
+})();
+
+// ============================================
 // ⭐ PART 1：防止用戶撳返回鍵返到表單頁重複提交
 // ============================================
 (function () {
-    // 先推一個 state，令 popstate 有嘢可以攔
     history.pushState(null, '', location.href);
 
     var toastTimer = null;
@@ -613,7 +660,6 @@ function goBackToHome() {
     }
 
     window.addEventListener('popstate', function () {
-        // 用戶想退，立即再推一個 state 阻止佢
         history.pushState(null, '', location.href);
         showBackToast(
             (typeof currentLang !== 'undefined' && currentLang === 'en')
@@ -623,11 +669,10 @@ function goBackToHome() {
     });
 })();
 
-// ===== 成功預約彈窗控制 =====
+// ===== 成功預約彈窗 =====
 (function () {
     var modal = document.getElementById('bookingModal');
     if (!modal) return;
-
     var closeBtn = document.getElementById('bookingModalClose');
 
     function openModal() {
@@ -635,14 +680,16 @@ function goBackToHome() {
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('modal-lock');
     }
-
     function closeModal() {
         modal.classList.remove('is-open');
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('modal-lock');
     }
 
-    if (sessionStorage.getItem('bookingPopupShown') !== '1') {
+    // ⭐ PART 2：修改模式（updated=1）唔彈成功彈窗
+    var isEdit = new URLSearchParams(location.search).get('updated') === '1';
+
+    if (!isEdit && sessionStorage.getItem('bookingPopupShown') !== '1') {
         window.addEventListener('load', function () {
             setTimeout(function () {
                 openModal();
@@ -652,17 +699,14 @@ function goBackToHome() {
     }
 
     closeBtn.addEventListener('click', closeModal);
-
     modal.addEventListener('click', function (e) {
         if (e.target === modal) closeModal();
     });
-
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
     });
 })();
 
-// 頁面初始化
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 });

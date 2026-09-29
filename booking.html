@@ -134,7 +134,7 @@
 <style>
     html { font-size: 130%; }
     body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
-    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
+    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1. gap5; }
     input, select {
         padding-top: 0.5rem !important;
         padding-bottom: 0.5rem !important;
@@ -156,7 +156,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.125rem;
+       : 0.125rem;
         min-height: 70px;
         border: 2px solid #374151;
         background-color: #0B0B0B;
@@ -314,6 +314,33 @@
         color: #000000 !important;
         font-weight: bold !important;
     }
+
+    /* ⭐ PART 2：編輯模式橫幅 */
+    #edit-mode-banner {
+        background-color: #F59E0B;
+        color: #000000;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    #edit-mode-banner button {
+        background-color: #000000;
+        color: #FFFFFF;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
 </style>
 </head>
 <body class="antialiased">
@@ -376,6 +403,12 @@
 
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
+
+            <!-- ⭐ PART 2：編輯模式橫幅 -->
+            <div id="edit-mode-banner" class="hidden">
+                <span><i class="fa-solid fa-pen-to-square"></i> <span data-i18n="edit_mode_text">修改模式：正在修改預約</span> <strong id="edit-mode-id"></strong></span>
+                <button type="button" onclick="cancelEditMode()" data-i18n="btn_cancel_edit">取消修改</button>
+            </div>
 
             <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
                 <div class="flex justify-between items-center mb-2">
@@ -639,6 +672,9 @@ let orderType = 'instant';
 let upgradeChoice = null;
 let pendingBookingData = null;
 
+// ⭐ PART 2：修改模式
+let editingBookingId = null;
+
 function calculateTotalFare() {
     if (currentBaseFare <= 0) return 0;
 
@@ -743,7 +779,9 @@ const translations = {
         whatsapp_inquiry: "WhatsApp",
         footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
         wechat_note_title: "我想用微信聯絡",
-        btn_add_wechat_now: "立即加微信"
+        btn_add_wechat_now: "立即加微信",
+        edit_mode_text: "修改模式：正在修改預約",
+        btn_cancel_edit: "取消修改"
     },
     en: {
         btn_more_payment: "More Options",
@@ -799,7 +837,9 @@ const translations = {
         whatsapp_inquiry: "WhatsApp",
         footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
         wechat_note_title: "Contact me via WeChat",
-        btn_add_wechat_now: "Add WeChat Now"
+        btn_add_wechat_now: "Add WeChat Now",
+        edit_mode_text: "Edit Mode: Editing booking",
+        btn_cancel_edit: "Cancel Edit"
     }
 };
 
@@ -1115,7 +1155,9 @@ function submitBookingAfterUpgrade() {
         fullMessage: fullMessage,
         customerMessage: customerMessage,
         orderType: orderType,
-        isWechatCustomer: data.isWechatCustomer === true
+        isWechatCustomer: data.isWechatCustomer === true,
+        // ⭐ PART 2：有值就 UPDATE，冇就 CREATE
+        bookingId: editingBookingId || undefined
     };
 
     const submitBtn = document.getElementById('booking-submit-btn');
@@ -1135,14 +1177,14 @@ function submitBookingAfterUpgrade() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ⭐ PART 1：記錄已提交（5 分鐘內有效）
-try {
+            // ⭐ PART 1：記錄已提交（5 分鐘內有效）+ 保存 customerMessage 供返回成功頁
+            try {
                 sessionStorage.setItem('taxiLastSubmission', JSON.stringify({
                     timestamp: Date.now(),
                     pickup: data.pickup || bookingData.pickup || '',
                     dropoff: data.dropoff || bookingData.dropoff || '',
                     phone: bookingData.phone || '',
-                    customerMessage: customerMessage   // ⭐ 新增：用嚟重新跳成功頁
+                    customerMessage: customerMessage
                 }));
             } catch(e) {}
             sessionStorage.removeItem('taxiSubmitting');
@@ -1155,8 +1197,23 @@ try {
             }
 
             const encodedData = encodeURIComponent(customerMessage);
+            const newBookingId = data.bookingId || '';
+
+            // ⭐ PART 2：保存 bookingId 供成功頁使用
+            if (newBookingId) {
+                try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {}
+            }
+
+            // ⭐ PART 2：清走修改模式
+            sessionStorage.removeItem('taxiEditingBookingId');
+
+            const idParam = newBookingId ? `&id=${encodeURIComponent(newBookingId)}` : '';
+            const updatedParam = data.updated ? '&updated=1' : '';
+
             // ⭐ PART 1：用 replace 取代 href
-            window.location.replace(`booking-success.html?data=${encodedData}`);
+            window.location.replace(
+                `booking-success.html?data=${encodedData}${idParam}${updatedParam}`
+            );
         } else {
             sessionStorage.removeItem('taxiSubmitting');
             if (submitBtn) {
@@ -1180,7 +1237,7 @@ try {
 function submitBooking(event) {
     event.preventDefault();
 
-    // ⭐ PART 1：防連按 / 防重複提交中
+    // ⭐ PART 1：防連按
     if (sessionStorage.getItem('taxiSubmitting') === '1') {
         alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...');
         return;
@@ -1296,6 +1353,46 @@ function submitBooking(event) {
 }
 
 // ============================================
+// ⭐ PART 2：修改模式
+// ============================================
+function initEditMode() {
+    const params = new URLSearchParams(location.search);
+    const editId = params.get('edit') || sessionStorage.getItem('taxiEditingBookingId');
+
+    if (!editId) return;
+
+    editingBookingId = editId;
+    try { sessionStorage.setItem('taxiEditingBookingId', editId); } catch(e) {}
+
+    const banner = document.getElementById('edit-mode-banner');
+    const idDisplay = document.getElementById('edit-mode-id');
+    if (banner) banner.classList.remove('hidden');
+    if (idDisplay) idDisplay.textContent = editId;
+
+    // 改提交按鈕文字
+    const submitBtn = document.getElementById('booking-submit-btn');
+    if (submitBtn) {
+        const span = submitBtn.querySelector('span');
+        if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
+    }
+
+    // 有 bookingId 就鎖定即時訂單（改單只支援預約）
+    const instantBtn = document.getElementById('btn-instant-order');
+    const bookingBtn = document.getElementById('btn-booking-order');
+    if (instantBtn) {
+        instantBtn.disabled = true;
+        instantBtn.style.opacity = '0.4';
+        instantBtn.style.pointerEvents = 'none';
+    }
+    if (bookingBtn) switchOrderType('booking');
+}
+
+function cancelEditMode() {
+    sessionStorage.removeItem('taxiEditingBookingId');
+    window.location.href = 'booking-success.html';
+}
+
+// ============================================
 // 頁面初始化
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
@@ -1373,26 +1470,29 @@ window.addEventListener('DOMContentLoaded', () => {
     checkShowFlightField();
     applyLanguage();
     switchOrderType('instant');
+    initEditMode();
 
-// ⭐ PART 1：檢查係咪啱啱先提交過
-    const recent = getRecentSubmission();
-    if (recent) {
-        setTimeout(function() {
-            const msg = currentLang === 'en'
-                ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home"
-                : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
-            if (confirm(msg)) {
-                // 確定：帶返訂單內容，跳去成功頁
-                const encoded = encodeURIComponent(recent.customerMessage || '');
-                window.location.replace('booking-success.html?data=' + encoded);
-            } else {
-                // 取消：等同成功頁嘅「返回主頁」
-                localStorage.removeItem('taxiRouteData');
-                localStorage.removeItem('taxiBookingData');
-                sessionStorage.removeItem('taxiLastSubmission');
-                window.location.replace('index.html');
-            }
-        }, 200);
+    // ⭐ PART 1 + bug fix：檢查係咪啱啱先提交過（修改模式下唔檢查）
+    if (!editingBookingId) {
+        const recent = getRecentSubmission();
+        if (recent) {
+            setTimeout(function() {
+                const msg = currentLang === 'en'
+                    ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home"
+                    : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
+                if (confirm(msg)) {
+                    // ⭐ 帶返訂單內容，跳去成功頁
+                    const encoded = encodeURIComponent(recent.customerMessage || '');
+                    window.location.replace('booking-success.html?data=' + encoded);
+                } else {
+                    // ⭐ 取消：等同成功頁嘅「返回主頁」
+                    localStorage.removeItem('taxiRouteData');
+                    localStorage.removeItem('taxiBookingData');
+                    sessionStorage.removeItem('taxiLastSubmission');
+                    window.location.replace('index.html');
+                }
+            }, 200);
+        }
     }
 });
 
