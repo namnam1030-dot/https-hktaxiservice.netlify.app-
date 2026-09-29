@@ -330,7 +330,7 @@
         gap: 8px;
         flex-wrap: wrap;
     }
-    #edit-mode-banner button {
+#edit-mode-banner button {
         background-color: #000000;
         color: #FFFFFF;
         border: none;
@@ -340,6 +340,10 @@
         font-size: 13px;
         cursor: pointer;
         white-space: nowrap;
+    }
+    /* ⭐ 覆蓋 display: flex，令 .hidden 生效 */
+    #edit-mode-banner.hidden {
+        display: none !important;
     }
 </style>
 </head>

@@ -238,7 +238,7 @@
         border: 1px solid #000000 !important;
     }
 
-    /* ⭐ 修改模式橫幅 */
+/* ⭐ 修改模式橫幅 */
     #edit-mode-banner {
         background-color: #F59E0B;
         color: #000000;
@@ -250,6 +250,10 @@
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
+    }
+    /* ⭐ 覆蓋 display: flex，令 .hidden 生效 */
+    #edit-mode-banner.hidden {
+        display: none !important;
     }
 </style>
 </head>
