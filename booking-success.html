@@ -55,16 +55,12 @@
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約成功 | 八五折的士 | 24小時網約車預約確認</title>
-
 <meta name="description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認。24小時八五折的士預約服務。">
-
 <meta name="keywords" content="預約成功,的士預約確認,八五折的士,85折的士,24小時的士,網約的士,WhatsApp叫車">
-
 <meta name="geo.region" content="HK">
 <meta name="geo.placename" content="Hong Kong">
 <meta name="geo.position" content="22.3193;114.1694">
@@ -85,7 +81,6 @@
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking-success.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking-success.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking-success.html">
-
 <link rel="canonical" href="https://hktaxiservice.netlify.app/booking-success.html">
 
 <script type="application/ld+json">
@@ -171,12 +166,10 @@
         visibility: hidden;
         transition: opacity .3s ease, visibility .3s ease;
     }
-
     .booking-modal.is-open {
         opacity: 1;
         visibility: visible;
     }
-
     .booking-modal__box {
         width: 100%;
         max-width: 400px;
@@ -189,11 +182,9 @@
         transform: translateY(24px) scale(.95);
         transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
     }
-
     .booking-modal.is-open .booking-modal__box {
         transform: translateY(0) scale(1);
     }
-
     .booking-modal__icon {
         width: 76px;
         height: 76px;
@@ -207,13 +198,11 @@
         border-radius: 50%;
         animation: bookingPop .5s ease .15s both;
     }
-
     @keyframes bookingPop {
         0% { transform: scale(0); }
         70% { transform: scale(1.15); }
         100% { transform: scale(1); }
     }
-
     .booking-modal__title {
         margin: 0 0 14px;
         font-size: 27px;
@@ -221,14 +210,12 @@
         color: #4ade80;
         line-height: 1.4;
     }
-
     .booking-modal__text {
         margin: 0 0 28px;
         font-size: 21px;
         line-height: 1.7;
         color: #d1d5db;
     }
-
     .booking-modal__btn {
         width: 100%;
         padding: 16px;
@@ -241,14 +228,8 @@
         cursor: pointer;
         transition: opacity .2s ease;
     }
-
-    .booking-modal__btn:active {
-        opacity: .85;
-    }
-
-    body.modal-lock {
-        overflow: hidden;
-    }
+    .booking-modal__btn:active { opacity: .85; }
+    body.modal-lock { overflow: hidden; }
 
     @media (max-width: 380px) {
         .booking-modal__title { font-size: 24px; }
@@ -340,12 +321,15 @@
         border: 1px solid #000000 !important;
     }
 
-    /* ⭐ PART 2：預約編號區塊（淺色主題） */
+    /* ⭐ 預約編號框（淺色主題） */
     html.light-theme body #booking-id-row {
         background-color: #FFF200 !important;
         border-color: #000000 !important;
     }
     html.light-theme body #booking-id-display {
+        color: #000000 !important;
+    }
+    html.light-theme body #booking-id-label {
         color: #000000 !important;
     }
 
@@ -367,12 +351,40 @@
         transition: opacity 0.3s ease;
         pointer-events: none;
     }
-    #back-toast.is-visible {
-        opacity: 1;
-    }
+    #back-toast.is-visible { opacity: 1; }
     html.light-theme body #back-toast {
         background: rgba(30, 30, 30, 0.95);
         color: #FFFFFF;
+    }
+
+    /* ⭐ 改動 6：訂單已更新 — 彈出色提示 Toast */
+    #updated-toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: #22c55e;
+        color: #FFFFFF;
+        padding: 14px 22px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 700;
+        z-index: 300;
+        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);
+        white-space: nowrap;
+        opacity: 0;
+        transition: transform 0.35s cubic-bezier(.34, 1.56, .64, 1), opacity 0.3s ease;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    #updated-toast.is-visible {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+    #updated-toast i {
+        font-size: 22px;
     }
 </style>
 </head>
@@ -390,8 +402,7 @@
             <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
                 為了方便下次叫車，您可以將本服務加到手機主畫面：
             </p>
-            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
-            </div>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
             <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
@@ -429,26 +440,28 @@
                     我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
                 </p>
             </div>
-            
-            <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
-                <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
+
+            <!-- ⭐ 改動 5：預約編號框移到此處（訂單內容框上方） -->
+            <!-- ⭐ 改動 4：字體放大 -->
+            <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-4 mb-4 text-center">
+                <div id="booking-id-label" class="text-xl text-gray-300 mb-2" data-i18n="booking_id_label">你的預約編號</div>
+                <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-4xl tracking-widest">—</div>
+                <button type="button" id="edit-booking-btn" onclick="goEditBooking()"
+                    class="mt-3 w-full bg-brand-yellow text-black font-bold py-2 rounded-lg text-base flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span data-i18n="btn_edit_booking">修改資料</span>
+                </button>
             </div>
 
-            <!-- ⭐ 訂單已修改提示 -->
+            <!-- ⭐ 訂單已修改橫幅 -->
             <div id="updated-banner" class="hidden bg-green-500/90 text-white rounded-xl p-3 mb-3 text-center font-bold flex items-center justify-center gap-2">
                 <i class="fa-solid fa-circle-check text-lg"></i>
                 <span data-i18n="updated_banner">訂單資料已成功更新！</span>
             </div>
 
-            <!-- ⭐ PART 2：預約編號 + 修改按鈕 -->
-            <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-3 mb-3 text-center">
-                <div class="text-xs text-gray-400 mb-1" data-i18n="booking_id_label">你的預約編號</div>
-                <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-lg tracking-wider">—</div>
-                <button type="button" id="edit-booking-btn" onclick="goEditBooking()"
-                    class="mt-2 w-full bg-brand-yellow text-black font-bold py-2 rounded-lg text-base flex items-center justify-center gap-2 shadow-md">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span data-i18n="btn_edit_booking">修改資料</span>
-                </button>
+            <!-- 訂單內容框（移到下方） -->
+            <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
+                <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
             </div>
 
             <div class="flex flex-col gap-2 mb-4">
@@ -514,6 +527,12 @@
     <!-- ⭐ PART 1：返回鍵提示 Toast -->
     <div id="back-toast" aria-live="polite"></div>
 
+    <!-- ⭐ 改動 6：訂單已更新 — 彈出色提示 -->
+    <div id="updated-toast" aria-live="polite">
+        <i class="fa-solid fa-circle-check"></i>
+        <span data-i18n="updated_toast">訂單資料已成功更新！</span>
+    </div>
+
 <script>
 // ============================================
 // 語言系統
@@ -541,7 +560,8 @@ const translations = {
         btn_close_guide: "了解，關閉",
         booking_id_label: "你的預約編號",
         btn_edit_booking: "修改資料",
-        updated_banner: "訂單資料已成功更新！"
+        updated_banner: "訂單資料已成功更新！",
+        updated_toast: "訂單資料已成功更新！"
     },
     en: {
         success_title: "Booking Submitted Successfully!",
@@ -563,7 +583,8 @@ const translations = {
         btn_close_guide: "Got it, Close",
         booking_id_label: "Your Booking ID",
         btn_edit_booking: "Edit Booking",
-        updated_banner: "Booking Updated Successfully!"
+        updated_banner: "Booking Updated Successfully!",
+        updated_toast: "Booking Updated Successfully!"
     }
 };
 
@@ -630,23 +651,35 @@ function goBackToHome() {
 }
 
 // ============================================
-// ⭐ 訂單已修改橫幅 + 彈窗文案
+// ⭐ 訂單已修改：橫幅 + 彈窗文案 + 彈出色提示
 // ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('updated') !== '1') return;
 
-    // 顯示綠色橫幅
+    // 1) 顯示綠色橫幅
     const banner = document.getElementById('updated-banner');
     if (banner) banner.classList.remove('hidden');
 
-    // 改彈窗文案
+    // 2) 改彈窗文案
     const title = document.getElementById('bookingModalTitle');
     const text = document.getElementById('bookingModalText');
     if (title) title.textContent = currentLang === 'en' ? 'Booking Updated!' : '訂單已成功更新！';
     if (text) text.innerHTML = currentLang === 'en'
         ? 'Your booking has been updated.<br>We will re-confirm shortly.'
         : '你嘅訂單已更新，<br>我哋會盡快重新確認。';
+
+    // 3) ⭐ 改動 6：彈出色提示 Toast（綠色，由頂部滑落）
+    window.addEventListener('load', function () {
+        setTimeout(function () {
+            const toast = document.getElementById('updated-toast');
+            if (!toast) return;
+            toast.classList.add('is-visible');
+            setTimeout(function () {
+                toast.classList.remove('is-visible');
+            }, 3200);
+        }, 300);
+    });
 })();
 
 // ============================================
@@ -716,7 +749,6 @@ function goBackToHome() {
         document.body.classList.remove('modal-lock');
     }
 
-    // ⭐ 新提交 / 修改完成都會彈窗（用唔同 key 避免衝突）
     var isUpdate = new URLSearchParams(location.search).get('updated') === '1';
     var popupKey = isUpdate ? 'bookingUpdatePopupShown' : 'bookingPopupShown';
 
