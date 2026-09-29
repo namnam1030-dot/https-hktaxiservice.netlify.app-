@@ -180,9 +180,20 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
   }
 }
 
+// ============================================
+// ⭐ 已改：Discord 訊息加修改時間戳
+// ============================================
 function buildDiscordMessage(data, bookingId, isUpdate) {
   let body = data.fullMessage || data.description || '收到新訂單';
-  if (isUpdate) body = '🔄 **【訂單已修改】**\n' + body;
+  if (isUpdate) {
+    const now = new Date().toLocaleString('zh-HK', {
+      timeZone: 'Asia/Hong_Kong',
+      hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    body = `🔄 **【訂單已修改】** _(${now})_\n` + body;
+  }
   if (bookingId) body += `\n🆔 \`${bookingId}\``;
   return body;
 }
