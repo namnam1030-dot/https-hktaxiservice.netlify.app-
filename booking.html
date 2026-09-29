@@ -413,9 +413,10 @@
             <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
-                    <button type="button" onclick="window.location.href='index.html'" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
-                        <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
-                    </button>
+
+<button type="button" onclick="window.location.href='index.html?from=edit'" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
+    <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
+</button>
                 </div>
                 <div class="text-xs text-gray-300 space-y-1">
                     <div><span class="text-gray-400" data-i18n="pickup_label">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>

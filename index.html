@@ -1352,6 +1352,12 @@ function swapLocations() {
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
 
+    // ⭐ 清走殘留嘅編輯 ID（除非係由 booking.html 嘅「修改路線」跳過嚟）
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('from') !== 'edit') {
+        sessionStorage.removeItem('taxiEditingBookingId');
+    }
+
     const returning = sessionStorage.getItem('returningFromResult') === '1';
     sessionStorage.removeItem('returningFromResult');
 
