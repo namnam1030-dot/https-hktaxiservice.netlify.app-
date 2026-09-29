@@ -13,10 +13,11 @@ function err(code, message) {
   return { statusCode: code, headers: CORS_HEADERS, body: JSON.stringify({ success: false, error: message }) };
 }
 
+// ============================================
+// ⭐ 改動 1：隨機 4 位數字 BookingID
+// ============================================
 function generateBookingId() {
-  const ts = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `BK-${ts}-${rand}`;
+  return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 function getCalendarClient() {
@@ -33,6 +34,29 @@ function parseDiscordWebhook(url) {
   if (!url) return null;
   const m = url.match(/\/webhooks\/(\d+)\/([^\/?]+)/);
   return m ? { id: m[1], token: m[2] } : null;
+}
+
+// ============================================
+// ⭐ 改動 2/3：喺「💰...」行之後插入 bookingId
+// ============================================
+function insertBookingIdAfterFare(text, bookingId) {
+  if (!bookingId) return text;
+  const lines = text.split('\n');
+  let insertIndex = -1;
+  // 由尾開始搵最後一行以 💰 開頭嘅
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].startsWith('💰')) {
+      insertIndex = i + 1;
+      break;
+    }
+  }
+  const idLine = `🆔 \`${bookingId}\``;
+  if (insertIndex >= 0) {
+    lines.splice(insertIndex, 0, idLine);
+  } else {
+    lines.push(idLine);
+  }
+  return lines.join('\n');
 }
 
 exports.handler = async (event) => {
@@ -112,11 +136,15 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
   let description = data.fullMessage || data.customerMessage
     || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
 
+  // 1) Markdown 連結轉純文字
   description = description
     .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
     .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, 'WhatsApp：$1')
     .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
     .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
+
+  // 2) ⭐ 改動 3：喺「💰...」行之後插入 bookingId（同 Discord 一樣位置）
+  description = insertBookingIdAfterFare(description, bookingId);
 
   const privateProps = { bookingId };
   if (discordMessageId) privateProps.discordMessageId = discordMessageId;
@@ -181,7 +209,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 }
 
 // ============================================
-// ⭐ 已改：Discord 訊息加修改時間戳
+// ⭐ 改動 2：bookingId 插入喺「💰...」下一行
 // ============================================
 function buildDiscordMessage(data, bookingId, isUpdate) {
   let body = data.fullMessage || data.description || '收到新訂單';
@@ -194,7 +222,8 @@ function buildDiscordMessage(data, bookingId, isUpdate) {
     });
     body = `🔄 **【訂單已修改】** _(${now})_\n` + body;
   }
-  if (bookingId) body += `\n🆔 \`${bookingId}\``;
+  // ⭐ 改動：用 helper 插入
+  body = insertBookingIdAfterFare(body, bookingId);
   return body;
 }
 
@@ -206,25 +235,45 @@ async function sendDiscordNotification(data, bookingId, waitForId) {
   }
 
   const message = buildDiscordMessage(data, bookingId, false);
-  const url = waitForId
-    ? webhookUrl + (webhookUrl.includes('?') ? '&' : '?') + 'wait=true'
-    : webhookUrl;
+  const body = JSON.stringify({ content: message, flags: 4 });
 
+  // ===== 1) 如果有 waitForId，先試 ?wait=true 攞 messageId =====
+  if (waitForId) {
+    const urlWithWait = webhookUrl + (webhookUrl.includes('?') ? '&' : '?') + 'wait=true';
+    try {
+      const res = await fetch(urlWithWait, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body
+      });
+      if (res.ok) {
+        const json = await res.json();
+        console.log('Discord 已發送（含 messageId）：', json.id);
+        return json.id;
+      }
+      const errText = await res.text().catch(() => '');
+      console.warn('[Discord] wait=true 失敗，改用普通 POST。狀態:', res.status, errText);
+    } catch (e) {
+      console.warn('[Discord] wait=true 拋錯，改用普通 POST:', e.message);
+    }
+  }
+
+  // ===== 2) Fallback：普通 POST =====
   try {
-    const res = await fetch(url, {
+    const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: message, flags: 4 })
+      body
     });
-    if (waitForId && res.ok) {
-      const json = await res.json();
-      console.log('Discord 已發送，messageId：', json.id);
-      return json.id;
+    if (res.ok) {
+      console.log('Discord 通知已發送（無 messageId）');
+    } else {
+      const errText = await res.text().catch(() => '');
+      console.error('[Discord] 普通 POST 失敗。狀態:', res.status, errText);
     }
-    console.log('Discord 通知已發送');
     return null;
   } catch (error) {
-    console.error('Discord 通知失敗：', error);
+    console.error('[Discord] 普通 POST 拋錯：', error);
     return null;
   }
 }
