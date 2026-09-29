@@ -1136,12 +1136,13 @@ function submitBookingAfterUpgrade() {
     .then(data => {
         if (data.success) {
             // ⭐ PART 1：記錄已提交（5 分鐘內有效）
-            try {
+try {
                 sessionStorage.setItem('taxiLastSubmission', JSON.stringify({
                     timestamp: Date.now(),
                     pickup: data.pickup || bookingData.pickup || '',
                     dropoff: data.dropoff || bookingData.dropoff || '',
-                    phone: bookingData.phone || ''
+                    phone: bookingData.phone || '',
+                    customerMessage: customerMessage   // ⭐ 新增：用嚟重新跳成功頁
                 }));
             } catch(e) {}
             sessionStorage.removeItem('taxiSubmitting');
@@ -1373,17 +1374,23 @@ window.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
     switchOrderType('instant');
 
-    // ⭐ PART 1：檢查係咪啱啱先提交過
+// ⭐ PART 1：檢查係咪啱啱先提交過
     const recent = getRecentSubmission();
     if (recent) {
         setTimeout(function() {
             const msg = currentLang === 'en'
-                ? "You recently submitted a booking.\n\nOK = back to success page\nCancel = start a new booking"
-                : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 繼續落新單";
+                ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home"
+                : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
             if (confirm(msg)) {
-                window.location.replace('booking-success.html');
+                // 確定：帶返訂單內容，跳去成功頁
+                const encoded = encodeURIComponent(recent.customerMessage || '');
+                window.location.replace('booking-success.html?data=' + encoded);
             } else {
+                // 取消：等同成功頁嘅「返回主頁」
+                localStorage.removeItem('taxiRouteData');
+                localStorage.removeItem('taxiBookingData');
                 sessionStorage.removeItem('taxiLastSubmission');
+                window.location.replace('index.html');
             }
         }, 200);
     }
