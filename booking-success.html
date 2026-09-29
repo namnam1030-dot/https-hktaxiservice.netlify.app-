@@ -434,6 +434,12 @@
                 <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
             </div>
 
+            <!-- ⭐ 訂單已修改提示 -->
+            <div id="updated-banner" class="hidden bg-green-500/90 text-white rounded-xl p-3 mb-3 text-center font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-check text-lg"></i>
+                <span data-i18n="updated_banner">訂單資料已成功更新！</span>
+            </div>
+
             <!-- ⭐ PART 2：預約編號 + 修改按鈕 -->
             <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-3 mb-3 text-center">
                 <div class="text-xs text-gray-400 mb-1" data-i18n="booking_id_label">你的預約編號</div>
@@ -496,7 +502,7 @@
             <h2 class="booking-modal__title" id="bookingModalTitle" data-i18n="popup_title">
                 預約訂單已成功送出！
             </h2>
-            <p class="booking-modal__text" data-i18n-html="popup_desc">
+            <p class="booking-modal__text" id="bookingModalText" data-i18n-html="popup_desc">
                 我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
             </p>
             <button type="button" class="booking-modal__btn" id="bookingModalClose" data-i18n="popup_btn">
@@ -534,7 +540,8 @@ const translations = {
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
         btn_close_guide: "了解，關閉",
         booking_id_label: "你的預約編號",
-        btn_edit_booking: "修改資料"
+        btn_edit_booking: "修改資料",
+        updated_banner: "訂單資料已成功更新！"
     },
     en: {
         success_title: "Booking Submitted Successfully!",
@@ -555,7 +562,8 @@ const translations = {
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
         btn_close_guide: "Got it, Close",
         booking_id_label: "Your Booking ID",
-        btn_edit_booking: "Edit Booking"
+        btn_edit_booking: "Edit Booking",
+        updated_banner: "Booking Updated Successfully!"
     }
 };
 
@@ -616,8 +624,30 @@ function goBackToHome() {
     sessionStorage.removeItem('taxiLastBookingId');
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiLastSubmission');
+    sessionStorage.removeItem('bookingPopupShown');
+    sessionStorage.removeItem('bookingUpdatePopupShown');
     window.location.href = 'index.html';
 }
+
+// ============================================
+// ⭐ 訂單已修改橫幅 + 彈窗文案
+// ============================================
+(function () {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('updated') !== '1') return;
+
+    // 顯示綠色橫幅
+    const banner = document.getElementById('updated-banner');
+    if (banner) banner.classList.remove('hidden');
+
+    // 改彈窗文案
+    const title = document.getElementById('bookingModalTitle');
+    const text = document.getElementById('bookingModalText');
+    if (title) title.textContent = currentLang === 'en' ? 'Booking Updated!' : '訂單已成功更新！';
+    if (text) text.innerHTML = currentLang === 'en'
+        ? 'Your booking has been updated.<br>We will re-confirm shortly.'
+        : '你嘅訂單已更新，<br>我哋會盡快重新確認。';
+})();
 
 // ============================================
 // ⭐ PART 2：預約編號 + 修改功能
@@ -686,14 +716,15 @@ function goBackToHome() {
         document.body.classList.remove('modal-lock');
     }
 
-    // ⭐ PART 2：修改模式（updated=1）唔彈成功彈窗
-    var isEdit = new URLSearchParams(location.search).get('updated') === '1';
+    // ⭐ 新提交 / 修改完成都會彈窗（用唔同 key 避免衝突）
+    var isUpdate = new URLSearchParams(location.search).get('updated') === '1';
+    var popupKey = isUpdate ? 'bookingUpdatePopupShown' : 'bookingPopupShown';
 
-    if (!isEdit && sessionStorage.getItem('bookingPopupShown') !== '1') {
+    if (sessionStorage.getItem(popupKey) !== '1') {
         window.addEventListener('load', function () {
             setTimeout(function () {
                 openModal();
-                sessionStorage.setItem('bookingPopupShown', '1');
+                sessionStorage.setItem(popupKey, '1');
             }, 200);
         });
     }

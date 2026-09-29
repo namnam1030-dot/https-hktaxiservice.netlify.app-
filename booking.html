@@ -134,7 +134,7 @@
 <style>
     html { font-size: 130%; }
     body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
-    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1. gap5; }
+    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
     input, select {
         padding-top: 0.5rem !important;
         padding-bottom: 0.5rem !important;
@@ -156,7 +156,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-       : 0.125rem;
+        gap: 0.125rem;
         min-height: 70px;
         border: 2px solid #374151;
         background-color: #0B0B0B;
@@ -413,10 +413,9 @@
             <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
-
-<button type="button" onclick="window.location.href='index.html?from=edit'" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
-    <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
-</button>
+                    <button type="button" onclick="window.location.href='index.html?from=edit'" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
+                        <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
+                    </button>
                 </div>
                 <div class="text-xs text-gray-300 space-y-1">
                     <div><span class="text-gray-400" data-i18n="pickup_label">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>
@@ -1157,7 +1156,6 @@ function submitBookingAfterUpgrade() {
         customerMessage: customerMessage,
         orderType: orderType,
         isWechatCustomer: data.isWechatCustomer === true,
-        // ⭐ PART 2：有值就 UPDATE，冇就 CREATE
         bookingId: editingBookingId || undefined
     };
 
@@ -1167,7 +1165,6 @@ function submitBookingAfterUpgrade() {
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ${translations[currentLang].btn_sending_booking}`;
     }
 
-    // ⭐ PART 1：提交中 flag
     sessionStorage.setItem('taxiSubmitting', '1');
 
     fetch('/.netlify/functions/booking', {
@@ -1178,7 +1175,6 @@ function submitBookingAfterUpgrade() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ⭐ PART 1：記錄已提交（5 分鐘內有效）+ 保存 customerMessage 供返回成功頁
             try {
                 sessionStorage.setItem('taxiLastSubmission', JSON.stringify({
                     timestamp: Date.now(),
@@ -1200,18 +1196,15 @@ function submitBookingAfterUpgrade() {
             const encodedData = encodeURIComponent(customerMessage);
             const newBookingId = data.bookingId || '';
 
-            // ⭐ PART 2：保存 bookingId 供成功頁使用
             if (newBookingId) {
                 try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {}
             }
 
-            // ⭐ PART 2：清走修改模式
             sessionStorage.removeItem('taxiEditingBookingId');
 
             const idParam = newBookingId ? `&id=${encodeURIComponent(newBookingId)}` : '';
             const updatedParam = data.updated ? '&updated=1' : '';
 
-            // ⭐ PART 1：用 replace 取代 href
             window.location.replace(
                 `booking-success.html?data=${encodedData}${idParam}${updatedParam}`
             );
@@ -1238,7 +1231,6 @@ function submitBookingAfterUpgrade() {
 function submitBooking(event) {
     event.preventDefault();
 
-    // ⭐ PART 1：防連按
     if (sessionStorage.getItem('taxiSubmitting') === '1') {
         alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...');
         return;
@@ -1354,13 +1346,18 @@ function submitBooking(event) {
 }
 
 // ============================================
-// ⭐ PART 2：修改模式
+// ⭐ PART 2：修改模式（只讀 URL 參數）
 // ============================================
 function initEditMode() {
     const params = new URLSearchParams(location.search);
-    const editId = params.get('edit') || sessionStorage.getItem('taxiEditingBookingId');
+    const editId = params.get('edit');   // ⭐ 只讀 URL，唔讀 sessionStorage
 
-    if (!editId) return;
+    if (!editId) {
+        // ⭐ URL 冇 edit 參數 → 清走任何殘留，確保唔會誤入修改模式
+        sessionStorage.removeItem('taxiEditingBookingId');
+        editingBookingId = null;
+        return;
+    }
 
     editingBookingId = editId;
     try { sessionStorage.setItem('taxiEditingBookingId', editId); } catch(e) {}
@@ -1370,14 +1367,12 @@ function initEditMode() {
     if (banner) banner.classList.remove('hidden');
     if (idDisplay) idDisplay.textContent = editId;
 
-    // 改提交按鈕文字
     const submitBtn = document.getElementById('booking-submit-btn');
     if (submitBtn) {
         const span = submitBtn.querySelector('span');
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
-    // 有 bookingId 就鎖定即時訂單（改單只支援預約）
     const instantBtn = document.getElementById('btn-instant-order');
     const bookingBtn = document.getElementById('btn-booking-order');
     if (instantBtn) {
@@ -1482,11 +1477,9 @@ window.addEventListener('DOMContentLoaded', () => {
                     ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home"
                     : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
                 if (confirm(msg)) {
-                    // ⭐ 帶返訂單內容，跳去成功頁
                     const encoded = encodeURIComponent(recent.customerMessage || '');
                     window.location.replace('booking-success.html?data=' + encoded);
                 } else {
-                    // ⭐ 取消：等同成功頁嘅「返回主頁」
                     localStorage.removeItem('taxiRouteData');
                     localStorage.removeItem('taxiBookingData');
                     sessionStorage.removeItem('taxiLastSubmission');
