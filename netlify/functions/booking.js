@@ -482,8 +482,8 @@ async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
 
   const content = buildNtfyMessage(data, bookingId, isUpdate === true, changedFields || null);
 
-  let title = '🚕 新訂單';
-  if (isUpdate) title = '🔄 訂單已修改';
+// ⭐ Title 唔可以用 emoji（HTTP Header 只支援 ASCII）
+  var title = isUpdate ? 'Order Updated' : 'New Order';
   if (bookingId) title += ' (' + bookingId + ')';
 
   try {
