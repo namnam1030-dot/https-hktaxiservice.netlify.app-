@@ -153,6 +153,23 @@
         line-height: 1.6;
     }
 
+    /* ⭐ 訂單內容框：改用 div + 行高 */
+    #booking-details {
+        line-height: 1.8;
+        word-break: break-word;
+        white-space: pre-wrap;
+        font-family: ui-monospace, 'PingFang HK', monospace;
+    }
+    /* ⭐ 修改欄位紅色高亮 */
+    .changed-value {
+        color: #ef4444;
+        font-weight: 700;
+    }
+    html.light-theme body .changed-value {
+        color: #dc2626 !important;
+        font-weight: 700;
+    }
+
     .booking-modal {
         position: fixed;
         inset: 0;
@@ -441,7 +458,7 @@
                 </p>
             </div>
 
-            <!-- ⭐ 預約編號框（訂單內容框上方） -->
+            <!-- ⭐ 預約編號框 -->
             <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-4 mb-4 text-center">
                 <div id="booking-id-label" class="text-xl text-gray-300 mb-2" data-i18n="booking_id_label">你的預約編號</div>
                 <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-4xl tracking-widest">—</div>
@@ -458,9 +475,9 @@
                 <span data-i18n="updated_banner">訂單資料已成功更新！</span>
             </div>
 
-            <!-- 訂單內容框 -->
+            <!-- 訂單內容框（改用 div，支援紅色高亮） -->
             <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
-                <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
+                <div id="booking-details" class="text-white text-lg"></div>
             </div>
 
             <div class="flex flex-col gap-2 mb-4">
@@ -523,10 +540,8 @@
         </div>
     </div>
 
-    <!-- ⭐ 返回鍵提示 Toast -->
     <div id="back-toast" aria-live="polite"></div>
 
-    <!-- ⭐ 訂單已更新 — 彈出色提示 -->
     <div id="updated-toast" aria-live="polite">
         <i class="fa-solid fa-circle-check"></i>
         <span data-i18n="updated_toast">訂單資料已成功更新！</span>
@@ -619,13 +634,80 @@ function applyLanguage() {
     });
 }
 
-// 從 URL 參數讀取訂單內容
+// ============================================
+// ⭐ 紅色高亮：渲染訂單內容
+// ============================================
+function escapeHtml(s) {
+    return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function renderBookingDetails(text, changedFields) {
+    const el = document.getElementById('booking-details');
+    if (!el) return;
+
+    // changedFields key → 對應行嘅前綴
+    const prefixMap = {
+        pickup: '📍 起點：',
+        dropoff: '🏁 終點：',
+        stopovers: '🛑 ',
+        date: '📅 日期：',
+        time: '⏰ 時間：',
+        flightNo: '✈️ 航班編號：',
+        passengers: '👥 人數：',
+        luggages: '🧳 行李件數：',
+        hasPet: '🐶 寵物：',
+        hasWheelchair: '♿️ 輪椅放置尾箱：',
+        payments: '💳 付款方式：',
+        contact: '👤 聯絡人：',
+        phone: '📞 電話：',
+        selectedCarName: '🚘 預約車款：',
+        selectedFareMode: '💎 收費模式：',
+        isWechatCustomer: '💚 備注：'
+    };
+
+    // 收集所有「已修改」嘅前綴
+    const changedPrefixes = [];
+    if (changedFields && typeof changedFields === 'object') {
+        for (const key of Object.keys(changedFields)) {
+            if (prefixMap[key]) changedPrefixes.push(prefixMap[key]);
+        }
+    }
+
+    const lines = String(text || '').split('\n');
+    const htmlLines = lines.map(line => {
+        for (const prefix of changedPrefixes) {
+            if (line.startsWith(prefix)) {
+                const value = line.substring(prefix.length);
+                return escapeHtml(prefix) +
+                       '<span class="changed-value">' +
+                       escapeHtml(value) +
+                       '</span>';
+            }
+        }
+        return escapeHtml(line);
+    });
+
+    el.innerHTML = htmlLines.join('\n');
+}
+
+// 從 URL 讀訂單內容
 const urlParams = new URLSearchParams(window.location.search);
 const bookingData = urlParams.get('data');
 
+// ⭐ 從 sessionStorage 讀 changedFields
+let changedFields = null;
+try {
+    const raw = sessionStorage.getItem('taxiChangedFields');
+    if (raw) changedFields = JSON.parse(raw);
+} catch(e) {}
+
 if (bookingData) {
     const decodedData = decodeURIComponent(bookingData);
-    document.getElementById('booking-details').textContent = decodedData;
+    renderBookingDetails(decodedData, changedFields);
 } else {
     document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
 }
@@ -648,7 +730,7 @@ function goBackToHome() {
     sessionStorage.removeItem('bookingPopupShown');
     sessionStorage.removeItem('bookingUpdatePopupShown');
     sessionStorage.removeItem('taxiLastSuccessUrl');
-    // ⭐ bfcache 修復：標記用戶已離開成功頁
+    sessionStorage.removeItem('taxiChangedFields');   // ⭐ 清走高亮資料
     sessionStorage.setItem('taxiLeftSuccessPage', '1');
     window.location.href = 'index.html';
 }
@@ -660,11 +742,9 @@ function goBackToHome() {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('updated') !== '1') return;
 
-    // 1) 顯示綠色橫幅
     const banner = document.getElementById('updated-banner');
     if (banner) banner.classList.remove('hidden');
 
-    // 2) 改彈窗文案
     const title = document.getElementById('bookingModalTitle');
     const text = document.getElementById('bookingModalText');
     if (title) title.textContent = currentLang === 'en' ? 'Booking Updated!' : '訂單已成功更新！';
@@ -672,7 +752,6 @@ function goBackToHome() {
         ? 'Your booking has been updated.<br>We will re-confirm shortly.'
         : '你嘅訂單已更新，<br>我哋會盡快重新確認。';
 
-    // 3) 彈出色提示 Toast
     window.addEventListener('load', function () {
         setTimeout(function () {
             const toast = document.getElementById('updated-toast');
@@ -686,7 +765,7 @@ function goBackToHome() {
 })();
 
 // ============================================
-// ⭐ 預約編號 + 修改功能（B 版）
+// ⭐ 預約編號 + 修改功能
 // ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
@@ -701,13 +780,14 @@ function goBackToHome() {
     if (row) row.classList.remove('hidden');
     if (display) display.textContent = bookingId;
 
-    // ⭐ B 版：記住乾淨成功頁 URL（remove updated=1）
     window.goEditBooking = function () {
         try {
             sessionStorage.setItem('taxiEditingBookingId', bookingId);
             const cleanUrl = new URL(location.href);
             cleanUrl.searchParams.delete('updated');
             sessionStorage.setItem('taxiLastSuccessUrl', cleanUrl.toString());
+            // ⭐ 清走舊 changedFields，避免下次進入時誤高亮
+            sessionStorage.removeItem('taxiChangedFields');
         } catch(e) {}
         location.href = `booking.html?edit=${encodeURIComponent(bookingId)}`;
     };
@@ -784,7 +864,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// ⭐ 修復 bfcache：由返回鍵復原成功頁時，檢查「已離開」標記
+// ⭐ 修復 bfcache
 // ============================================
 window.addEventListener('pageshow', function(event) {
     if (!event.persisted) return;

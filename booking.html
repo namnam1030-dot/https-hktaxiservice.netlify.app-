@@ -674,7 +674,6 @@ let orderType = 'instant';
 let upgradeChoice = null;
 let pendingBookingData = null;
 
-// ⭐ 修改模式
 let editingBookingId = null;
 
 function calculateTotalFare() {
@@ -860,7 +859,7 @@ function getRecentSubmission() {
 }
 
 // ============================================
-// ⭐ 表單快照（用於修改模式預填）
+// ⭐ 表單快照：包含所有會比較嘅欄位
 // ============================================
 function saveFormSnapshot() {
     try {
@@ -869,8 +868,13 @@ function saveFormSnapshot() {
             if (el.checked) payments.push(el.value);
         });
 
+        const routeData = loadRouteDataFromLocalStorage() || {};
+
         const snapshot = {
             orderType: orderType,
+            pickup: routeData.pickup || '',
+            dropoff: routeData.dropoff || '',
+            stopovers: (routeData.stopovers || []).join('、'),
             date: document.getElementById('date')?.value || '',
             time: document.getElementById('time')?.value || '',
             flightNo: document.getElementById('flight_no')?.value || '',
@@ -878,11 +882,13 @@ function saveFormSnapshot() {
             luggages: document.getElementById('luggages')?.value || '',
             hasPet: document.getElementById('has_pet')?.checked || false,
             hasWheelchair: document.getElementById('has_wheelchair')?.checked || false,
-            payments: payments,
+            payments: payments.join(' / '),
             contactTitle: document.getElementById('contact_title')?.value || '',
             contactSurname: document.getElementById('contact_surname')?.value || '',
             phone: document.getElementById('phone')?.value || '',
-            isWechatCustomer: document.getElementById('is_wechat_customer')?.checked || false
+            isWechatCustomer: document.getElementById('is_wechat_customer')?.checked || false,
+            selectedCarName: selectedCarName || '',
+            selectedFareMode: selectedFareMode || ''
         };
 
         localStorage.setItem('taxiEditPrefillData', JSON.stringify(snapshot));
@@ -902,14 +908,12 @@ function restoreFormSnapshot() {
         const s = JSON.parse(raw);
         console.log('[Snapshot] 讀取快照：', s);
 
-        // 1) 訂單類型
         if (s.orderType === 'booking') {
             switchOrderType('booking');
         } else if (s.orderType === 'instant') {
             switchOrderType('instant');
         }
 
-        // 2) 日期 / 時間
         if (s.date) {
             const dateEl = document.getElementById('date');
             if (dateEl) dateEl.value = s.date;
@@ -918,14 +922,10 @@ function restoreFormSnapshot() {
             const timeEl = document.getElementById('time');
             if (timeEl) timeEl.value = s.time;
         }
-
-        // 3) 航班編號
         if (s.flightNo) {
             const el = document.getElementById('flight_no');
             if (el) el.value = s.flightNo;
         }
-
-        // 4) 人數 / 行李
         if (s.passengers) {
             const el = document.getElementById('passengers');
             if (el) el.value = s.passengers;
@@ -935,20 +935,25 @@ function restoreFormSnapshot() {
             if (el) el.value = s.luggages;
         }
 
-        // 5) 寵物 / 輪椅
         const petEl = document.getElementById('has_pet');
         if (petEl) petEl.checked = !!s.hasPet;
         const wheelEl = document.getElementById('has_wheelchair');
         if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
 
-        // 6) 付款方式
-        if (Array.isArray(s.payments) && s.payments.length > 0) {
+        // 付款方式（新格式：字串 "現金 / PayMe"，舊格式：array）
+        let paymentArr = [];
+        if (typeof s.payments === 'string') {
+            paymentArr = s.payments.split(' / ').filter(Boolean);
+        } else if (Array.isArray(s.payments)) {
+            paymentArr = s.payments;
+        }
+        if (paymentArr.length > 0) {
             document.querySelectorAll('input[name="payment_method"]').forEach(el => {
                 el.checked = false;
             });
             let hasNonCash = false;
             document.querySelectorAll('input[name="payment_method"]').forEach(el => {
-                if (s.payments.includes(el.value)) {
+                if (paymentArr.includes(el.value)) {
                     el.checked = true;
                     if (el.value !== '現金') hasNonCash = true;
                 }
@@ -959,7 +964,6 @@ function restoreFormSnapshot() {
             }
         }
 
-        // 7) 稱謂 / 聯絡人
         if (s.contactTitle) {
             const el = document.getElementById('contact_title');
             if (el) el.value = s.contactTitle;
@@ -968,20 +972,116 @@ function restoreFormSnapshot() {
             const el = document.getElementById('contact_surname');
             if (el) el.value = s.contactSurname;
         }
-
-        // 8) 電話
         if (s.phone) {
             const el = document.getElementById('phone');
             if (el) el.value = s.phone;
         }
 
-        // 9) 微信客戶
         const wxEl = document.getElementById('is_wechat_customer');
         if (wxEl) wxEl.checked = !!s.isWechatCustomer;
 
         console.log('[Snapshot] 已預填完成');
     } catch(e) {
         console.error('[Snapshot] 預填失敗：', e);
+    }
+}
+
+// ============================================
+// ⭐ 計算 changedFields（對比舊快照 vs 現況）
+// ============================================
+function computeChangedFields() {
+    try {
+        const raw = localStorage.getItem('taxiEditPrefillData');
+        if (!raw) return null;
+        const old = JSON.parse(raw);
+
+        const routeData = loadRouteDataFromLocalStorage() || {};
+
+        const payments = [];
+        document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+            if (el.checked) payments.push(el.value);
+        });
+
+        const cur = {
+            pickup: routeData.pickup || '',
+            dropoff: routeData.dropoff || '',
+            stopovers: (routeData.stopovers || []).join('、'),
+            date: document.getElementById('date')?.value || '',
+            time: document.getElementById('time')?.value || '',
+            flightNo: document.getElementById('flight_no')?.value || '',
+            passengers: document.getElementById('passengers')?.value || '',
+            luggages: document.getElementById('luggages')?.value || '',
+            hasPet: document.getElementById('has_pet')?.checked || false,
+            hasWheelchair: document.getElementById('has_wheelchair')?.checked || false,
+            payments: payments.join(' / '),
+            contactTitle: document.getElementById('contact_title')?.value || '',
+            contactSurname: document.getElementById('contact_surname')?.value || '',
+            phone: document.getElementById('phone')?.value || '',
+            isWechatCustomer: document.getElementById('is_wechat_customer')?.checked || false,
+            selectedCarName: selectedCarName || '',
+            selectedFareMode: selectedFareMode || ''
+        };
+
+        const labels = {
+            pickup: '起點',
+            dropoff: '終點',
+            stopovers: '中途站',
+            date: '日期',
+            time: '時間',
+            flightNo: '航班編號',
+            passengers: '人數',
+            luggages: '行李件數',
+            hasPet: '寵物',
+            hasWheelchair: '輪椅',
+            payments: '付款方式',
+            contactTitle: '稱謂',
+            contactSurname: '聯絡人',
+            phone: '電話',
+            isWechatCustomer: '微信客戶',
+            selectedCarName: '車款',
+            selectedFareMode: '收費模式'
+        };
+
+        function fmt(val, key) {
+            if (typeof val === 'boolean') return val ? '✅' : '❌';
+            if (key === 'selectedFareMode') {
+                if (val === 'discount') return '八五折';
+                if (val === 'normal') return '正價';
+                return val || '-';
+            }
+            return String(val || '').trim() || '（空）';
+        }
+
+        const changed = {};
+        for (const key of Object.keys(labels)) {
+            const oldRaw = old[key];
+            const newRaw = cur[key];
+            const oldStr = fmt(oldRaw, key);
+            const newStr = fmt(newRaw, key);
+            if (oldStr !== newStr) {
+                changed[key] = { label: labels[key], old: oldStr, new: newStr };
+            }
+        }
+
+        // 稱謂 + 聯絡人合併成「聯絡人」
+        if (changed.contactTitle || changed.contactSurname) {
+            const oldTitle = old.contactTitle || '';
+            const oldSur = old.contactSurname || '';
+            const newTitle = cur.contactTitle || '';
+            const newSur = cur.contactSurname || '';
+            changed['contact'] = {
+                label: '聯絡人',
+                old: `${oldSur}${oldTitle}`.trim() || '（空）',
+                new: `${newSur}${newTitle}`.trim() || '（空）'
+            };
+            delete changed.contactTitle;
+            delete changed.contactSurname;
+        }
+
+        return Object.keys(changed).length > 0 ? changed : null;
+    } catch(e) {
+        console.error('[ChangedFields] 計算失敗：', e);
+        return null;
     }
 }
 
@@ -1098,14 +1198,10 @@ function checkShowFlightField() {
     }
 }
 
-// ============================================
-// ⭐ 乘客人數檢查：5+ 人自動切去 MAXUS MIFA 7
-// ============================================
 function checkPassengerLimit() {
     const passengersSelect = document.getElementById('passengers');
     const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
 
-    // ⭐ 5 人或以上：4 人車（豐田混能）自動切換去 MAXUS MIFA 7
     if (passengerVal > 4) {
         if (selectedCarName === '豐田混能的士' || !selectedCarName) {
             selectedCarName = 'MAXUS MIFA 7';
@@ -1114,7 +1210,6 @@ function checkPassengerLimit() {
             selectedMinFare = 130;
             selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)';
             selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
-            // 85 折只限豐田混能，reset 返正價
             if (selectedFareMode === 'discount') {
                 selectedFareMode = 'normal';
             }
@@ -1273,6 +1368,13 @@ function submitBookingAfterUpgrade() {
 
     const fullMessage = discordMsgLines.join('\n');
 
+    // ⭐ 修改模式：計算 changedFields
+    let changedFields = null;
+    if (editingBookingId) {
+        changedFields = computeChangedFields();
+        console.log('[ChangedFields] 結果：', changedFields);
+    }
+
     const bookingData = {
         pickup: data.pickup,
         stopover: data.stopoverTexts.join(' / '),
@@ -1301,7 +1403,8 @@ function submitBookingAfterUpgrade() {
         customerMessage: customerMessage,
         orderType: orderType,
         isWechatCustomer: data.isWechatCustomer === true,
-        bookingId: editingBookingId || undefined
+        bookingId: editingBookingId || undefined,
+        changedFields: changedFields || undefined   // ⭐ 傳去 Function
     };
 
     const submitBtn = document.getElementById('booking-submit-btn');
@@ -1347,6 +1450,13 @@ function submitBookingAfterUpgrade() {
                 try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {}
             }
 
+            // ⭐ 傳 changedFields 去成功頁（用 sessionStorage，避免 URL 太長）
+            if (changedFields) {
+                try { sessionStorage.setItem('taxiChangedFields', JSON.stringify(changedFields)); } catch(e) {}
+            } else {
+                sessionStorage.removeItem('taxiChangedFields');
+            }
+
             sessionStorage.removeItem('taxiEditingBookingId');
 
             const idParam = newBookingId ? `&id=${encodeURIComponent(newBookingId)}` : '';
@@ -1383,7 +1493,6 @@ function submitBooking(event) {
         return;
     }
 
-    // ⭐ 提交前再檢查一次（防繞過 onchange）
     checkPassengerLimit();
 
     if (!selectedFareMode) {
@@ -1496,7 +1605,7 @@ function submitBooking(event) {
 }
 
 // ============================================
-// ⭐ 修改模式（只讀 URL 參數）
+// ⭐ 修改模式
 // ============================================
 function initEditMode() {
     const params = new URLSearchParams(location.search);
@@ -1531,7 +1640,6 @@ function initEditMode() {
     }
     if (bookingBtn) switchOrderType('booking');
 
-    // ⭐ 還原表單快照
     restoreFormSnapshot();
 }
 
