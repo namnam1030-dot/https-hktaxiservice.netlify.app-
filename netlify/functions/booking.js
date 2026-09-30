@@ -1,4 +1,4 @@
-cconst { google } = require('googleapis');
+const { google } = require('googleapis');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -33,6 +33,7 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
+// 喺「💰...」行之後插入 bookingId
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   const lines = text.split('\n');
@@ -43,7 +44,7 @@ function insertBookingIdAfterFare(text, bookingId) {
       break;
     }
   }
-  const idLine = `🆔 \`${bookingId}\``;
+  const idLine = '🆔 `' + bookingId + '`';
   if (insertIndex >= 0) {
     lines.splice(insertIndex, 0, idLine);
   } else {
@@ -52,22 +53,24 @@ function insertBookingIdAfterFare(text, bookingId) {
   return lines.join('\n');
 }
 
-// 將 changedFields 轉成 Discord diff code block（紅 / 綠）
+// ⭐ 將 changedFields 轉成 Discord diff code block（紅 / 綠）
+// ⚠️ 用 String.fromCharCode(96,96,96) 產生反引號，避免被 Markdown 解析器干擾
 function buildChangedFieldsText(changedFields) {
   if (!changedFields || typeof changedFields !== 'object') return '';
   const keys = Object.keys(changedFields);
   if (keys.length === 0) return '';
 
   const lines = [];
-  for (const key of keys) {
-    const f = changedFields[key];
+  for (let i = 0; i < keys.length; i++) {
+    const f = changedFields[keys[i]];
     if (!f) continue;
-    lines.push(`- ${f.label}：${f.old || '（空）'}`);
-    lines.push(`+ ${f.label}：${f.new || '（空）'}`);
+    lines.push('- ' + f.label + '：' + (f.old || '（空）'));
+    lines.push('+ ' + f.label + '：' + (f.new || '（空）'));
   }
   if (lines.length === 0) return '';
 
-  return '```diff\n' + lines.join('\n') + '\n```';
+  const ticks = String.fromCharCode(96, 96, 96);   // 三個反引號
+  return ticks + 'diff\n' + lines.join('\n') + '\n' + ticks;
 }
 
 exports.handler = async (event) => {
@@ -123,7 +126,7 @@ async function findExistingBooking(bookingId) {
   const calendar = getCalendarClient();
   const res = await calendar.events.list({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
-    privateExtendedProperty: [`bookingId=${bookingId}`],
+    privateExtendedProperty: ['bookingId=' + bookingId],
     maxResults: 1
   });
   const items = res.data.items || [];
@@ -131,13 +134,13 @@ async function findExistingBooking(bookingId) {
   const ev = items[0];
   return {
     eventId: ev.id,
-    bookingId,
-    discordMessageId: ev.extendedProperties?.private?.discordMessageId || null
+    bookingId: bookingId,
+    discordMessageId: (ev.extendedProperties && ev.extendedProperties.private && ev.extendedProperties.private.discordMessageId) || null
   };
 }
 
 function buildCalendarEvent(data, bookingId, discordMessageId) {
-  const startTime = new Date(`${data.date}T${data.time}:00+08:00`);
+  const startTime = new Date(data.date + 'T' + data.time + ':00+08:00');
   const endTime = new Date(startTime);
   endTime.setMinutes(endTime.getMinutes() + 1);
 
@@ -146,7 +149,7 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     : '\n\n[網站預約]';
 
   let description = data.fullMessage || data.customerMessage
-    || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
+    || ('📞 電話：' + data.phone + '\n📍 ' + data.pickup + ' → ' + data.dropoff);
 
   description = description
     .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
@@ -156,11 +159,11 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
 
   description = insertBookingIdAfterFare(description, bookingId);
 
-  const privateProps = { bookingId };
+  const privateProps = { bookingId: bookingId };
   if (discordMessageId) privateProps.discordMessageId = discordMessageId;
 
   return {
-    summary: `🚕 ${data.pickup} → ${data.dropoff} - ${data.carType || '的士預約'}`,
+    summary: '🚕 ' + data.pickup + ' → ' + data.dropoff + ' - ' + (data.carType || '的士預約'),
     description: description + bookingSourceMark,
     start: { dateTime: startTime.toISOString(), timeZone: 'Asia/Hong_Kong' },
     end: { dateTime: endTime.toISOString(), timeZone: 'Asia/Hong_Kong' },
@@ -175,7 +178,7 @@ async function addToGoogleCalendar(data, bookingId, discordMessageId) {
   const resource = buildCalendarEvent(data, bookingId, discordMessageId);
   const result = await calendar.events.insert({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
-    resource,
+    resource: resource,
     sendUpdates: 'all'
   });
   console.log('成功加入日曆：', result.data.htmlLink);
@@ -188,7 +191,7 @@ async function updateGoogleCalendar(existing, data) {
   const result = await calendar.events.patch({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     eventId: existing.eventId,
-    resource,
+    resource: resource,
     sendUpdates: 'all'
   });
   console.log('日曆已更新：', result.data.htmlLink);
@@ -200,16 +203,16 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
     const calendar = getCalendarClient();
     const ev = await calendar.events.get({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
-      eventId
+      eventId: eventId
     });
-    const existing = ev.data.extendedProperties?.private || {};
+    const existing = (ev.data.extendedProperties && ev.data.extendedProperties.private) || {};
+    const merged = Object.assign({}, existing, { discordMessageId: discordMessageId });
+
     await calendar.events.patch({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
-      eventId,
+      eventId: eventId,
       resource: {
-        extendedProperties: {
-          private: { ...existing, discordMessageId }
-        }
+        extendedProperties: { private: merged }
       }
     });
     console.log('已回寫 Discord messageId');
@@ -220,6 +223,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
+
   if (isUpdate) {
     const now = new Date().toLocaleString('zh-HK', {
       timeZone: 'Asia/Hong_Kong',
@@ -227,7 +231,8 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-    let header = `🔄 **【訂單已修改】** _(${now})_\n`;
+
+    let header = '🔄 **【訂單已修改】** _(' + now + ')_\n';
 
     const diffText = buildChangedFieldsText(changedFields);
     if (diffText) {
@@ -238,22 +243,23 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
     header += '**最新訂單內容：**\n';
     body = header + body;
   }
+
   body = insertBookingIdAfterFare(body, bookingId);
   return body;
 }
 
-async function sendDiscordNotification(data, bookingId, waitForId, isUpdate = false, changedFields = null) {
+async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, changedFields) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) {
     console.log('Discord 未設定，跳過通知');
     return null;
   }
 
-  const message = buildDiscordMessage(data, bookingId, isUpdate, changedFields);
+  const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
   const reqBody = JSON.stringify({ content: message, flags: 4 });
 
   if (waitForId) {
-    const urlWithWait = webhookUrl + (webhookUrl.includes('?') ? '&' : '?') + 'wait=true';
+    const urlWithWait = webhookUrl + (webhookUrl.indexOf('?') >= 0 ? '&' : '?') + 'wait=true';
     try {
       const res = await fetch(urlWithWait, {
         method: 'POST',
@@ -265,7 +271,7 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate = fa
         console.log('Discord 已發送（含 messageId）：', json.id);
         return json.id;
       }
-      const errText = await res.text().catch(() => '');
+      const errText = await res.text().catch(function() { return ''; });
       console.warn('[Discord] wait=true 失敗，改用普通 POST。狀態:', res.status, errText);
     } catch (e) {
       console.warn('[Discord] wait=true 拋錯，改用普通 POST:', e.message);
@@ -281,7 +287,7 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate = fa
     if (res.ok) {
       console.log('Discord 通知已發送（無 messageId）');
     } else {
-      const errText = await res.text().catch(() => '');
+      const errText = await res.text().catch(function() { return ''; });
       console.error('[Discord] 普通 POST 失敗。狀態:', res.status, errText);
     }
     return null;
@@ -291,7 +297,7 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate = fa
   }
 }
 
-// ⭐ 新增：刪除 Discord 訊息
+// 刪除 Discord 訊息
 async function deleteDiscordMessage(messageId) {
   if (!messageId) return false;
 
@@ -304,16 +310,15 @@ async function deleteDiscordMessage(messageId) {
     return false;
   }
 
-  const deleteUrl = `https://discord.com/api/webhooks/${wh.id}/${wh.token}/messages/${messageId}`;
+  const deleteUrl = 'https://discord.com/api/webhooks/' + wh.id + '/' + wh.token + '/messages/' + messageId;
 
   try {
     const res = await fetch(deleteUrl, { method: 'DELETE' });
     if (res.ok || res.status === 404) {
-      // 404 = 訊息已經唔存在，都算成功
       console.log('Discord 舊訊息已刪除（或不存在）：', messageId);
       return true;
     }
-    const errText = await res.text().catch(() => '');
+    const errText = await res.text().catch(function() { return ''; });
     console.error('[Discord] 刪除失敗。狀態:', res.status, errText);
     return false;
   } catch (e) {
