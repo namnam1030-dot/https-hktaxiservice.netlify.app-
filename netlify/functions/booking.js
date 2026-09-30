@@ -439,6 +439,12 @@ async function updateDiscordNotification(existing, data, changedFields) {
 function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.customerMessage || data.description || '收到新訂單';
 
+  // ⭐ 清理 Discord Markdown 格式，變返乾淨純文字
+  // [88887799](tel:88887799) → 88887799
+  body = body.replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1');
+  // [WhatsApp](<https://wa.me/...>) → https://wa.me/...
+  body = body.replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '$1');
+
   let header = '';
   if (isUpdate) {
     const now = new Date().toLocaleString('zh-HK', {
