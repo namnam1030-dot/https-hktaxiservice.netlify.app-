@@ -343,7 +343,7 @@
         white-space: nowrap;
     }
 
-    /* ⭐ 修改太遲 Modal 淺色主題 */
+/* ⭐ 修改太遲 Modal 淺色主題 */
     html.light-theme body #edit-too-late-modal > div {
         background-color: #FFFFFF !important;
         border-color: #dc2626 !important;
@@ -353,6 +353,15 @@
     }
     html.light-theme body #edit-too-late-modal p {
         color: #374151 !important;
+    }
+
+    /* ⭐ 修改太遲 Modal 內嘅「返回主頁」按鈕：同成功頁保持一致 */
+    html.light-theme body #edit-too-late-back-btn {
+        background-color: #E5E7EB !important;
+        color: #000000 !important;
+    }
+    html.light-theme body #edit-too-late-back-btn:hover {
+        background-color: #D1D5DB !important;
     }
 </style>
 </head>
@@ -684,7 +693,7 @@
                 <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-phone text-xl"></i> 致電 6881 5441
                 </a>
-                <button onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
+<button id="edit-too-late-back-btn" onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁
                 </button>
             </div>
