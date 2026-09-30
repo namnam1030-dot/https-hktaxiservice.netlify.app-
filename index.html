@@ -183,7 +183,6 @@
         font-size: 16px !important;
     }
 
-    /* ⭐⭐⭐ Android 強化版 pac-container ⭐⭐⭐ */
     .pac-container {
         background-color: #1E1E1E !important;
         color: #ffffff !important;
@@ -218,7 +217,6 @@
         margin-right: 8px !important;
     }
 
-    /* ⭐⭐⭐ 淡化 powered by Google ⭐⭐⭐ */
     .pac-container::after {
         opacity: 0.15 !important;
         transform: scale(0.65) !important;
@@ -236,7 +234,6 @@
         user-select: none !important;
     }
 
-    /* ⭐ 動態推開：pac-container 出現時，容器加 margin-bottom */
     .pac-pushed {
         transition: margin-bottom 0.15s ease !important;
     }
@@ -280,6 +277,171 @@
         background-color: #FFF200 !important;
         color: #000000 !important;
         border: 1px solid #000000 !important;
+    }
+
+    /* =========================================================
+       ⭐ 查詢 / 修改預約（浮動按鈕）
+       ========================================================= */
+    #lookup-float-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #FFF200;
+        color: #000000;
+        border: 2px solid #000000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        z-index: 55;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    #lookup-float-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+    }
+    #lookup-float-btn:active {
+        transform: scale(0.95);
+    }
+    html.light-theme body #lookup-float-btn {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+    }
+
+    #lookup-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 200;
+    }
+    #lookup-modal.hidden {
+        display: none;
+    }
+
+    #lookup-modal .lookup-box {
+        background: #161616;
+        border: 2px solid #FFF200;
+        border-radius: 20px;
+        padding: 28px 24px 24px;
+        max-width: 400px;
+        width: 100%;
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    html.light-theme body #lookup-modal .lookup-box {
+        background: #FFFFFF !important;
+        border-color: #000000 !important;
+    }
+
+    #lookup-modal .lookup-close {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        background: transparent;
+        border: none;
+        color: #9CA3AF;
+        font-size: 24px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 4px;
+    }
+    html.light-theme body #lookup-modal .lookup-close {
+        color: #6B7280 !important;
+    }
+
+    #lookup-modal h3 {
+        color: #FFFFFF;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        text-align: center;
+    }
+    html.light-theme body #lookup-modal h3 {
+        color: #000000 !important;
+    }
+
+    #lookup-modal p.lookup-desc {
+        color: #9CA3AF;
+        font-size: 13px;
+        text-align: center;
+        margin-bottom: 18px;
+        line-height: 1.5;
+    }
+    html.light-theme body #lookup-modal p.lookup-desc {
+        color: #4B5563 !important;
+    }
+
+    #lookup-modal label {
+        display: block;
+        color: #D1D5DB;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    html.light-theme body #lookup-modal label {
+        color: #000000 !important;
+    }
+
+    #lookup-modal input {
+        width: 100%;
+        background: #0B0B0B;
+        border: 1px solid #374151;
+        color: #FFFFFF;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 16px;
+        margin-bottom: 14px;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+    #lookup-modal input:focus {
+        border-color: #FFF200;
+    }
+    html.light-theme body #lookup-modal input {
+        background: #FFFFFF !important;
+        border-color: #D1D5DB !important;
+        color: #000000 !important;
+    }
+
+    #lookup-submit-btn {
+        width: 100%;
+        background: #FFF200;
+        color: #000000;
+        border: 1px solid #000000;
+        font-weight: 700;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+    }
+    #lookup-submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    #lookup-submit-btn:active {
+        opacity: 0.85;
+    }
+
+    #lookup-error {
+        color: #EF4444;
+        font-size: 14px;
+        margin-bottom: 10px;
+        text-align: center;
+        min-height: 20px;
+        line-height: 1.4;
     }
 </style>
 </head>
@@ -499,12 +661,37 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
 
+    <!-- ⭐ 查詢 / 修改預約 浮動按鈕 -->
+    <button id="lookup-float-btn" onclick="openLookupModal()" title="查詢 / 修改預約" aria-label="查詢或修改預約">
+        <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+
+    <!-- ⭐ 查詢 / 修改預約 Modal -->
+    <div id="lookup-modal" class="hidden" role="dialog" aria-modal="true">
+        <div class="lookup-box">
+            <button class="lookup-close" onclick="closeLookupModal()" aria-label="關閉">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 data-i18n="lookup_title">查詢 / 修改預約</h3>
+            <p class="lookup-desc" data-i18n="lookup_desc">輸入預約編號及預約時使用嘅電話號碼</p>
+
+            <label data-i18n="lookup_label_id">預約編號（4 位數字）</label>
+            <input type="tel" id="lookup-booking-id" maxlength="4" inputmode="numeric" pattern="\d{4}" placeholder="1234" autocomplete="off">
+
+            <label data-i18n="lookup_label_phone">聯絡電話</label>
+            <input type="tel" id="lookup-phone" inputmode="numeric" placeholder="例：9123 4567" autocomplete="off">
+
+            <div id="lookup-error"></div>
+
+            <button id="lookup-submit-btn" onclick="submitLookup()" data-i18n="lookup_btn">查詢預約</button>
+        </div>
+    </div>
+
 <script>
 // ============================================
 // 跨頁面共享函數
 // ============================================
 
-// ⭐ 加入 placeId 欄
 function saveRouteDataToLocalStorage() {
     const pickupEl = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -530,7 +717,6 @@ function saveRouteDataToLocalStorage() {
     localStorage.setItem('taxiRouteData', JSON.stringify(data));
 }
 
-// ⭐ 同步恢復 placeId
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
@@ -574,7 +760,6 @@ function loadRouteDataFromLocalStorage() {
     }
 }
 
-// ⭐ 清 placeId
 function clearAllInputs() {
     const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
     ids.forEach(id => {
@@ -602,9 +787,6 @@ function clearAllInputs() {
     document.getElementById('calc-pickup')?.focus();
 }
 
-// ============================================
-// ⭐ 零打擾版：冇 placeId 就靜默 geocode 補返（唔彈 confirm）
-// ============================================
 function calculateAndGoToResult() {
     const pickupEl  = document.getElementById('calc-pickup');
     const dropoffEl = document.getElementById('calc-dropoff');
@@ -618,7 +800,6 @@ function calculateAndGoToResult() {
         return;
     }
 
-    // ⭐ 收集所有要補 placeId 嘅欄位
     const fields = [
         { el: pickupEl,  val: pickupVal },
         { el: dropoffEl, val: dropoffVal }
@@ -629,7 +810,6 @@ function calculateAndGoToResult() {
         if (v) fields.push({ el, val: v });
     }
 
-    // ⭐ 邊個冇 placeId 就背景 geocode（冇 popup、冇 confirm）
     const tasks = [];
     fields.forEach(f => {
         if (!f.el.dataset.placeId) {
@@ -641,7 +821,6 @@ function calculateAndGoToResult() {
         }
     });
 
-    // ⭐ 顯示 loading（避免用戶連撳）
     const btn = document.getElementById('calc-fare-btn');
     if (btn) {
         btn.disabled = true;
@@ -652,21 +831,16 @@ function calculateAndGoToResult() {
         }</span>`;
     }
 
-    // ⭐ 全部補完（或者 timeout）就跳頁
     Promise.all(tasks).then(() => {
         localStorage.removeItem('taxiBookingData');
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     }).catch(() => {
-        // 就算出錯都照跳（result.html 有 fallback）
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     });
 }
 
-// ============================================
-// ⭐ 靜默 geocode：補 placeId，失敗就當冇，唔會 throw
-// ============================================
 function geocodeSilently(text) {
     return new Promise(resolve => {
         if (!text || !window.google || !google.maps.Geocoder) return resolve('');
@@ -674,7 +848,6 @@ function geocodeSilently(text) {
         let settled = false;
         const done = v => { if (!settled) { settled = true; resolve(v); } };
 
-        // ⏰ 4 秒硬 timeout，唔想拖慢用戶
         const timeout = setTimeout(() => done(''), 4000);
 
         try {
@@ -691,7 +864,7 @@ function geocodeSilently(text) {
                     if (status === 'OK' && results && results[0] && results[0].place_id) {
                         done(results[0].place_id);
                     } else {
-                        done('');   // 搵唔到就當冇，result.html 有 fallback
+                        done('');
                     }
                 }
             );
@@ -789,7 +962,7 @@ function swapStopoverValues(fromIndex, toIndex) {
 }
 
 // ============================================
-// 語音辨識（完全保留原版，冇改過）
+// 語音辨識
 // ============================================
 function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1004,7 +1177,12 @@ const translations = {
         voice_btn_text: "[起點] 經 [中途站] 去 [目的地]",
         btn_calc_fare: "立即預計車費",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
+        lookup_title: "查詢 / 修改預約",
+        lookup_desc: "輸入預約編號及預約時使用嘅電話號碼",
+        lookup_label_id: "預約編號（4 位數字）",
+        lookup_label_phone: "聯絡電話",
+        lookup_btn: "查詢預約"
     },
     en: {
         btn_more_payment: "More Options",
@@ -1059,7 +1237,12 @@ const translations = {
         voice_btn_text: "Speak your trip...",
         btn_calc_fare: "Calculate Estimated Fare",
         whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
+        lookup_title: "Search / Edit Booking",
+        lookup_desc: "Enter your booking ID and the phone number used for booking",
+        lookup_label_id: "Booking ID (4 digits)",
+        lookup_label_phone: "Phone Number",
+        lookup_btn: "Search Booking"
     }
 };
 
@@ -1104,7 +1287,7 @@ function applyLanguage() {
 }
 
 // ============================================
-// ⭐⭐⭐ pac-container 動態處理（隱藏空、推開有建議）
+// pac-container 動態處理
 // ============================================
 const pushedMap = new Map();
 
@@ -1120,17 +1303,14 @@ function setupPacWatcher() {
             const hasItems = items.length > 0;
             const rect = pc.getBoundingClientRect();
 
-            // ⭐ 如果冇建議（空 pac-container），完全隱藏
             if (!hasItems || rect.height < 40) {
                 pc.style.setProperty('display', 'none', 'important');
                 return;
             }
 
-            // 有建議，正常顯示
             pc.style.removeProperty('display');
             seenPacs.add(pc);
 
-            // 搵對應 input
             const input = findInputForPac(pc);
             if (!input) return;
 
@@ -1143,7 +1323,6 @@ function setupPacWatcher() {
             pushedMap.set(container, pc);
         });
 
-        // 清理唔再需要推開嘅
         pushedMap.forEach((pc, container) => {
             if (!seenPacs.has(pc)) {
                 container.style.marginBottom = '';
@@ -1154,7 +1333,6 @@ function setupPacWatcher() {
     }, 150);
 }
 
-// ⭐ 用位置搵對應 input
 function findInputForPac(pc) {
     const pcRect = pc.getBoundingClientRect();
     let bestInput = null;
@@ -1174,7 +1352,7 @@ function findInputForPac(pc) {
 }
 
 // ============================================
-// ⭐ Autocomplete（保留用戶輸入）
+// Autocomplete
 // ============================================
 function initAutocomplete() {
     console.log('[TaxiRoute] initAutocomplete 已觸發');
@@ -1213,7 +1391,6 @@ function _attachAutocompletes() {
         const el = document.getElementById(inputId);
         if (!el) return;
 
-        // ⭐ 每個 input 一個 suppress flag
         let suppressInput = false;
 
         const ac = new google.maps.places.Autocomplete(el, options);
@@ -1221,7 +1398,6 @@ function _attachAutocompletes() {
         ac.addListener('place_changed', () => {
             const place = ac.getPlace();
             suppressInput = true;
-            // ⭐ 保留用戶打嘅字，唔覆蓋 el.value
             if (place && place.place_id) el.dataset.placeId = place.place_id;
             toggleClearBtn(inputId, btnId);
             setTimeout(() => { suppressInput = false; }, 400);
@@ -1347,25 +1523,163 @@ function swapLocations() {
 }
 
 // ============================================
+// ⭐ 查詢 / 修改預約（浮動按鈕）
+// ============================================
+const LOOKUP_MAX_ATTEMPTS = 3;
+const LOOKUP_LOCK_MINUTES = 30;
+const LOOKUP_LOCK_KEY = 'taxiLookupLockedUntil';
+const LOOKUP_ATTEMPTS_KEY = 'taxiLookupAttempts';
+
+function isLookupLocked() {
+    const lockedUntil = parseInt(localStorage.getItem(LOOKUP_LOCK_KEY) || '0', 10);
+    return Date.now() < lockedUntil;
+}
+
+function getLookupLockRemainingMinutes() {
+    const lockedUntil = parseInt(localStorage.getItem(LOOKUP_LOCK_KEY) || '0', 10);
+    if (Date.now() >= lockedUntil) return 0;
+    return Math.ceil((lockedUntil - Date.now()) / 60000);
+}
+
+function recordLookupFailure() {
+    let attempts = parseInt(localStorage.getItem(LOOKUP_ATTEMPTS_KEY) || '0', 10);
+    attempts += 1;
+    localStorage.setItem(LOOKUP_ATTEMPTS_KEY, String(attempts));
+
+    if (attempts >= LOOKUP_MAX_ATTEMPTS) {
+        const lockUntil = Date.now() + LOOKUP_LOCK_MINUTES * 60 * 1000;
+        localStorage.setItem(LOOKUP_LOCK_KEY, String(lockUntil));
+        localStorage.removeItem(LOOKUP_ATTEMPTS_KEY);
+        return { locked: true, remaining: 0 };
+    }
+    return { locked: false, remaining: LOOKUP_MAX_ATTEMPTS - attempts };
+}
+
+function resetLookupAttempts() {
+    localStorage.removeItem(LOOKUP_ATTEMPTS_KEY);
+    localStorage.removeItem(LOOKUP_LOCK_KEY);
+}
+
+function openLookupModal() {
+    const modal = document.getElementById('lookup-modal');
+    if (!modal) return;
+
+    if (isLookupLocked()) {
+        const remaining = getLookupLockRemainingMinutes();
+        alert(currentLang === 'en'
+            ? 'Too many failed attempts. Please try again in ' + remaining + ' minutes.'
+            : '嘗試次數過多，請於 ' + remaining + ' 分鐘後再試。');
+        return;
+    }
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(function() {
+        const input = document.getElementById('lookup-booking-id');
+        if (input) input.focus();
+    }, 100);
+
+    const errEl = document.getElementById('lookup-error');
+    if (errEl) errEl.textContent = '';
+}
+
+function closeLookupModal() {
+    const modal = document.getElementById('lookup-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function submitLookup() {
+    const errEl = document.getElementById('lookup-error');
+    const submitBtn = document.getElementById('lookup-submit-btn');
+    const bookingIdInput = document.getElementById('lookup-booking-id');
+    const phoneInput = document.getElementById('lookup-phone');
+
+    const bookingId = (bookingIdInput && bookingIdInput.value || '').trim();
+    const phone = (phoneInput && phoneInput.value || '').trim();
+
+    if (errEl) errEl.textContent = '';
+
+    if (!/^\d{4}$/.test(bookingId)) {
+        if (errEl) errEl.textContent = currentLang === 'en'
+            ? 'Please enter a 4-digit booking ID.'
+            : '請輸入 4 位數字預約編號。';
+        return;
+    }
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length < 4) {
+        if (errEl) errEl.textContent = currentLang === 'en'
+            ? 'Please enter a valid phone number.'
+            : '請輸入有效嘅電話號碼。';
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = currentLang === 'en' ? 'Searching...' : '搜尋中...';
+    }
+
+    fetch('/.netlify/functions/lookup-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId: bookingId, phone: phone })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            resetLookupAttempts();
+
+            try {
+                sessionStorage.setItem('taxiEditingBookingId', bookingId);
+                sessionStorage.setItem('taxiLookupResult', JSON.stringify(data.orderData || {}));
+            } catch(e) {}
+
+            window.location.href = 'booking.html?edit=' + encodeURIComponent(bookingId);
+        } else {
+            const failInfo = recordLookupFailure();
+            if (failInfo.locked) {
+                if (errEl) errEl.textContent = currentLang === 'en'
+                    ? 'Too many failed attempts. Locked for 30 minutes.'
+                    : '嘗試次數過多，已鎖定 30 分鐘。';
+            } else {
+                const msg = data.error || (currentLang === 'en' ? 'Not found.' : '搵唔到呢個預約。');
+                if (errEl) errEl.textContent = msg + (currentLang === 'en'
+                    ? ' (' + failInfo.remaining + ' attempts left)'
+                    : '（剩 ' + failInfo.remaining + ' 次機會）');
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = currentLang === 'en' ? 'Search Booking' : '查詢預約';
+            }
+        }
+    })
+    .catch(function(err) {
+        console.error('[Lookup] 錯誤：', err);
+        recordLookupFailure();
+        if (errEl) errEl.textContent = currentLang === 'en'
+            ? 'Network error. Please try again.'
+            : '網絡錯誤，請重試。';
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = currentLang === 'en' ? 'Search Booking' : '查詢預約';
+        }
+    });
+}
+
+// ============================================
 // 頁面初始化
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
 
-    // ⭐ 清走殘留嘅編輯 ID（除非係由 booking.html 嘅「修改路線」跳過嚟）
-    const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get('from') !== 'edit') {
-        sessionStorage.removeItem('taxiEditingBookingId');
-    }
-
     const returning = sessionStorage.getItem('returningFromResult') === '1';
     sessionStorage.removeItem('returningFromResult');
 
-    // ⭐ PART 2：檢查係咪修改模式
     const isEditMode = !!sessionStorage.getItem('taxiEditingBookingId');
 
     if (returning || isEditMode) {
-        // 修改模式：保留路線資料，唔清走
         loadRouteDataFromLocalStorage();
     } else {
         localStorage.removeItem('taxiRouteData');
@@ -1388,11 +1702,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setupStopoverDragging();
+
+    // ⭐ 查詢 Modal：點背景 / ESC 關閉
+    const lookupModal = document.getElementById('lookup-modal');
+    if (lookupModal) {
+        lookupModal.addEventListener('click', function(e) {
+            if (e.target === lookupModal) closeLookupModal();
+        });
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const m = document.getElementById('lookup-modal');
+            if (m && !m.classList.contains('hidden')) closeLookupModal();
+        }
+    });
+
+    // ⭐ 查詢 Modal：輸入框按 Enter 直接提交
+    const lookupIdInput = document.getElementById('lookup-booking-id');
+    const lookupPhoneInput = document.getElementById('lookup-phone');
+    if (lookupIdInput) {
+        lookupIdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                lookupPhoneInput && lookupPhoneInput.focus();
+            }
+        });
+    }
+    if (lookupPhoneInput) {
+        lookupPhoneInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitLookup();
+            }
+        });
+    }
 });
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
