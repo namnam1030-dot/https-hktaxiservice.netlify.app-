@@ -342,6 +342,18 @@
         cursor: pointer;
         white-space: nowrap;
     }
+
+    /* ⭐ 修改太遲 Modal 淺色主題 */
+    html.light-theme body #edit-too-late-modal > div {
+        background-color: #FFFFFF !important;
+        border-color: #dc2626 !important;
+    }
+    html.light-theme body #edit-too-late-modal h3 {
+        color: #000000 !important;
+    }
+    html.light-theme body #edit-too-late-modal p {
+        color: #374151 !important;
+    }
 </style>
 </head>
 <body class="antialiased">
@@ -652,6 +664,32 @@
         </div>
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
+
+    <!-- ⭐ 修改太遲提示 Modal -->
+    <div id="edit-too-late-modal" class="hidden fixed inset-0 z-[999] bg-black/85 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
+            <div class="text-red-500 text-5xl mb-3">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-white mb-3">距離出發時間不足 45 分鐘</h3>
+            <p class="text-lg text-gray-300 mb-6 leading-relaxed">如需更改訂單請與我們聯絡。</p>
+
+            <div class="flex flex-col gap-3">
+                <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp 查詢
+                </a>
+                <button onclick="showWeComQR()" class="wechat-query-btn w-full font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-brands fa-weixin text-xl"></i> WeChat 查詢
+                </button>
+                <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-phone text-xl"></i> 致電 6881 5441
+                </a>
+                <button onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁
+                </button>
+            </div>
+        </div>
+    </div>
 
 <script>
 // ============================================
@@ -1390,7 +1428,6 @@ function submitBookingAfterUpgrade() {
         isWechatCustomer: data.isWechatCustomer === true,
         bookingId: editingBookingId || undefined,
         changedFields: changedFields || undefined,
-        // ⭐ 車費資料（存入 extendedProperties）
         currentBaseFare: currentBaseFare,
         currentTunnelFee: currentTunnelFee,
         selectedFareMode: selectedFareMode,
@@ -1587,6 +1624,53 @@ function submitBooking(event) {
     }
 }
 
+// ⭐ 檢查距離出發時間是否 < 45 分鐘
+function isTooLateToEdit() {
+    var dateStr = '';
+    var timeStr = '';
+
+    try {
+        var lookupRaw = sessionStorage.getItem('taxiLookupResult');
+        if (lookupRaw) {
+            var o = JSON.parse(lookupRaw);
+            dateStr = o.date || '';
+            timeStr = o.time || '';
+        }
+    } catch(e) {}
+
+    if (!dateStr || !timeStr) {
+        try {
+            var snapRaw = localStorage.getItem('taxiEditPrefillData');
+            if (snapRaw) {
+                var s = JSON.parse(snapRaw);
+                dateStr = s.date || '';
+                timeStr = s.time || '';
+            }
+        } catch(e) {}
+    }
+
+    if (!dateStr || !timeStr) return false;
+
+    var target = new Date(dateStr + 'T' + timeStr + ':00+08:00');
+    if (isNaN(target.getTime())) return false;
+
+    var diffMin = (target.getTime() - Date.now()) / (1000 * 60);
+    return diffMin < 45;
+}
+
+// ⭐ 顯示「修改太遲」Modal
+function showEditTooLateModal() {
+    var modal = document.getElementById('edit-too-late-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    var banner = document.getElementById('edit-mode-banner');
+    if (banner) banner.classList.add('hidden');
+    var submitBtn = document.getElementById('booking-submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+}
+
 function initEditMode() {
     var params = new URLSearchParams(location.search);
     var editId = params.get('edit');
@@ -1594,6 +1678,12 @@ function initEditMode() {
     if (!editId) {
         sessionStorage.removeItem('taxiEditingBookingId');
         editingBookingId = null;
+        return;
+    }
+
+    // ⭐ 檢查 < 45 分鐘
+    if (isTooLateToEdit()) {
+        showEditTooLateModal();
         return;
     }
 
@@ -1633,7 +1723,6 @@ function applyLookupResultIfAny() {
         var o = JSON.parse(raw);
         console.log('[Lookup] 用 server 資料預填：', o);
 
-        // ⭐ 1) 寫返 taxiRouteData 落 localStorage
         var stopoversArr = [];
         if (o.stopovers) {
             stopoversArr = String(o.stopovers).split('、').filter(Boolean);
@@ -1648,7 +1737,6 @@ function applyLookupResultIfAny() {
         };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
 
-        // ⭐ 2) 更新路線摘要顯示
         var pickupEl = document.getElementById('booking-pickup-display');
         var dropoffEl = document.getElementById('booking-dropoff-display');
         if (pickupEl) pickupEl.innerText = o.pickup || '-';
@@ -1662,7 +1750,6 @@ function applyLookupResultIfAny() {
 
         switchOrderType('booking');
 
-        // ⭐ 3) 恢復車費資料
         if (typeof o.baseFare === 'number' && o.baseFare > 0) {
             currentBaseFare = o.baseFare;
         }
@@ -1676,7 +1763,6 @@ function applyLookupResultIfAny() {
             selectedFareMode = o.selectedFareMode;
         }
 
-        // ⭐ 4) 表單欄位預填
         if (o.date) {
             var elD = document.getElementById('date');
             if (elD) elD.value = o.date;
@@ -1739,7 +1825,6 @@ function applyLookupResultIfAny() {
         var wxEl = document.getElementById('is_wechat_customer');
         if (wxEl) wxEl.checked = !!o.isWechatCustomer;
 
-        // ⭐ 5) 車款還原
         if (o.carDisplayText) {
             var cd = String(o.carDisplayText);
             if (cd.indexOf('MIFA') >= 0) {
@@ -1780,7 +1865,6 @@ function applyLookupResultIfAny() {
             }
         }
 
-        // ⭐ 6) 收費模式（如 o.feeMode 有值覆蓋）
         if (o.feeMode) {
             if (String(o.feeMode).indexOf('八五折') >= 0) {
                 selectedFareMode = 'discount';
@@ -1791,11 +1875,7 @@ function applyLookupResultIfAny() {
 
         updateCarDisplay();
 
-        // ⭐ 7) 建立 baseline snapshot（清舊，用啱填好嘅 DOM 建新）
-        localStorage.removeItem('taxiEditPrefillData');
-        saveFormSnapshot(o.carDisplayText || '');
-
-// ⭐ 8) 同步 taxiBookingData（否則轉去 fleet 頁會冇車費）
+        // ⭐ 同步 taxiBookingData（否則轉去 fleet 頁會冇車費）
         try {
             var bookingSnapshot = {
                 selectedCarName: selectedCarName,
@@ -1814,7 +1894,9 @@ function applyLookupResultIfAny() {
             console.error('[Lookup] 同步 taxiBookingData 失敗：', e);
         }
 
-        // ⭐ 9) 清走 lookup 結果
+        localStorage.removeItem('taxiEditPrefillData');
+        saveFormSnapshot(o.carDisplayText || '');
+
         sessionStorage.removeItem('taxiLookupResult');
 
         console.log('[Lookup] 預填完成');
