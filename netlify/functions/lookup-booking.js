@@ -24,18 +24,48 @@ function getCalendarClient() {
   return google.calendar({ version: 'v3', auth });
 }
 
-// 只保留數字（方便對比電話）
-function cleanPhone(s) {
-  return String(s || '').replace(/\D/g, '');
-}
-
 // 由 description 抽電話（舊訂單 fallback）
 function extractPhoneFromDescription(description) {
   if (!description) return '';
-  // 匹配「📞 電話：9123 4567」或「📞 電話：+852 9123 4567」等格式
   const m = description.match(/📞\s*電話[：:]\s*([+\d\s\-()]+)/);
   if (!m) return '';
-  return cleanPhone(m[1]);
+  return String(m[1]).replace(/\D/g, '');
+}
+
+// ⭐ 產生電話候選集
+// 規則：
+//   8 位        → [8位, 852+8位]（香港號碼）
+//   11位 852開頭 → [11位, 去852後8位]（香港號碼帶國碼）
+//   其他         → [原值]（大陸號碼、錯誤輸入等）
+function phoneCandidates(input) {
+  const d = String(input || '').replace(/\D/g, '');
+  const result = [];
+  if (!d) return result;
+
+  if (d.length === 8) {
+    result.push(d);
+    result.push('852' + d);
+  } else if (d.length === 11 && d.indexOf('852') === 0) {
+    result.push(d);
+    result.push(d.slice(3));
+  } else {
+    result.push(d);
+  }
+  return result;
+}
+
+// ⭐ 比對兩個電話（候選集交集唔為空 = 匹配）
+function phoneMatches(inputPhone, storedPhone) {
+  const inputCands = phoneCandidates(inputPhone);
+  const storedCands = phoneCandidates(storedPhone);
+  if (inputCands.length === 0 || storedCands.length === 0) return false;
+
+  for (let i = 0; i < inputCands.length; i++) {
+    for (let j = 0; j < storedCands.length; j++) {
+      if (inputCands[i] === storedCands[j]) return true;
+    }
+  }
+  return false;
 }
 
 exports.handler = async (event) => {
@@ -50,21 +80,24 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const inputBookingId = String(body.bookingId || '').trim();
-    const inputPhone = cleanPhone(body.phone);
+    const inputPhoneRaw = String(body.phone || '').replace(/\D/g, '');
 
-    // 基本驗證
+    // ⭐ 驗證：bookingId 必須 4 位數字
     if (!inputBookingId || !/^\d{4}$/.test(inputBookingId)) {
       return err(400, '請輸入 4 位數字預約編號');
     }
-    if (!inputPhone || inputPhone.length < 4) {
-      return err(400, '請輸入有效嘅電話號碼');
+
+    // ⭐ 驗證：8 位（港）或 11 位（大陸 / 852+8）
+    const validLen = inputPhoneRaw.length === 8 || inputPhoneRaw.length === 11;
+
+    if (!validLen) {
+      return err(400, '請輸入 8 位或 11 位數字電話號碼');
     }
 
-    console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，phone:', inputPhone);
+    console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，phone:', inputPhoneRaw);
 
     const calendar = getCalendarClient();
 
-    // 用 bookingId 搵 event
     const res = await calendar.events.list({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       privateExtendedProperty: ['bookingId=' + inputBookingId],
@@ -84,33 +117,21 @@ exports.handler = async (event) => {
     let phoneMatch = false;
     let matchSource = '';
 
-    // 1) 優先對比 extendedProperties.phone
     if (ext.phone) {
-      if (cleanPhone(ext.phone) === inputPhone) {
+      if (phoneMatches(inputPhoneRaw, ext.phone)) {
         phoneMatch = true;
         matchSource = 'extendedProperties';
-      } else if (cleanPhone(ext.phone).endsWith(inputPhone) && inputPhone.length >= 4) {
-        // 允許輸入後 4 位（客人可能只記後 4 位）
-        phoneMatch = true;
-        matchSource = 'extendedProperties-suffix';
       }
     }
 
-    // 2) Fallback：由 description 抽電話
     if (!phoneMatch) {
       const descPhone = extractPhoneFromDescription(ev.description);
-      if (descPhone) {
-        if (descPhone === inputPhone) {
-          phoneMatch = true;
-          matchSource = 'description';
-        } else if (descPhone.endsWith(inputPhone) && inputPhone.length >= 4) {
-          phoneMatch = true;
-          matchSource = 'description-suffix';
-        }
+      if (descPhone && phoneMatches(inputPhoneRaw, descPhone)) {
+        phoneMatch = true;
+        matchSource = 'description';
       }
     }
 
-    // 3) 都搵唔到 → 失敗
     if (!phoneMatch) {
       console.log('[Lookup] 電話唔匹配');
       return err(403, '預約編號或電話唔正確');
@@ -121,7 +142,6 @@ exports.handler = async (event) => {
     // ===== 組裝返回資料 =====
     let orderData = {};
 
-    // 新訂單：有完整 extendedProperties
     if (ext.pickup || ext.dropoff || ext.date) {
       orderData = {
         pickup: ext.pickup || '',
@@ -143,15 +163,11 @@ exports.handler = async (event) => {
         feeMode: ext.feeMode || ''
       };
     } else {
-      // 舊訂單：只有 description，盡量抽取可填嘅欄位
       const desc = ev.description || '';
-
-      // 起點：由 summary 抽「🚕 XXX → YYY」
       const summaryMatch = (ev.summary || '').match(/🚕\s*(.+?)\s*→\s*(.+?)\s*-\s*/);
       const pickupFromSummary = summaryMatch ? summaryMatch[1].trim() : '';
       const dropoffFromSummary = summaryMatch ? summaryMatch[2].trim() : '';
 
-      // 由 description 抽起點 / 終點 / 人數 / 電話
       const pickupMatch = desc.match(/📍\s*起點[：:]\s*(.+)/);
       const dropoffMatch = desc.match(/🏁\s*終點[：:]\s*(.+)/);
       const passengersMatch = desc.match(/👥\s*人數[：:]\s*(.+)/);
@@ -172,11 +188,11 @@ exports.handler = async (event) => {
         payments: paymentMatch ? paymentMatch[1].trim() : '',
         contactTitle: '',
         contactSurname: surnameMatch ? surnameMatch[1].trim() : '',
-        phone: inputPhone,
+        phone: inputPhoneRaw,
         isWechatCustomer: false,
         carDisplayText: '',
         feeMode: '',
-        isLegacy: true   // ⭐ 標記係舊訂單，前端可提示
+        isLegacy: true
       };
     }
 
