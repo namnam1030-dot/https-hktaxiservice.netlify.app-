@@ -1635,6 +1635,33 @@ function applyLookupResultIfAny() {
         var o = JSON.parse(raw);
         console.log('[Lookup] 用 server 資料預填：', o);
 
+        // ⭐ 1) 寫返 taxiRouteData 落 localStorage（否則路線摘要 & 提交會冇路線）
+        var stopoversArr = [];
+        if (o.stopovers) {
+            stopoversArr = String(o.stopovers).split('、').filter(Boolean);
+        }
+        var routeData = {
+            pickup: o.pickup || '',
+            pickupPlaceId: '',
+            dropoff: o.dropoff || '',
+            dropoffPlaceId: '',
+            stopovers: stopoversArr,
+            stopoverPlaceIds: stopoversArr.map(function() { return ''; })
+        };
+        localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
+
+        // ⭐ 2) 更新路線摘要顯示
+        var pickupEl = document.getElementById('booking-pickup-display');
+        var dropoffEl = document.getElementById('booking-dropoff-display');
+        if (pickupEl) pickupEl.innerText = o.pickup || '-';
+        if (dropoffEl) dropoffEl.innerText = o.dropoff || '-';
+        if (stopoversArr.length > 0) {
+            var stopoverWrapper = document.getElementById('booking-stopover-display-wrapper');
+            var stopoverDisplay = document.getElementById('booking-stopover-display');
+            if (stopoverDisplay) stopoverDisplay.innerText = stopoversArr.join(' ➔ ');
+            if (stopoverWrapper) stopoverWrapper.classList.remove('hidden');
+        }
+
         switchOrderType('booking');
 
         if (o.date) {
