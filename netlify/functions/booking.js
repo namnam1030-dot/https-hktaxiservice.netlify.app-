@@ -1,4 +1,4 @@
-const { google } = require('googleapis');
+cconst { google } = require('googleapis');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -13,9 +13,6 @@ function err(code, message) {
   return { statusCode: code, headers: CORS_HEADERS, body: JSON.stringify({ success: false, error: message }) };
 }
 
-// ============================================
-// ⭐ 改動 1：隨機 4 位數字 BookingID
-// ============================================
 function generateBookingId() {
   return Math.floor(1000 + Math.random() * 9000).toString();
 }
@@ -36,14 +33,10 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
-// ============================================
-// ⭐ 改動 2/3：喺「💰...」行之後插入 bookingId
-// ============================================
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   const lines = text.split('\n');
   let insertIndex = -1;
-  // 由尾開始搵最後一行以 💰 開頭嘅
   for (let i = lines.length - 1; i >= 0; i--) {
     if (lines[i].startsWith('💰')) {
       insertIndex = i + 1;
@@ -59,6 +52,24 @@ function insertBookingIdAfterFare(text, bookingId) {
   return lines.join('\n');
 }
 
+// 將 changedFields 轉成 Discord diff code block（紅 / 綠）
+function buildChangedFieldsText(changedFields) {
+  if (!changedFields || typeof changedFields !== 'object') return '';
+  const keys = Object.keys(changedFields);
+  if (keys.length === 0) return '';
+
+  const lines = [];
+  for (const key of keys) {
+    const f = changedFields[key];
+    if (!f) continue;
+    lines.push(`- ${f.label}：${f.old || '（空）'}`);
+    lines.push(`+ ${f.label}：${f.new || '（空）'}`);
+  }
+  if (lines.length === 0) return '';
+
+  return '```diff\n' + lines.join('\n') + '\n```';
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: CORS_HEADERS, body: '' };
@@ -69,11 +80,12 @@ exports.handler = async (event) => {
     console.log('收到訂單：', bookingData);
 
     const incomingBookingId = bookingData.bookingId || null;
+    const changedFields = bookingData.changedFields || null;
 
-    // ===== 即時訂單：永遠 CREATE，唔支援修改 =====
+    // ===== 即時訂單：永遠 CREATE，跳過 Calendar，唔產生 bookingId =====
     if (bookingData.orderType === 'instant') {
       console.log('即時訂單，跳過 Calendar');
-      await sendDiscordNotification(bookingData, null, false);
+      await sendDiscordNotification(bookingData, null, false, false, null);
       return ok({ success: true, bookingId: null, updated: false });
     }
 
@@ -82,8 +94,8 @@ exports.handler = async (event) => {
       const existing = await findExistingBooking(incomingBookingId);
       if (existing) {
         await updateGoogleCalendar(existing, bookingData);
-        await updateDiscordNotification(existing, bookingData);
-        console.log('訂單已更新：', incomingBookingId);
+        await updateDiscordNotification(existing, bookingData, changedFields);
+        console.log('訂單已更新：', incomingBookingId, '，修改欄位：', changedFields ? Object.keys(changedFields) : '無');
         return ok({ success: true, bookingId: incomingBookingId, updated: true });
       }
       console.log('搵唔到舊訂單，改為新建：', incomingBookingId);
@@ -93,7 +105,7 @@ exports.handler = async (event) => {
     const newBookingId = generateBookingId();
 
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
-    const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true);
+    const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, false, null);
 
     if (discordMessageId && calendarEvent && calendarEvent.id) {
       await patchCalendarDiscordMessageId(calendarEvent.id, discordMessageId);
@@ -136,14 +148,12 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
   let description = data.fullMessage || data.customerMessage
     || `📞 電話：${data.phone}\n📍 ${data.pickup} → ${data.dropoff}`;
 
-  // 1) Markdown 連結轉純文字
   description = description
     .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
     .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, 'WhatsApp：$1')
     .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
     .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
 
-  // 2) ⭐ 改動 3：喺「💰...」行之後插入 bookingId（同 Discord 一樣位置）
   description = insertBookingIdAfterFare(description, bookingId);
 
   const privateProps = { bookingId };
@@ -208,10 +218,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
   }
 }
 
-// ============================================
-// ⭐ 改動 2：bookingId 插入喺「💰...」下一行
-// ============================================
-function buildDiscordMessage(data, bookingId, isUpdate) {
+function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
   if (isUpdate) {
     const now = new Date().toLocaleString('zh-HK', {
@@ -220,31 +227,38 @@ function buildDiscordMessage(data, bookingId, isUpdate) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-    body = `🔄 **【訂單已修改】** _(${now})_\n` + body;
+    let header = `🔄 **【訂單已修改】** _(${now})_\n`;
+
+    const diffText = buildChangedFieldsText(changedFields);
+    if (diffText) {
+      header += '\n**修改內容：**\n' + diffText + '\n\n';
+    } else {
+      header += '\n_（未能偵測具體修改欄位）_\n\n';
+    }
+    header += '**最新訂單內容：**\n';
+    body = header + body;
   }
-  // ⭐ 改動：用 helper 插入
   body = insertBookingIdAfterFare(body, bookingId);
   return body;
 }
 
-async function sendDiscordNotification(data, bookingId, waitForId) {
+async function sendDiscordNotification(data, bookingId, waitForId, isUpdate = false, changedFields = null) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) {
     console.log('Discord 未設定，跳過通知');
     return null;
   }
 
-  const message = buildDiscordMessage(data, bookingId, false);
-  const body = JSON.stringify({ content: message, flags: 4 });
+  const message = buildDiscordMessage(data, bookingId, isUpdate, changedFields);
+  const reqBody = JSON.stringify({ content: message, flags: 4 });
 
-  // ===== 1) 如果有 waitForId，先試 ?wait=true 攞 messageId =====
   if (waitForId) {
     const urlWithWait = webhookUrl + (webhookUrl.includes('?') ? '&' : '?') + 'wait=true';
     try {
       const res = await fetch(urlWithWait, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body
+        body: reqBody
       });
       if (res.ok) {
         const json = await res.json();
@@ -258,12 +272,11 @@ async function sendDiscordNotification(data, bookingId, waitForId) {
     }
   }
 
-  // ===== 2) Fallback：普通 POST =====
   try {
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body
+      body: reqBody
     });
     if (res.ok) {
       console.log('Discord 通知已發送（無 messageId）');
@@ -278,42 +291,62 @@ async function sendDiscordNotification(data, bookingId, waitForId) {
   }
 }
 
-async function updateDiscordNotification(existing, data) {
+// ⭐ 新增：刪除 Discord 訊息
+async function deleteDiscordMessage(messageId) {
+  if (!messageId) return false;
+
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  if (!webhookUrl) return;
+  if (!webhookUrl) return false;
 
   const wh = parseDiscordWebhook(webhookUrl);
   if (!wh) {
     console.error('無法解析 Discord webhook URL');
-    return;
+    return false;
   }
 
-  const messageId = existing.discordMessageId;
-
-  if (!messageId) {
-    console.log('舊訂單冇 discordMessageId，改為發新訊息');
-    const newId = await sendDiscordNotification(data, existing.bookingId, true);
-    if (newId) {
-      await patchCalendarDiscordMessageId(existing.eventId, newId);
-    }
-    return;
-  }
-
-  const editUrl = `https://discord.com/api/webhooks/${wh.id}/${wh.token}/messages/${messageId}`;
-  const message = buildDiscordMessage(data, existing.bookingId, true);
+  const deleteUrl = `https://discord.com/api/webhooks/${wh.id}/${wh.token}/messages/${messageId}`;
 
   try {
-    const res = await fetch(editUrl, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: message, flags: 4 })
-    });
-    if (res.ok) {
-      console.log('Discord 訊息已更新');
-    } else {
-      console.error('Discord 更新失敗，狀態：', res.status, await res.text());
+    const res = await fetch(deleteUrl, { method: 'DELETE' });
+    if (res.ok || res.status === 404) {
+      // 404 = 訊息已經唔存在，都算成功
+      console.log('Discord 舊訊息已刪除（或不存在）：', messageId);
+      return true;
     }
+    const errText = await res.text().catch(() => '');
+    console.error('[Discord] 刪除失敗。狀態:', res.status, errText);
+    return false;
   } catch (e) {
-    console.error('Discord 更新出錯：', e);
+    console.error('[Discord] 刪除拋錯：', e);
+    return false;
   }
+}
+
+// ⭐ 方案 C：先發新訊息，成功後刪除舊訊息
+async function updateDiscordNotification(existing, data, changedFields) {
+  console.log('方案 C：發新訊息 + 刪舊訊息');
+
+  const oldMessageId = existing.discordMessageId;
+
+  // 1) 先發新訊息（帶紅色 diff）→ 拎新 messageId
+  const newMessageId = await sendDiscordNotification(
+    data,
+    existing.bookingId,
+    true,           // waitForId
+    true,           // isUpdate
+    changedFields
+  );
+
+  if (!newMessageId) {
+    console.error('新訊息發送失敗，保留舊訊息唔刪');
+    return;
+  }
+
+  // 2) 新訊息成功發出 → 刪除舊訊息
+  if (oldMessageId) {
+    await deleteDiscordMessage(oldMessageId);
+  }
+
+  // 3) 更新 Calendar 嘅 discordMessageId 為最新嗰條
+  await patchCalendarDiscordMessageId(existing.eventId, newMessageId);
 }
