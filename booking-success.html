@@ -333,7 +333,7 @@
         color: #000000 !important;
     }
 
-    /* ⭐ PART 1：返回鍵提示 Toast */
+    /* ⭐ 返回鍵提示 Toast */
     #back-toast {
         position: fixed;
         bottom: 24px;
@@ -357,7 +357,7 @@
         color: #FFFFFF;
     }
 
-    /* ⭐ 改動 6：訂單已更新 — 彈出色提示 Toast */
+    /* ⭐ 訂單已更新 — 彈出色提示 Toast */
     #updated-toast {
         position: fixed;
         top: 20px;
@@ -434,7 +434,7 @@
                 <i class="fa-solid fa-check-circle text-green-400 text-5xl mb-3"></i>
                 <h1 class="text-green-300 font-bold text-3xl mb-2 success-title">
                     <span class="success-title__emoji">✅</span>
-                    <span！ data-i18n="success_title">預約訂</單已成功送出span>
+                    <span data-i18n="success_title">預約訂單已成功送出！</span>
                 </h1>
                 <p class="text-gray-300 text-xl mt-2 success-desc" data-i18n-html="success_desc">
                     我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
@@ -523,7 +523,7 @@
         </div>
     </div>
 
-    <!-- ⭐ PART 1：返回鍵提示 Toast -->
+    <!-- ⭐ 返回鍵提示 Toast -->
     <div id="back-toast" aria-live="polite"></div>
 
     <!-- ⭐ 訂單已更新 — 彈出色提示 -->
@@ -641,13 +641,15 @@ function closeWeComQR() {
 function goBackToHome() {
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
-    localStorage.removeItem('taxiEditPrefillData');   // ⭐ 新增：清走表單快照
+    localStorage.removeItem('taxiEditPrefillData');
     sessionStorage.removeItem('taxiLastBookingId');
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiLastSubmission');
     sessionStorage.removeItem('bookingPopupShown');
     sessionStorage.removeItem('bookingUpdatePopupShown');
-    sessionStorage.removeItem('taxiLastSuccessUrl');   // ⭐ B 版：清走
+    sessionStorage.removeItem('taxiLastSuccessUrl');
+    // ⭐ bfcache 修復：標記用戶已離開成功頁
+    sessionStorage.setItem('taxiLeftSuccessPage', '1');
     window.location.href = 'index.html';
 }
 
@@ -684,7 +686,7 @@ function goBackToHome() {
 })();
 
 // ============================================
-// ⭐ PART 2：預約編號 + 修改功能
+// ⭐ 預約編號 + 修改功能（B 版）
 // ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
@@ -699,7 +701,7 @@ function goBackToHome() {
     if (row) row.classList.remove('hidden');
     if (display) display.textContent = bookingId;
 
-    // ⭐ B 版：記住成功頁 URL（remove updated=1），取消修改時跳返乾淨版本
+    // ⭐ B 版：記住乾淨成功頁 URL（remove updated=1）
     window.goEditBooking = function () {
         try {
             sessionStorage.setItem('taxiEditingBookingId', bookingId);
@@ -712,7 +714,7 @@ function goBackToHome() {
 })();
 
 // ============================================
-// ⭐ PART 1：防止用戶撳返回鍵返到表單頁重複提交
+// ⭐ 防止用戶撳返回鍵返到表單頁重複提交
 // ============================================
 (function () {
     history.pushState(null, '', location.href);
@@ -779,6 +781,18 @@ function goBackToHome() {
 
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
+});
+
+// ============================================
+// ⭐ 修復 bfcache：由返回鍵復原成功頁時，檢查「已離開」標記
+// ============================================
+window.addEventListener('pageshow', function(event) {
+    if (!event.persisted) return;
+
+    if (sessionStorage.getItem('taxiLeftSuccessPage') === '1') {
+        sessionStorage.removeItem('taxiLeftSuccessPage');
+        location.replace('index.html');
+    }
 });
 </script>
 <script src="theme.js"></script>
