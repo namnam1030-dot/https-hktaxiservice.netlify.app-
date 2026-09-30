@@ -457,11 +457,11 @@ function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
     header += '【最新訂單內容】\n';
     content = header + body;
   } else {
-    // ⭐ 唔再加「【新訂單】」標題，直接顯示內容
+    // 唔再加「【新訂單】」標題，直接顯示內容
     content = body;
   }
 
-  // ⭐ 將 bookingId 搬去 💰 行嘅下一行
+  // 將 bookingId 搬去 💰 行嘅下一行
   if (bookingId) {
     const lines = content.split('\n');
     let insertIndex = -1;
@@ -496,15 +496,11 @@ async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
 
   const content = buildNtfyMessage(data, bookingId, isUpdate === true, changedFields || null);
 
-  // ⭐ Title 只保留 Order / Order Updated（唔用 New）
-  let title = isUpdate ? 'Order Updated' : 'Order';
-  if (bookingId) title += ' (' + bookingId + ')';
-
   try {
     const res = await fetch(ntfyUrl, {
       method: 'POST',
       headers: {
-        'Title': title,
+        // ⭐ 移除 Title，第一行唔會再顯示 Order / Order (ID)
         'Priority': isUpdate ? 'default' : 'high',
         'Tags': isUpdate ? 'arrows_counterclockwise' : 'taxi',
         'Content-Type': 'text/plain; charset=utf-8'
