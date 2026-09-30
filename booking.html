@@ -1642,7 +1642,164 @@ function initEditMode() {
     }
     if (bookingBtn) switchOrderType('booking');
 
-    restoreFormSnapshot();
+    // ⭐ 由 index.html lookup 跳入嚟 → 用 server 資料預填；否則用本機快照
+    if (!applyLookupResultIfAny()) {
+        restoreFormSnapshot();
+    }
+}
+
+// ============================================
+// ⭐ 由 index.html lookup 跳入嚟 → 用 server 資料預填
+// ============================================
+function applyLookupResultIfAny() {
+    try {
+        const raw = sessionStorage.getItem('taxiLookupResult');
+        if (!raw) return false;
+
+        const o = JSON.parse(raw);
+        console.log('[Lookup] 用 server 資料預填：', o);
+
+        // 1) 訂單類型（lookup 出嚟嘅單一定係預約）
+        switchOrderType('booking');
+
+        // 2) 日期 / 時間
+        if (o.date) {
+            const el = document.getElementById('date');
+            if (el) el.value = o.date;
+        }
+        if (o.time) {
+            const el = document.getElementById('time');
+            if (el) el.value = o.time;
+        }
+
+        // 3) 航班編號
+        if (o.flightNo) {
+            const el = document.getElementById('flight_no');
+            if (el) el.value = o.flightNo;
+        }
+
+        // 4) 人數 / 行李
+        if (o.passengers) {
+            const el = document.getElementById('passengers');
+            if (el) el.value = o.passengers;
+        }
+        if (o.luggages) {
+            const el = document.getElementById('luggages');
+            if (el) el.value = o.luggages;
+        }
+
+        // 5) 寵物 / 輪椅
+        const petEl = document.getElementById('has_pet');
+        if (petEl) petEl.checked = !!o.hasPet;
+        const wheelEl = document.getElementById('has_wheelchair');
+        if (wheelEl) wheelEl.checked = !!o.hasWheelchair;
+
+        // 6) 付款方式
+        if (o.payments) {
+            const paymentArr = String(o.payments).split(' / ').filter(Boolean);
+            if (paymentArr.length > 0) {
+                document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+                    el.checked = false;
+                });
+                let hasNonCash = false;
+                document.querySelectorAll('input[name="人
+        if (opayment_method"]').forEach(el => {
+                    if (paymentArr.includes(el.value)) {
+                        el.checked = true;
+                        if (el.value !== '現金') hasNonCash = true;
+                    }
+                });
+                if (hasNonCash) {
+                    const more = document.getElementById('more-payment-options');
+                    if (more) more.classList.remove('hidden');
+                }
+            }
+        }
+
+        // 7) 稱謂 / 聯絡.contactTitle) {
+            const el = document.getElementById('contact_title');
+            if (el) el.value = o.contactTitle;
+        }
+        if (o.contactSurname) {
+            const el = document.getElementById('contact_surname');
+            if (el) el.value = o.contactSurname;
+        }
+
+        // 8) 電話
+        if (o.phone) {
+            const el = document.getElementById('phone');
+            if (el) el.value = o.phone;
+        }
+
+        // 9) 微信客戶
+        const wxEl = document.getElementById('is_wechat_customer');
+        if (wxEl) wxEl.checked = !!o.isWechatCustomer;
+
+        // 10) 車款 —— 用 carDisplayText 反查 selectedCarName
+        if (o.carDisplayText) {
+            const cd = String(o.carDisplayText);
+            if (cd.includes('MIFA')) {
+                selectedCarName = 'MAXUS MIFA 7';
+                selectedCarNameEn = 'MAXUS MIFA 7';
+                selectedSurcharge = 50;
+                selectedMinFare = 130;
+                selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)';
+                selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
+            } else if (cd.includes('E9')) {
+                selectedCarName = '廣汽 E9';
+                selectedCarNameEn = 'GAC E9';
+                selectedSurcharge = 100;
+                selectedMinFare = 180;
+                selectedFeeMode = '附加費 HK$100 (最低消費 HK$180)';
+                selectedFeeModeEn = 'Surcharge HK$100 (Min. Fare HK$180)';
+            } else if (cd.includes('大黃蜂') || cd.includes('Bumblebee')) {
+                selectedCarName = '吉利大黃蜂';
+                selectedCarNameEn = 'Geely Bumblebee';
+                selectedSurcharge = 80;
+                selectedMinFare = 160;
+                selectedFeeMode = '附加費 HK$80 (最低消費 HK$160)';
+                selectedFeeModeEn = 'Surcharge HK$80 (Min. Fare HK$160)';
+            } else if (cd.includes('NOAH') || cd.includes('輪椅')) {
+                selectedCarName = '豐田 NOAH 輪椅的士';
+                selectedCarNameEn = 'Toyota NOAH Wheelchair Taxi';
+                selectedSurcharge = 150;
+                selectedMinFare = 230;
+                selectedFeeMode = '附加費 HK$150 (最低消費 HK$230)';
+                selectedFeeModeEn = 'Surcharge HK$150 (Min. Fare HK$230)';
+            } else {
+                selectedCarName = '豐田混能的士';
+                selectedCarNameEn = 'Toyota Hybrid Taxi';
+                selectedSurcharge = 0;
+                selectedMinFare = 0;
+                selectedFeeMode = '標準收費・無附加費';
+                selectedFeeModeEn = 'Standard Fare · No Surcharge';
+            }
+            updateCarDisplay();
+        }
+
+        // 11) 收費模式
+        if (o.feeMode) {
+            if (String(o.feeMode).includes('八五折')) {
+                selectedFareMode = 'discount';
+            } else {
+                selectedFareMode = 'normal';
+            }
+            updateCarDisplay();
+        }
+
+        // 12) ⭐ 建立 baseline snapshot（清舊，用啱填好嘅 DOM 建新）
+        localStorage.removeItem('taxiEditPrefillData');
+        saveFormSnapshot(o.carDisplayText || '');
+
+        // 13) 清走 lookup 結果，避免下次進入誤用
+        sessionStorage.removeItem('taxiLookupResult');
+
+        console.log('[Lookup] 預填完成');
+        return true;
+    } catch(e) {
+        console.error('[Lookup] 預填失敗：', e);
+        return false;
+    }
 }
 
 function cancelEditMode() {
