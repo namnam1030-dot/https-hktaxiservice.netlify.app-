@@ -31,10 +31,9 @@ exports.handler = async (event) => {
       return err(500, 'NTFY_URL 未設定');
     }
 
-    // 清理 Discord Markdown
+    // ⭐ 保留 [tel:xxx] 連結，只將 Discord 格式 [WhatsApp](<url>) 轉做標準 markdown
     let clean = message
-      .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
-      .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '$1')
+      .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '[WhatsApp]($1)')
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/\n{3,}/g, '\n\n');
 
@@ -43,9 +42,11 @@ exports.handler = async (event) => {
     }
 
     // ⭐ 動態加 Title header：只有 title 有值先傳
+    // ⭐ 加 Markdown: yes，令 tel: 連結可以點擊
     const reqHeaders = {
       'Priority': 'high',
       'Tags': 'taxi',
+      'Markdown': 'yes',
       'Content-Type': 'text/plain; charset=utf-8'
     };
     if (title && title !== 'Notification') {
