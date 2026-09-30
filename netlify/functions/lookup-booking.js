@@ -24,7 +24,6 @@ function getCalendarClient() {
   return google.calendar({ version: 'v3', auth });
 }
 
-// 由 description 抽電話（舊訂單 fallback）
 function extractPhoneFromDescription(description) {
   if (!description) return '';
   const m = description.match(/📞\s*電話[：:]\s*([+\d\s\-()]+)/);
@@ -32,40 +31,9 @@ function extractPhoneFromDescription(description) {
   return String(m[1]).replace(/\D/g, '');
 }
 
-// ⭐ 產生電話候選集
-// 規則：
-//   8 位        → [8位, 852+8位]（香港號碼）
-//   11位 852開頭 → [11位, 去852後8位]（香港號碼帶國碼）
-//   其他         → [原值]（大陸號碼、錯誤輸入等）
-function phoneCandidates(input) {
-  const d = String(input || '').replace(/\D/g, '');
-  const result = [];
-  if (!d) return result;
-
-  if (d.length === 8) {
-    result.push(d);
-    result.push('852' + d);
-  } else if (d.length === 11 && d.indexOf('852') === 0) {
-    result.push(d);
-    result.push(d.slice(3));
-  } else {
-    result.push(d);
-  }
-  return result;
-}
-
-// ⭐ 比對兩個電話（候選集交集唔為空 = 匹配）
-function phoneMatches(inputPhone, storedPhone) {
-  const inputCands = phoneCandidates(inputPhone);
-  const storedCands = phoneCandidates(storedPhone);
-  if (inputCands.length === 0 || storedCands.length === 0) return false;
-
-  for (let i = 0; i < inputCands.length; i++) {
-    for (let j = 0; j < storedCands.length; j++) {
-      if (inputCands[i] === storedCands[j]) return true;
-    }
-  }
-  return false;
+// 清理電話：只保留數字
+function cleanPhone(s) {
+  return String(s || '').replace(/\D/g, '');
 }
 
 exports.handler = async (event) => {
@@ -80,21 +48,19 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const inputBookingId = String(body.bookingId || '').trim();
-    const inputPhoneRaw = String(body.phone || '').replace(/\D/g, '');
+    const inputPhone = cleanPhone(body.phone);
 
-    // ⭐ 驗證：bookingId 必須 4 位數字
+    // 驗證：bookingId 必須 4 位數字
     if (!inputBookingId || !/^\d{4}$/.test(inputBookingId)) {
       return err(400, '請輸入 4 位數字預約編號');
     }
 
-    // ⭐ 驗證：8 位（港）或 11 位（大陸 / 852+8）
-    const validLen = inputPhoneRaw.length === 8 || inputPhoneRaw.length === 11;
-
-    if (!validLen) {
-      return err(400, '請輸入 8 位或 11 位數字電話號碼');
+    // 驗證：電話唔可以空白
+    if (!inputPhone) {
+      return err(400, '請輸入電話號碼');
     }
 
-    console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，phone:', inputPhoneRaw);
+    console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，phone:', inputPhone);
 
     const calendar = getCalendarClient();
 
@@ -113,12 +79,12 @@ exports.handler = async (event) => {
     const ev = items[0];
     const ext = (ev.extendedProperties && ev.extendedProperties.private) || {};
 
-    // ===== 電話驗證 =====
+    // ===== 電話驗證：清理後完全相同 =====
     let phoneMatch = false;
     let matchSource = '';
 
     if (ext.phone) {
-      if (phoneMatches(inputPhoneRaw, ext.phone)) {
+      if (cleanPhone(ext.phone) === inputPhone) {
         phoneMatch = true;
         matchSource = 'extendedProperties';
       }
@@ -126,7 +92,7 @@ exports.handler = async (event) => {
 
     if (!phoneMatch) {
       const descPhone = extractPhoneFromDescription(ev.description);
-      if (descPhone && phoneMatches(inputPhoneRaw, descPhone)) {
+      if (descPhone && descPhone === inputPhone) {
         phoneMatch = true;
         matchSource = 'description';
       }
@@ -188,7 +154,7 @@ exports.handler = async (event) => {
         payments: paymentMatch ? paymentMatch[1].trim() : '',
         contactTitle: '',
         contactSurname: surnameMatch ? surnameMatch[1].trim() : '',
-        phone: inputPhoneRaw,
+        phone: inputPhone,
         isWechatCustomer: false,
         carDisplayText: '',
         feeMode: '',
