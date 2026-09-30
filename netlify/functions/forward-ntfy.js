@@ -42,10 +42,10 @@ exports.handler = async (event) => {
       clean = clean.substring(0, 3500) + '\n…（內容過長已截斷）';
     }
 
+    // ⭐ 移除 Title header，第一行唔會再顯示 Order / Order (ID)
     const res = await fetch(ntfyUrl, {
       method: 'POST',
       headers: {
-        'Title': title,
         'Priority': 'high',
         'Tags': 'taxi',
         'Content-Type': 'text/plain; charset=utf-8'
