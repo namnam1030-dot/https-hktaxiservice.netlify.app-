@@ -432,10 +432,10 @@ async function updateDiscordNotification(existing, data, changedFields) {
 function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.customerMessage || data.description || '收到新訂單';
 
-  // 清理 Discord Markdown
+  // ⭐ 保留 [tel:xxx] 連結，只將 Discord 格式 [WhatsApp](<url>) 轉做 [WhatsApp](url)
   body = body
-    .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
-    .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '$1');
+    .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '[WhatsApp]($1)')
+    .replace(/\*\*([^*]+)\*\*/g, '$1');
 
   let content = '';
 
@@ -457,7 +457,6 @@ function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
     header += '【最新訂單內容】\n';
     content = header + body;
   } else {
-    // 唔再加「【新訂單】」標題，直接顯示內容
     content = body;
   }
 
@@ -500,9 +499,9 @@ async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
     const res = await fetch(ntfyUrl, {
       method: 'POST',
       headers: {
-        // ⭐ 移除 Title，第一行唔會再顯示 Order / Order (ID)
         'Priority': isUpdate ? 'default' : 'high',
         'Tags': isUpdate ? 'arrows_counterclockwise' : 'taxi',
+        'Markdown': 'yes',   // ⭐ 啟用 markdown 渲染（電話連結可點擊）
         'Content-Type': 'text/plain; charset=utf-8'
       },
       body: content
