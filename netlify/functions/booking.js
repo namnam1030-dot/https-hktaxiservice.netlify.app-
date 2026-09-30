@@ -159,7 +159,34 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
 
   description = insertBookingIdAfterFare(description, bookingId);
 
-  const privateProps = { bookingId: bookingId };
+  // ⭐ 建立結構化資料（用於 lookup-booking 查詢）
+  const cleanPhone = String(data.phone || '').replace(/\D/g, '');
+  const stopoversStr = Array.isArray(data.stopoverTexts)
+    ? data.stopoverTexts.map(function(s) {
+        return String(s).replace(/中途站\d+:\s*/, '');
+      }).join('、')
+    : '';
+
+  const privateProps = {
+    bookingId: bookingId,
+    phone: cleanPhone,
+    pickup: data.pickup || '',
+    dropoff: data.dropoff || '',
+    stopovers: stopoversStr,
+    date: data.date || '',
+    time: data.time || '',
+    flightNo: data.flightNo || '',
+    passengers: data.passengers || '',
+    luggages: data.luggages || '',
+    hasPet: data.hasPet ? 'true' : 'false',
+    hasWheelchair: data.hasWheelchair ? 'true' : 'false',
+    payments: data.paymentMethod || '',
+    contactTitle: data.title || '',
+    contactSurname: data.surname || '',
+    isWechatCustomer: data.isWechatCustomer ? 'true' : 'false',
+    carDisplayText: data.carType || '',
+    feeMode: data.feeMode || ''
+  };
   if (discordMessageId) privateProps.discordMessageId = discordMessageId;
 
   return {
