@@ -33,7 +33,6 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
-// 喺「💰...」行之後插入 bookingId
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   const lines = text.split('\n');
@@ -53,8 +52,7 @@ function insertBookingIdAfterFare(text, bookingId) {
   return lines.join('\n');
 }
 
-// ⭐ 將 changedFields 轉成 Discord diff code block（紅 / 綠）
-// ⚠️ 用 String.fromCharCode(96,96,96) 產生反引號，避免被 Markdown 解析器干擾
+// 用 String.fromCharCode(96,96,96) 產生反引號，避免 Markdown 干擾
 function buildChangedFieldsText(changedFields) {
   if (!changedFields || typeof changedFields !== 'object') return '';
   const keys = Object.keys(changedFields);
@@ -69,7 +67,7 @@ function buildChangedFieldsText(changedFields) {
   }
   if (lines.length === 0) return '';
 
-  const ticks = String.fromCharCode(96, 96, 96);   // 三個反引號
+  const ticks = String.fromCharCode(96, 96, 96);
   return ticks + 'diff\n' + lines.join('\n') + '\n' + ticks;
 }
 
@@ -159,7 +157,6 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
 
   description = insertBookingIdAfterFare(description, bookingId);
 
-  // ⭐ 建立結構化資料（用於 lookup-booking 查詢）
   const cleanPhone = String(data.phone || '').replace(/\D/g, '');
   const stopoversStr = Array.isArray(data.stopoverTexts)
     ? data.stopoverTexts.map(function(s) {
@@ -185,7 +182,13 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     contactSurname: data.surname || '',
     isWechatCustomer: data.isWechatCustomer ? 'true' : 'false',
     carDisplayText: data.carType || '',
-    feeMode: data.feeMode || ''
+    feeMode: data.feeMode || '',
+    // ⭐ 車費資料（用於 lookup 恢復）
+    baseFare: String(data.currentBaseFare || 0),
+    tunnelFee: String(data.currentTunnelFee || 0),
+    surcharge: String(data.surcharge || 0),
+    selectedFareMode: String(data.selectedFareMode || 'normal'),
+    selectedCarName: String(data.selectedCarName || '')
   };
   if (discordMessageId) privateProps.discordMessageId = discordMessageId;
 
@@ -234,7 +237,6 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
     });
     const existing = (ev.data.extendedProperties && ev.data.extendedProperties.private) || {};
     const merged = Object.assign({}, existing, { discordMessageId: discordMessageId });
-
     await calendar.events.patch({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       eventId: eventId,
@@ -258,7 +260,6 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-
     let header = '🔄 **【訂單已修改】** _(' + now + ')_\n';
 
     const diffText = buildChangedFieldsText(changedFields);
@@ -324,7 +325,6 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
   }
 }
 
-// 刪除 Discord 訊息
 async function deleteDiscordMessage(messageId) {
   if (!messageId) return false;
 
@@ -354,18 +354,17 @@ async function deleteDiscordMessage(messageId) {
   }
 }
 
-// ⭐ 方案 C：先發新訊息，成功後刪除舊訊息
+// 方案 C：先發新訊息，成功後刪除舊訊息
 async function updateDiscordNotification(existing, data, changedFields) {
   console.log('方案 C：發新訊息 + 刪舊訊息');
 
   const oldMessageId = existing.discordMessageId;
 
-  // 1) 先發新訊息（帶紅色 diff）→ 拎新 messageId
   const newMessageId = await sendDiscordNotification(
     data,
     existing.bookingId,
-    true,           // waitForId
-    true,           // isUpdate
+    true,
+    true,
     changedFields
   );
 
@@ -374,11 +373,9 @@ async function updateDiscordNotification(existing, data, changedFields) {
     return;
   }
 
-  // 2) 新訊息成功發出 → 刪除舊訊息
   if (oldMessageId) {
     await deleteDiscordMessage(oldMessageId);
   }
 
-  // 3) 更新 Calendar 嘅 discordMessageId 為最新嗰條
   await patchCalendarDiscordMessageId(existing.eventId, newMessageId);
 }
