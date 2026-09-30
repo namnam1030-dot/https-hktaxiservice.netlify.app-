@@ -70,21 +70,6 @@ function buildChangedFieldsText(changedFields) {
   return ticks + 'diff\n' + lines.join('\n') + '\n' + ticks;
 }
 
-function buildChangedFieldsPlainText(changedFields) {
-  if (!changedFields || typeof changedFields !== 'object') return '';
-  const keys = Object.keys(changedFields);
-  if (keys.length === 0) return '';
-
-  const lines = [];
-  for (let i = 0; i < keys.length; i++) {
-    const f = changedFields[keys[i]];
-    if (!f) continue;
-    lines.push('【改前】' + f.label + '：' + (f.old || '（空）'));
-    lines.push('【改後】' + f.label + '：' + (f.new || '（空）'));
-  }
-  return lines.join('\n');
-}
-
 function ensureDateTime(data) {
   if (!data.date || !data.time) {
     const now = new Date();
@@ -119,7 +104,7 @@ exports.handler = async (event) => {
       const existing = await findExistingBooking(incomingBookingId);
       if (existing) {
         await updateGoogleCalendar(existing, bookingData);
-        await updateAllNotifications(existing, bookingData, changedFields);
+        await updateDiscordNotification(existing, bookingData, changedFields);
         console.log('訂單已更新：', incomingBookingId);
         return ok({ success: true, bookingId: incomingBookingId, updated: true });
       }
@@ -132,12 +117,6 @@ exports.handler = async (event) => {
 
       await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields);
 
-      try {
-        await sendNtfyNotification(bookingData, instantBookingId, isEdit, changedFields);
-      } catch (e) {
-        console.error('[Ntfy] 發送失敗：', e);
-      }
-
       return ok({ success: true, bookingId: instantBookingId, updated: isEdit });
     }
 
@@ -145,12 +124,6 @@ exports.handler = async (event) => {
 
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
     const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, isEdit, changedFields);
-
-    try {
-      await sendNtfyNotification(bookingData, newBookingId, isEdit, changedFields);
-    } catch (e) {
-      console.error('[Ntfy] 發送失敗：', e);
-    }
 
     if (discordMessageId && calendarEvent && calendarEvent.id) {
       await patchCalendarDiscordMessageId(calendarEvent.id, discordMessageId);
@@ -428,111 +401,4 @@ async function updateDiscordNotification(existing, data, changedFields) {
   }
 
   await patchCalendarDiscordMessageId(existing.eventId, newMessageId);
-}
-
-/* ============================================
-   ntfy 通知
-   ============================================ */
-function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
-  let body = data.fullMessage || data.customerMessage || data.description || '收到新訂單';
-
-  body = body
-    .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '[WhatsApp]($1)')
-    .replace(/\*\*([^*]+)\*\*/g, '$1');
-
-  let content = '';
-
-  if (isUpdate) {
-    const now = new Date().toLocaleString('zh-HK', {
-      timeZone: 'Asia/Hong_Kong',
-      hour12: false,
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit'
-    });
-    let header = '🔄【訂單已修改】(' + now + ')\n\n';
-
-    const plainChanges = buildChangedFieldsPlainText(changedFields);
-    if (plainChanges) {
-      header += '【修改內容】\n' + plainChanges + '\n\n';
-    } else {
-      header += '（未能偵測具體修改欄位）\n\n';
-    }
-    header += '【最新訂單內容】\n';
-    content = header + body;
-  } else {
-    content = body;
-  }
-
-  if (bookingId) {
-    const lines = content.split('\n');
-    let insertIndex = -1;
-    for (let i = lines.length - 1; i >= 0; i--) {
-      if (lines[i].startsWith('💰')) {
-        insertIndex = i + 1;
-        break;
-      }
-    }
-    const idLine = '🆔 ' + bookingId;
-    if (insertIndex >= 0) {
-      lines.splice(insertIndex, 0, idLine);
-    } else {
-      lines.push(idLine);
-    }
-    content = lines.join('\n');
-  }
-
-  if (content.length > 3500) {
-    content = content.substring(0, 3500) + '\n…（內容過長已截斷）';
-  }
-
-  return content;
-}
-
-async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
-  const ntfyUrl = process.env.NTFY_URL;
-  if (!ntfyUrl) {
-    console.log('[Ntfy] 未設定，跳過通知');
-    return;
-  }
-
-  const content = buildNtfyMessage(data, bookingId, isUpdate === true, changedFields || null);
-
-  try {
-    const res = await fetch(ntfyUrl, {
-      method: 'POST',
-      headers: {
-        'Priority': isUpdate ? 'default' : 'high',
-        'Tags': isUpdate ? 'arrows_counterclockwise' : 'taxi',
-        'Markdown': 'yes',
-        'Content-Type': 'text/plain; charset=utf-8'
-      },
-      body: content
-    });
-
-    if (res.ok) {
-      console.log('[Ntfy] 通知已發送');
-    } else {
-      const errText = await res.text().catch(function() { return ''; });
-      console.error('[Ntfy] 發送失敗。狀態:', res.status, errText);
-    }
-  } catch (e) {
-    console.error('[Ntfy] 拋錯：', e);
-  }
-}
-
-/* ============================================
-   統一管理：同時發送到多個平台
-   ============================================ */
-async function updateAllNotifications(existing, data, changedFields) {
-  try {
-    await updateDiscordNotification(existing, data, changedFields);
-  } catch (e) {
-    console.error('[All] Discord 更新失敗：', e);
-  }
-
-  try {
-    await sendNtfyNotification(data, existing.bookingId, true, changedFields);
-  } catch (e) {
-    console.error('[All] ntfy 更新失敗：', e);
-  }
 }
