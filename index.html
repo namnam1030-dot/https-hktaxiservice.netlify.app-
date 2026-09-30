@@ -361,11 +361,11 @@
         color: #6B7280 !important;
     }
 
-    #lookup-modal h3 {
+#lookup-modal h3 {
         color: #FFFFFF;
-        font-size: 20px;
+        font-size: 26px;
         font-weight: 700;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         text-align: center;
     }
     html.light-theme body #lookup-modal h3 {
@@ -374,9 +374,9 @@
 
     #lookup-modal p.lookup-desc {
         color: #9CA3AF;
-        font-size: 13px;
+        font-size: 17px;
         text-align: center;
-        margin-bottom: 18px;
+        margin-bottom: 22px;
         line-height: 1.5;
     }
     html.light-theme body #lookup-modal p.lookup-desc {
@@ -386,9 +386,9 @@
     #lookup-modal label {
         display: block;
         color: #D1D5DB;
-        font-size: 13px;
+        font-size: 19px;
         font-weight: 700;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
     html.light-theme body #lookup-modal label {
         color: #000000 !important;
@@ -399,12 +399,15 @@
         background: #0B0B0B;
         border: 1px solid #374151;
         color: #FFFFFF;
-        padding: 10px 14px;
+        padding: 14px 16px;
         border-radius: 10px;
-        font-size: 16px;
-        margin-bottom: 14px;
+        font-size: 20px;
+        margin-bottom: 18px;
         outline: none;
         transition: border-color 0.2s ease;
+    }
+    #lookup-modal input::placeholder {
+        font-size: 20px;
     }
     #lookup-modal input:focus {
         border-color: #FFF200;
@@ -421,11 +424,12 @@
         color: #000000;
         border: 1px solid #000000;
         font-weight: 700;
-        padding: 12px;
+        padding: 16px;
         border-radius: 10px;
-        font-size: 16px;
+        font-size: 21px;
         cursor: pointer;
         transition: opacity 0.2s ease;
+    
     }
     #lookup-submit-btn:disabled {
         opacity: 0.6;
@@ -1177,7 +1181,7 @@ var translations = {
         whatsapp_inquiry: "WhatsApp",
         footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
         lookup_title: "查詢 / 修改預約",
-        lookup_desc: "輸入預約編號及預約時使用嘅電話號碼",
+        lookup_desc: "輸入預約編號及預約時輸入嘅電話號碼",
         lookup_label_id: "預約編號（4 位數字）",
         lookup_label_phone: "聯絡電話",
         lookup_btn: "查詢預約"
@@ -1237,7 +1241,7 @@ var translations = {
         whatsapp_inquiry: "WhatsApp",
         footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
         lookup_title: "Search / Edit Booking",
-        lookup_desc: "Enter your booking ID and the phone number used for booking",
+        lookup_desc: "Enter your booking ID and the phone number you entered when booking",
         lookup_label_id: "Booking ID (4 digits)",
         lookup_label_phone: "Phone Number",
         lookup_btn: "Search Booking"
