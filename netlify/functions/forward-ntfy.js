@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const title = String(body.title || 'Notification');
+    const title = String(body.title || '').trim();
     const message = String(body.message || '');
 
     const ntfyUrl = process.env.NTFY_URL;
@@ -42,19 +42,24 @@ exports.handler = async (event) => {
       clean = clean.substring(0, 3500) + '\n…（內容過長已截斷）';
     }
 
-    // ⭐ 移除 Title header，第一行唔會再顯示 Order / Order (ID)
+    // ⭐ 動態加 Title header：只有 title 有值先傳
+    const reqHeaders = {
+      'Priority': 'high',
+      'Tags': 'taxi',
+      'Content-Type': 'text/plain; charset=utf-8'
+    };
+    if (title && title !== 'Notification') {
+      reqHeaders['Title'] = title;
+    }
+
     const res = await fetch(ntfyUrl, {
       method: 'POST',
-      headers: {
-        'Priority': 'high',
-        'Tags': 'taxi',
-        'Content-Type': 'text/plain; charset=utf-8'
-      },
+      headers: reqHeaders,
       body: clean
     });
 
     if (res.ok) {
-      console.log('[Forward-Ntfy] 已發送');
+      console.log('[Forward-Ntfy] 已發送', title ? '(Title: ' + title + ')' : '(無 Title)');
       return ok({ success: true });
     } else {
       const errText = await res.text().catch(() => '');
