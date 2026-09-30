@@ -629,8 +629,7 @@
             </button>
         </div>
     </section>
-
-    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
+<footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
@@ -661,12 +660,10 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
 
-    <!-- ⭐ 查詢 / 修改預約 浮動按鈕 -->
     <button id="lookup-float-btn" onclick="openLookupModal()" title="查詢 / 修改預約" aria-label="查詢或修改預約">
         <i class="fa-solid fa-magnifying-glass"></i>
     </button>
 
-    <!-- ⭐ 查詢 / 修改預約 Modal -->
     <div id="lookup-modal" class="hidden" role="dialog" aria-modal="true">
         <div class="lookup-box">
             <button class="lookup-close" onclick="closeLookupModal()" aria-label="關閉">
@@ -688,26 +685,22 @@
     </div>
 
 <script>
-// ============================================
-// 跨頁面共享函數
-// ============================================
-
 function saveRouteDataToLocalStorage() {
-    const pickupEl = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
+    var pickupEl = document.getElementById('calc-pickup');
+    var dropoffEl = document.getElementById('calc-dropoff');
 
-    const data = {
-        pickup: pickupEl?.value.trim() || '',
-        pickupPlaceId: pickupEl?.dataset.placeId || '',
-        dropoff: dropoffEl?.value.trim() || '',
-        dropoffPlaceId: dropoffEl?.dataset.placeId || '',
+    var data = {
+        pickup: pickupEl ? pickupEl.value.trim() : '',
+        pickupPlaceId: pickupEl ? (pickupEl.dataset.placeId || '') : '',
+        dropoff: dropoffEl ? dropoffEl.value.trim() : '',
+        dropoffPlaceId: dropoffEl ? (dropoffEl.dataset.placeId || '') : '',
         stopovers: [],
         stopoverPlaceIds: []
     };
 
-    for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById(`calc-stopover-${i}`);
-        const v = el?.value.trim() || '';
+    for (var i = 1; i <= 3; i++) {
+        var el = document.getElementById('calc-stopover-' + i);
+        var v = el ? el.value.trim() : '';
         if (v) {
             data.stopovers.push(v);
             data.stopoverPlaceIds.push(el.dataset.placeId || '');
@@ -718,42 +711,43 @@ function saveRouteDataToLocalStorage() {
 }
 
 function loadRouteDataFromLocalStorage() {
-    const saved = localStorage.getItem('taxiRouteData');
+    var saved = localStorage.getItem('taxiRouteData');
     if (!saved) return;
 
     try {
-        const data = JSON.parse(saved);
+        var data = JSON.parse(saved);
 
-        const pickupEl = document.getElementById('calc-pickup');
+        var pickupEl = document.getElementById('calc-pickup');
         if (pickupEl && data.pickup) {
             pickupEl.value = data.pickup;
             if (data.pickupPlaceId) pickupEl.dataset.placeId = data.pickupPlaceId;
             toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         }
 
-        const dropoffEl = document.getElementById('calc-dropoff');
+        var dropoffEl = document.getElementById('calc-dropoff');
         if (dropoffEl && data.dropoff) {
             dropoffEl.value = data.dropoff;
             if (data.dropoffPlaceId) dropoffEl.dataset.placeId = data.dropoffPlaceId;
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
-        (data.stopovers || []).forEach((stop, index) => {
-            const i = index + 1;
-            const container = document.getElementById(`stopover-container-${i}`);
-            const input = document.getElementById(`calc-stopover-${i}`);
+        (data.stopovers || []).forEach(function(stop, index) {
+            var i = index + 1;
+            var container = document.getElementById('stopover-container-' + i);
+            var input = document.getElementById('calc-stopover-' + i);
             if (container && input) {
                 container.classList.remove('hidden');
                 input.value = stop;
-                const pid = (data.stopoverPlaceIds || [])[index];
+                var pid = (data.stopoverPlaceIds || [])[index];
                 if (pid) input.dataset.placeId = pid;
-                toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+                toggleClearBtn('calc-stopover-' + i, 'clear-stop-' + i + '-btn');
                 currentStopCount = Math.max(currentStopCount, i);
             }
         });
 
         if (currentStopCount >= 3) {
-            document.getElementById('add-stop-btn')?.classList.add('hidden');
+            var addStopBtn1 = document.getElementById('add-stop-btn');
+            if (addStopBtn1) addStopBtn1.classList.add('hidden');
         }
     } catch(e) {
         console.log('No saved route data');
@@ -761,21 +755,21 @@ function loadRouteDataFromLocalStorage() {
 }
 
 function clearAllInputs() {
-    const ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
+    var ids = ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'];
+    ids.forEach(function(id) {
+        var el = document.getElementById(id);
         if (el) {
             el.value = '';
             delete el.dataset.placeId;
         }
     });
 
-    for (let i = 1; i <= 3; i++) {
-        const container = document.getElementById(`stopover-container-${i}`);
+    for (var i = 1; i <= 3; i++) {
+        var container = document.getElementById('stopover-container-' + i);
         if (container) container.classList.add('hidden');
     }
     currentStopCount = 0;
-    const addStopBtn = document.getElementById('add-stop-btn');
+    var addStopBtn = document.getElementById('add-stop-btn');
     if (addStopBtn) addStopBtn.classList.remove('hidden');
 
     toggleClearBtn('calc-pickup', 'clear-pickup-btn');
@@ -784,14 +778,15 @@ function clearAllInputs() {
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
 
-    document.getElementById('calc-pickup')?.focus();
+    var p = document.getElementById('calc-pickup');
+    if (p) p.focus();
 }
 
 function calculateAndGoToResult() {
-    const pickupEl  = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
-    const pickupVal  = pickupEl?.value.trim()  || '';
-    const dropoffVal = dropoffEl?.value.trim() || '';
+    var pickupEl  = document.getElementById('calc-pickup');
+    var dropoffEl = document.getElementById('calc-dropoff');
+    var pickupVal  = pickupEl ? (pickupEl.value.trim() || '') : '';
+    var dropoffVal = dropoffEl ? (dropoffEl.value.trim() || '') : '';
 
     if (!pickupVal || !dropoffVal) {
         alert(currentLang === 'en'
@@ -800,58 +795,57 @@ function calculateAndGoToResult() {
         return;
     }
 
-    const fields = [
+    var fields = [
         { el: pickupEl,  val: pickupVal },
         { el: dropoffEl, val: dropoffVal }
     ];
-    for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById(`calc-stopover-${i}`);
-        const v = el?.value.trim();
-        if (v) fields.push({ el, val: v });
+    for (var i = 1; i <= 3; i++) {
+        var el = document.getElementById('calc-stopover-' + i);
+        var v = el ? el.value.trim() : '';
+        if (v) fields.push({ el: el, val: v });
     }
 
-    const tasks = [];
-    fields.forEach(f => {
+    var tasks = [];
+    fields.forEach(function(f) {
         if (!f.el.dataset.placeId) {
             tasks.push(
-                geocodeSilently(f.val).then(pid => {
+                geocodeSilently(f.val).then(function(pid) {
                     if (pid) f.el.dataset.placeId = pid;
                 })
             );
         }
     });
 
-    const btn = document.getElementById('calc-fare-btn');
+    var btn = document.getElementById('calc-fare-btn');
     if (btn) {
         btn.disabled = true;
         btn.style.opacity = '0.7';
         btn.style.cursor = 'wait';
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> <span>${
-            currentLang === 'en' ? 'Processing...' : '正在處理...'
-        }</span>`;
+        var loadingText = currentLang === 'en' ? 'Processing...' : '正在處理...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> <span>' + loadingText + '</span>';
     }
 
-    Promise.all(tasks).then(() => {
+    Promise.all(tasks).then(function() {
         localStorage.removeItem('taxiBookingData');
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
-    }).catch(() => {
+    }).catch(function() {
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     });
 }
 
 function geocodeSilently(text) {
-    return new Promise(resolve => {
+    return new Promise(function(resolve) {
         if (!text || !window.google || !google.maps.Geocoder) return resolve('');
 
-        let settled = false;
-        const done = v => { if (!settled) { settled = true; resolve(v); } };
+        var settled = false;
+        var done = function(v) { if (!settled) { settled = true; resolve(v); } };
 
-        const timeout = setTimeout(() => done(''), 4000);
+        var timeout = setTimeout(function() { done(''); }, 4000);
 
         try {
-            const geocoder = new google.maps.Geocoder();
+            var geocoder = new google.maps.Geocoder();
             geocoder.geocode(
                 {
                     address: text,
@@ -859,7 +853,7 @@ function geocodeSilently(text) {
                     language: 'zh-HK',
                     componentRestrictions: { country: 'HK' }
                 },
-                (results, status) => {
+                function(results, status) {
                     clearTimeout(timeout);
                     if (status === 'OK' && results && results[0] && results[0].place_id) {
                         done(results[0].place_id);
@@ -876,79 +870,83 @@ function geocodeSilently(text) {
 }
 
 function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
+    var el = document.getElementById('wecom-modal');
+    if (el) el.classList.remove('hidden');
 }
 
 function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
+    var el = document.getElementById('wecom-modal');
+    if (el) el.classList.add('hidden');
 }
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(reg) {
             console.log('SW Registered!', reg);
-        }).catch(err => {
+        }).catch(function(err) {
             console.log('SW Registration Failed!', err);
         });
     });
 }
 
-// ============================================
-// 中途站拖動重新排序
-// ============================================
-let draggedStopoverIndex = null;
+/* ============================================
+   中途站拖動重新排序
+   ============================================ */
+var draggedStopoverIndex = null;
 
 function setupStopoverDragging() {
-    for (let i = 1; i <= 3; i++) {
-        const container = document.getElementById(`stopover-container-${i}`);
-        if (!container) continue;
-        
-        const handle = container.querySelector('.stopover-drag-handle');
-        if (!handle) continue;
-        
-        handle.addEventListener('dragstart', function(e) {
-            draggedStopoverIndex = i;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', i.toString());
-            container.classList.add('opacity-50');
-        });
-        
-        handle.addEventListener('dragend', function(e) {
-            container.classList.remove('opacity-50');
-            document.querySelectorAll('[id^="stopover-container-"]').forEach(c => {
-                c.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+    for (var i = 1; i <= 3; i++) {
+        (function(i) {
+            var container = document.getElementById('stopover-container-' + i);
+            if (!container) return;
+
+            var handle = container.querySelector('.stopover-drag-handle');
+            if (!handle) return;
+
+            handle.addEventListener('dragstart', function(e) {
+                draggedStopoverIndex = i;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', String(i));
+                container.classList.add('opacity-50');
             });
-            draggedStopoverIndex = null;
-        });
-        
-        container.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
-                container.classList.add('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
-            }
-        });
-        
-        container.addEventListener('dragleave', function(e) {
-            container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
-        });
-        
-        container.addEventListener('drop', function(e) {
-            e.preventDefault();
-            container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
-            if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
-                swapStopoverValues(draggedStopoverIndex, i);
-            }
-        });
+
+            handle.addEventListener('dragend', function(e) {
+                container.classList.remove('opacity-50');
+                document.querySelectorAll('[id^="stopover-container-"]').forEach(function(c) {
+                    c.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+                });
+                draggedStopoverIndex = null;
+            });
+
+            container.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
+                    container.classList.add('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+                }
+            });
+
+            container.addEventListener('dragleave', function(e) {
+                container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+            });
+
+            container.addEventListener('drop', function(e) {
+                e.preventDefault();
+                container.classList.remove('stopover-drop-target', 'ring-2', 'ring-brand-yellow');
+                if (draggedStopoverIndex !== null && draggedStopoverIndex !== i) {
+                    swapStopoverValues(draggedStopoverIndex, i);
+                }
+            });
+        })(i);
     }
 }
 
 function swapStopoverValues(fromIndex, toIndex) {
-    const fromInput = document.getElementById(`calc-stopover-${fromIndex}`);
-    const toInput = document.getElementById(`calc-stopover-${toIndex}`);
+    var fromInput = document.getElementById('calc-stopover-' + fromIndex);
+    var toInput = document.getElementById('calc-stopover-' + toIndex);
     if (fromInput && toInput) {
-        const tempVal = fromInput.value;
-        const tempId = fromInput.dataset.placeId || '';
+        var tempVal = fromInput.value;
+        var tempId = fromInput.dataset.placeId || '';
         fromInput.value = toInput.value;
         toInput.value = tempVal;
         if (toInput.dataset.placeId) fromInput.dataset.placeId = toInput.dataset.placeId;
@@ -956,16 +954,16 @@ function swapStopoverValues(fromIndex, toIndex) {
         if (tempId) toInput.dataset.placeId = tempId;
         else delete toInput.dataset.placeId;
 
-        toggleClearBtn(`calc-stopover-${fromIndex}`, `clear-stop-${fromIndex}-btn`);
-        toggleClearBtn(`calc-stopover-${toIndex}`, `clear-stop-${toIndex}-btn`);
+        toggleClearBtn('calc-stopover-' + fromIndex, 'clear-stop-' + fromIndex + '-btn');
+        toggleClearBtn('calc-stopover-' + toIndex, 'clear-stop-' + toIndex + '-btn');
     }
 }
 
-// ============================================
-// 語音辨識
-// ============================================
+/* ============================================
+   語音辨識
+   ============================================ */
 function startVoiceRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
         alert("您的瀏覽器暫不支援語音辨識。\n\n建議使用：\n• iOS：Safari 瀏覽器\n• Android：Chrome 瀏覽器\n• 桌面：Chrome / Edge\n\n或直接使用輸入框填寫。");
@@ -977,58 +975,58 @@ function startVoiceRecognition() {
         return;
     }
 
-    const recognition = new SpeechRecognition();
+    var recognition = new SpeechRecognition();
     recognition.lang = 'zh-HK';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    const micBtn = document.getElementById('voice-btn');
-    const micText = document.getElementById('mic-text');
-    const micIcon = document.getElementById('mic-icon');
+    var micBtn = document.getElementById('voice-btn');
+    var micText = document.getElementById('mic-text');
+    var micIcon = document.getElementById('mic-icon');
 
     micBtn.classList.add('bg-brand-yellow', 'text-black');
     micText.innerText = "正在啟動麥克風...";
     micIcon.className = "fa-solid fa-spinner fa-spin text-base";
 
-    recognition.onstart = () => {
+    recognition.onstart = function() {
         micText.innerText = "🎤 請講出完整行程...";
     };
 
-    recognition.onresult = (event) => {
+    recognition.onresult = function(event) {
         recognition.stop();
-        const speechResult = event.results[0][0].transcript;
+        var speechResult = event.results[0][0].transcript;
         micText.innerText = "聽到：「" + speechResult + "」";
 
-        let pickup = "", dropoff = "", stopover = "";
-        let text = speechResult;
+        var pickup = "", dropoff = "", stopover = "";
+        var text = speechResult;
 
         text = text.replace(/我想/g, "").replace(/查詢/g, "").replace(/車費/g, "").replace(/價錢/g, "").replace(/預約/g, "").replace(/的士/g, "");
 
-        let fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
+        var fromMatch = text.match(/(?:由|從)(.*?)(?:經|途經|去|到|至|$)/);
         if (fromMatch && fromMatch[1]) {
             pickup = fromMatch[1].trim();
         } else {
-            let firstSplit = text.split(/經|途經|去|到|至/)[0];
+            var firstSplit = text.split(/經|途經|去|到|至/)[0];
             if (firstSplit) pickup = firstSplit.trim();
         }
 
-        let viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
+        var viaMatch = text.match(/(?:經|途經)(.*?)(?:去|到|至|$)/);
         if (viaMatch && viaMatch[1]) {
-            let viaText = viaMatch[1].trim();
-            let subToSplit = viaText.split(/去|到|至/);
+            var viaText = viaMatch[1].trim();
+            var subToSplit = viaText.split(/去|到|至/);
             stopover = subToSplit[0].trim();
         }
 
-        let toMatch = text.match(/(?:去|到|至)(.+)$/);
+        var toMatch = text.match(/(?:去|到|至)(.+)$/);
         if (toMatch && toMatch[1]) {
             dropoff = toMatch[1].trim();
         } else {
-            let parts = text.split(/經|途經/);
+            var parts = text.split(/經|途經/);
             if (parts.length >= 2) {
-                let lastPart = parts[parts.length - 1].trim();
+                var lastPart = parts[parts.length - 1].trim();
                 if (lastPart && lastPart !== stopover) dropoff = lastPart;
             } else if (!dropoff) {
-                let words = text.split(/\s+/);
+                var words = text.split(/\s+/);
                 if (words.length >= 2 && !pickup) {
                     pickup = words[0];
                     dropoff = words[words.length - 1];
@@ -1037,34 +1035,34 @@ function startVoiceRecognition() {
         }
 
         if (pickup) {
-            const el = document.getElementById('calc-pickup');
+            var el = document.getElementById('calc-pickup');
             if (el) {
                 el.value = pickup;
                 delete el.dataset.placeId;
                 toggleClearBtn('calc-pickup', 'clear-pickup-btn');
             }
         }
-        
+
         if (stopover) {
             if (currentStopCount === 0) addStopoverField();
-            const el = document.getElementById('calc-stopover-1');
-            if (el) {
-                el.value = stopover;
-                delete el.dataset.placeId;
+            var el2 = document.getElementById('calc-stopover-1');
+            if (el2) {
+                el2.value = stopover;
+                delete el2.dataset.placeId;
                 toggleClearBtn('calc-stopover-1', 'clear-stop-1-btn');
             }
         }
-        
+
         if (dropoff) {
-            const el = document.getElementById('calc-dropoff');
-            if (el) {
-                el.value = dropoff;
-                delete el.dataset.placeId;
+            var el3 = document.getElementById('calc-dropoff');
+            if (el3) {
+                el3.value = dropoff;
+                delete el3.dataset.placeId;
                 toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
             }
         }
 
-        setTimeout(() => {
+        setTimeout(function() {
             micBtn.classList.remove('bg-brand-yellow', 'text-black');
             micText.innerText = translations[currentLang].voice_btn_text;
             micIcon.className = "fa-solid fa-microphone text-base";
@@ -1072,8 +1070,8 @@ function startVoiceRecognition() {
         }, 1000);
     };
 
-    recognition.onerror = (event) => {
-        let errMsg = "未能識別語音，請重試或以文字輸入";
+    recognition.onerror = function(event) {
+        var errMsg = "未能識別語音，請重試或以文字輸入";
         switch (event.error) {
             case 'not-allowed':
             case 'service-not-allowed':
@@ -1098,13 +1096,13 @@ function startVoiceRecognition() {
         micIcon.className = "fa-solid fa-microphone-slash text-base";
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
 
-        setTimeout(() => {
+        setTimeout(function() {
             micText.innerText = translations[currentLang].voice_btn_text;
             micIcon.className = "fa-solid fa-microphone text-base";
         }, 3000);
     };
 
-    recognition.onend = () => {
+    recognition.onend = function() {
         micBtn.classList.remove('bg-brand-yellow', 'text-black');
         micIcon.className = "fa-solid fa-microphone text-base";
     };
@@ -1118,12 +1116,12 @@ function startVoiceRecognition() {
     }
 }
 
-// ============================================
-// 語言系統
-// ============================================
-let currentLang = localStorage.getItem('taxiLang') || 'zh';
+/* ============================================
+   語言系統
+   ============================================ */
+var currentLang = localStorage.getItem('taxiLang') || 'zh';
 
-const translations = {
+var translations = {
     zh: {
         btn_more_payment: "更多付款方式",
         label_verification: "電話驗證",
@@ -1246,10 +1244,10 @@ const translations = {
     }
 };
 
-let currentStopCount = 0;
+var currentStopCount = 0;
 
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
 });
@@ -1261,47 +1259,47 @@ function toggleLanguage() {
 }
 
 function applyLanguage() {
-    const btn = document.getElementById('lang-toggle-btn');
+    var btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
 
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
             el.textContent = translations[currentLang][key];
         }
     });
 
-    document.querySelectorAll('[data-i18n-html]').forEach(el => {
-        const key = el.getAttribute('data-i18n-html');
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-html');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
             el.innerHTML = translations[currentLang][key];
         }
     });
 
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
             el.placeholder = translations[currentLang][key];
         }
     });
 }
 
-// ============================================
-// pac-container 動態處理
-// ============================================
-const pushedMap = new Map();
+/* ============================================
+   pac-container 動態處理
+   ============================================ */
+var pushedMap = new Map();
 
 function setupPacWatcher() {
     console.log('[TaxiRoute] setupPacWatcher 已啟動');
 
-    setInterval(() => {
-        const allPacs = document.querySelectorAll('.pac-container');
-        const seenPacs = new Set();
+    setInterval(function() {
+        var allPacs = document.querySelectorAll('.pac-container');
+        var seenPacs = new Set();
 
-        allPacs.forEach(pc => {
-            const items = pc.querySelectorAll('.pac-item');
-            const hasItems = items.length > 0;
-            const rect = pc.getBoundingClientRect();
+        allPacs.forEach(function(pc) {
+            var items = pc.querySelectorAll('.pac-item');
+            var hasItems = items.length > 0;
+            var rect = pc.getBoundingClientRect();
 
             if (!hasItems || rect.height < 40) {
                 pc.style.setProperty('display', 'none', 'important');
@@ -1311,19 +1309,19 @@ function setupPacWatcher() {
             pc.style.removeProperty('display');
             seenPacs.add(pc);
 
-            const input = findInputForPac(pc);
+            var input = findInputForPac(pc);
             if (!input) return;
 
-            const container = input.closest('.relative');
+            var container = input.closest('.relative');
             if (!container) return;
 
-            const pushAmount = Math.ceil(rect.height) + 16;
+            var pushAmount = Math.ceil(rect.height) + 16;
             container.style.marginBottom = pushAmount + 'px';
             container.classList.add('pac-pushed');
             pushedMap.set(container, pc);
         });
 
-        pushedMap.forEach((pc, container) => {
+        pushedMap.forEach(function(pc, container) {
             if (!seenPacs.has(pc)) {
                 container.style.marginBottom = '';
                 container.classList.remove('pac-pushed');
@@ -1334,14 +1332,14 @@ function setupPacWatcher() {
 }
 
 function findInputForPac(pc) {
-    const pcRect = pc.getBoundingClientRect();
-    let bestInput = null;
-    let bestDist = Infinity;
+    var pcRect = pc.getBoundingClientRect();
+    var bestInput = null;
+    var bestDist = Infinity;
 
-    document.querySelectorAll('input[type="text"]').forEach(input => {
-        const iRect = input.getBoundingClientRect();
+    document.querySelectorAll('input[type="text"]').forEach(function(input) {
+        var iRect = input.getBoundingClientRect();
         if (iRect.height === 0) return;
-        const dist = Math.abs(pcRect.top - iRect.bottom);
+        var dist = Math.abs(pcRect.top - iRect.bottom);
         if (dist < bestDist && dist < 120) {
             bestDist = dist;
             bestInput = input;
@@ -1351,13 +1349,13 @@ function findInputForPac(pc) {
     return bestInput;
 }
 
-// ============================================
-// Autocomplete
-// ============================================
+/* ============================================
+   Autocomplete
+   ============================================ */
 function initAutocomplete() {
     console.log('[TaxiRoute] initAutocomplete 已觸發');
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             _attachAutocompletes();
             setupPacWatcher();
         });
@@ -1368,18 +1366,18 @@ function initAutocomplete() {
 }
 
 function _attachAutocompletes() {
-    const hkBounds = new google.maps.LatLngBounds(
+    var hkBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(22.15, 113.83),
         new google.maps.LatLng(22.58, 114.50)
     );
 
-    const options = {
+    var options = {
         bounds: hkBounds,
         componentRestrictions: { country: "hk" },
         fields: ["place_id", "formatted_address", "geometry", "name"]
     };
 
-    const inputMap = [
+    var inputMap = [
         ['calc-pickup',     'clear-pickup-btn'],
         ['calc-dropoff',    'clear-dropoff-btn'],
         ['calc-stopover-1', 'clear-stop-1-btn'],
@@ -1387,39 +1385,41 @@ function _attachAutocompletes() {
         ['calc-stopover-3', 'clear-stop-3-btn']
     ];
 
-    inputMap.forEach(([inputId, btnId]) => {
-        const el = document.getElementById(inputId);
+    inputMap.forEach(function(pair) {
+        var inputId = pair[0];
+        var btnId = pair[1];
+        var el = document.getElementById(inputId);
         if (!el) return;
 
-        let suppressInput = false;
+        var suppressInput = false;
 
-        const ac = new google.maps.places.Autocomplete(el, options);
+        var ac = new google.maps.places.Autocomplete(el, options);
 
-        ac.addListener('place_changed', () => {
-            const place = ac.getPlace();
+        ac.addListener('place_changed', function() {
+            var place = ac.getPlace();
             suppressInput = true;
             if (place && place.place_id) el.dataset.placeId = place.place_id;
             toggleClearBtn(inputId, btnId);
-            setTimeout(() => { suppressInput = false; }, 400);
+            setTimeout(function() { suppressInput = false; }, 400);
         });
 
-        el.addEventListener('input', () => {
+        el.addEventListener('input', function() {
             if (suppressInput) return;
             delete el.dataset.placeId;
         });
 
-        el.addEventListener('focus', () => {
-            setTimeout(() => {
-                document.querySelectorAll('.pac-container').forEach(pc => {
+        el.addEventListener('focus', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.pac-container').forEach(function(pc) {
                     pc.style.zIndex = '999999';
                     pc.style.position = 'fixed';
                 });
             }, 100);
         });
 
-        el.addEventListener('click', () => {
-            setTimeout(() => {
-                document.querySelectorAll('.pac-container').forEach(pc => {
+        el.addEventListener('click', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.pac-container').forEach(function(pc) {
                     pc.style.zIndex = '999999';
                 });
             }, 100);
@@ -1430,21 +1430,21 @@ function _attachAutocompletes() {
 function addStopoverField() {
     if (currentStopCount < 3) {
         currentStopCount++;
-        const container = document.getElementById(`stopover-container-${currentStopCount}`);
+        var container = document.getElementById('stopover-container-' + currentStopCount);
         if (container) container.classList.remove('hidden');
 
         if (currentStopCount >= 3) {
-            const btn = document.getElementById('add-stop-btn');
+            var btn = document.getElementById('add-stop-btn');
             if (btn) btn.classList.add('hidden');
         }
     }
 }
 
 function removeStopoverField(index) {
-    const values = [];
-    for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById(`calc-stopover-${i}`);
-        const container = document.getElementById(`stopover-container-${i}`);
+    var values = [];
+    for (var i = 1; i <= 3; i++) {
+        var el = document.getElementById('calc-stopover-' + i);
+        var container = document.getElementById('stopover-container-' + i);
         if (el && container && !container.classList.contains('hidden')) {
             values.push({
                 value: el.value,
@@ -1455,33 +1455,33 @@ function removeStopoverField(index) {
 
     values.splice(index - 1, 1);
 
-    for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById(`calc-stopover-${i}`);
-        const container = document.getElementById(`stopover-container-${i}`);
-        if (!el || !container) continue;
+    for (var j = 1; j <= 3; j++) {
+        var el2 = document.getElementById('calc-stopover-' + j);
+        var container2 = document.getElementById('stopover-container-' + j);
+        if (!el2 || !container2) continue;
 
-        const v = values[i - 1];
+        var v = values[j - 1];
         if (v) {
-            el.value = v.value;
-            if (v.placeId) el.dataset.placeId = v.placeId;
-            else delete el.dataset.placeId;
-            container.classList.remove('hidden');
+            el2.value = v.value;
+            if (v.placeId) el2.dataset.placeId = v.placeId;
+            else delete el2.dataset.placeId;
+            container2.classList.remove('hidden');
         } else {
-            el.value = '';
-            delete el.dataset.placeId;
-            container.classList.add('hidden');
+            el2.value = '';
+            delete el2.dataset.placeId;
+            container2.classList.add('hidden');
         }
-        toggleClearBtn(`calc-stopover-${i}`, `clear-stop-${i}-btn`);
+        toggleClearBtn('calc-stopover-' + j, 'clear-stop-' + j + '-btn');
     }
 
     currentStopCount = values.length;
-    const btn = document.getElementById('add-stop-btn');
+    var btn = document.getElementById('add-stop-btn');
     if (btn) btn.classList.remove('hidden');
 }
 
 function toggleClearBtn(inputId, btnId) {
-    const input = document.getElementById(inputId);
-    const btn = document.getElementById(btnId);
+    var input = document.getElementById(inputId);
+    var btn = document.getElementById(btnId);
     if (input && btn) {
         if (input.value.trim().length > 0) {
             btn.classList.remove('hidden');
@@ -1492,7 +1492,7 @@ function toggleClearBtn(inputId, btnId) {
 }
 
 function clearInput(inputId, btnId) {
-    const input = document.getElementById(inputId);
+    var input = document.getElementById(inputId);
     if (input) {
         input.value = '';
         delete input.dataset.placeId;
@@ -1502,11 +1502,11 @@ function clearInput(inputId, btnId) {
 }
 
 function swapLocations() {
-    const pickupEl = document.getElementById('calc-pickup');
-    const dropoffEl = document.getElementById('calc-dropoff');
+    var pickupEl = document.getElementById('calc-pickup');
+    var dropoffEl = document.getElementById('calc-dropoff');
     if (pickupEl && dropoffEl) {
-        const tempVal = pickupEl.value;
-        const tempId = pickupEl.dataset.placeId || '';
+        var tempVal = pickupEl.value;
+        var tempId = pickupEl.dataset.placeId || '';
 
         pickupEl.value = dropoffEl.value;
         dropoffEl.value = tempVal;
@@ -1522,32 +1522,32 @@ function swapLocations() {
     }
 }
 
-// ============================================
-// ⭐ 查詢 / 修改預約（浮動按鈕）
-// ============================================
-const LOOKUP_MAX_ATTEMPTS = 3;
-const LOOKUP_LOCK_MINUTES = 30;
-const LOOKUP_LOCK_KEY = 'taxiLookupLockedUntil';
-const LOOKUP_ATTEMPTS_KEY = 'taxiLookupAttempts';
+/* ============================================
+   查詢 / 修改預約（浮動按鈕）
+   ============================================ */
+var LOOKUP_MAX_ATTEMPTS = 3;
+var LOOKUP_LOCK_MINUTES = 30;
+var LOOKUP_LOCK_KEY = 'taxiLookupLockedUntil';
+var LOOKUP_ATTEMPTS_KEY = 'taxiLookupAttempts';
 
 function isLookupLocked() {
-    const lockedUntil = parseInt(localStorage.getItem(LOOKUP_LOCK_KEY) || '0', 10);
+    var lockedUntil = parseInt(localStorage.getItem(LOOKUP_LOCK_KEY) || '0', 10);
     return Date.now() < lockedUntil;
 }
 
 function getLookupLockRemainingMinutes() {
-    const lockedUntil = parseInt(localStorage.getItem(LOOKUP_LOCK_KEY) || '0', 10);
+    var lockedUntil = parseInt(localStorage.getItem(LOOKUP_LOCK_KEY) || '0', 10);
     if (Date.now() >= lockedUntil) return 0;
     return Math.ceil((lockedUntil - Date.now()) / 60000);
 }
 
 function recordLookupFailure() {
-    let attempts = parseInt(localStorage.getItem(LOOKUP_ATTEMPTS_KEY) || '0', 10);
+    var attempts = parseInt(localStorage.getItem(LOOKUP_ATTEMPTS_KEY) || '0', 10);
     attempts += 1;
     localStorage.setItem(LOOKUP_ATTEMPTS_KEY, String(attempts));
 
     if (attempts >= LOOKUP_MAX_ATTEMPTS) {
-        const lockUntil = Date.now() + LOOKUP_LOCK_MINUTES * 60 * 1000;
+        var lockUntil = Date.now() + LOOKUP_LOCK_MINUTES * 60 * 1000;
         localStorage.setItem(LOOKUP_LOCK_KEY, String(lockUntil));
         localStorage.removeItem(LOOKUP_ATTEMPTS_KEY);
         return { locked: true, remaining: 0 };
@@ -1561,11 +1561,11 @@ function resetLookupAttempts() {
 }
 
 function openLookupModal() {
-    const modal = document.getElementById('lookup-modal');
+    var modal = document.getElementById('lookup-modal');
     if (!modal) return;
 
     if (isLookupLocked()) {
-        const remaining = getLookupLockRemainingMinutes();
+        var remaining = getLookupLockRemainingMinutes();
         alert(currentLang === 'en'
             ? 'Too many failed attempts. Please try again in ' + remaining + ' minutes.'
             : '嘗試次數過多，請於 ' + remaining + ' 分鐘後再試。');
@@ -1576,31 +1576,40 @@ function openLookupModal() {
     document.body.style.overflow = 'hidden';
 
     setTimeout(function() {
-        const input = document.getElementById('lookup-booking-id');
+        var input = document.getElementById('lookup-booking-id');
         if (input) input.focus();
     }, 100);
 
-    const errEl = document.getElementById('lookup-error');
+    var errEl = document.getElementById('lookup-error');
     if (errEl) errEl.textContent = '';
 }
 
 function closeLookupModal() {
-    const modal = document.getElementById('lookup-modal');
+    var modal = document.getElementById('lookup-modal');
     if (!modal) return;
     modal.classList.add('hidden');
     document.body.style.overflow = '';
 }
 
 function submitLookup() {
-    const errEl = document.getElementById('lookup-error');
-    const submitBtn = document.getElementById('lookup-submit-btn');
-    const bookingIdInput = document.getElementById('lookup-booking-id');
-    const phoneInput = document.getElementById('lookup-phone');
+    var errEl = document.getElementById('lookup-error');
+    var submitBtn = document.getElementById('lookup-submit-btn');
+    var bookingIdInput = document.getElementById('lookup-booking-id');
+    var phoneInput = document.getElementById('lookup-phone');
 
-    const bookingId = (bookingIdInput && bookingIdInput.value || '').trim();
-    const phone = (phoneInput && phoneInput.value || '').trim();
+    var bookingId = (bookingIdInput && bookingIdInput.value || '').trim();
+    var phone = (phoneInput && phoneInput.value || '').trim();
 
     if (errEl) errEl.textContent = '';
+
+    // 提交前再檢查鎖定狀態
+    if (isLookupLocked()) {
+        var remainingMin = getLookupLockRemainingMinutes();
+        if (errEl) errEl.textContent = currentLang === 'en'
+            ? 'Too many failed attempts. Please try again in ' + remainingMin + ' minutes.'
+            : '嘗試次數過多，請於 ' + remainingMin + ' 分鐘後再試。';
+        return;
+    }
 
     if (!/^\d{4}$/.test(bookingId)) {
         if (errEl) errEl.textContent = currentLang === 'en'
@@ -1608,11 +1617,11 @@ function submitLookup() {
             : '請輸入 4 位數字預約編號。';
         return;
     }
-    const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 4) {
+    var cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length === 0) {
         if (errEl) errEl.textContent = currentLang === 'en'
-            ? 'Please enter a valid phone number.'
-            : '請輸入有效嘅電話號碼。';
+            ? 'Please enter a phone number.'
+            : '請輸入電話號碼。';
         return;
     }
 
@@ -1638,13 +1647,13 @@ function submitLookup() {
 
             window.location.href = 'booking.html?edit=' + encodeURIComponent(bookingId);
         } else {
-            const failInfo = recordLookupFailure();
+            var failInfo = recordLookupFailure();
             if (failInfo.locked) {
                 if (errEl) errEl.textContent = currentLang === 'en'
                     ? 'Too many failed attempts. Locked for 30 minutes.'
                     : '嘗試次數過多，已鎖定 30 分鐘。';
             } else {
-                const msg = data.error || (currentLang === 'en' ? 'Not found.' : '搵唔到呢個預約。');
+                var msg = data.error || (currentLang === 'en' ? 'Not found.' : '搵唔到呢個預約。');
                 if (errEl) errEl.textContent = msg + (currentLang === 'en'
                     ? ' (' + failInfo.remaining + ' attempts left)'
                     : '（剩 ' + failInfo.remaining + ' 次機會）');
@@ -1668,16 +1677,16 @@ function submitLookup() {
     });
 }
 
-// ============================================
-// 頁面初始化
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
+/* ============================================
+   頁面初始化
+   ============================================ */
+document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 
-    const returning = sessionStorage.getItem('returningFromResult') === '1';
+    var returning = sessionStorage.getItem('returningFromResult') === '1';
     sessionStorage.removeItem('returningFromResult');
 
-    const isEditMode = !!sessionStorage.getItem('taxiEditingBookingId');
+    var isEditMode = !!sessionStorage.getItem('taxiEditingBookingId');
 
     if (returning || isEditMode) {
         loadRouteDataFromLocalStorage();
@@ -1685,26 +1694,25 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
 
-        const pickupEl = document.getElementById('calc-pickup');
-        const dropoffEl = document.getElementById('calc-dropoff');
+        var pickupEl = document.getElementById('calc-pickup');
+        var dropoffEl = document.getElementById('calc-dropoff');
         if (pickupEl) pickupEl.value = '';
         if (dropoffEl) dropoffEl.value = '';
 
-        for (let i = 1; i <= 3; i++) {
-            const stopInput = document.getElementById(`calc-stopover-${i}`);
-            const stopContainer = document.getElementById(`stopover-container-${i}`);
+        for (var i = 1; i <= 3; i++) {
+            var stopInput = document.getElementById('calc-stopover-' + i);
+            var stopContainer = document.getElementById('stopover-container-' + i);
             if (stopInput) stopInput.value = '';
             if (stopContainer) stopContainer.classList.add('hidden');
         }
         currentStopCount = 0;
-        const addStopBtn = document.getElementById('add-stop-btn');
+        var addStopBtn = document.getElementById('add-stop-btn');
         if (addStopBtn) addStopBtn.classList.remove('hidden');
     }
 
     setupStopoverDragging();
 
-    // ⭐ 查詢 Modal：點背景 / ESC 關閉
-    const lookupModal = document.getElementById('lookup-modal');
+    var lookupModal = document.getElementById('lookup-modal');
     if (lookupModal) {
         lookupModal.addEventListener('click', function(e) {
             if (e.target === lookupModal) closeLookupModal();
@@ -1712,19 +1720,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            const m = document.getElementById('lookup-modal');
+            var m = document.getElementById('lookup-modal');
             if (m && !m.classList.contains('hidden')) closeLookupModal();
         }
     });
 
-    // ⭐ 查詢 Modal：輸入框按 Enter 直接提交
-    const lookupIdInput = document.getElementById('lookup-booking-id');
-    const lookupPhoneInput = document.getElementById('lookup-phone');
+    var lookupIdInput = document.getElementById('lookup-booking-id');
+    var lookupPhoneInput = document.getElementById('lookup-phone');
     if (lookupIdInput) {
         lookupIdInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                lookupPhoneInput && lookupPhoneInput.focus();
+                if (lookupPhoneInput) lookupPhoneInput.focus();
             }
         });
     }
@@ -1741,8 +1748,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="theme.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function() {
         if (refreshing) return;
         refreshing = true;
         window.location.reload();
