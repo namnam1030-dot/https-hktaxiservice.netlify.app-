@@ -85,7 +85,6 @@ function buildChangedFieldsPlainText(changedFields) {
   return lines.join('\n');
 }
 
-// 補上默認日期時間（即時訂單唔入 Calendar 但通知會用）
 function ensureDateTime(data) {
   if (!data.date || !data.time) {
     const now = new Date();
@@ -116,11 +115,9 @@ exports.handler = async (event) => {
 
     ensureDateTime(bookingData);
 
-    // ===== 有 bookingId：試搵 Calendar（可能係之前入過 Calendar 嘅訂單） =====
     if (incomingBookingId) {
       const existing = await findExistingBooking(incomingBookingId);
       if (existing) {
-        // Calendar 有 record → UPDATE
         await updateGoogleCalendar(existing, bookingData);
         await updateAllNotifications(existing, bookingData, changedFields);
         console.log('訂單已更新：', incomingBookingId);
@@ -129,15 +126,12 @@ exports.handler = async (event) => {
       console.log('Calendar 搵唔到 bookingId，視為首次入 Calendar：', incomingBookingId);
     }
 
-    // ===== 即時訂單：唔入 Calendar，只發通知 =====
     if (isInstantOrder) {
       const instantBookingId = incomingBookingId || generateBookingId();
       console.log('即時訂單，跳過 Calendar。bookingId:', instantBookingId);
 
-      // 發 Discord（唔需要 messageId，因為即時訂單唔入 Calendar，冇得存）
       await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields);
 
-      // 發 ntfy
       try {
         await sendNtfyNotification(bookingData, instantBookingId, isEdit, changedFields);
       } catch (e) {
@@ -147,7 +141,6 @@ exports.handler = async (event) => {
       return ok({ success: true, bookingId: instantBookingId, updated: isEdit });
     }
 
-    // ===== 預約訂單：正常 CREATE =====
     const newBookingId = incomingBookingId || generateBookingId();
 
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
@@ -439,13 +432,13 @@ async function updateDiscordNotification(existing, data, changedFields) {
 function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.customerMessage || data.description || '收到新訂單';
 
-  // ⭐ 清理 Discord Markdown 格式，變返乾淨純文字
-  // [88887799](tel:88887799) → 88887799
-  body = body.replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1');
-  // [WhatsApp](<https://wa.me/...>) → https://wa.me/...
-  body = body.replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '$1');
+  // 清理 Discord Markdown
+  body = body
+    .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
+    .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '$1');
 
-  let header = '';
+  let content = '';
+
   if (isUpdate) {
     const now = new Date().toLocaleString('zh-HK', {
       timeZone: 'Asia/Hong_Kong',
@@ -453,7 +446,7 @@ function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-    header = '🔄【訂單已修改】(' + now + ')\n\n';
+    let header = '🔄【訂單已修改】(' + now + ')\n\n';
 
     const plainChanges = buildChangedFieldsPlainText(changedFields);
     if (plainChanges) {
@@ -462,14 +455,29 @@ function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
       header += '（未能偵測具體修改欄位）\n\n';
     }
     header += '【最新訂單內容】\n';
+    content = header + body;
   } else {
-    header = '🚕【新訂單】\n';
+    // ⭐ 唔再加「【新訂單】」標題，直接顯示內容
+    content = body;
   }
 
-  let content = header + body;
-
+  // ⭐ 將 bookingId 搬去 💰 行嘅下一行
   if (bookingId) {
-    content += '\n🆔 ' + bookingId;
+    const lines = content.split('\n');
+    let insertIndex = -1;
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i].startsWith('💰')) {
+        insertIndex = i + 1;
+        break;
+      }
+    }
+    const idLine = '🆔 ' + bookingId;
+    if (insertIndex >= 0) {
+      lines.splice(insertIndex, 0, idLine);
+    } else {
+      lines.push(idLine);
+    }
+    content = lines.join('\n');
   }
 
   if (content.length > 3500) {
@@ -488,8 +496,8 @@ async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
 
   const content = buildNtfyMessage(data, bookingId, isUpdate === true, changedFields || null);
 
-// ⭐ Title 唔可以用 emoji（HTTP Header 只支援 ASCII）
-  var title = isUpdate ? 'Order Updated' : 'New Order';
+  // ⭐ Title 只保留 Order / Order Updated（唔用 New）
+  let title = isUpdate ? 'Order Updated' : 'Order';
   if (bookingId) title += ' (' + bookingId + ')';
 
   try {
