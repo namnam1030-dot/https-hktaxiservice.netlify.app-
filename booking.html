@@ -1795,7 +1795,26 @@ function applyLookupResultIfAny() {
         localStorage.removeItem('taxiEditPrefillData');
         saveFormSnapshot(o.carDisplayText || '');
 
-        // ⭐ 8) 清走 lookup 結果
+// ⭐ 8) 同步 taxiBookingData（否則轉去 fleet 頁會冇車費）
+        try {
+            var bookingSnapshot = {
+                selectedCarName: selectedCarName,
+                selectedCarNameEn: selectedCarNameEn,
+                selectedSurcharge: selectedSurcharge,
+                selectedMinFare: selectedMinFare,
+                selectedFeeMode: selectedFeeMode,
+                selectedFeeModeEn: selectedFeeModeEn,
+                selectedFareMode: selectedFareMode,
+                currentBaseFare: currentBaseFare,
+                currentTunnelFee: currentTunnelFee
+            };
+            localStorage.setItem('taxiBookingData', JSON.stringify(bookingSnapshot));
+            console.log('[Lookup] 已同步 taxiBookingData');
+        } catch(e) {
+            console.error('[Lookup] 同步 taxiBookingData 失敗：', e);
+        }
+
+        // ⭐ 9) 清走 lookup 結果
         sessionStorage.removeItem('taxiLookupResult');
 
         console.log('[Lookup] 預填完成');
