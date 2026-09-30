@@ -31,7 +31,6 @@ function extractPhoneFromDescription(description) {
   return String(m[1]).replace(/\D/g, '');
 }
 
-// 清理電話：只保留數字
 function cleanPhone(s) {
   return String(s || '').replace(/\D/g, '');
 }
@@ -50,12 +49,10 @@ exports.handler = async (event) => {
     const inputBookingId = String(body.bookingId || '').trim();
     const inputPhone = cleanPhone(body.phone);
 
-    // 驗證：bookingId 必須 4 位數字
     if (!inputBookingId || !/^\d{4}$/.test(inputBookingId)) {
       return err(400, '請輸入 4 位數字預約編號');
     }
 
-    // 驗證：電話唔可以空白
     if (!inputPhone) {
       return err(400, '請輸入電話號碼');
     }
@@ -126,9 +123,16 @@ exports.handler = async (event) => {
         phone: ext.phone || '',
         isWechatCustomer: ext.isWechatCustomer === 'true',
         carDisplayText: ext.carDisplayText || '',
-        feeMode: ext.feeMode || ''
+        feeMode: ext.feeMode || '',
+        // ⭐ 車費資料
+        baseFare: parseInt(ext.baseFare || '0', 10) || 0,
+        tunnelFee: parseInt(ext.tunnelFee || '0', 10) || 0,
+        surcharge: parseInt(ext.surcharge || '0', 10) || 0,
+        selectedFareMode: ext.selectedFareMode || 'normal',
+        selectedCarName: ext.selectedCarName || ''
       };
     } else {
+      // 舊訂單 fallback
       const desc = ev.description || '';
       const summaryMatch = (ev.summary || '').match(/🚕\s*(.+?)\s*→\s*(.+?)\s*-\s*/);
       const pickupFromSummary = summaryMatch ? summaryMatch[1].trim() : '';
@@ -158,6 +162,11 @@ exports.handler = async (event) => {
         isWechatCustomer: false,
         carDisplayText: '',
         feeMode: '',
+        baseFare: 0,
+        tunnelFee: 0,
+        surcharge: 0,
+        selectedFareMode: 'normal',
+        selectedCarName: '',
         isLegacy: true
       };
     }
