@@ -315,7 +315,7 @@
         font-weight: bold !important;
     }
 
-    /* ⭐ PART 2：編輯模式橫幅 */
+    /* ⭐ 編輯模式橫幅 */
     #edit-mode-banner {
         background-color: #F59E0B;
         color: #000000;
@@ -324,13 +324,15 @@
         font-weight: 700;
         font-size: 15px;
         margin-bottom: 12px;
-        display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
         flex-wrap: wrap;
     }
-#edit-mode-banner button {
+    #edit-mode-banner:not(.hidden) {
+        display: flex;
+    }
+    #edit-mode-banner button {
         background-color: #000000;
         color: #FFFFFF;
         border: none;
@@ -340,10 +342,6 @@
         font-size: 13px;
         cursor: pointer;
         white-space: nowrap;
-    }
-    /* ⭐ 覆蓋 display: flex，令 .hidden 生效 */
-    #edit-mode-banner.hidden {
-        display: none !important;
     }
 </style>
 </head>
@@ -408,7 +406,7 @@
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
-            <!-- ⭐ PART 2：編輯模式橫幅 -->
+            <!-- ⭐ 編輯模式橫幅 -->
             <div id="edit-mode-banner" class="hidden">
                 <span><i class="fa-solid fa-pen-to-square"></i> <span data-i18n="edit_mode_text">修改模式：正在修改預約</span> <strong id="edit-mode-id"></strong></span>
                 <button type="button" onclick="cancelEditMode()" data-i18n="btn_cancel_edit">取消修改</button>
@@ -676,7 +674,7 @@ let orderType = 'instant';
 let upgradeChoice = null;
 let pendingBookingData = null;
 
-// ⭐ PART 2：修改模式
+// ⭐ 修改模式
 let editingBookingId = null;
 
 function calculateTotalFare() {
@@ -848,7 +846,7 @@ const translations = {
 };
 
 // ============================================
-// ⭐ PART 1：防重複提交 helper
+// PART 1：防重複提交 helper
 // ============================================
 function getRecentSubmission() {
     try {
@@ -859,6 +857,135 @@ function getRecentSubmission() {
         sessionStorage.removeItem('taxiLastSubmission');
         return null;
     } catch(e) { return null; }
+}
+
+// ============================================
+// ⭐ 新增：表單快照（用於修改模式預填）
+// ============================================
+function saveFormSnapshot() {
+    try {
+        const payments = [];
+        document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+            if (el.checked) payments.push(el.value);
+        });
+
+        const snapshot = {
+            orderType: orderType,
+            date: document.getElementById('date')?.value || '',
+            time: document.getElementById('time')?.value || '',
+            flightNo: document.getElementById('flight_no')?.value || '',
+            passengers: document.getElementById('passengers')?.value || '',
+            luggages: document.getElementById('luggages')?.value || '',
+            hasPet: document.getElementById('has_pet')?.checked || false,
+            hasWheelchair: document.getElementById('has_wheelchair')?.checked || false,
+            payments: payments,
+            contactTitle: document.getElementById('contact_title')?.value || '',
+            contactSurname: document.getElementById('contact_surname')?.value || '',
+            phone: document.getElementById('phone')?.value || '',
+            isWechatCustomer: document.getElementById('is_wechat_customer')?.checked || false
+        };
+
+        localStorage.setItem('taxiEditPrefillData', JSON.stringify(snapshot));
+        console.log('[Snapshot] 已保存表單快照');
+    } catch(e) {
+        console.error('[Snapshot] 保存失敗：', e);
+    }
+}
+
+function restoreFormSnapshot() {
+    try {
+        const raw = localStorage.getItem('taxiEditPrefillData');
+        if (!raw) {
+            console.log('[Snapshot] 冇快照，唔預填');
+            return;
+        }
+        const s = JSON.parse(raw);
+        console.log('[Snapshot] 讀取快照：', s);
+
+        // 1) 訂單類型
+        if (s.orderType === 'booking') {
+            switchOrderType('booking');
+        } else if (s.orderType === 'instant') {
+            switchOrderType('instant');
+        }
+
+        // 2) 日期 / 時間
+        if (s.date) {
+            const dateEl = document.getElementById('date');
+            if (dateEl) dateEl.value = s.date;
+        }
+        if (s.time) {
+            const timeEl = document.getElementById('time');
+            if (timeEl) timeEl.value = s.time;
+        }
+
+        // 3) 航班編號
+        if (s.flightNo) {
+            const el = document.getElementById('flight_no');
+            if (el) el.value = s.flightNo;
+        }
+
+        // 4) 人數 / 行李
+        if (s.passengers) {
+            const el = document.getElementById('passengers');
+            if (el) el.value = s.passengers;
+        }
+        if (s.luggages) {
+            const el = document.getElementById('luggages');
+            if (el) el.value = s.luggages;
+        }
+
+        // 5) 寵物 / 輪椅
+        const petEl = document.getElementById('has_pet');
+        if (petEl) petEl.checked = !!s.hasPet;
+        const wheelEl = document.getElementById('has_wheelchair');
+        if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
+
+        // 6) 付款方式
+        if (Array.isArray(s.payments) && s.payments.length > 0) {
+            // 先全部 uncheck
+            document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+                el.checked = false;
+            });
+            // 再根據快照 check
+            let hasNonCash = false;
+            document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+                if (s.payments.includes(el.value)) {
+                    el.checked = true;
+                    if (el.value !== '現金') hasNonCash = true;
+                }
+            });
+            // 如果有非現金選項，展開「更多付款方式」
+            if (hasNonCash) {
+                const more = document.getElementById('more-payment-options');
+                if (more) more.classList.remove('hidden');
+            }
+        }
+
+        // 7) 稱謂 / 聯絡人
+        if (s.contactTitle) {
+            const el = document.getElementById('contact_title');
+            if (el) el.value = s.contactTitle;
+        }
+        if (s.contactSurname) {
+            const el = document.getElementById('contact_surname');
+            if (el) el.value = s.contactSurname;
+        }
+
+        // 8) 電話
+        if (s.phone) {
+            const el = document.getElementById('phone');
+            if (el) el.value = s.phone;
+        }
+
+        // 9) 微信客戶
+        const wxEl = document.getElementById('is_wechat_customer');
+        if (wxEl) wxEl.checked = !!s.isWechatCustomer;
+
+        console.log('[Snapshot] 已預填完成');
+    } catch(e) {
+        console.error('[Snapshot] 預填失敗：', e);
+    }
 }
 
 function switchOrderType(type) {
@@ -1179,6 +1306,9 @@ function submitBookingAfterUpgrade() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // ⭐ 新增：保存表單快照，方便日後修改預填
+            saveFormSnapshot();
+
             try {
                 sessionStorage.setItem('taxiLastSubmission', JSON.stringify({
                     timestamp: Date.now(),
@@ -1350,14 +1480,14 @@ function submitBooking(event) {
 }
 
 // ============================================
-// ⭐ PART 2：修改模式（只讀 URL 參數）
+// ⭐ 修改模式（只讀 URL 參數）
 // ============================================
 function initEditMode() {
     const params = new URLSearchParams(location.search);
-    const editId = params.get('edit');   // ⭐ 只讀 URL，唔讀 sessionStorage
+    const editId = params.get('edit');   // 只讀 URL，唔讀 sessionStorage
 
     if (!editId) {
-        // ⭐ URL 冇 edit 參數 → 清走任何殘留，確保唔會誤入修改模式
+        // URL 冇 edit 參數 → 清走任何殘留
         sessionStorage.removeItem('taxiEditingBookingId');
         editingBookingId = null;
         return;
@@ -1385,11 +1515,21 @@ function initEditMode() {
         instantBtn.style.pointerEvents = 'none';
     }
     if (bookingBtn) switchOrderType('booking');
+
+    // ⭐ 新增：還原表單快照
+    restoreFormSnapshot();
 }
 
+// ⭐ B 版：取消修改 → 讀返成功頁 URL（冇 updated=1）
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
-    window.location.href = 'booking-success.html';
+
+    const lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
+    if (lastSuccessUrl) {
+        window.location.href = lastSuccessUrl;
+    } else {
+        window.location.href = 'booking-success.html';
+    }
 }
 
 // ============================================
@@ -1443,6 +1583,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
 
+    // ⚠️ 注意：呢兩個 default value 會被 restoreFormSnapshot 覆蓋（如果編輯模式）
     if (dateInput) dateInput.value = formattedDate;
     if (timeInput) timeInput.value = formattedTime;
 
@@ -1470,9 +1611,11 @@ window.addEventListener('DOMContentLoaded', () => {
     checkShowFlightField();
     applyLanguage();
     switchOrderType('instant');
+
+    // ⭐ 順序很重要：initEditMode 會 call restoreFormSnapshot 覆蓋 default 值
     initEditMode();
 
-    // ⭐ PART 1 + bug fix：檢查係咪啱啱先提交過（修改模式下唔檢查）
+    // ⭐ PART 1：檢查係咪啱啱先提交過（修改模式下唔檢查）
     if (!editingBookingId) {
         const recent = getRecentSubmission();
         if (recent) {
@@ -1486,6 +1629,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 } else {
                     localStorage.removeItem('taxiRouteData');
                     localStorage.removeItem('taxiBookingData');
+                    localStorage.removeItem('taxiEditPrefillData');
                     sessionStorage.removeItem('taxiLastSubmission');
                     window.location.replace('index.html');
                 }

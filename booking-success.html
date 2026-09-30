@@ -434,15 +434,14 @@
                 <i class="fa-solid fa-check-circle text-green-400 text-5xl mb-3"></i>
                 <h1 class="text-green-300 font-bold text-3xl mb-2 success-title">
                     <span class="success-title__emoji">✅</span>
-                    <span data-i18n="success_title">預約訂單已成功送出！</span>
+                    <span！ data-i18n="success_title">預約訂</單已成功送出span>
                 </h1>
                 <p class="text-gray-300 text-xl mt-2 success-desc" data-i18n-html="success_desc">
                     我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
                 </p>
             </div>
 
-            <!-- ⭐ 改動 5：預約編號框移到此處（訂單內容框上方） -->
-            <!-- ⭐ 改動 4：字體放大 -->
+            <!-- ⭐ 預約編號框（訂單內容框上方） -->
             <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-4 mb-4 text-center">
                 <div id="booking-id-label" class="text-xl text-gray-300 mb-2" data-i18n="booking_id_label">你的預約編號</div>
                 <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-4xl tracking-widest">—</div>
@@ -459,7 +458,7 @@
                 <span data-i18n="updated_banner">訂單資料已成功更新！</span>
             </div>
 
-            <!-- 訂單內容框（移到下方） -->
+            <!-- 訂單內容框 -->
             <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
                 <pre id="booking-details" class="text-white text-lg whitespace-pre-wrap font-mono"></pre>
             </div>
@@ -527,7 +526,7 @@
     <!-- ⭐ PART 1：返回鍵提示 Toast -->
     <div id="back-toast" aria-live="polite"></div>
 
-    <!-- ⭐ 改動 6：訂單已更新 — 彈出色提示 -->
+    <!-- ⭐ 訂單已更新 — 彈出色提示 -->
     <div id="updated-toast" aria-live="polite">
         <i class="fa-solid fa-circle-check"></i>
         <span data-i18n="updated_toast">訂單資料已成功更新！</span>
@@ -642,11 +641,13 @@ function closeWeComQR() {
 function goBackToHome() {
     localStorage.removeItem('taxiRouteData');
     localStorage.removeItem('taxiBookingData');
+    localStorage.removeItem('taxiEditPrefillData');   // ⭐ 新增：清走表單快照
     sessionStorage.removeItem('taxiLastBookingId');
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiLastSubmission');
     sessionStorage.removeItem('bookingPopupShown');
     sessionStorage.removeItem('bookingUpdatePopupShown');
+    sessionStorage.removeItem('taxiLastSuccessUrl');   // ⭐ B 版：清走
     window.location.href = 'index.html';
 }
 
@@ -669,7 +670,7 @@ function goBackToHome() {
         ? 'Your booking has been updated.<br>We will re-confirm shortly.'
         : '你嘅訂單已更新，<br>我哋會盡快重新確認。';
 
-    // 3) ⭐ 改動 6：彈出色提示 Toast（綠色，由頂部滑落）
+    // 3) 彈出色提示 Toast
     window.addEventListener('load', function () {
         setTimeout(function () {
             const toast = document.getElementById('updated-toast');
@@ -698,8 +699,14 @@ function goBackToHome() {
     if (row) row.classList.remove('hidden');
     if (display) display.textContent = bookingId;
 
+    // ⭐ B 版：記住成功頁 URL（remove updated=1），取消修改時跳返乾淨版本
     window.goEditBooking = function () {
-        try { sessionStorage.setItem('taxiEditingBookingId', bookingId); } catch(e) {}
+        try {
+            sessionStorage.setItem('taxiEditingBookingId', bookingId);
+            const cleanUrl = new URL(location.href);
+            cleanUrl.searchParams.delete('updated');
+            sessionStorage.setItem('taxiLastSuccessUrl', cleanUrl.toString());
+        } catch(e) {}
         location.href = `booking.html?edit=${encodeURIComponent(bookingId)}`;
     };
 })();
