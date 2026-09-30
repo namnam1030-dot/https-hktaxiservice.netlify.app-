@@ -650,7 +650,7 @@ function renderBookingDetails(text, changedFields) {
     if (!el) return;
 
     // changedFields key → 對應行嘅前綴
-    const prefixMap = {
+const prefixMap = {
         pickup: '📍 起點：',
         dropoff: '🏁 終點：',
         stopovers: '🛑 ',
@@ -664,7 +664,7 @@ function renderBookingDetails(text, changedFields) {
         payments: '💳 付款方式：',
         contact: '👤 聯絡人：',
         phone: '📞 電話：',
-        selectedCarName: '🚘 預約車款：',
+        carDisplayText: '🚘 預約車款：',
         selectedFareMode: '💎 收費模式：',
         isWechatCustomer: '💚 備注：'
     };

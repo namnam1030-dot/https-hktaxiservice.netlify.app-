@@ -845,7 +845,7 @@ const translations = {
 };
 
 // ============================================
-// PART 1：防重複提交 helper
+// 防重複提交 helper
 // ============================================
 function getRecentSubmission() {
     try {
@@ -860,8 +860,9 @@ function getRecentSubmission() {
 
 // ============================================
 // ⭐ 表單快照：包含所有會比較嘅欄位
+// ⭐ 改動：加 carDisplayText 參數
 // ============================================
-function saveFormSnapshot() {
+function saveFormSnapshot(carDisplayText) {
     try {
         const payments = [];
         document.querySelectorAll('input[name="payment_method"]').forEach(el => {
@@ -888,6 +889,7 @@ function saveFormSnapshot() {
             phone: document.getElementById('phone')?.value || '',
             isWechatCustomer: document.getElementById('is_wechat_customer')?.checked || false,
             selectedCarName: selectedCarName || '',
+            carDisplayText: carDisplayText || '',
             selectedFareMode: selectedFareMode || ''
         };
 
@@ -940,7 +942,6 @@ function restoreFormSnapshot() {
         const wheelEl = document.getElementById('has_wheelchair');
         if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
 
-        // 付款方式（新格式：字串 "現金 / PayMe"，舊格式：array）
         let paymentArr = [];
         if (typeof s.payments === 'string') {
             paymentArr = s.payments.split(' / ').filter(Boolean);
@@ -987,9 +988,10 @@ function restoreFormSnapshot() {
 }
 
 // ============================================
-// ⭐ 計算 changedFields（對比舊快照 vs 現況）
+// ⭐ 計算 changedFields
+// ⭐ 改動：加 carDisplayText 參數 + 用 carDisplayText 取代 selectedCarName
 // ============================================
-function computeChangedFields() {
+function computeChangedFields(carDisplayText) {
     try {
         const raw = localStorage.getItem('taxiEditPrefillData');
         if (!raw) return null;
@@ -1018,7 +1020,7 @@ function computeChangedFields() {
             contactSurname: document.getElementById('contact_surname')?.value || '',
             phone: document.getElementById('phone')?.value || '',
             isWechatCustomer: document.getElementById('is_wechat_customer')?.checked || false,
-            selectedCarName: selectedCarName || '',
+            carDisplayText: carDisplayText || '',
             selectedFareMode: selectedFareMode || ''
         };
 
@@ -1038,7 +1040,7 @@ function computeChangedFields() {
             contactSurname: '聯絡人',
             phone: '電話',
             isWechatCustomer: '微信客戶',
-            selectedCarName: '車款',
+            carDisplayText: '預約車款',
             selectedFareMode: '收費模式'
         };
 
@@ -1368,10 +1370,10 @@ function submitBookingAfterUpgrade() {
 
     const fullMessage = discordMsgLines.join('\n');
 
-    // ⭐ 修改模式：計算 changedFields
+    // ⭐ 修改模式：計算 changedFields（傳 carDisplayText）
     let changedFields = null;
     if (editingBookingId) {
-        changedFields = computeChangedFields();
+        changedFields = computeChangedFields(carDisplayText);
         console.log('[ChangedFields] 結果：', changedFields);
     }
 
@@ -1404,7 +1406,7 @@ function submitBookingAfterUpgrade() {
         orderType: orderType,
         isWechatCustomer: data.isWechatCustomer === true,
         bookingId: editingBookingId || undefined,
-        changedFields: changedFields || undefined   // ⭐ 傳去 Function
+        changedFields: changedFields || undefined
     };
 
     const submitBtn = document.getElementById('booking-submit-btn');
@@ -1423,7 +1425,8 @@ function submitBookingAfterUpgrade() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            saveFormSnapshot();
+            // ⭐ 改動：傳 carDisplayText
+            saveFormSnapshot(carDisplayText);
 
             try {
                 sessionStorage.setItem('taxiLastSubmission', JSON.stringify({
@@ -1450,7 +1453,6 @@ function submitBookingAfterUpgrade() {
                 try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {}
             }
 
-            // ⭐ 傳 changedFields 去成功頁（用 sessionStorage，避免 URL 太長）
             if (changedFields) {
                 try { sessionStorage.setItem('taxiChangedFields', JSON.stringify(changedFields)); } catch(e) {}
             } else {
