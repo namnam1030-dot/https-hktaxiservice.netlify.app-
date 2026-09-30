@@ -860,7 +860,7 @@ function getRecentSubmission() {
 }
 
 // ============================================
-// ⭐ 新增：表單快照（用於修改模式預填）
+// ⭐ 表單快照（用於修改模式預填）
 // ============================================
 function saveFormSnapshot() {
     try {
@@ -943,11 +943,9 @@ function restoreFormSnapshot() {
 
         // 6) 付款方式
         if (Array.isArray(s.payments) && s.payments.length > 0) {
-            // 先全部 uncheck
             document.querySelectorAll('input[name="payment_method"]').forEach(el => {
                 el.checked = false;
             });
-            // 再根據快照 check
             let hasNonCash = false;
             document.querySelectorAll('input[name="payment_method"]').forEach(el => {
                 if (s.payments.includes(el.value)) {
@@ -955,7 +953,6 @@ function restoreFormSnapshot() {
                     if (el.value !== '現金') hasNonCash = true;
                 }
             });
-            // 如果有非現金選項，展開「更多付款方式」
             if (hasNonCash) {
                 const more = document.getElementById('more-payment-options');
                 if (more) more.classList.remove('hidden');
@@ -1101,14 +1098,31 @@ function checkShowFlightField() {
     }
 }
 
+// ============================================
+// ⭐ 乘客人數檢查：5+ 人自動切去 MAXUS MIFA 7
+// ============================================
 function checkPassengerLimit() {
     const passengersSelect = document.getElementById('passengers');
     const passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
-    if (passengerVal > 4 && selectedCarName === '豐田混能的士') {
-        alert(currentLang === 'en' ? "Passenger count exceeds 4. Toyota Hybrid Taxi cannot be selected. Please choose a 6-seater vehicle." : "乘客人數超過四人，豐田混能的士無法選擇，請選擇其他 6 座位車款。");
-        selectedCarName = '';
-        selectedCarNameEn = '';
-        updateCarDisplay();
+
+    // ⭐ 5 人或以上：4 人車（豐田混能）自動切換去 MAXUS MIFA 7
+    if (passengerVal > 4) {
+        if (selectedCarName === '豐田混能的士' || !selectedCarName) {
+            selectedCarName = 'MAXUS MIFA 7';
+            selectedCarNameEn = 'MAXUS MIFA 7';
+            selectedSurcharge = 50;
+            selectedMinFare = 130;
+            selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)';
+            selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
+            // 85 折只限豐田混能，reset 返正價
+            if (selectedFareMode === 'discount') {
+                selectedFareMode = 'normal';
+            }
+            updateCarDisplay();
+            alert(currentLang === 'en'
+                ? "5+ passengers: auto-switched to MAXUS MIFA 7 (6-seater)."
+                : "乘客人數為 5 人或以上，已自動為你切換至 MAXUS MIFA 7（6 座位）。");
+        }
     }
 }
 
@@ -1306,7 +1320,6 @@ function submitBookingAfterUpgrade() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ⭐ 新增：保存表單快照，方便日後修改預填
             saveFormSnapshot();
 
             try {
@@ -1369,6 +1382,9 @@ function submitBooking(event) {
         alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...');
         return;
     }
+
+    // ⭐ 提交前再檢查一次（防繞過 onchange）
+    checkPassengerLimit();
 
     if (!selectedFareMode) {
         alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
@@ -1484,10 +1500,9 @@ function submitBooking(event) {
 // ============================================
 function initEditMode() {
     const params = new URLSearchParams(location.search);
-    const editId = params.get('edit');   // 只讀 URL，唔讀 sessionStorage
+    const editId = params.get('edit');
 
     if (!editId) {
-        // URL 冇 edit 參數 → 清走任何殘留
         sessionStorage.removeItem('taxiEditingBookingId');
         editingBookingId = null;
         return;
@@ -1516,11 +1531,10 @@ function initEditMode() {
     }
     if (bookingBtn) switchOrderType('booking');
 
-    // ⭐ 新增：還原表單快照
+    // ⭐ 還原表單快照
     restoreFormSnapshot();
 }
 
-// ⭐ B 版：取消修改 → 讀返成功頁 URL（冇 updated=1）
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
 
@@ -1583,7 +1597,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
 
-    // ⚠️ 注意：呢兩個 default value 會被 restoreFormSnapshot 覆蓋（如果編輯模式）
     if (dateInput) dateInput.value = formattedDate;
     if (timeInput) timeInput.value = formattedTime;
 
@@ -1612,10 +1625,8 @@ window.addEventListener('DOMContentLoaded', () => {
     applyLanguage();
     switchOrderType('instant');
 
-    // ⭐ 順序很重要：initEditMode 會 call restoreFormSnapshot 覆蓋 default 值
     initEditMode();
 
-    // ⭐ PART 1：檢查係咪啱啱先提交過（修改模式下唔檢查）
     if (!editingBookingId) {
         const recent = getRecentSubmission();
         if (recent) {
