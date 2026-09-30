@@ -1713,9 +1713,43 @@ function initEditMode() {
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
-    // ⭐ 唔再鎖定「即時訂單」按鈕，允許客人自由切換
-    var bookingBtn = document.getElementById('btn-booking-order');
-    if (bookingBtn) switchOrderType('booking');
+// ⭐ 判斷原本訂單類型，決定是否鎖定即時訂單按鈕
+    // - 預約訂單 → 鎖定即時訂單按鈕（唔俾改成即時）
+    // - 即時訂單 → 唔鎖，可以自由切換
+    var originalOrderType = 'booking';
+
+    // 優先判斷是否由 lookup 進入（lookup 一定係預約訂單）
+    var hasLookupResult = false;
+    try {
+        if (sessionStorage.getItem('taxiLookupResult')) hasLookupResult = true;
+    } catch(e) {}
+
+    if (hasLookupResult) {
+        originalOrderType = 'booking';
+    } else {
+        // 由本機快照讀
+        try {
+            var snapRaw = localStorage.getItem('taxiEditPrefillData');
+            if (snapRaw) {
+                var snap = JSON.parse(snapRaw);
+                if (snap.orderType) originalOrderType = snap.orderType;
+            }
+        } catch(e) {}
+    }
+
+    if (originalOrderType === 'booking') {
+        // 預約訂單 → 鎖定即時訂單按鈕
+        var instantBtn = document.getElementById('btn-instant-order');
+        if (instantBtn) {
+            instantBtn.disabled = true;
+            instantBtn.style.opacity = '0.4';
+            instantBtn.style.pointerEvents = 'none';
+        }
+        switchOrderType('booking');
+    } else {
+        // 即時訂單 → 唔鎖，可以自由切換
+        switchOrderType('instant');
+    }
 
     if (!applyLookupResultIfAny()) {
         restoreFormSnapshot();
