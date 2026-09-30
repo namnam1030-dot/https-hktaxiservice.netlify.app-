@@ -295,7 +295,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 }
 
 /* ============================================
-   Discord 通知
+   Discord 通知（加隨機延遲避免 Rate Limit）
    ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
@@ -329,6 +329,10 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
     console.log('Discord 未設定，跳過通知');
     return null;
   }
+
+  // ⭐ 隨機延遲 0-800ms，避免同 Apps Script 撞 Rate Limit
+  const randomDelay = Math.floor(Math.random() * 800);
+  await new Promise(function(r) { setTimeout(r, randomDelay); });
 
   const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
   const reqBody = JSON.stringify({ content: message, flags: 4 });
@@ -432,7 +436,6 @@ async function updateDiscordNotification(existing, data, changedFields) {
 function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.customerMessage || data.description || '收到新訂單';
 
-  // ⭐ 保留 [tel:xxx] 連結，只將 Discord 格式 [WhatsApp](<url>) 轉做 [WhatsApp](url)
   body = body
     .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, '[WhatsApp]($1)')
     .replace(/\*\*([^*]+)\*\*/g, '$1');
@@ -460,7 +463,6 @@ function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
     content = body;
   }
 
-  // 將 bookingId 搬去 💰 行嘅下一行
   if (bookingId) {
     const lines = content.split('\n');
     let insertIndex = -1;
@@ -501,7 +503,7 @@ async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
       headers: {
         'Priority': isUpdate ? 'default' : 'high',
         'Tags': isUpdate ? 'arrows_counterclockwise' : 'taxi',
-        'Markdown': 'yes',   // ⭐ 啟用 markdown 渲染（電話連結可點擊）
+        'Markdown': 'yes',
         'Content-Type': 'text/plain; charset=utf-8'
       },
       body: content
