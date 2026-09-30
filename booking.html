@@ -654,9 +654,9 @@
     </footer>
 
 <script>
-/* ============================================
-   PART A：變數 + 翻譯
-   ============================================ */
+// ============================================
+// 頁面變數 + 翻譯
+// ============================================
 var currentLang = localStorage.getItem('taxiLang') || 'zh';
 var selectedCarName = '';
 var selectedCarNameEn = '';
@@ -668,8 +668,10 @@ var selectedFareMode = '';
 var currentBaseFare = 0;
 var currentTunnelFee = 0;
 var orderType = 'instant';
+
 var upgradeChoice = null;
 var pendingBookingData = null;
+
 var editingBookingId = null;
 
 function calculateTotalFare() {
@@ -837,9 +839,6 @@ var translations = {
     }
 };
 
-/* ============================================
-   PART B：helper + 快照 + changedFields
-   ============================================ */
 function getRecentSubmission() {
     try {
         var raw = sessionStorage.getItem('taxiLastSubmission');
@@ -1071,9 +1070,6 @@ function computeChangedFields(carDisplayText) {
     }
 }
 
-/* ============================================
-   PART C：頁面函數
-   ============================================ */
 function switchOrderType(type) {
     orderType = type;
     var instantBtn = document.getElementById('btn-instant-order');
@@ -1393,7 +1389,12 @@ function submitBookingAfterUpgrade() {
         orderType: orderType,
         isWechatCustomer: data.isWechatCustomer === true,
         bookingId: editingBookingId || undefined,
-        changedFields: changedFields || undefined
+        changedFields: changedFields || undefined,
+        // ⭐ 車費資料（存入 extendedProperties）
+        currentBaseFare: currentBaseFare,
+        currentTunnelFee: currentTunnelFee,
+        selectedFareMode: selectedFareMode,
+        selectedCarName: selectedCarName
     };
 
     var submitBtn = document.getElementById('booking-submit-btn');
@@ -1586,9 +1587,6 @@ function submitBooking(event) {
     }
 }
 
-/* ============================================
-   PART D：修改模式 + lookup 預填
-   ============================================ */
 function initEditMode() {
     var params = new URLSearchParams(location.search);
     var editId = params.get('edit');
@@ -1635,7 +1633,7 @@ function applyLookupResultIfAny() {
         var o = JSON.parse(raw);
         console.log('[Lookup] 用 server 資料預填：', o);
 
-        // ⭐ 1) 寫返 taxiRouteData 落 localStorage（否則路線摘要 & 提交會冇路線）
+        // ⭐ 1) 寫返 taxiRouteData 落 localStorage
         var stopoversArr = [];
         if (o.stopovers) {
             stopoversArr = String(o.stopovers).split('、').filter(Boolean);
@@ -1664,6 +1662,21 @@ function applyLookupResultIfAny() {
 
         switchOrderType('booking');
 
+        // ⭐ 3) 恢復車費資料
+        if (typeof o.baseFare === 'number' && o.baseFare > 0) {
+            currentBaseFare = o.baseFare;
+        }
+        if (typeof o.tunnelFee === 'number' && o.tunnelFee >= 0) {
+            currentTunnelFee = o.tunnelFee;
+        }
+        if (typeof o.surcharge === 'number' && o.surcharge >= 0) {
+            selectedSurcharge = o.surcharge;
+        }
+        if (o.selectedFareMode === 'discount' || o.selectedFareMode === 'normal') {
+            selectedFareMode = o.selectedFareMode;
+        }
+
+        // ⭐ 4) 表單欄位預填
         if (o.date) {
             var elD = document.getElementById('date');
             if (elD) elD.value = o.date;
@@ -1726,6 +1739,7 @@ function applyLookupResultIfAny() {
         var wxEl = document.getElementById('is_wechat_customer');
         if (wxEl) wxEl.checked = !!o.isWechatCustomer;
 
+        // ⭐ 5) 車款還原
         if (o.carDisplayText) {
             var cd = String(o.carDisplayText);
             if (cd.indexOf('MIFA') >= 0) {
@@ -1764,21 +1778,24 @@ function applyLookupResultIfAny() {
                 selectedFeeMode = '標準收費・無附加費';
                 selectedFeeModeEn = 'Standard Fare · No Surcharge';
             }
-            updateCarDisplay();
         }
 
+        // ⭐ 6) 收費模式（如 o.feeMode 有值覆蓋）
         if (o.feeMode) {
             if (String(o.feeMode).indexOf('八五折') >= 0) {
                 selectedFareMode = 'discount';
             } else {
                 selectedFareMode = 'normal';
             }
-            updateCarDisplay();
         }
 
+        updateCarDisplay();
+
+        // ⭐ 7) 建立 baseline snapshot（清舊，用啱填好嘅 DOM 建新）
         localStorage.removeItem('taxiEditPrefillData');
         saveFormSnapshot(o.carDisplayText || '');
 
+        // ⭐ 8) 清走 lookup 結果
         sessionStorage.removeItem('taxiLookupResult');
 
         console.log('[Lookup] 預填完成');
@@ -1799,9 +1816,6 @@ function cancelEditMode() {
     }
 }
 
-/* ============================================
-   PART E：頁面初始化
-   ============================================ */
 window.addEventListener('DOMContentLoaded', function() {
     var bookingData = loadBookingDataFromLocalStorage();
     if (bookingData) {
