@@ -153,14 +153,12 @@
         line-height: 1.6;
     }
 
-    /* ⭐ 訂單內容框：改用 div + 行高 */
     #booking-details {
         line-height: 1.8;
         word-break: break-word;
         white-space: pre-wrap;
         font-family: ui-monospace, 'PingFang HK', monospace;
     }
-    /* ⭐ 修改欄位紅色高亮 */
     .changed-value {
         color: #ef4444;
         font-weight: 700;
@@ -338,7 +336,6 @@
         border: 1px solid #000000 !important;
     }
 
-    /* ⭐ 預約編號框（淺色主題） */
     html.light-theme body #booking-id-row {
         background-color: #FFF200 !important;
         border-color: #000000 !important;
@@ -350,7 +347,6 @@
         color: #000000 !important;
     }
 
-    /* ⭐ 返回鍵提示 Toast */
     #back-toast {
         position: fixed;
         bottom: 24px;
@@ -374,7 +370,6 @@
         color: #FFFFFF;
     }
 
-    /* ⭐ 訂單已更新 — 彈出色提示 Toast */
     #updated-toast {
         position: fixed;
         top: 20px;
@@ -458,7 +453,6 @@
                 </p>
             </div>
 
-            <!-- ⭐ 預約編號框 -->
             <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-4 mb-4 text-center">
                 <div id="booking-id-label" class="text-xl text-gray-300 mb-2" data-i18n="booking_id_label">你的預約編號</div>
                 <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-4xl tracking-widest">—</div>
@@ -469,13 +463,11 @@
                 </button>
             </div>
 
-            <!-- ⭐ 訂單已修改橫幅 -->
             <div id="updated-banner" class="hidden bg-green-500/90 text-white rounded-xl p-3 mb-3 text-center font-bold flex items-center justify-center gap-2">
                 <i class="fa-solid fa-circle-check text-lg"></i>
                 <span data-i18n="updated_banner">訂單資料已成功更新！</span>
             </div>
 
-            <!-- 訂單內容框（改用 div，支援紅色高亮） -->
             <div class="bg-black/60 border border-gray-700 rounded-xl p-4 mb-6 text-left">
                 <div id="booking-details" class="text-white text-lg"></div>
             </div>
@@ -552,6 +544,7 @@
 // 語言系統
 // ============================================
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
+var isInstantOrder = false;
 
 const translations = {
     zh: {
@@ -632,11 +625,18 @@ function applyLanguage() {
             el.placeholder = translations[currentLang][key];
         }
     });
+
+    // ⭐ 即時訂單 / 預約訂單 label 唔同字眼
+    var label = document.getElementById('booking-id-label');
+    if (label) {
+        if (isInstantOrder) {
+            label.textContent = currentLang === 'en' ? 'Your Order ID' : '你的訂單編號';
+        } else {
+            label.textContent = currentLang === 'en' ? 'Your Booking ID' : '你的預約編號';
+        }
+    }
 }
 
-// ============================================
-// ⭐ 紅色高亮：渲染訂單內容
-// ============================================
 function escapeHtml(s) {
     return String(s || '')
         .replace(/&/g, '&amp;')
@@ -649,8 +649,7 @@ function renderBookingDetails(text, changedFields) {
     const el = document.getElementById('booking-details');
     if (!el) return;
 
-    // changedFields key → 對應行嘅前綴
-const prefixMap = {
+    const prefixMap = {
         pickup: '📍 起點：',
         dropoff: '🏁 終點：',
         stopovers: '🛑 ',
@@ -669,7 +668,6 @@ const prefixMap = {
         isWechatCustomer: '💚 備注：'
     };
 
-    // 收集所有「已修改」嘅前綴
     const changedPrefixes = [];
     if (changedFields && typeof changedFields === 'object') {
         for (const key of Object.keys(changedFields)) {
@@ -694,11 +692,10 @@ const prefixMap = {
     el.innerHTML = htmlLines.join('\n');
 }
 
-// 從 URL 讀訂單內容
 const urlParams = new URLSearchParams(window.location.search);
 const bookingData = urlParams.get('data');
+isInstantOrder = urlParams.get('instant') === '1';
 
-// ⭐ 從 sessionStorage 讀 changedFields
 let changedFields = null;
 try {
     const raw = sessionStorage.getItem('taxiChangedFields');
@@ -730,14 +727,11 @@ function goBackToHome() {
     sessionStorage.removeItem('bookingPopupShown');
     sessionStorage.removeItem('bookingUpdatePopupShown');
     sessionStorage.removeItem('taxiLastSuccessUrl');
-    sessionStorage.removeItem('taxiChangedFields');   // ⭐ 清走高亮資料
+    sessionStorage.removeItem('taxiChangedFields');
     sessionStorage.setItem('taxiLeftSuccessPage', '1');
     window.location.href = 'index.html';
 }
 
-// ============================================
-// ⭐ 訂單已修改：橫幅 + 彈窗文案 + 彈出色提示
-// ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('updated') !== '1') return;
@@ -764,9 +758,6 @@ function goBackToHome() {
     });
 })();
 
-// ============================================
-// ⭐ 預約編號 + 修改功能
-// ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
     const bookingId = urlParams.get('id') || sessionStorage.getItem('taxiLastBookingId');
@@ -786,16 +777,12 @@ function goBackToHome() {
             const cleanUrl = new URL(location.href);
             cleanUrl.searchParams.delete('updated');
             sessionStorage.setItem('taxiLastSuccessUrl', cleanUrl.toString());
-            // ⭐ 清走舊 changedFields，避免下次進入時誤高亮
             sessionStorage.removeItem('taxiChangedFields');
         } catch(e) {}
-        location.href = `booking.html?edit=${encodeURIComponent(bookingId)}`;
+        location.href = 'booking.html?edit=' + encodeURIComponent(bookingId);
     };
 })();
 
-// ============================================
-// ⭐ 防止用戶撳返回鍵返到表單頁重複提交
-// ============================================
 (function () {
     history.pushState(null, '', location.href);
 
@@ -821,7 +808,6 @@ function goBackToHome() {
     });
 })();
 
-// ===== 成功預約彈窗 =====
 (function () {
     var modal = document.getElementById('bookingModal');
     if (!modal) return;
@@ -860,12 +846,11 @@ function goBackToHome() {
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
-    applyLanguage();
+    setTimeout(function() {
+        applyLanguage();
+    }, 0);
 });
 
-// ============================================
-// ⭐ 修復 bfcache
-// ============================================
 window.addEventListener('pageshow', function(event) {
     if (!event.persisted) return;
 

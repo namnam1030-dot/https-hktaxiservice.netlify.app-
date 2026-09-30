@@ -343,7 +343,7 @@
         white-space: nowrap;
     }
 
-/* ⭐ 修改太遲 Modal 淺色主題 */
+    /* 修改太遲 Modal 淺色主題 */
     html.light-theme body #edit-too-late-modal > div {
         background-color: #FFFFFF !important;
         border-color: #dc2626 !important;
@@ -355,7 +355,7 @@
         color: #374151 !important;
     }
 
-    /* ⭐ 修改太遲 Modal 內嘅「返回主頁」按鈕：同成功頁保持一致 */
+    /* 修改太遲 Modal 內嘅「返回主頁」按鈕：同成功頁保持一致 */
     html.light-theme body #edit-too-late-back-btn {
         background-color: #E5E7EB !important;
         color: #000000 !important;
@@ -693,7 +693,7 @@
                 <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-phone text-xl"></i> 致電 6881 5441
                 </a>
-<button id="edit-too-late-back-btn" onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
+                <button id="edit-too-late-back-btn" onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁
                 </button>
             </div>
@@ -1494,8 +1494,9 @@ function submitBookingAfterUpgrade() {
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
             var updatedParam = data.updated ? '&updated=1' : '';
+            var instantParam = (orderType === 'instant') ? '&instant=1' : '';
 
-            window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam);
+            window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam + instantParam);
         } else {
             sessionStorage.removeItem('taxiSubmitting');
             if (submitBtn) {
@@ -1652,6 +1653,8 @@ function isTooLateToEdit() {
             var snapRaw = localStorage.getItem('taxiEditPrefillData');
             if (snapRaw) {
                 var s = JSON.parse(snapRaw);
+                // ⭐ 即時訂單唔檢查 45 分鐘
+                if (s.orderType === 'instant') return false;
                 dateStr = s.date || '';
                 timeStr = s.time || '';
             }
@@ -1710,13 +1713,8 @@ function initEditMode() {
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
-    var instantBtn = document.getElementById('btn-instant-order');
+    // ⭐ 唔再鎖定「即時訂單」按鈕，允許客人自由切換
     var bookingBtn = document.getElementById('btn-booking-order');
-    if (instantBtn) {
-        instantBtn.disabled = true;
-        instantBtn.style.opacity = '0.4';
-        instantBtn.style.pointerEvents = 'none';
-    }
     if (bookingBtn) switchOrderType('booking');
 
     if (!applyLookupResultIfAny()) {
