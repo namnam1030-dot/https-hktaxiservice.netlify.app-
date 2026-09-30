@@ -52,7 +52,6 @@ function insertBookingIdAfterFare(text, bookingId) {
   return lines.join('\n');
 }
 
-// 用 String.fromCharCode(96,96,96) 產生反引號，避免 Markdown 干擾
 function buildChangedFieldsText(changedFields) {
   if (!changedFields || typeof changedFields !== 'object') return '';
   const keys = Object.keys(changedFields);
@@ -71,6 +70,36 @@ function buildChangedFieldsText(changedFields) {
   return ticks + 'diff\n' + lines.join('\n') + '\n' + ticks;
 }
 
+function buildChangedFieldsPlainText(changedFields) {
+  if (!changedFields || typeof changedFields !== 'object') return '';
+  const keys = Object.keys(changedFields);
+  if (keys.length === 0) return '';
+
+  const lines = [];
+  for (let i = 0; i < keys.length; i++) {
+    const f = changedFields[keys[i]];
+    if (!f) continue;
+    lines.push('【改前】' + f.label + '：' + (f.old || '（空）'));
+    lines.push('【改後】' + f.label + '：' + (f.new || '（空）'));
+  }
+  return lines.join('\n');
+}
+
+// 補上默認日期時間（即時訂單唔入 Calendar 但通知會用）
+function ensureDateTime(data) {
+  if (!data.date || !data.time) {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    data.date = data.date || (yyyy + '-' + mm + '-' + dd);
+    data.time = data.time || (hh + ':' + mi);
+  }
+  return data;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: CORS_HEADERS, body: '' };
@@ -82,37 +111,59 @@ exports.handler = async (event) => {
 
     const incomingBookingId = bookingData.bookingId || null;
     const changedFields = bookingData.changedFields || null;
+    const isInstantOrder = bookingData.orderType === 'instant';
+    const isEdit = !!incomingBookingId;
 
-    // ===== 即時訂單：永遠 CREATE，跳過 Calendar，唔產生 bookingId =====
-    if (bookingData.orderType === 'instant') {
-      console.log('即時訂單，跳過 Calendar');
-      await sendDiscordNotification(bookingData, null, false, false, null);
-      return ok({ success: true, bookingId: null, updated: false });
-    }
+    ensureDateTime(bookingData);
 
-    // ===== 預約訂單：有 bookingId 先試 UPDATE =====
+    // ===== 有 bookingId：試搵 Calendar（可能係之前入過 Calendar 嘅訂單） =====
     if (incomingBookingId) {
       const existing = await findExistingBooking(incomingBookingId);
       if (existing) {
+        // Calendar 有 record → UPDATE
         await updateGoogleCalendar(existing, bookingData);
-        await updateDiscordNotification(existing, bookingData, changedFields);
-        console.log('訂單已更新：', incomingBookingId, '，修改欄位：', changedFields ? Object.keys(changedFields) : '無');
+        await updateAllNotifications(existing, bookingData, changedFields);
+        console.log('訂單已更新：', incomingBookingId);
         return ok({ success: true, bookingId: incomingBookingId, updated: true });
       }
-      console.log('搵唔到舊訂單，改為新建：', incomingBookingId);
+      console.log('Calendar 搵唔到 bookingId，視為首次入 Calendar：', incomingBookingId);
     }
 
-    // ===== CREATE =====
-    const newBookingId = generateBookingId();
+    // ===== 即時訂單：唔入 Calendar，只發通知 =====
+    if (isInstantOrder) {
+      const instantBookingId = incomingBookingId || generateBookingId();
+      console.log('即時訂單，跳過 Calendar。bookingId:', instantBookingId);
+
+      // 發 Discord（唔需要 messageId，因為即時訂單唔入 Calendar，冇得存）
+      await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields);
+
+      // 發 ntfy
+      try {
+        await sendNtfyNotification(bookingData, instantBookingId, isEdit, changedFields);
+      } catch (e) {
+        console.error('[Ntfy] 發送失敗：', e);
+      }
+
+      return ok({ success: true, bookingId: instantBookingId, updated: isEdit });
+    }
+
+    // ===== 預約訂單：正常 CREATE =====
+    const newBookingId = incomingBookingId || generateBookingId();
 
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
-    const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, false, null);
+    const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, isEdit, changedFields);
+
+    try {
+      await sendNtfyNotification(bookingData, newBookingId, isEdit, changedFields);
+    } catch (e) {
+      console.error('[Ntfy] 發送失敗：', e);
+    }
 
     if (discordMessageId && calendarEvent && calendarEvent.id) {
       await patchCalendarDiscordMessageId(calendarEvent.id, discordMessageId);
     }
 
-    return ok({ success: true, bookingId: newBookingId, updated: false });
+    return ok({ success: true, bookingId: newBookingId, updated: isEdit });
 
   } catch (error) {
     console.error('處理訂單時出錯：', error);
@@ -183,12 +234,12 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     isWechatCustomer: data.isWechatCustomer ? 'true' : 'false',
     carDisplayText: data.carType || '',
     feeMode: data.feeMode || '',
-    // ⭐ 車費資料（用於 lookup 恢復）
     baseFare: String(data.currentBaseFare || 0),
     tunnelFee: String(data.currentTunnelFee || 0),
     surcharge: String(data.surcharge || 0),
     selectedFareMode: String(data.selectedFareMode || 'normal'),
-    selectedCarName: String(data.selectedCarName || '')
+    selectedCarName: String(data.selectedCarName || ''),
+    orderType: data.orderType || 'booking'
   };
   if (discordMessageId) privateProps.discordMessageId = discordMessageId;
 
@@ -250,6 +301,9 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
   }
 }
 
+/* ============================================
+   Discord 通知
+   ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
 
@@ -354,9 +408,8 @@ async function deleteDiscordMessage(messageId) {
   }
 }
 
-// 方案 C：先發新訊息，成功後刪除舊訊息
 async function updateDiscordNotification(existing, data, changedFields) {
-  console.log('方案 C：發新訊息 + 刪舊訊息');
+  console.log('Discord：發新訊息 + 刪舊訊息');
 
   const oldMessageId = existing.discordMessageId;
 
@@ -369,7 +422,7 @@ async function updateDiscordNotification(existing, data, changedFields) {
   );
 
   if (!newMessageId) {
-    console.error('新訊息發送失敗，保留舊訊息唔刪');
+    console.error('Discord 新訊息發送失敗，保留舊訊息唔刪');
     return;
   }
 
@@ -378,4 +431,97 @@ async function updateDiscordNotification(existing, data, changedFields) {
   }
 
   await patchCalendarDiscordMessageId(existing.eventId, newMessageId);
+}
+
+/* ============================================
+   ntfy 通知
+   ============================================ */
+function buildNtfyMessage(data, bookingId, isUpdate, changedFields) {
+  let body = data.fullMessage || data.customerMessage || data.description || '收到新訂單';
+
+  let header = '';
+  if (isUpdate) {
+    const now = new Date().toLocaleString('zh-HK', {
+      timeZone: 'Asia/Hong_Kong',
+      hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    header = '🔄【訂單已修改】(' + now + ')\n\n';
+
+    const plainChanges = buildChangedFieldsPlainText(changedFields);
+    if (plainChanges) {
+      header += '【修改內容】\n' + plainChanges + '\n\n';
+    } else {
+      header += '（未能偵測具體修改欄位）\n\n';
+    }
+    header += '【最新訂單內容】\n';
+  } else {
+    header = '🚕【新訂單】\n';
+  }
+
+  let content = header + body;
+
+  if (bookingId) {
+    content += '\n🆔 ' + bookingId;
+  }
+
+  if (content.length > 3500) {
+    content = content.substring(0, 3500) + '\n…（內容過長已截斷）';
+  }
+
+  return content;
+}
+
+async function sendNtfyNotification(data, bookingId, isUpdate, changedFields) {
+  const ntfyUrl = process.env.NTFY_URL;
+  if (!ntfyUrl) {
+    console.log('[Ntfy] 未設定，跳過通知');
+    return;
+  }
+
+  const content = buildNtfyMessage(data, bookingId, isUpdate === true, changedFields || null);
+
+  let title = '🚕 新訂單';
+  if (isUpdate) title = '🔄 訂單已修改';
+  if (bookingId) title += ' (' + bookingId + ')';
+
+  try {
+    const res = await fetch(ntfyUrl, {
+      method: 'POST',
+      headers: {
+        'Title': title,
+        'Priority': isUpdate ? 'default' : 'high',
+        'Tags': isUpdate ? 'arrows_counterclockwise' : 'taxi',
+        'Content-Type': 'text/plain; charset=utf-8'
+      },
+      body: content
+    });
+
+    if (res.ok) {
+      console.log('[Ntfy] 通知已發送');
+    } else {
+      const errText = await res.text().catch(function() { return ''; });
+      console.error('[Ntfy] 發送失敗。狀態:', res.status, errText);
+    }
+  } catch (e) {
+    console.error('[Ntfy] 拋錯：', e);
+  }
+}
+
+/* ============================================
+   統一管理：同時發送到多個平台
+   ============================================ */
+async function updateAllNotifications(existing, data, changedFields) {
+  try {
+    await updateDiscordNotification(existing, data, changedFields);
+  } catch (e) {
+    console.error('[All] Discord 更新失敗：', e);
+  }
+
+  try {
+    await sendNtfyNotification(data, existing.bookingId, true, changedFields);
+  } catch (e) {
+    console.error('[All] ntfy 更新失敗：', e);
+  }
 }
