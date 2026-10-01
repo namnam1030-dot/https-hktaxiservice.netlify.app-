@@ -268,7 +268,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 }
 
 /* ============================================
-   Discord 通知（加隨機延遲避免 Rate Limit）
+   Discord 通知（隨機延遲 + 429 重試）
    ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
@@ -296,6 +296,54 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   return body;
 }
 
+// ⭐ 通用：帶 429 重試嘅 fetch
+async function fetchWithRetry(url, options, maxRetries) {
+  maxRetries = maxRetries || 3;
+  let lastResponse = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+
+      // 成功（2xx）
+      if (res.ok) return res;
+
+      // 429 Rate Limit → 重試
+      if (res.status === 429) {
+        const waitMs = (attempt + 1) * 3000;
+        console.warn('[Retry] 429 Rate Limit，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
+        await new Promise(function(r) { setTimeout(r, waitMs); });
+        lastResponse = res;
+        continue;
+      }
+
+      // 5xx Server Error → 重試
+      if (res.status >= 500) {
+        const waitMs = (attempt + 1) * 2000;
+        console.warn('[Retry] ' + res.status + ' Server Error，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
+        await new Promise(function(r) { setTimeout(r, waitMs); });
+        lastResponse = res;
+        continue;
+      }
+
+      // 4xx（除 429）→ 唔重試，直接返回
+      return res;
+
+    } catch (e) {
+      // 網絡錯誤 → 重試
+      if (attempt < maxRetries - 1) {
+        const waitMs = (attempt + 1) * 2000;
+        console.warn('[Retry] 網絡錯誤：' + e.message + '，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
+        await new Promise(function(r) { setTimeout(r, waitMs); });
+        continue;
+      }
+      throw e;
+    }
+  }
+
+  return lastResponse;
+}
+
 async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, changedFields) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) {
@@ -310,37 +358,41 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
   const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
   const reqBody = JSON.stringify({ content: message, flags: 4 });
 
+  // 嘗試用 wait=true 拎 messageId
   if (waitForId) {
     const urlWithWait = webhookUrl + (webhookUrl.indexOf('?') >= 0 ? '&' : '?') + 'wait=true';
     try {
-      const res = await fetch(urlWithWait, {
+      const res = await fetchWithRetry(urlWithWait, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: reqBody
-      });
-      if (res.ok) {
+      }, 3);
+
+      if (res && res.ok) {
         const json = await res.json();
         console.log('Discord 已發送（含 messageId）：', json.id);
         return json.id;
       }
-      const errText = await res.text().catch(function() { return ''; });
-      console.warn('[Discord] wait=true 失敗，改用普通 POST。狀態:', res.status, errText);
+      const errText = res ? await res.text().catch(function() { return ''; }) : '';
+      console.warn('[Discord] wait=true 失敗，改用普通 POST。狀態:', res ? res.status : '無回應', errText);
     } catch (e) {
       console.warn('[Discord] wait=true 拋錯，改用普通 POST:', e.message);
     }
   }
 
+  // Fallback：普通 POST
   try {
-    const res = await fetch(webhookUrl, {
+    const res = await fetchWithRetry(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: reqBody
-    });
-    if (res.ok) {
+    }, 3);
+
+    if (res && res.ok) {
       console.log('Discord 通知已發送（無 messageId）');
     } else {
-      const errText = await res.text().catch(function() { return ''; });
-      console.error('[Discord] 普通 POST 失敗。狀態:', res.status, errText);
+      const errText = res ? await res.text().catch(function() { return ''; }) : '';
+      console.error('[Discord] 普通 POST 失敗。狀態:', res ? res.status : '無回應', errText);
     }
     return null;
   } catch (error) {
@@ -364,13 +416,13 @@ async function deleteDiscordMessage(messageId) {
   const deleteUrl = 'https://discord.com/api/webhooks/' + wh.id + '/' + wh.token + '/messages/' + messageId;
 
   try {
-    const res = await fetch(deleteUrl, { method: 'DELETE' });
-    if (res.ok || res.status === 404) {
+    const res = await fetchWithRetry(deleteUrl, { method: 'DELETE' }, 2);
+    if (res && (res.ok || res.status === 404)) {
       console.log('Discord 舊訊息已刪除（或不存在）：', messageId);
       return true;
     }
-    const errText = await res.text().catch(function() { return ''; });
-    console.error('[Discord] 刪除失敗。狀態:', res.status, errText);
+    const errText = res ? await res.text().catch(function() { return ''; }) : '';
+    console.error('[Discord] 刪除失敗。狀態:', res ? res.status : '無回應', errText);
     return false;
   } catch (e) {
     console.error('[Discord] 刪除拋錯：', e);
