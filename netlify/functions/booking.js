@@ -170,7 +170,8 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
     .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, 'WhatsApp：$1')
     .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
-    .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
+    .replace(/\n\n🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴$/, '')
+    .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, ''); // 兼容舊格式
 
   // ⭐ 清理電話 + 中途站字串
   const cleanPhone = String(data.phone || '').replace(/\D/g, '');
@@ -180,26 +181,26 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
       }).join('、')
     : '';
 
-  // ⭐ 如果 description 冇中途站，插入去「起點」下一行
-  if (stopoversStr && description.indexOf('🛑') < 0 && description.indexOf('中途站') < 0) {
+  // ⭐ 如果 description 冇中途站，喺起點前加「🛑有中途站」+ 中途站
+  if (stopoversStr && description.indexOf('🛑有中途站') < 0 && description.indexOf('🛑 中途站') < 0) {
     // 支援兩種格式：
-    // 1. customerMessage: "📍 起點：xxx\n..."  → 插去「📍 起點：」下一行
-    // 2. fullMessage: "🚕 xxx → yyy\n..."     → 插去「🚕 ...」下一行
+    // 1. customerMessage: "📍 起點：xxx\n..."  → 插去「📍 起點：」上一行
+    // 2. fullMessage: "🚕 xxx → yyy\n..."     → 插去「🚕 ...」上一行
     const pickupLineMatch = description.match(/^(📍\s*起點[：:][^\n]*\n)/m);
     if (pickupLineMatch) {
       description = description.replace(
         pickupLineMatch[0],
-        pickupLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
+        '🛑有中途站\n' + pickupLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
       );
     } else {
       const firstLineMatch = description.match(/^([^\n]*\n)/);
       if (firstLineMatch) {
         description = description.replace(
           firstLineMatch[0],
-          firstLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
+          '🛑有中途站\n' + firstLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
         );
       } else {
-        description = '🛑 中途站：' + stopoversStr + '\n' + description;
+        description = '🛑有中途站\n🛑 中途站：' + stopoversStr + '\n' + description;
       }
     }
   }
@@ -297,6 +298,17 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
    ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
+
+  // ⭐ 有中途站，喺 Discord 訊息最頂加提醒
+  const stopoversStr = Array.isArray(data.stopoverTexts)
+    ? data.stopoverTexts.map(function(s) {
+        return String(s).replace(/中途站\d+:\s*/, '');
+      }).join('、')
+    : '';
+
+  if (stopoversStr && body.indexOf('🛑有中途站') < 0) {
+    body = '🛑有中途站\n' + body;
+  }
 
   if (isUpdate) {
     const now = new Date().toLocaleString('zh-HK', {
