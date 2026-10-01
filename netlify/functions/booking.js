@@ -296,16 +296,21 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 /* ============================================
    Discord 通知（隨機延遲 + 429 重試）
    ============================================ */
+
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
 
-  // ⭐ 有中途站，喺 Discord 訊息最頂加提醒
-  const stopoversStr = Array.isArray(data.stopoverTexts)
-    ? data.stopoverTexts.map(function(s) {
-        return String(s).replace(/中途站\d+:\s*/, '');
-      }).join('、')
-    : '';
+  // ⭐ 支援 stopoverTexts（array）或 stopover（string）
+  let stopoversStr = '';
+  if (Array.isArray(data.stopoverTexts)) {
+    stopoversStr = data.stopoverTexts.map(function(s) {
+      return String(s).replace(/中途站\d+:\s*/, '');
+    }).join('、');
+  } else if (typeof data.stopover === 'string' && data.stopover.trim()) {
+    stopoversStr = data.stopover.trim();
+  }
 
+  // ⭐ 有中途站，喺最頂加提醒（唔顯示中途站名）
   if (stopoversStr && body.indexOf('🛑有中途站') < 0) {
     body = '🛑有中途站\n' + body;
   }
@@ -328,6 +333,9 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
     header += '**最新訂單內容：**\n';
     body = header + body;
   }
+
+  // ⭐ 全部 🔸 改 🔴
+  body = body.replace(/🔸/g, '🔴');
 
   body = insertBookingIdAfterFare(body, bookingId);
   return body;
