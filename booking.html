@@ -363,6 +363,31 @@
     html.light-theme body #edit-too-late-back-btn:hover {
         background-color: #D1D5DB !important;
     }
+
+    /* ⭐ 強制修改太遲 Modal 內致電按鈕為成功頁一樣嘅藍色（深淺色主題都一樣） */
+    #edit-too-late-modal a[href^="tel:"] {
+        background-color: #3B82F6 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+    }
+    #edit-too-late-modal a[href^="tel:"]:hover {
+        background-color: #2563EB !important;
+    }
+    html.light-theme body #edit-too-late-modal a[href^="tel:"] {
+        background-color: #3B82F6 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+    }
+    html.light-theme body #edit-too-late-modal a[href^="tel:"]:hover {
+        background-color: #2563EB !important;
+    }
+    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"] {
+        background-color: #3B82F6 !important;
+        color: #FFFFFF !important;
+    }
+    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"]:hover {
+        background-color: #2563EB !important;
+    }
 </style>
 </head>
 <body class="antialiased">
