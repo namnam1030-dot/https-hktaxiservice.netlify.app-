@@ -1789,9 +1789,12 @@ function applyLookupResultIfAny() {
         var o = JSON.parse(raw);
         console.log('[Lookup] 用 server 資料預填：', o);
 
-        var stopoversArr = [];
+var stopoversArr = [];
         if (o.stopovers) {
-            stopoversArr = String(o.stopovers).split('、').filter(Boolean);
+            // ⭐ 支援多種分隔符號：、/ ➔ / ,
+            stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) {
+                return s.trim();
+            }).filter(Boolean);
         }
         var routeData = {
             pickup: o.pickup || '',
@@ -1807,11 +1810,15 @@ function applyLookupResultIfAny() {
         var dropoffEl = document.getElementById('booking-dropoff-display');
         if (pickupEl) pickupEl.innerText = o.pickup || '-';
         if (dropoffEl) dropoffEl.innerText = o.dropoff || '-';
+
+        // ⭐ 中途站顯示
+        var stopoverWrapper = document.getElementById('booking-stopover-display-wrapper');
+        var stopoverDisplay = document.getElementById('booking-stopover-display');
         if (stopoversArr.length > 0) {
-            var stopoverWrapper = document.getElementById('booking-stopover-display-wrapper');
-            var stopoverDisplay = document.getElementById('booking-stopover-display');
             if (stopoverDisplay) stopoverDisplay.innerText = stopoversArr.join(' ➔ ');
             if (stopoverWrapper) stopoverWrapper.classList.remove('hidden');
+        } else {
+            if (stopoverWrapper) stopoverWrapper.classList.add('hidden');
         }
 
         switchOrderType('booking');
