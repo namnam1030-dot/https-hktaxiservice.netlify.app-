@@ -159,7 +159,6 @@ exports.handler = async (event) => {
         selectedCarName: ext.selectedCarName || ''
       };
     } else {
-      // 舊訂單 fallback
       const desc = ev.description || '';
       const summaryMatch = (ev.summary || '').match(/🚕\s*(.+?)\s*→\s*(.+?)\s*-\s*/);
       const pickupFromSummary = summaryMatch ? summaryMatch[1].trim() : '';
