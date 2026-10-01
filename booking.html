@@ -343,7 +343,6 @@
         white-space: nowrap;
     }
 
-    /* 修改太遲 Modal 淺色主題 */
     html.light-theme body #edit-too-late-modal > div {
         background-color: #FFFFFF !important;
         border-color: #dc2626 !important;
@@ -355,7 +354,6 @@
         color: #374151 !important;
     }
 
-    /* 修改太遲 Modal 內嘅「返回主頁」按鈕：同成功頁保持一致 */
     html.light-theme body #edit-too-late-back-btn {
         background-color: #E5E7EB !important;
         color: #000000 !important;
@@ -364,7 +362,6 @@
         background-color: #D1D5DB !important;
     }
 
-    /* ⭐ 強制修改太遲 Modal 內致電按鈕為成功頁一樣嘅藍色（深淺色主題都一樣） */
     #edit-too-late-modal a[href^="tel:"] {
         background-color: #3B82F6 !important;
         color: #FFFFFF !important;
@@ -1432,11 +1429,11 @@ function submitBookingAfterUpgrade() {
         console.log('[ChangedFields] 結果：', changedFields);
     }
 
-var bookingData = {
-    pickup: data.pickup,
-    stopover: data.stopoverTexts.join(' / '),
-    stopoverTexts: data.stopoverTexts,
-    dropoff: data.dropoff,
+    var bookingData = {
+        pickup: data.pickup,
+        stopover: data.stopoverTexts.join(' / '),
+        stopoverTexts: data.stopoverTexts,
+        dropoff: data.dropoff,
         date: data.date || '',
         time: data.time || '',
         timeFormatted: data.timeStringFormatted || '',
@@ -1660,7 +1657,6 @@ function submitBooking(event) {
     }
 }
 
-// ⭐ 檢查距離出發時間是否 < 45 分鐘
 function isTooLateToEdit() {
     var dateStr = '';
     var timeStr = '';
@@ -1679,7 +1675,6 @@ function isTooLateToEdit() {
             var snapRaw = localStorage.getItem('taxiEditPrefillData');
             if (snapRaw) {
                 var s = JSON.parse(snapRaw);
-                // ⭐ 即時訂單唔檢查 45 分鐘
                 if (s.orderType === 'instant') return false;
                 dateStr = s.date || '';
                 timeStr = s.time || '';
@@ -1696,7 +1691,6 @@ function isTooLateToEdit() {
     return diffMin < 45;
 }
 
-// ⭐ 顯示「修改太遲」Modal
 function showEditTooLateModal() {
     var modal = document.getElementById('edit-too-late-modal');
     if (modal) {
@@ -1719,7 +1713,6 @@ function initEditMode() {
         return;
     }
 
-    // ⭐ 檢查 < 45 分鐘
     if (isTooLateToEdit()) {
         showEditTooLateModal();
         return;
@@ -1739,12 +1732,8 @@ function initEditMode() {
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
-// ⭐ 判斷原本訂單類型，決定是否鎖定即時訂單按鈕
-    // - 預約訂單 → 鎖定即時訂單按鈕（唔俾改成即時）
-    // - 即時訂單 → 唔鎖，可以自由切換
     var originalOrderType = 'booking';
 
-    // 優先判斷是否由 lookup 進入（lookup 一定係預約訂單）
     var hasLookupResult = false;
     try {
         if (sessionStorage.getItem('taxiLookupResult')) hasLookupResult = true;
@@ -1753,7 +1742,6 @@ function initEditMode() {
     if (hasLookupResult) {
         originalOrderType = 'booking';
     } else {
-        // 由本機快照讀
         try {
             var snapRaw = localStorage.getItem('taxiEditPrefillData');
             if (snapRaw) {
@@ -1764,7 +1752,6 @@ function initEditMode() {
     }
 
     if (originalOrderType === 'booking') {
-        // 預約訂單 → 鎖定即時訂單按鈕
         var instantBtn = document.getElementById('btn-instant-order');
         if (instantBtn) {
             instantBtn.disabled = true;
@@ -1773,7 +1760,6 @@ function initEditMode() {
         }
         switchOrderType('booking');
     } else {
-        // 即時訂單 → 唔鎖，可以自由切換
         switchOrderType('instant');
     }
 
@@ -1790,9 +1776,8 @@ function applyLookupResultIfAny() {
         var o = JSON.parse(raw);
         console.log('[Lookup] 用 server 資料預填：', o);
 
-var stopoversArr = [];
+        var stopoversArr = [];
         if (o.stopovers) {
-            // ⭐ 支援多種分隔符號：、/ ➔ / ,
             stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) {
                 return s.trim();
             }).filter(Boolean);
@@ -1812,7 +1797,6 @@ var stopoversArr = [];
         if (pickupEl) pickupEl.innerText = o.pickup || '-';
         if (dropoffEl) dropoffEl.innerText = o.dropoff || '-';
 
-        // ⭐ 中途站顯示
         var stopoverWrapper = document.getElementById('booking-stopover-display-wrapper');
         var stopoverDisplay = document.getElementById('booking-stopover-display');
         if (stopoversArr.length > 0) {
@@ -1949,7 +1933,6 @@ var stopoversArr = [];
 
         updateCarDisplay();
 
-        // ⭐ 同步 taxiBookingData（否則轉去 fleet 頁會冇車費）
         try {
             var bookingSnapshot = {
                 selectedCarName: selectedCarName,
