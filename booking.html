@@ -1432,10 +1432,11 @@ function submitBookingAfterUpgrade() {
         console.log('[ChangedFields] 結果：', changedFields);
     }
 
-    var bookingData = {
-        pickup: data.pickup,
-        stopover: data.stopoverTexts.join(' / '),
-        dropoff: data.dropoff,
+var bookingData = {
+    pickup: data.pickup,
+    stopover: data.stopoverTexts.join(' / '),
+    stopoverTexts: data.stopoverTexts,
+    dropoff: data.dropoff,
         date: data.date || '',
         time: data.time || '',
         timeFormatted: data.timeStringFormatted || '',
