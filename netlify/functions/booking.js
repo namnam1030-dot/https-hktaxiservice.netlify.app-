@@ -172,14 +172,39 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
     .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
 
-  description = insertBookingIdAfterFare(description, bookingId);
-
+  // ⭐ 清理電話 + 中途站字串
   const cleanPhone = String(data.phone || '').replace(/\D/g, '');
   const stopoversStr = Array.isArray(data.stopoverTexts)
     ? data.stopoverTexts.map(function(s) {
         return String(s).replace(/中途站\d+:\s*/, '');
       }).join('、')
     : '';
+
+  // ⭐ 如果 description 冇中途站，插入去「起點」下一行
+  if (stopoversStr && description.indexOf('🛑') < 0 && description.indexOf('中途站') < 0) {
+    // 支援兩種格式：
+    // 1. customerMessage: "📍 起點：xxx\n..."  → 插去「📍 起點：」下一行
+    // 2. fullMessage: "🚕 xxx → yyy\n..."     → 插去「🚕 ...」下一行
+    const pickupLineMatch = description.match(/^(📍\s*起點[：:][^\n]*\n)/m);
+    if (pickupLineMatch) {
+      description = description.replace(
+        pickupLineMatch[0],
+        pickupLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
+      );
+    } else {
+      const firstLineMatch = description.match(/^([^\n]*\n)/);
+      if (firstLineMatch) {
+        description = description.replace(
+          firstLineMatch[0],
+          firstLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
+        );
+      } else {
+        description = '🛑 中途站：' + stopoversStr + '\n' + description;
+      }
+    }
+  }
+
+  description = insertBookingIdAfterFare(description, bookingId);
 
   const privateProps = {
     bookingId: bookingId,
@@ -296,7 +321,6 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   return body;
 }
 
-// ⭐ 通用：帶 429 重試嘅 fetch
 async function fetchWithRetry(url, options, maxRetries) {
   maxRetries = maxRetries || 3;
   let lastResponse = null;
@@ -305,10 +329,8 @@ async function fetchWithRetry(url, options, maxRetries) {
     try {
       const res = await fetch(url, options);
 
-      // 成功（2xx）
       if (res.ok) return res;
 
-      // 429 Rate Limit → 重試
       if (res.status === 429) {
         const waitMs = (attempt + 1) * 3000;
         console.warn('[Retry] 429 Rate Limit，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
@@ -317,7 +339,6 @@ async function fetchWithRetry(url, options, maxRetries) {
         continue;
       }
 
-      // 5xx Server Error → 重試
       if (res.status >= 500) {
         const waitMs = (attempt + 1) * 2000;
         console.warn('[Retry] ' + res.status + ' Server Error，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
@@ -326,11 +347,9 @@ async function fetchWithRetry(url, options, maxRetries) {
         continue;
       }
 
-      // 4xx（除 429）→ 唔重試，直接返回
       return res;
 
     } catch (e) {
-      // 網絡錯誤 → 重試
       if (attempt < maxRetries - 1) {
         const waitMs = (attempt + 1) * 2000;
         console.warn('[Retry] 網絡錯誤：' + e.message + '，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
@@ -351,14 +370,12 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
     return null;
   }
 
-  // ⭐ 隨機延遲 0-800ms，避免同 Apps Script 撞 Rate Limit
   const randomDelay = Math.floor(Math.random() * 800);
   await new Promise(function(r) { setTimeout(r, randomDelay); });
 
   const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
   const reqBody = JSON.stringify({ content: message, flags: 4 });
 
-  // 嘗試用 wait=true 拎 messageId
   if (waitForId) {
     const urlWithWait = webhookUrl + (webhookUrl.indexOf('?') >= 0 ? '&' : '?') + 'wait=true';
     try {
@@ -380,7 +397,6 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
     }
   }
 
-  // Fallback：普通 POST
   try {
     const res = await fetchWithRetry(webhookUrl, {
       method: 'POST',
