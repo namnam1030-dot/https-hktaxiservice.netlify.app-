@@ -35,6 +35,25 @@ function cleanPhone(s) {
   return String(s || '').replace(/\D/g, '');
 }
 
+// ⭐ 由 description 抽中途站
+function extractStopoversFromDescription(description) {
+  if (!description) return '';
+  
+  // 優先：「🛑 中途站：xxx、yyy」
+  const m = description.match(/🛑\s*中途站[：:]\s*([^\n]+)/);
+  if (m) {
+    return m[1].trim();
+  }
+  
+  // Fallback：由「（經 xxx、yyy）」
+  const routeMatch = description.match(/（經\s*([^）]+)）/);
+  if (routeMatch) {
+    return routeMatch[1].trim();
+  }
+  
+  return '';
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: CORS_HEADERS, body: '' };
@@ -76,7 +95,7 @@ exports.handler = async (event) => {
     const ev = items[0];
     const ext = (ev.extendedProperties && ev.extendedProperties.private) || {};
 
-    // ===== 電話驗證：清理後完全相同 =====
+    // ===== 電話驗證 =====
     let phoneMatch = false;
     let matchSource = '';
 
@@ -106,10 +125,19 @@ exports.handler = async (event) => {
     let orderData = {};
 
     if (ext.pickup || ext.dropoff || ext.date) {
+      // ⭐ 中途站：優先讀 extendedProperties，冇就由 description 抽
+      let stopovers = ext.stopovers || '';
+      if (!stopovers) {
+        stopovers = extractStopoversFromDescription(ev.description);
+        if (stopovers) {
+          console.log('[Lookup] 由 description 抽到中途站：', stopovers);
+        }
+      }
+
       orderData = {
         pickup: ext.pickup || '',
         dropoff: ext.dropoff || '',
-        stopovers: ext.stopovers || '',
+        stopovers: stopovers,
         date: ext.date || '',
         time: ext.time || '',
         flightNo: ext.flightNo || '',
@@ -124,7 +152,6 @@ exports.handler = async (event) => {
         isWechatCustomer: ext.isWechatCustomer === 'true',
         carDisplayText: ext.carDisplayText || '',
         feeMode: ext.feeMode || '',
-        // ⭐ 車費資料
         baseFare: parseInt(ext.baseFare || '0', 10) || 0,
         tunnelFee: parseInt(ext.tunnelFee || '0', 10) || 0,
         surcharge: parseInt(ext.surcharge || '0', 10) || 0,
@@ -143,11 +170,12 @@ exports.handler = async (event) => {
       const passengersMatch = desc.match(/👥\s*人數[：:]\s*(.+)/);
       const paymentMatch = desc.match(/💳\s*付款方式[：:]\s*(.+)/);
       const surnameMatch = desc.match(/👤\s*聯絡人[：:]\s*(.+)/);
+      const stopoversFromDesc = extractStopoversFromDescription(desc);
 
       orderData = {
         pickup: pickupMatch ? pickupMatch[1].trim() : pickupFromSummary,
         dropoff: dropoffMatch ? dropoffMatch[1].trim() : dropoffFromSummary,
-        stopovers: '',
+        stopovers: stopoversFromDesc,
         date: '',
         time: '',
         flightNo: '',
