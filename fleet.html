@@ -364,7 +364,7 @@
                                 <i class="fa-solid fa-check"></i> <span data-i18n="btn_select_normal">正價</span>
                             </button>
                             <button type="button" id="toyota-discount-btn" onclick="setToyotaFareMode('discount')" class="toyota-mode-btn-inactive px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-percent"></i> <span data-i18n="btn_select_discount">八五折</span>
+                                <i class="fa-solid fa-percent"></i> <span id="toyota-discount-label" data-i18n="btn_select_discount">八五折</span>
                             </button>
                         </div>
                     </div>
@@ -569,6 +569,17 @@ let selectedFareMode = 'normal';
 let previewFareMode = 'normal';
 let currentBaseFare = 0;
 let currentTunnelFee = 0;
+let isShenzhenBay = false; // ⭐ 新增：判斷起點是否深圳灣
+
+// ⭐ 新增：獲取折扣率
+function getDiscountRate() {
+    return isShenzhenBay ? 0.9 : 0.85;
+}
+
+// ⭐ 新增：獲取折扣名稱
+function getDiscountLabel() {
+    return isShenzhenBay ? (currentLang === 'en' ? '10% Off' : '九折') : (currentLang === 'en' ? '15% Off' : '八五折');
+}
 
 // ============================================
 // 翻譯物件
@@ -693,6 +704,14 @@ function loadBookingDataFromLocalStorage() {
     return null;
 }
 
+function loadRouteDataFromLocalStorage() {
+    const saved = localStorage.getItem('taxiRouteData');
+    if (saved) {
+        try { return JSON.parse(saved); } catch(e) { return null; }
+    }
+    return null;
+}
+
 function saveBookingDataToLocalStorage() {
     const data = {
         selectedCarName: selectedCarName,
@@ -710,22 +729,24 @@ function saveBookingDataToLocalStorage() {
 
 function backToBooking() {
     if (selectedCarName) {
+        const rate = getDiscountRate(); // ⭐ 使用動態折扣率
         if (selectedCarName === '豐田混能的士' && selectedFareMode === 'discount') {
-            const discountedBase = Math.round(currentBaseFare * 0.85);
+            const discountedBase = Math.round(currentBaseFare * rate);
             if (discountedBase <= 100) selectedFareMode = 'normal';
         }
         saveBookingDataToLocalStorage();
     }
-    goToBookingPage();   // ⭐ PART 2
+    goToBookingPage();
 }
 
 function setToyotaFareMode(mode) {
+    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
     if (mode === 'discount' && currentBaseFare > 0) {
-        const discountedBase = Math.round(currentBaseFare * 0.85);
+        const discountedBase = Math.round(currentBaseFare * rate);
         if (discountedBase <= 100) {
             alert(currentLang === 'en' ? 
-                "15% discount is not applicable for this trip (minimum fare not reached)" : 
-                "此行程未達到八五折優惠的最低消費要求");
+                "Discount is not applicable for this trip (minimum fare not reached)" : 
+                "此行程未達到折扣優惠的最低消費要求");
             return;
         }
     }
@@ -737,10 +758,17 @@ function setToyotaFareMode(mode) {
 function updateToyotaModeButtons() {
     const normalBtn = document.getElementById('toyota-normal-btn');
     const discountBtn = document.getElementById('toyota-discount-btn');
+    const discountLabel = document.getElementById('toyota-discount-label');
     if (!normalBtn || !discountBtn) return;
 
-    const discountedBase = Math.round(currentBaseFare * 0.85);
+    const rate = getDiscountRate();
+    const discountedBase = Math.round(currentBaseFare * rate);
     const discountAvailable = currentBaseFare > 0 && discountedBase > 100;
+
+    // ⭐ 更新按鈕文字
+    if (discountLabel) {
+        discountLabel.innerText = getDiscountLabel();
+    }
 
     if (!discountAvailable && previewFareMode === 'discount') previewFareMode = 'normal';
 
@@ -766,7 +794,7 @@ function selectToyotaCar() {
     selectedFeeModeEn = 'Standard Fare · No Surcharge';
     selectedFareMode = previewFareMode;
     saveBookingDataToLocalStorage();
-    goToBookingPage();   // ⭐ PART 2
+    goToBookingPage();
 }
 
 function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeTextEn) {
@@ -778,7 +806,7 @@ function selectCarAndGoToBooking(name, feeText, surcharge, minFare, nameEn, feeT
     selectedFeeModeEn = feeTextEn;
     selectedFareMode = 'normal';
     saveBookingDataToLocalStorage();
-    goToBookingPage();   // ⭐ PART 2
+    goToBookingPage();
 }
 
 function renderCarCardsVisual(activeName) {
@@ -816,12 +844,14 @@ function updateCarCardFees() {
         return;
     }
 
+    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
+
     // 豐田混能
     const car1El = document.getElementById('car1-fee-display');
     if (car1El) {
         let fare;
         if (previewFareMode === 'discount') {
-            const discountedBase = Math.round(currentBaseFare * 0.85);
+            const discountedBase = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
             if (discountedBase > 100) {
                 let discountTunnelFee = 0;
                 if (currentTunnelFee > 0) {
@@ -918,6 +948,10 @@ function applyLanguage() {
         }
     });
 
+    // ⭐ 更新折扣按鈕文字
+    const discountLabel = document.getElementById('toyota-discount-label');
+    if (discountLabel) discountLabel.innerText = getDiscountLabel();
+
     updateCarCardFees();
 }
 
@@ -933,7 +967,7 @@ function closeWeComQR() {
 // 頁面初始化
 // ============================================
 window.addEventListener('DOMContentLoaded', () => {
-    initEditMode();   // ⭐ PART 2
+    initEditMode();
 
     const bookingData = loadBookingDataFromLocalStorage();
     if (bookingData) {
@@ -947,6 +981,13 @@ window.addEventListener('DOMContentLoaded', () => {
         currentBaseFare = bookingData.currentBaseFare || 0;
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
+    
+    // ⭐ 初始化時判斷是否深圳灣
+    const routeData = loadRouteDataFromLocalStorage();
+    if (routeData && routeData.pickup) {
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+    }
+
     previewFareMode = selectedFareMode;
     renderCarCardsVisual(selectedCarName);
     updateToyotaModeButtons();

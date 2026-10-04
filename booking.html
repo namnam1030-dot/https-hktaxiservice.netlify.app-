@@ -737,17 +737,29 @@ var selectedFareMode = '';
 var currentBaseFare = 0;
 var currentTunnelFee = 0;
 var orderType = 'instant';
+var isShenzhenBay = false; // ⭐ 新增：判斷起點是否深圳灣
 
 var upgradeChoice = null;
 var pendingBookingData = null;
 
 var editingBookingId = null;
 
+// ⭐ 新增：獲取折扣率
+function getDiscountRate() {
+    return isShenzhenBay ? 0.9 : 0.85;
+}
+
+// ⭐ 新增：獲取折扣名稱
+function getDiscountLabel() {
+    return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
+}
+
 function calculateTotalFare() {
     if (currentBaseFare <= 0) return 0;
+    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') {
-            var discountedBase = Math.max(Math.round(currentBaseFare * 0.85), 100);
+            var discountedBase = Math.max(Math.round(currentBaseFare * rate), 100);
             var discountTunnelFee = 0;
             if (currentTunnelFee > 0) {
                 var harborTunnelCount = Math.floor(currentTunnelFee / 50);
@@ -774,8 +786,9 @@ function calculateTotalFare() {
 function isMinimumCharge() {
     if (!selectedFareMode) return false;
     if (currentBaseFare <= 0) return false;
+    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
     if (selectedCarName === '豐田混能的士') {
-        if (selectedFareMode === 'discount') return Math.round(currentBaseFare * 0.85) < 100;
+        if (selectedFareMode === 'discount') return Math.round(currentBaseFare * rate) < 100;
         return currentBaseFare < 100;
     }
     return currentBaseFare < 80;
@@ -1100,7 +1113,7 @@ function computeChangedFields(carDisplayText) {
         function fmt(val, key) {
             if (typeof val === 'boolean') return val ? '✅' : '❌';
             if (key === 'selectedFareMode') {
-                if (val === 'discount') return '八五折';
+                if (val === 'discount') return getDiscountLabel();
                 if (val === 'normal') return '正價';
                 return val || '-';
             }
@@ -1185,7 +1198,7 @@ function updateCarDisplay() {
         if (isMinimumCharge()) {
             fareModeTextEl.innerText = currentLang === 'en' ? 'Minimum Fare' : '最低消費';
         } else if (selectedFareMode === 'discount') {
-            fareModeTextEl.innerText = currentLang === 'en' ? '15% Discount' : '八五折優惠';
+            fareModeTextEl.innerText = getDiscountLabel(); // ⭐ 使用動態折扣名稱
         } else if (selectedFareMode === 'normal') {
             fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
         } else {
@@ -1350,7 +1363,7 @@ function submitBookingAfterUpgrade() {
     if (minCharge) {
         msgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
     } else {
-        if (selectedFareMode === 'discount') msgLines.push('💎 收費模式：8️⃣5️⃣ 八五折優惠');
+        if (selectedFareMode === 'discount') msgLines.push('💎 收費模式：' + getDiscountLabel()); // ⭐ 動態折扣名稱
         else msgLines.push('💎 收費模式：💯 正價按錶收費');
         var noteExtra = '';
         if (selectedSurcharge > 0) noteExtra += '+車款附加費';
@@ -1403,7 +1416,7 @@ function submitBookingAfterUpgrade() {
         discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
     } else {
         if (selectedFareMode === 'discount') {
-            discordMsgLines.push('💎 八五折優惠');
+            discordMsgLines.push('💎 ' + getDiscountLabel()); // ⭐ 動態折扣名稱
         } else {
             var feeModeText = '💯正價按錶收費';
             if (selectedCarName === 'MAXUS MIFA 7') {
@@ -1449,7 +1462,7 @@ function submitBookingAfterUpgrade() {
         totalFare: data.totalFareForWhatsApp,
         flightNo: data.flightNo,
         upgradeOption: carDisplayText,
-        feeMode: minCharge ? '最低消費' : (selectedFareMode === 'discount' ? '八五折優惠' : '正價按錶收費'),
+        feeMode: minCharge ? '最低消費' : (selectedFareMode === 'discount' ? getDiscountLabel() : '正價按錶收費'), // ⭐ 動態折扣名稱
         isMinimumCharge: minCharge,
         minimumChargeTotal: minChargeTotal,
         surcharge: selectedSurcharge,
@@ -1792,6 +1805,9 @@ function applyLookupResultIfAny() {
         };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
 
+        // ⭐ 判斷是否深圳灣
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+
         var pickupEl = document.getElementById('booking-pickup-display');
         var dropoffEl = document.getElementById('booking-dropoff-display');
         if (pickupEl) pickupEl.innerText = o.pickup || '-';
@@ -1924,7 +1940,7 @@ function applyLookupResultIfAny() {
         }
 
         if (o.feeMode) {
-            if (String(o.feeMode).indexOf('八五折') >= 0) {
+            if (String(o.feeMode).indexOf('八五折') >= 0 || String(o.feeMode).indexOf('九折') >= 0) {
                 selectedFareMode = 'discount';
             } else {
                 selectedFareMode = 'normal';
@@ -1990,6 +2006,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
     var routeData = loadRouteDataFromLocalStorage();
     if (routeData) {
+        // ⭐ 判斷是否深圳灣
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+        
         if (routeData.pickup) document.getElementById('booking-pickup-display').innerText = routeData.pickup;
         if (routeData.dropoff) document.getElementById('booking-dropoff-display').innerText = routeData.dropoff;
         if (routeData.stopovers && routeData.stopovers.length > 0) {

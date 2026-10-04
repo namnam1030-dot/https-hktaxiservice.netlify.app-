@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
-<!-- ✅✅✅ 反黑閃終極版（html 即落 class，body 出現即補）✅✅✅ -->
+<!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -21,16 +21,13 @@
 
     var root = document.documentElement;
 
-    // ⭐ 即刻落 class 落 <html>
     root.classList.toggle('light-theme', isLight);
 
-    // 底色 + data-theme
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
 
-    // ⭐ body 一出現即補 class（趕得及同 Tailwind 一齊 paint）
     if (isLight) {
         var obs = new MutationObserver(function() {
             if (document.body) {
@@ -44,7 +41,6 @@
 </script>
 
 <style>
-    /* 原本 html[data-theme] 規則（雙重保險） */
     html[data-theme="light"],
     html[data-theme="light"] body {
         background-color: #FFFFFF !important;
@@ -56,7 +52,6 @@
         color: #FFFFFF !important;
     }
 
-    /* ⭐ 新增：html.light-theme 一落即生效 */
     html.light-theme,
     html.light-theme body {
         background-color: #FFFFFF !important;
@@ -123,7 +118,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- ⭐ 由 black-translucent 改為 default，避免 iOS standalone 底層黑 -->
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
@@ -176,7 +170,7 @@
     .pac-item:hover { background-color: #333; }
     .pac-item-query { color: #FFF200; font-size: 17px; }
 
-    /* ===== 淺色主題（全部由 body.light-theme → html.light-theme body）===== */
+    /* ===== 淺色主題 ===== */
     html.light-theme body .pac-container {
         background-color: #FFFFFF;
         color: #000000;
@@ -190,7 +184,6 @@
     html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
     html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
 
-    /* 淺色主題下頁面專屬按鈕 */
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
@@ -202,7 +195,6 @@
         border: 1px solid #000000 !important;
     }
 
-    /* 淺色主題下動態路線選項按鈕 */
     html.light-theme body #route-options-list button {
         background-color: #F3F4F6 !important;
         border-color: #D1D5DB !important;
@@ -213,7 +205,6 @@
         border-color: #000000 !important;
         color: #000000 !important;
     }
-    /* 淺色主題下隧道偵測框 */
     html.light-theme body .bg-sky-900\/30 {
         background-color: rgba(14, 165, 233, 0.1) !important;
     }
@@ -229,11 +220,6 @@
         border-color: #000000 !important;
     }
 
-    /* =========================================================
-       🔧 深→淺切換殘留修復（result 專屬）
-       ========================================================= */
-
-    /* ── 1) 隧道偵測框：整個框 + 所有子元素強制深藍 ── */
     html.light-theme body #detected-tunnels-container,
     html.light-theme body #detected-tunnels-container *,
     html.light-theme body #detected-tunnels-container .text-sky-200,
@@ -244,14 +230,12 @@
         color: #0369A1 !important;
     }
 
-    /* ── 2) 隧道費用行：整行 + 所有子元素強制深藍 ── */
     html.light-theme body #res-tunnel-row,
     html.light-theme body #res-tunnel-row *,
     html.light-theme body #res-tunnel-row .text-sky-300 {
         color: #0369A1 !important;
     }
 
-    /* ── 3) 收費模式兩個方格：強制白底 + 淺灰邊 ── */
     html.light-theme body #discount-option-container,
     html.light-theme body .space-y-3 > label.bg-brand-dark,
     html.light-theme body label.bg-brand-dark,
@@ -261,7 +245,6 @@
         border-color: #D1D5DB !important;
     }
 
-    /* ── 4) 收費模式複選框：強制淺色渲染（避免黑方塊）── */
     html.light-theme body input[type="checkbox"],
     html.light-theme body .fare-mode-checkbox {
         color-scheme: light !important;
@@ -269,7 +252,6 @@
         background-color: #FFFFFF !important;
     }
 
-    /* ── 5) hover 時保持黑框 ── */
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
     html.light-theme body #discount-option-container:hover {
         border-color: #000000 !important;
@@ -294,6 +276,7 @@
     let currentBaseFare = 0;
     let currentTunnelFee = 0;
     let routeData = null;
+    let isShenzhenBay = false; // ⭐ 新增：判斷起點是否深圳灣
 
     // ============================================
     // 2. 翻譯物件
@@ -382,9 +365,17 @@
         }
     };
 
-    // ============================================
-    // 3. 所有函數定義
-    // ============================================
+    // ⭐ 新增：獲取折扣率函數
+    function getDiscountRate() {
+        if (!routeData || !routeData.pickup) return 0.85;
+        var p = routeData.pickup;
+        return (p.indexOf('深圳灣') >= 0 || p.indexOf('深圳湾') >= 0) ? 0.9 : 0.85;
+    }
+
+    // ⭐ 新增：獲取折扣名稱
+    function getDiscountLabel() {
+        return isShenzhenBay ? (currentLang === 'en' ? '10% Discount Offer' : '九折優惠') : (currentLang === 'en' ? '15% Discount Offer' : '八五折優惠');
+    }
 
     function loadRouteDataFromLocalStorage() {
         const saved = localStorage.getItem('taxiRouteData');
@@ -437,20 +428,19 @@
         window.location.href = 'fleet.html';
     }
 
-function goToBookingPage() {
-    if (!selectedFareMode) {
-        alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
-        return;
+    function goToBookingPage() {
+        if (!selectedFareMode) {
+            alert(currentLang === 'en' ? "Please select a fare mode (normal or 15% discount)!" : "請先選擇收費模式（正價或八五折優惠）！");
+            return;
+        }
+        if (!selectedCarName) {
+            selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
+        }
+        saveBookingDataToLocalStorage();
+        const editId = sessionStorage.getItem('taxiEditingBookingId');
+        const suffix = editId ? `?edit=${encodeURIComponent(editId)}` : '';
+        window.location.href = 'booking.html' + suffix;
     }
-    if (!selectedCarName) {
-        selectCar('豐田混能的士', '標準收費・無附加費', 0, 0, 'Toyota Hybrid Taxi', 'Standard Fare · No Surcharge', true);
-    }
-    saveBookingDataToLocalStorage();
-    // ⭐ PART 2：修改模式下帶返 edit 參數
-    const editId = sessionStorage.getItem('taxiEditingBookingId');
-    const suffix = editId ? `?edit=${encodeURIComponent(editId)}` : '';
-    window.location.href = 'booking.html' + suffix;
-}
 
     function showWeComQR() {
         document.getElementById('wecom-modal').classList.remove('hidden');
@@ -487,74 +477,41 @@ function goToBookingPage() {
         return Math.round(fare);
     }
 
-    // =========================================================
-    // ⭐ normalizeLocation —— 支援起點 / 終點不同座標
-    // =========================================================
-    // 參數 isPickup：
-    //   true  → 起點（機場的士站接客）22.312861, 113.936500
-    //   false → 終點（T1 離境大堂落客）22.315500, 113.936361
-    //
-    // 規則：
-    //   1. T2 具體關鍵字 → T2 座標
-    //   2. T1 具體關鍵字 → T1 座標
-    //   3. 純機場輸入：
-    //      - 起點 → 22.312861, 113.936500
-    //      - 終點 → 22.315500, 113.936361
-    //   4. 其他一律交返俾 Google
-    //
-    // T1: 22°18'55.8"N 113°56'10.9"E → 22.315500, 113.936361（終點落客）
-    // T2: 22°18'58.8"N 113°56'15.4"E → 22.316333, 113.937611
-    // 機場的士站（起點）: 22°18'46.3"N 113°56'11.4"E → 22.312861, 113.936500
-    // =========================================================
     function normalizeLocation(loc, isPickup = false) {
         if (!loc) return "";
         let trimmed = loc.trim();
 
-        // T2：先檢查（避免「機場T2」被之後嘅 T1 攔截）
         if (/二號客運大樓|二号客运大楼|機場t2|机场t2|terminal\s*2/i.test(trimmed)) {
             return new google.maps.LatLng(22.316333, 113.937611);
         }
-
-        // T1：具體關鍵字
         if (/一號客運大樓|一号客运大楼|機場t1|机场t1|terminal\s*1|hkia/i.test(trimmed)) {
             return new google.maps.LatLng(22.315500, 113.936361);
         }
 
-        // ⭐ 純機場輸入（忽略空格、標點）才 fallback
         let cleaned = trimmed.replace(/[\s\-\(\)（）,，。\.、]/g, "");
 
-        // 起點：機場的士站（接客）
         const airportPickupKeywords = [
-            "機場", "机场",
-            "香港國際機場", "香港国际机场",
-            "赤鱲角機場", "赤鱲角机场", "赤腊角机场",
-            "機場1號停車場", "机场1号停车场",
-            "機場一號停車場", "机场一号停车场",
-            "機場2號停車場", "机场2号停车场",
-            "機場二號停車場", "机场二号停车场"
+            "機場", "机场", "香港國際機場", "香港国际机场", "赤鱲角機場", "赤鱲角机场", "赤腊角机场",
+            "機場1號停車場", "机场1号停车场", "機場一號停車場", "机场一号停车场",
+            "機場2號停車場", "机场2号停车场", "機場二號停車場", "机场二号停车场"
         ];
         if (isPickup && airportPickupKeywords.includes(cleaned)) {
             return new google.maps.LatLng(22.313625, 113.936071);
         }
 
-        // 終點：T1 離境大堂（落客）
         const airportDropoffKeywords = [
-            "機場", "机场",
-            "香港國際機場", "香港国际机场",
-            "赤鱲角機場", "赤鱲角机场", "赤腊角机场"
+            "機場", "机场", "香港國際機場", "香港国际机场", "赤鱲角機場", "赤鱲角机场", "赤腊角机场"
         ];
         if (!isPickup && airportDropoffKeywords.includes(cleaned)) {
             return new google.maps.LatLng(22.315500, 113.936361);
         }
 
-        // 其他既有地點
         if (trimmed.includes("迪士尼")) return "迪士尼樂園度假區的士站";
         if (trimmed.includes("蓮塘") || trimmed.includes("香園圍") || trimmed.includes("香園圍口岸")) return new google.maps.LatLng(22.553780, 114.153662);
         if (trimmed.includes("愉景灣")) return "愉景灣的士站";
         if (trimmed.includes("落馬洲")) return "落馬洲支線出入境管制站";
         if (trimmed.includes("深圳灣")) return new google.maps.LatLng(22.475889, 113.955944);
 
-        // 其他一律交返俾 Google
         return trimmed;
     }
 
@@ -630,6 +587,10 @@ function goToBookingPage() {
         let pickupVal = routeData.pickup || '';
         let dropoffVal = routeData.dropoff || '';
         let stopoverTexts = routeData.stopovers || [];
+        
+        // ⭐ 判斷是否深圳灣起點
+        isShenzhenBay = (pickupVal.indexOf('深圳灣') >= 0 || pickupVal.indexOf('深圳湾') >= 0);
+
         if (!pickupVal || !dropoffVal) {
             alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
             window.location.href = 'index.html';
@@ -646,9 +607,8 @@ function goToBookingPage() {
         document.getElementById('confirm-dropoff').innerText = dropoffVal;
 
         if (!directionsService) directionsService = new google.maps.DirectionsService();
-        let isShenzhenBay = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
+        let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
 
-        // ⭐ 起點用 isPickup=true，終點及中途站用 isPickup=false
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
         let waypoints = [];
@@ -664,7 +624,7 @@ function goToBookingPage() {
 
         directionsService.route(request, (result, status) => {
             if (status === google.maps.DirectionsStatus.OK) {
-                routesData = processRoutes(result.routes, isShenzhenBay);
+                routesData = processRoutes(result.routes, isShenzhenBayRoute);
                 result.routes = routesData;
                 document.getElementById('loading-indicator').classList.add('hidden');
                 document.getElementById('result-content').classList.remove('hidden');
@@ -681,13 +641,13 @@ function goToBookingPage() {
                         let durSeconds = 0;
                         legs.forEach(leg => { distMeters += leg.distance.value; durSeconds += leg.duration.value; });
                         let distKm = distMeters / 1000;
-                        if (isShenzhenBay) distKm += 2.8;
+                        if (isShenzhenBayRoute) distKm += 2.8;
                         let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
-                        btn.onclick = () => selectRouteOption(index, isShenzhenBay);
+                        btn.onclick = () => selectRouteOption(index, isShenzhenBayRoute);
                         btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
                                         <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
                         routeListContainer.appendChild(btn);
@@ -696,7 +656,7 @@ function goToBookingPage() {
                     routeOptionsBox.classList.add('hidden');
                 }
 
-                displaySelectedRoute(result, 0, isShenzhenBay);
+                displaySelectedRoute(result, 0, isShenzhenBayRoute);
             } else {
                 alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
                 window.location.href = 'index.html';
@@ -704,18 +664,18 @@ function goToBookingPage() {
         });
     }
 
-    function selectRouteOption(index, isShenzhenBay) {
+    function selectRouteOption(index, isShenzhenBayRoute) {
         const btns = document.querySelectorAll('#route-options-list button');
         btns.forEach((btn, i) => {
             if (i === index) btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-brand-yellow/20 border-brand-yellow text-white font-bold";
             else btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-black/40 border-gray-700 text-gray-400 hover:text-white";
         });
         if (directionsRenderer && directionsRenderer.getDirections()) {
-            displaySelectedRoute(directionsRenderer.getDirections(), index, isShenzhenBay);
+            displaySelectedRoute(directionsRenderer.getDirections(), index, isShenzhenBayRoute);
         }
     }
 
-    function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBay) {
+    function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute) {
         if (!map) {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
@@ -740,7 +700,7 @@ function goToBookingPage() {
         selectedRoute.legs.forEach(leg => { totalMeters += leg.distance.value; totalSeconds += leg.duration.value; });
 
         let routeKm = totalMeters / 1000;
-        let finalKm = isShenzhenBay ? (routeKm + 2.8) : routeKm;
+        let finalKm = isShenzhenBayRoute ? (routeKm + 2.8) : routeKm;
         let durationMinutes = Math.round(totalSeconds / 60);
         let baseMeterFare = calculateTaxiBaseFare(finalKm);
         let tunnelResult = checkTunnelsForRoute(selectedRoute, false);
@@ -788,6 +748,7 @@ function goToBookingPage() {
     function handleFareModeSelection(mode) {
         const normalCheckbox = document.getElementById('fare-mode-normal');
         const discountCheckbox = document.getElementById('fare-mode-discount');
+        const rate = getDiscountRate(); // ⭐ 獲取動態折扣率
 
         if (mode === 'normal') {
             if (normalCheckbox.checked) {
@@ -796,9 +757,9 @@ function goToBookingPage() {
             } else selectedFareMode = '';
         } else if (mode === 'discount') {
             if (discountCheckbox.checked) {
-                let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+                let discountedBaseFare = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
                 if (discountedBaseFare <= 100) {
-                    alert(currentLang === 'en' ? "15% discount is not applicable for this trip (minimum fare not reached)" : "此行程未達到八五折優惠的最低消費要求");
+                    alert(currentLang === 'en' ? "Discount is not applicable for this trip (minimum fare not reached)" : "此行程未達到折扣優惠的最低消費要求");
                     discountCheckbox.checked = false;
                     return;
                 }
@@ -820,6 +781,7 @@ function goToBookingPage() {
         const normalFareNote = document.getElementById('normal-fare-note');
         const discountFareNote = document.getElementById('discount-fare-note');
         const discountContainer = document.getElementById('discount-option-container');
+        const rate = getDiscountRate(); // ⭐ 獲取動態折扣率
 
         let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
         if (currentBaseFare <= 100) normalFare = 100 + currentTunnelFee + selectedSurcharge;
@@ -833,7 +795,7 @@ function goToBookingPage() {
             }
         }
 
-        let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+        let discountedBaseFare = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
         let discountEligible = discountedBaseFare > 100;
         let discountTunnelFee = 0;
         if (currentTunnelFee > 0) {
@@ -842,6 +804,12 @@ function goToBookingPage() {
         }
         let discountFare = discountedBaseFare + discountTunnelFee;
         if (discountContainer) discountContainer.style.display = '';
+
+        // ⭐ 更新折扣名稱
+        const discountLabelEl = document.querySelector('[data-i18n="fare_discount_label"]');
+        if (discountLabelEl) {
+            discountLabelEl.innerText = getDiscountLabel();
+        }
 
         if (discountEligible) {
             if (discountContainer) { discountContainer.style.opacity = '1'; discountContainer.style.pointerEvents = 'auto'; }
@@ -878,7 +846,14 @@ function goToBookingPage() {
         const discountCheckbox = document.getElementById('fare-mode-discount');
         if (currentBaseFare <= 0) return;
         if (discountContainer) discountContainer.style.display = '';
-        let discountedBaseFare = Math.round(currentBaseFare * 0.85);
+        const rate = getDiscountRate(); // ⭐ 獲取動態折扣率
+        let discountedBaseFare = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
+
+        // ⭐ 更新折扣名稱
+        const discountLabelEl = document.querySelector('[data-i18n="fare_discount_label"]');
+        if (discountLabelEl) {
+            discountLabelEl.innerText = getDiscountLabel();
+        }
 
         if (discountedBaseFare > 100) {
             if (discountContainer) { discountContainer.style.opacity = '1'; discountContainer.style.pointerEvents = 'auto'; }
@@ -897,6 +872,12 @@ function goToBookingPage() {
 
     function initMap() {
         routeData = loadRouteDataFromLocalStorage();
+        
+        // ⭐ 初始化時判斷是否深圳灣
+        if (routeData && routeData.pickup) {
+            isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+        }
+
         const bookingData = loadBookingDataFromLocalStorage();
         if (bookingData) {
             selectedCarName = bookingData.selectedCarName || '';
@@ -919,7 +900,7 @@ function goToBookingPage() {
     }
 
     // ============================================
-    // 語言系統（頁面專屬）
+    // 語言系統
     // ============================================
     let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
@@ -1024,7 +1005,7 @@ function goToBookingPage() {
             </p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
             </div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                 了解，關閉
             </button>
         </div>
