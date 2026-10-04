@@ -626,7 +626,6 @@ function applyLanguage() {
         }
     });
 
-    // ⭐ 即時訂單 / 預約訂單 label 唔同字眼
     var label = document.getElementById('booking-id-label');
     if (label) {
         if (isInstantOrder) {
@@ -692,9 +691,36 @@ function renderBookingDetails(text, changedFields) {
     el.innerHTML = htmlLines.join('\n');
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const bookingData = urlParams.get('data');
-isInstantOrder = urlParams.get('instant') === '1';
+// ⭐ 優先從 sessionStorage 讀取，避免 URL 過長導致資料丟失
+let customerMessage = '';
+try {
+    const lastSub = sessionStorage.getItem('taxiLastSubmission');
+    if (lastSub) {
+        const parsed = JSON.parse(lastSub);
+        customerMessage = parsed.customerMessage || '';
+    }
+} catch(e) {}
+
+// 如果 sessionStorage 沒有，才 fallback 去 URL
+if (!customerMessage) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlData = urlParams.get('data');
+    if (urlData) {
+        try {
+            customerMessage = decodeURIComponent(urlData);
+        } catch(e) {
+            console.error('URL 解碼失敗:', e);
+            customerMessage = urlData;
+        }
+    }
+}
+
+isInstantOrder = (new URLSearchParams(window.location.search)).get('instant') === '1';
+
+// ⭐ 強制根據當前語言設定顯示
+if (localStorage.getItem('taxiLang') === 'en') {
+    currentLang = 'en';
+}
 
 let changedFields = null;
 try {
@@ -702,9 +728,8 @@ try {
     if (raw) changedFields = JSON.parse(raw);
 } catch(e) {}
 
-if (bookingData) {
-    const decodedData = decodeURIComponent(bookingData);
-    renderBookingDetails(decodedData, changedFields);
+if (customerMessage) {
+    renderBookingDetails(customerMessage, changedFields);
 } else {
     document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
 }

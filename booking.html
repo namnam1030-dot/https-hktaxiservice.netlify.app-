@@ -647,10 +647,10 @@
             <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
             <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
             <div class="flex flex-col gap-3">
-                <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">
+<button onclick="confirmUpgrade(true)" data-i18n="btn_accept_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">
                     ✅ 接受免費升級
                 </button>
-                <button onclick="confirmUpgrade(false)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-base transition">
+                <button onclick="confirmUpgrade(false)" data-i18n="btn_decline_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-base transition">
                     ❌ 不用，謝謝
                 </button>
             </div>
@@ -804,6 +804,9 @@ function getMinimumChargeTotal() {
 
 var translations = {
     zh: {
+
+btn_accept_upgrade: "✅ 接受免費升級",
+        btn_decline_upgrade: "❌ 不用，謝謝",
         btn_more_payment: "更多付款方式",
         btn_confirm_booking: "確認預約",
         btn_sending_booking: "正在送出預約...",
@@ -862,6 +865,9 @@ var translations = {
         btn_cancel_edit: "取消修改"
     },
     en: {
+
+btn_accept_upgrade: "✅ Accept Free Upgrade",
+        btn_decline_upgrade: "❌ No, Thanks",
         btn_more_payment: "More Options",
         btn_confirm_booking: "Confirm Booking",
         btn_sending_booking: "Sending Booking...",
@@ -1342,35 +1348,59 @@ function submitBookingAfterUpgrade() {
     var minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
     var tunnelSuffix = currentTunnelFee > 0 ? '（已包含隧道費）' : '';
 
+// ==========================================
+    // ⭐ 根據語言生成中/英文訊息
+    // ==========================================
     var msgLines = [];
-    msgLines.push('📍 起點：' + data.pickup);
-    data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s); });
-    msgLines.push('🏁 終點：' + data.dropoff);
-    if (data.flightNo) msgLines.push('✈️ 航班編號：' + data.flightNo);
-    if (orderType === 'booking') {
-        msgLines.push('📅 日期：' + data.date);
-        msgLines.push('⏰ 時間：' + data.timeStringFormatted);
+    var isEn = (currentLang === 'en');
+
+    if (isEn) {
+        msgLines.push('📍 Pickup: ' + data.pickup);
+        data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
+        msgLines.push('🏁 Dropoff: ' + data.dropoff);
+        if (data.flightNo) msgLines.push('✈️ Flight: ' + data.flightNo);
+        if (orderType === 'booking') {
+            msgLines.push('📅 Date: ' + data.date);
+            msgLines.push('⏰ Time: ' + data.timeStringFormatted);
+        }
+        msgLines.push('👥 Passengers: ' + data.passengers);
+        if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 Luggages: ' + data.luggages);
+        if (data.hasPet) msgLines.push('🐶 Pet: ✅');
+        if (data.hasWheelchair) msgLines.push('♿ Wheelchair in trunk: ✅');
+        if (data.paymentStr) msgLines.push('💳 Payment: ' + data.paymentStr);
+        if (data.surname) msgLines.push('👤 Contact: ' + data.surname + ' ' + data.title);
+        msgLines.push('📞 Phone: ' + data.phone);
+        msgLines.push('🚘 Vehicle: ' + carDisplayText);
+    } else {
+        msgLines.push('📍 起點：' + data.pickup);
+        data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s); });
+        msgLines.push('🏁 終點：' + data.dropoff);
+        if (data.flightNo) msgLines.push('✈️ 航班編號：' + data.flightNo);
+        if (orderType === 'booking') {
+            msgLines.push('📅 日期：' + data.date);
+            msgLines.push('⏰ 時間：' + data.timeStringFormatted);
+        }
+        msgLines.push('👥 人數：' + data.passengers);
+        if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 行李件數：' + data.luggages);
+        if (data.hasPet) msgLines.push('🐶 寵物：✅');
+        if (data.hasWheelchair) msgLines.push('♿️ 輪椅放置尾箱：✅');
+        if (data.paymentStr) msgLines.push('💳 付款方式：' + data.paymentStr);
+        if (data.surname) msgLines.push('👤 聯絡人：' + data.surname + ' ' + data.title);
+        msgLines.push('📞 電話：' + data.phone);
+        msgLines.push('🚘 預約車款：' + carDisplayText);
     }
-    msgLines.push('👥 人數：' + data.passengers);
-    if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 行李件數：' + data.luggages);
-    if (data.hasPet) msgLines.push('🐶 寵物：✅');
-    if (data.hasWheelchair) msgLines.push('♿️ 輪椅放置尾箱：✅');
-    if (data.paymentStr) msgLines.push('💳 付款方式：' + data.paymentStr);
-    if (data.surname) msgLines.push('👤 聯絡人：' + data.surname + ' ' + data.title);
-    msgLines.push('📞 電話：' + data.phone);
-    msgLines.push('🚘 預約車款：' + carDisplayText);
 
     if (minCharge) {
-        msgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
+        msgLines.push((isEn ? '💰 Pricing: Minimum charge HK$' : '💰 收費模式：最低消費 HK$') + minChargeTotal + tunnelSuffix);
     } else {
-        if (selectedFareMode === 'discount') msgLines.push('💎 收費模式：' + getDiscountLabel()); // ⭐ 動態折扣名稱
-        else msgLines.push('💎 收費模式：💯 正價按錶收費');
+        if (selectedFareMode === 'discount') msgLines.push('💎 ' + getDiscountLabel());
+        else msgLines.push(isEn ? '💎 Pricing: Standard Metered Fare' : '💎 收費模式：💯 正價按錶收費');
         var noteExtra = '';
-        if (selectedSurcharge > 0) noteExtra += '+車款附加費';
-        if (currentTunnelFee > 0) noteExtra += '+隧道費';
-        msgLines.push('💰 預計車費總額：HK$' + data.totalFareForWhatsApp + ' (基本收費' + noteExtra + ')');
+        if (selectedSurcharge > 0) noteExtra += (isEn ? '+Surcharge' : '+車款附加費');
+        if (currentTunnelFee > 0) noteExtra += (isEn ? '+Tunnel Fee' : '+隧道費');
+        msgLines.push(isEn ? '💰 Estimated Total: HK$' + data.totalFareForWhatsApp : '💰 預計車費總額：HK$' + data.totalFareForWhatsApp + ' (基本收費' + noteExtra + ')');
     }
-    if (data.isWechatCustomer) msgLines.push('💚 備注：微訊客戶');
+    if (data.isWechatCustomer) msgLines.push(isEn ? '💚 Note: WeChat Customer' : '💚 備注：微訊客戶');
 
     var customerMessage = msgLines.join('\n');
 
