@@ -1558,7 +1558,7 @@ function submitBookingAfterUpgrade() {
 
             sessionStorage.removeItem('taxiEditingBookingId');
 
-            var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
+var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
             var updatedParam = data.updated ? '&updated=1' : '';
             var instantParam = (orderType === 'instant') ? '&instant=1' : '';
 
@@ -1566,6 +1566,9 @@ function submitBookingAfterUpgrade() {
             var bdtParam = '';
             if (orderType === 'booking' && data.date && data.time) {
                 bdtParam = '&bdt=' + encodeURIComponent(data.date + ' ' + data.time);
+                sessionStorage.setItem('taxiLastBdt', data.date + ' ' + data.time); // ⭐ 加呢行
+            } else {
+                sessionStorage.removeItem('taxiLastBdt'); // ⭐ 加呢行
             }
 
             window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam + instantParam + bdtParam);

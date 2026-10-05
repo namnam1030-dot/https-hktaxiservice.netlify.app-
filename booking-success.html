@@ -616,7 +616,7 @@ const translations = {
 };
 
 // ============================================
-// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯) - 已修復 Bug
+// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯) - 已修復 Bug，加入 sessionStorage 讀取
 // ============================================
 function updateSuccessDesc() {
     const now = new Date();
@@ -630,9 +630,14 @@ function updateSuccessDesc() {
             // 即時訂單：夜更時段一律顯示「請直接致電」
             targetKey = 'success_night_instant';
         } else {
-            // 預約訂單：檢查用車時間 (bdt)
-            const urlParams = new URLSearchParams(window.location.search);
-            const bdtStr = urlParams.get('bdt'); // 格式: YYYY-MM-DD HH:MM
+            // ⭐ 優先從 sessionStorage 讀取用車時間
+            let bdtStr = sessionStorage.getItem('taxiLastBdt');
+            
+            // 如果 sessionStorage 冇，才 fallback 去 URL
+            if (!bdtStr) {
+                const urlParams = new URLSearchParams(window.location.search);
+                bdtStr = urlParams.get('bdt');
+            }
             
             if (bdtStr) {
                 // ⭐ 用 Regex 提取 HH:MM，就算格式有少少偏差都捉到
@@ -642,12 +647,11 @@ function updateSuccessDesc() {
                     // 用車時間在 06:00 前 → 夜更提示；06:00 後 → 早更提示
                     targetKey = (bdtHour < 6) ? 'success_night_instant' : 'success_morning_booking';
                 } else {
-                    // 有 bdt 但解析唔到，保守起見當早更
+                    // 有時間但解析唔到，保守起見當早更
                     targetKey = 'success_morning_booking';
                 }
             } else {
-                // ⭐ 完全冇 bdt 參數（可能舊網址或傳遞失敗）
-                // 因為現在是夜間時段，保守起見顯示夜更提示（叫客人有急事致電）
+                // ⭐ 完全冇時間資訊，夜間時段保守顯示夜更提示
                 targetKey = 'success_night_instant';
             }
         }
@@ -813,6 +817,7 @@ function goBackToHome() {
     sessionStorage.removeItem('bookingUpdatePopupShown');
     sessionStorage.removeItem('taxiLastSuccessUrl');
     sessionStorage.removeItem('taxiChangedFields');
+    sessionStorage.removeItem('taxiLastBdt'); // ⭐ 清理時間記錄
     sessionStorage.setItem('taxiLeftSuccessPage', '1');
     window.location.href = 'index.html';
 }
