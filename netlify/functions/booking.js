@@ -110,11 +110,7 @@ exports.handler = async (event) => {
       if (existing) {
         await updateGoogleCalendar(existing, bookingData);
         await updateDiscordNotification(existing, bookingData, changedFields);
-        
-        // ⭐ 同時發送更新通知去 Telegram
-        const tgMsg = buildDiscordMessage(bookingData, existing.bookingId, true, changedFields || null);
-        await sendTelegramNotification(tgMsg);
-        
+        await updateTelegramNotification(existing, bookingData, changedFields);
         console.log('訂單已更新：', incomingBookingId);
         return ok({ success: true, bookingId: incomingBookingId, updated: true });
       }
@@ -126,8 +122,7 @@ exports.handler = async (event) => {
       console.log('即時訂單，跳過 Calendar。bookingId:', instantBookingId);
 
       await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields);
-      
-      // ⭐ 同時發送新訂單通知去 Telegram
+
       const tgMsg = buildDiscordMessage(bookingData, instantBookingId, isEdit === true, changedFields || null);
       await sendTelegramNotification(tgMsg);
 
@@ -139,12 +134,15 @@ exports.handler = async (event) => {
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
     const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, isEdit, changedFields);
 
-    // ⭐ 同時發送新訂單通知去 Telegram
     const tgMsg = buildDiscordMessage(bookingData, newBookingId, isEdit === true, changedFields || null);
-    await sendTelegramNotification(tgMsg);
+    const tgResult = await sendTelegramNotification(tgMsg);
 
-    if (discordMessageId && calendarEvent && calendarEvent.id) {
-      await patchCalendarDiscordMessageId(calendarEvent.id, discordMessageId);
+    if (calendarEvent && calendarEvent.id) {
+      await patchCalendarMessageIds(
+        calendarEvent.id,
+        discordMessageId || null,
+        (tgResult && tgResult.messageId) || null
+      );
     }
 
     return ok({ success: true, bookingId: newBookingId, updated: isEdit });
@@ -162,24 +160,24 @@ function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
 
-  // 1. 處理三反引號代碼塊（```diff ... ```）→ 直接變成純文字，移除語言標記同反引號
+  // 1. 處理三反引號代碼塊（```diff ... ```）→ 直接變成純文字
   result = result.replace(/```(\w*)\n?([\s\S]*?)```/g, function(m, lang, code) {
     return String(code).trim();
   });
 
-  // 2. 處理單反引號 inline code（`xxx`）→ 變成 Telegram 嘅 <code>
+  // 2. 處理單反引號 inline code
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  // 3. 轉換 Discord 嘅 [文字](<網址>) 做 Telegram 嘅 <a href="網址">文字</a>
+  // 3. 轉換 Discord 嘅 [文字](<網址>)
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '<a href="$2">$1</a>');
 
   // 4. 轉換普通 markdown [文字](網址)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 
-  // 5. 轉換 **粗體** 做 <b>粗體</b>
+  // 5. 轉換 **粗體**
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
-  // 6. 保護已轉好嘅 HTML tag（避免被 escape）
+  // 6. 保護已轉好嘅 HTML tag
   const placeholders = [];
   result = result.replace(/<a href="[^"]+">[^<]+<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
@@ -200,7 +198,7 @@ function convertToTelegramHtml(text) {
 async function sendTelegramNotification(message) {
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     console.log('[Telegram] 未設定，跳過');
-    return false;
+    return { success: false, messageId: null };
   }
 
   const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
@@ -218,6 +216,8 @@ async function sendTelegramNotification(message) {
   if (remaining.length > 0) chunks.push(remaining);
 
   let allSuccess = true;
+  let firstMessageId = null;
+
   for (let i = 0; i < chunks.length; i++) {
     try {
       const res = await fetch(url, {
@@ -233,6 +233,7 @@ async function sendTelegramNotification(message) {
       const data = await res.json();
       if (data.ok) {
         console.log('✅ Telegram 發送成功，message_id:', data.result.message_id);
+        if (i === 0) firstMessageId = data.result.message_id;
       } else {
         console.error('❌ Telegram 失敗:', data.description);
         allSuccess = false;
@@ -245,7 +246,54 @@ async function sendTelegramNotification(message) {
       allSuccess = false;
     }
   }
-  return allSuccess;
+
+  return { success: allSuccess, messageId: firstMessageId };
+}
+
+async function deleteTelegramMessage(messageId) {
+  if (!messageId) return false;
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+
+  const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/deleteMessage';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        message_id: parseInt(messageId, 10)
+      })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      console.log('✅ Telegram 舊訊息已刪除：', messageId);
+      return true;
+    }
+    console.error('❌ Telegram 刪除失敗：', data.description);
+    return false;
+  } catch (e) {
+    console.error('❌ Telegram 刪除拋錯：', e.message);
+    return false;
+  }
+}
+
+async function updateTelegramNotification(existing, data, changedFields) {
+  console.log('Telegram：發新訊息 + 刪舊訊息');
+  const oldMessageId = existing.telegramMessageId;
+
+  const message = buildDiscordMessage(data, existing.bookingId, true, changedFields || null);
+  const result = await sendTelegramNotification(message);
+
+  if (!result.success) {
+    console.error('Telegram 新訊息發送失敗，保留舊訊息唔刪');
+    return;
+  }
+
+  if (oldMessageId) {
+    await deleteTelegramMessage(oldMessageId);
+  }
+
+  await patchCalendarMessageIds(existing.eventId, null, result.messageId);
 }
 
 /* ============================================
@@ -261,10 +309,12 @@ async function findExistingBooking(bookingId) {
   const items = res.data.items || [];
   if (items.length === 0) return null;
   const ev = items[0];
+  const priv = (ev.extendedProperties && ev.extendedProperties.private) || {};
   return {
     eventId: ev.id,
     bookingId: bookingId,
-    discordMessageId: (ev.extendedProperties && ev.extendedProperties.private && ev.extendedProperties.private.discordMessageId) || null
+    discordMessageId: priv.discordMessageId || null,
+    telegramMessageId: priv.telegramMessageId || null
   };
 }
 
@@ -364,7 +414,7 @@ async function updateGoogleCalendar(existing, data) {
   return result.data;
 }
 
-async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
+async function patchCalendarMessageIds(eventId, discordMessageId, telegramMessageId) {
   try {
     const calendar = getCalendarClient();
     const ev = await calendar.events.get({
@@ -372,15 +422,23 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
       eventId: eventId
     });
     const existing = (ev.data.extendedProperties && ev.data.extendedProperties.private) || {};
-    const merged = Object.assign({}, existing, { discordMessageId: discordMessageId });
+    const merged = Object.assign({}, existing);
+
+    if (discordMessageId !== null && discordMessageId !== undefined) {
+      merged.discordMessageId = discordMessageId;
+    }
+    if (telegramMessageId !== null && telegramMessageId !== undefined) {
+      merged.telegramMessageId = telegramMessageId;
+    }
+
     await calendar.events.patch({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       eventId: eventId,
       resource: { extendedProperties: { private: merged } }
     });
-    console.log('已回寫 Discord messageId');
+    console.log('已回寫 message IDs');
   } catch (e) {
-    console.error('回寫 discordMessageId 失敗：', e);
+    console.error('回寫 message IDs 失敗：', e);
   }
 }
 
@@ -552,5 +610,5 @@ async function updateDiscordNotification(existing, data, changedFields) {
   if (oldMessageId) {
     await deleteDiscordMessage(oldMessageId);
   }
-  await patchCalendarDiscordMessageId(existing.eventId, newMessageId);
+  await patchCalendarMessageIds(existing.eventId, newMessageId, null);
 }
