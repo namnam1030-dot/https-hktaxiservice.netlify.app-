@@ -616,7 +616,7 @@ const translations = {
 };
 
 // ============================================
-// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯) - 已修復 Bug，加入 sessionStorage 讀取
+// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯) - 終極修復版
 // ============================================
 function updateSuccessDesc() {
     const now = new Date();
@@ -630,13 +630,22 @@ function updateSuccessDesc() {
             // 即時訂單：夜更時段一律顯示「請直接致電」
             targetKey = 'success_night_instant';
         } else {
-            // ⭐ 優先從 sessionStorage 讀取用車時間
+            // ⭐ 策略 1: 從 sessionStorage 讀取用車時間
             let bdtStr = sessionStorage.getItem('taxiLastBdt');
             
-            // 如果 sessionStorage 冇，才 fallback 去 URL
+            // ⭐ 策略 2: 如果失敗，嘗試從 URL 讀取
             if (!bdtStr) {
                 const urlParams = new URLSearchParams(window.location.search);
                 bdtStr = urlParams.get('bdt');
+            }
+            
+            // ⭐ 策略 3: 如果仍然失敗，嘗試從 customerMessage (訂單內容) 中提取
+            if (!bdtStr && customerMessage) {
+                // 尋找類似 "⏰ 時間：06:57" 或 "⏰ Time: 06:57" 的格式
+                const timeMatch = customerMessage.match(/⏰\s*(?:時間|Time)[：:]\s*(\d{1,2}):(\d{2})/);
+                if (timeMatch) {
+                    bdtStr = timeMatch[1] + ':' + timeMatch[2];
+                }
             }
             
             if (bdtStr) {
