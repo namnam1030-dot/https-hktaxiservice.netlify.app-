@@ -6,6 +6,10 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
+// ⭐ Telegram 設定（讀取環境變數）
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
 function ok(body) {
   return { statusCode: 200, headers: CORS_HEADERS, body: JSON.stringify(body) };
 }
@@ -35,10 +39,11 @@ function parseDiscordWebhook(url) {
 
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
+  if (text.indexOf('🆔') >= 0) return text;
   const lines = text.split('\n');
   let insertIndex = -1;
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i].startsWith('💰')) {
+    if (lines[i].trim().startsWith('💰')) {
       insertIndex = i + 1;
       break;
     }
@@ -105,6 +110,8 @@ exports.handler = async (event) => {
       if (existing) {
         await updateGoogleCalendar(existing, bookingData);
         await updateDiscordNotification(existing, bookingData, changedFields);
+        // ⭐ 更新時同時發 Telegram
+        await sendTelegramForUpdate(bookingData, existing.bookingId, changedFields);
         console.log('訂單已更新：', incomingBookingId);
         return ok({ success: true, bookingId: incomingBookingId, updated: true });
       }
@@ -116,6 +123,9 @@ exports.handler = async (event) => {
       console.log('即時訂單，跳過 Calendar。bookingId:', instantBookingId);
 
       await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields);
+      // ⭐ 同時發 Telegram
+      const tgMsg = buildDiscordMessage(bookingData, instantBookingId, isEdit === true, changedFields || null);
+      await sendTelegramNotification(tgMsg);
 
       return ok({ success: true, bookingId: instantBookingId, updated: isEdit });
     }
@@ -124,6 +134,10 @@ exports.handler = async (event) => {
 
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
     const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, isEdit, changedFields);
+
+    // ⭐ 同時發 Telegram
+    const tgMsg = buildDiscordMessage(bookingData, newBookingId, isEdit === true, changedFields || null);
+    await sendTelegramNotification(tgMsg);
 
     if (discordMessageId && calendarEvent && calendarEvent.id) {
       await patchCalendarDiscordMessageId(calendarEvent.id, discordMessageId);
@@ -137,6 +151,107 @@ exports.handler = async (event) => {
   }
 };
 
+async function sendTelegramForUpdate(data, bookingId, changedFields) {
+  try {
+    const message = buildDiscordMessage(data, bookingId, true, changedFields || null);
+    await sendTelegramNotification(message);
+  } catch (e) {
+    console.error('[Telegram] 更新通知失敗：', e.message);
+  }
+}
+
+/* ============================================
+   Telegram 發送（支援 HTML）
+   ============================================ */
+function convertToTelegramHtml(text) {
+  if (!text) return '';
+  let result = String(text);
+
+  // 1. 先處理 Discord 嘅 <url> suppress embed 格式 → 轉純 url
+  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '[$1]($2)');
+
+  // 2. 轉 markdown link → HTML link
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // 3. 轉 **bold** → <b>
+  result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+
+  // 4. 轉 `code` → <code>
+  result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // 5. 保護已轉好嘅 HTML tag（唔 escape）
+  const placeholders = [];
+  result = result.replace(/<a href="[^"]+">[^<]+<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
+    placeholders.push(m);
+    return '\u0000' + (placeholders.length - 1) + '\u0000';
+  });
+
+  // 6. Escape 剩低嘅 & < >
+  result = result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // 7. 還原 HTML tag
+  result = result.replace(/\u0000(\d+)\u0000/g, function(_, idx) {
+    return placeholders[parseInt(idx, 10)];
+  });
+
+  return result;
+}
+
+async function sendTelegramNotification(message) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.log('[Telegram] 未設定，跳過');
+    return false;
+  }
+
+  const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  const htmlMessage = convertToTelegramHtml(message);
+
+  // Telegram 限制 4096 字
+  const MAX_LEN = 4000;
+  const chunks = [];
+  let remaining = htmlMessage;
+  while (remaining.length > MAX_LEN) {
+    let cut = remaining.lastIndexOf('\n', MAX_LEN);
+    if (cut < MAX_LEN / 2) cut = MAX_LEN;
+    chunks.push(remaining.substring(0, cut));
+    remaining = remaining.substring(cut);
+  }
+  if (remaining.length > 0) chunks.push(remaining);
+
+  let allSuccess = true;
+  for (let i = 0; i < chunks.length; i++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: chunks[i],
+          parse_mode: 'HTML',
+          disable_web_page_preview: true
+        })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        console.log('✅ Telegram 發送成功，message_id:', data.result.message_id);
+      } else {
+        console.error('❌ Telegram 失敗:', data.description);
+        allSuccess = false;
+      }
+      if (i < chunks.length - 1) {
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    } catch (e) {
+      console.error('❌ Telegram 拋錯：', e.message);
+      allSuccess = false;
+    }
+  }
+  return allSuccess;
+}
+
+/* ============================================
+   Calendar / Discord 原有函數
+   ============================================ */
 async function findExistingBooking(bookingId) {
   const calendar = getCalendarClient();
   const res = await calendar.events.list({
@@ -171,38 +286,17 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, 'WhatsApp：$1')
     .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
     .replace(/\n\n🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴$/, '')
-    .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, ''); // 兼容舊格式
+    .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
 
-  // ⭐ 清理電話 + 中途站字串
   const cleanPhone = String(data.phone || '').replace(/\D/g, '');
   const stopoversStr = Array.isArray(data.stopoverTexts)
     ? data.stopoverTexts.map(function(s) {
         return String(s).replace(/中途站\d+:\s*/, '');
       }).join('、')
-    : '';
+    : (typeof data.stopover === 'string' && data.stopover.trim() ? data.stopover.trim() : '');
 
-  // ⭐ 如果 description 冇中途站，喺起點前加「🛑有中途站」+ 中途站
-  if (stopoversStr && description.indexOf('🛑有中途站') < 0 && description.indexOf('🛑 中途站') < 0) {
-    // 支援兩種格式：
-    // 1. customerMessage: "📍 起點：xxx\n..."  → 插去「📍 起點：」上一行
-    // 2. fullMessage: "🚕 xxx → yyy\n..."     → 插去「🚕 ...」上一行
-    const pickupLineMatch = description.match(/^(📍\s*起點[：:][^\n]*\n)/m);
-    if (pickupLineMatch) {
-      description = description.replace(
-        pickupLineMatch[0],
-        '🛑有中途站\n' + pickupLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
-      );
-    } else {
-      const firstLineMatch = description.match(/^([^\n]*\n)/);
-      if (firstLineMatch) {
-        description = description.replace(
-          firstLineMatch[0],
-          '🛑有中途站\n' + firstLineMatch[0] + '🛑 中途站：' + stopoversStr + '\n'
-        );
-      } else {
-        description = '🛑有中途站\n🛑 中途站：' + stopoversStr + '\n' + description;
-      }
-    }
+  if (stopoversStr && description.indexOf('🛑有中途站') < 0) {
+    description = '🛑有中途站\n' + description;
   }
 
   description = insertBookingIdAfterFare(description, bookingId);
@@ -283,9 +377,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
     await calendar.events.patch({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       eventId: eventId,
-      resource: {
-        extendedProperties: { private: merged }
-      }
+      resource: { extendedProperties: { private: merged } }
     });
     console.log('已回寫 Discord messageId');
   } catch (e) {
@@ -294,13 +386,11 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 }
 
 /* ============================================
-   Discord 通知（隨機延遲 + 429 重試）
+   Discord 通知
    ============================================ */
-
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
 
-  // ⭐ 支援 stopoverTexts（array）或 stopover（string）
   let stopoversStr = '';
   if (Array.isArray(data.stopoverTexts)) {
     stopoversStr = data.stopoverTexts.map(function(s) {
@@ -310,7 +400,6 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
     stopoversStr = data.stopover.trim();
   }
 
-  // ⭐ 有中途站，喺最頂加提醒（唔顯示中途站名）
   if (stopoversStr && body.indexOf('🛑有中途站') < 0) {
     body = '🛑有中途站\n' + body;
   }
@@ -334,9 +423,7 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
     body = header + body;
   }
 
-  // ⭐ 全部 🔸 改 🔴
   body = body.replace(/🔸/g, '🔴');
-
   body = insertBookingIdAfterFare(body, bookingId);
   return body;
 }
@@ -348,38 +435,33 @@ async function fetchWithRetry(url, options, maxRetries) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       const res = await fetch(url, options);
-
       if (res.ok) return res;
 
       if (res.status === 429) {
         const waitMs = (attempt + 1) * 3000;
-        console.warn('[Retry] 429 Rate Limit，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
+        console.warn('[Retry] 429 Rate Limit，等 ' + waitMs + 'ms 後重試');
         await new Promise(function(r) { setTimeout(r, waitMs); });
         lastResponse = res;
         continue;
       }
-
       if (res.status >= 500) {
         const waitMs = (attempt + 1) * 2000;
-        console.warn('[Retry] ' + res.status + ' Server Error，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
+        console.warn('[Retry] ' + res.status + ' Server Error，等 ' + waitMs + 'ms 後重試');
         await new Promise(function(r) { setTimeout(r, waitMs); });
         lastResponse = res;
         continue;
       }
-
       return res;
-
     } catch (e) {
       if (attempt < maxRetries - 1) {
         const waitMs = (attempt + 1) * 2000;
-        console.warn('[Retry] 網絡錯誤：' + e.message + '，等 ' + waitMs + 'ms 後重試 (' + (attempt + 1) + '/' + maxRetries + ')');
+        console.warn('[Retry] 網絡錯誤：' + e.message);
         await new Promise(function(r) { setTimeout(r, waitMs); });
         continue;
       }
       throw e;
     }
   }
-
   return lastResponse;
 }
 
@@ -404,16 +486,15 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
         headers: { 'Content-Type': 'application/json' },
         body: reqBody
       }, 3);
-
       if (res && res.ok) {
         const json = await res.json();
         console.log('Discord 已發送（含 messageId）：', json.id);
         return json.id;
       }
       const errText = res ? await res.text().catch(function() { return ''; }) : '';
-      console.warn('[Discord] wait=true 失敗，改用普通 POST。狀態:', res ? res.status : '無回應', errText);
+      console.warn('[Discord] wait=true 失敗。狀態:', res ? res.status : '無回應', errText);
     } catch (e) {
-      console.warn('[Discord] wait=true 拋錯，改用普通 POST:', e.message);
+      console.warn('[Discord] wait=true 拋錯：', e.message);
     }
   }
 
@@ -423,7 +504,6 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
       headers: { 'Content-Type': 'application/json' },
       body: reqBody
     }, 3);
-
     if (res && res.ok) {
       console.log('Discord 通知已發送（無 messageId）');
     } else {
@@ -439,7 +519,6 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
 
 async function deleteDiscordMessage(messageId) {
   if (!messageId) return false;
-
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) return false;
 
@@ -450,15 +529,12 @@ async function deleteDiscordMessage(messageId) {
   }
 
   const deleteUrl = 'https://discord.com/api/webhooks/' + wh.id + '/' + wh.token + '/messages/' + messageId;
-
   try {
     const res = await fetchWithRetry(deleteUrl, { method: 'DELETE' }, 2);
     if (res && (res.ok || res.status === 404)) {
-      console.log('Discord 舊訊息已刪除（或不存在）：', messageId);
+      console.log('Discord 舊訊息已刪除：', messageId);
       return true;
     }
-    const errText = res ? await res.text().catch(function() { return ''; }) : '';
-    console.error('[Discord] 刪除失敗。狀態:', res ? res.status : '無回應', errText);
     return false;
   } catch (e) {
     console.error('[Discord] 刪除拋錯：', e);
@@ -468,25 +544,14 @@ async function deleteDiscordMessage(messageId) {
 
 async function updateDiscordNotification(existing, data, changedFields) {
   console.log('Discord：發新訊息 + 刪舊訊息');
-
   const oldMessageId = existing.discordMessageId;
-
-  const newMessageId = await sendDiscordNotification(
-    data,
-    existing.bookingId,
-    true,
-    true,
-    changedFields
-  );
-
+  const newMessageId = await sendDiscordNotification(data, existing.bookingId, true, true, changedFields);
   if (!newMessageId) {
     console.error('Discord 新訊息發送失敗，保留舊訊息唔刪');
     return;
   }
-
   if (oldMessageId) {
     await deleteDiscordMessage(oldMessageId);
   }
-
   await patchCalendarDiscordMessageId(existing.eventId, newMessageId);
 }
