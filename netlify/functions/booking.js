@@ -6,7 +6,7 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
-// ⭐ Telegram 設定（讀取環境變數）
+// ⭐ Telegram 設定
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -110,8 +110,11 @@ exports.handler = async (event) => {
       if (existing) {
         await updateGoogleCalendar(existing, bookingData);
         await updateDiscordNotification(existing, bookingData, changedFields);
-        // ⭐ 更新時同時發 Telegram
-        await sendTelegramForUpdate(bookingData, existing.bookingId, changedFields);
+        
+        // ⭐ 同時發送更新通知去 Telegram
+        const tgMsg = buildDiscordMessage(bookingData, existing.bookingId, true, changedFields || null);
+        await sendTelegramNotification(tgMsg);
+        
         console.log('訂單已更新：', incomingBookingId);
         return ok({ success: true, bookingId: incomingBookingId, updated: true });
       }
@@ -123,7 +126,8 @@ exports.handler = async (event) => {
       console.log('即時訂單，跳過 Calendar。bookingId:', instantBookingId);
 
       await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields);
-      // ⭐ 同時發 Telegram
+      
+      // ⭐ 同時發送新訂單通知去 Telegram
       const tgMsg = buildDiscordMessage(bookingData, instantBookingId, isEdit === true, changedFields || null);
       await sendTelegramNotification(tgMsg);
 
@@ -135,7 +139,7 @@ exports.handler = async (event) => {
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
     const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, isEdit, changedFields);
 
-    // ⭐ 同時發 Telegram
+    // ⭐ 同時發送新訂單通知去 Telegram
     const tgMsg = buildDiscordMessage(bookingData, newBookingId, isEdit === true, changedFields || null);
     await sendTelegramNotification(tgMsg);
 
@@ -151,45 +155,41 @@ exports.handler = async (event) => {
   }
 };
 
-async function sendTelegramForUpdate(data, bookingId, changedFields) {
-  try {
-    const message = buildDiscordMessage(data, bookingId, true, changedFields || null);
-    await sendTelegramNotification(message);
-  } catch (e) {
-    console.error('[Telegram] 更新通知失敗：', e.message);
-  }
-}
-
 /* ============================================
-   Telegram 發送（支援 HTML）
+   Telegram 發送（修正版：完美處理 diff 同 <code>）
    ============================================ */
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
 
-  // 1. 先處理 Discord 嘅 <url> suppress embed 格式 → 轉純 url
-  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '[$1]($2)');
+  // 1. 處理三反引號代碼塊（```diff ... ```）→ 直接變成純文字，移除語言標記同反引號
+  result = result.replace(/```(\w*)\n?([\s\S]*?)```/g, function(m, lang, code) {
+    return String(code).trim();
+  });
 
-  // 2. 轉 markdown link → HTML link
-  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-
-  // 3. 轉 **bold** → <b>
-  result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-
-  // 4. 轉 `code` → <code>
+  // 2. 處理單反引號 inline code（`xxx`）→ 變成 Telegram 嘅 <code>
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  // 5. 保護已轉好嘅 HTML tag（唔 escape）
+  // 3. 轉換 Discord 嘅 [文字](<網址>) 做 Telegram 嘅 <a href="網址">文字</a>
+  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '<a href="$2">$1</a>');
+
+  // 4. 轉換普通 markdown [文字](網址)
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // 5. 轉換 **粗體** 做 <b>粗體</b>
+  result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+
+  // 6. 保護已轉好嘅 HTML tag（避免被 escape）
   const placeholders = [];
   result = result.replace(/<a href="[^"]+">[^<]+<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
     return '\u0000' + (placeholders.length - 1) + '\u0000';
   });
 
-  // 6. Escape 剩低嘅 & < >
+  // 7. Escape 剩低嘅 & < >
   result = result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-  // 7. 還原 HTML tag
+  // 8. 還原 HTML tag
   result = result.replace(/\u0000(\d+)\u0000/g, function(_, idx) {
     return placeholders[parseInt(idx, 10)];
   });
@@ -206,7 +206,6 @@ async function sendTelegramNotification(message) {
   const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
   const htmlMessage = convertToTelegramHtml(message);
 
-  // Telegram 限制 4096 字
   const MAX_LEN = 4000;
   const chunks = [];
   let remaining = htmlMessage;
@@ -250,7 +249,7 @@ async function sendTelegramNotification(message) {
 }
 
 /* ============================================
-   Calendar / Discord 原有函數
+   Calendar 相關
    ============================================ */
 async function findExistingBooking(bookingId) {
   const calendar = getCalendarClient();
@@ -386,7 +385,7 @@ async function patchCalendarDiscordMessageId(eventId, discordMessageId) {
 }
 
 /* ============================================
-   Discord 通知
+   Discord 相關
    ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
