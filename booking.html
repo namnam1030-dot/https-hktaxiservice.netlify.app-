@@ -1562,7 +1562,14 @@ function submitBookingAfterUpgrade() {
             var updatedParam = data.updated ? '&updated=1' : '';
             var instantParam = (orderType === 'instant') ? '&instant=1' : '';
 
-            window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam + instantParam);
+            // ⭐ 帶上預約用車時間去成功頁 (格式: YYYY-MM-DD HH:MM)
+            var bdtParam = '';
+            if (orderType === 'booking' && data.date && data.time) {
+                bdtParam = '&bdt=' + encodeURIComponent(data.date + ' ' + data.time);
+            }
+
+            window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam + instantParam + bdtParam);
+
         } else {
             sessionStorage.removeItem('taxiSubmitting');
             if (submitBtn) {
