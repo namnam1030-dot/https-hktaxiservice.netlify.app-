@@ -411,9 +411,10 @@
         localStorage.setItem('taxiBookingData', JSON.stringify(data));
     }
 
-    function goBackToInput() {
-        window.location.href = 'index.html';
-    }
+function goBackToInput() {
+    sessionStorage.setItem('returningFromResult', '1'); // ⭐ 加呢行
+    window.location.href = 'index.html';
+}
 
     function goToFleetPage() {
         if (!selectedCarName) {
