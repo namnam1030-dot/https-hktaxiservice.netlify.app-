@@ -516,28 +516,52 @@ function goBackToInput() {
         return trimmed;
     }
 
-    function processRoutes(routes, isShenzhenBay) {
-        if (!routes || routes.length === 0) return [];
-        if (routes.length === 1) {
-            routes[0].customLabel = "最佳路線";
-            return [routes[0]];
-        }
-        let routeMetrics = routes.map((r, idx) => {
-            let dur = 0, dist = 0;
-            r.legs.forEach(leg => { dur += leg.duration.value; dist += leg.distance.value; });
-            return { index: idx, route: r, dur, dist };
-        });
-        let fastest = [...routeMetrics].sort((a, b) => a.dur - b.dur)[0];
-        let shortest = [...routeMetrics].sort((a, b) => a.dist - b.dist)[0];
-        if (fastest.index !== shortest.index) {
-            fastest.route.customLabel = "最快路線";
-            shortest.route.customLabel = "最短路線";
-            return [fastest.route, shortest.route];
-        } else {
-            fastest.route.customLabel = "最快及最短路線";
-            return [fastest.route];
-        }
+function processRoutes(routes, isShenzhenBay) {
+    if (!routes || routes.length === 0) return [];
+    
+    // ⭐ 只有 1 條路線，直接顯示
+    if (routes.length === 1) {
+        routes[0].customLabel = "最佳路線";
+        return [routes[0]];
     }
+    
+    // ⭐ 計算每條路線嘅總時間同總距離
+    let routeMetrics = routes.map((r, idx) => {
+        let dur = 0, dist = 0;
+        r.legs.forEach(leg => { dur += leg.duration.value; dist += leg.distance.value; });
+        return { index: idx, route: r, dur: dur, dist: dist };
+    });
+    
+    // ⭐ 搵出最快同最短
+    let fastest = [...routeMetrics].sort((a, b) => a.dur - b.dur)[0];
+    let shortest = [...routeMetrics].sort((a, b) => a.dist - b.dist)[0];
+    
+    // ============================================
+    // 情況 A：最快同最短係同一條
+    // ============================================
+    if (fastest.index === shortest.index) {
+        fastest.route.customLabel = "⚡ 最快及最短路線";
+        
+        // ⭐ 從剩餘路線中揀一條替代（按時間排序，取第二快）
+        let others = routeMetrics.filter(m => m.index !== fastest.index);
+        
+        if (others.length > 0) {
+            let alternative = [...others].sort((a, b) => a.dur - b.dur)[0];
+            alternative.route.customLabel = "📏 替代路線";
+            return [fastest.route, alternative.route];
+        }
+        
+        // 冇其他路線，只顯示一條
+        return [fastest.route];
+    }
+    
+    // ============================================
+    // 情況 B：最快同最短係唔同路線
+    // ============================================
+    fastest.route.customLabel = "⚡ 最快路線";
+    shortest.route.customLabel = "📏 最短路線";
+    return [fastest.route, shortest.route];
+}
 
     const tunnelDatabase = [
         { name: "紅隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300 },
