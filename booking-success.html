@@ -566,8 +566,8 @@ const translations = {
     zh: {
         success_title: "預約訂單已成功送出！",
         success_desc: "我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認",
-        success_night_instant: "00:00-06:00夜更時段，<br>如2分鐘內沒收到我哋回覆，<br>煩請直接致電，謝謝！",
-        success_morning_booking: "我們的早更同事會在明早<br>06:00-08:00回覆確認訂單，謝謝！",
+        success_night_instant: "00:00-07:00夜更時段，<br>如2分鐘內沒收到我哋回覆，<br>煩請直接致電，謝謝！",
+        success_morning_booking: "我們的早更同事會在明早<br>07:00-08:00回覆確認訂單，謝謝！",
         success_contact_prompt: "如有急需，可以直接聯絡我哋：",
         btn_whatsapp_inquiry: "WhatsApp 查詢",
         btn_wechat_inquiry: "WeChat 查詢",
@@ -591,8 +591,8 @@ const translations = {
     en: {
         success_title: "Booking Submitted Successfully!",
         success_desc: "We will confirm via <br>WhatsApp or phone within 5-10 minutes",
-        success_night_instant: "00:00-06:00 Night Shift,<br>If you don't receive our reply within 2 minutes,<br>please call us directly. Thank you!",
-        success_morning_booking: "Our morning shift colleague<br>will confirm your order between 06:00-08:00 tomorrow. Thank you!",
+        success_night_instant: "00:00-07:00 Night Shift,<br>If you don't receive our reply within 2 minutes,<br>please call us directly. Thank you!",
+        success_morning_booking: "Our morning shift colleague<br>will confirm your order between 07:00-08:00 tomorrow. Thank you!",
         success_contact_prompt: "For urgent matters, contact us directly:",
         btn_whatsapp_inquiry: "WhatsApp Enquiry",
         btn_wechat_inquiry: "WeChat Enquiry",
@@ -622,7 +622,7 @@ function updateSuccessDesc() {
     const now = new Date();
     // 獲取香港時間的小時 (0-23)
     const hkHour = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong', hour12: false, hour: '2-digit' }), 10);
-    const isNightShift = (hkHour >= 0 && hkHour < 6);
+    const isNightShift = (hkHour >= 0 && hkHour < 7);
     let targetKey = 'success_desc'; // 預設顯示正常文字
 
     if (isNightShift) {
@@ -653,8 +653,8 @@ function updateSuccessDesc() {
                 const timeMatch = bdtStr.match(/(\d{1,2}):(\d{2})/);
                 if (timeMatch) {
                     const bdtHour = parseInt(timeMatch[1], 10);
-                    // 用車時間在 06:00 前 → 夜更提示；06:00 後 → 早更提示
-                    targetKey = (bdtHour < 6) ? 'success_night_instant' : 'success_morning_booking';
+                    // 用車時間在 07:00 前 → 夜更提示；07:00 後 → 早更提示
+                    targetKey = (bdtHour < 7) ? 'success_night_instant' : 'success_morning_booking';
                 } else {
                     // 有時間但解析唔到，保守起見當早更
                     targetKey = 'success_morning_booking';
