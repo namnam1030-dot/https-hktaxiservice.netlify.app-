@@ -541,11 +541,16 @@
 
 <script>
 // ============================================
-// 語言系統
+// ⭐ 最頂：語言與核心變數宣告 (防止 TDZ 錯誤)
 // ============================================
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
-var isInstantOrder = false;
+let isInstantOrder = (new URLSearchParams(window.location.search)).get('instant') === '1';
+let customerMessage = '';
+let changedFields = null;
 
+// ============================================
+// 語言翻譯字典
+// ============================================
 const translations = {
     zh: {
         success_title: "預約訂單已成功送出！",
@@ -599,57 +604,73 @@ const translations = {
     }
 };
 
-// ⭐ 判斷顯示哪一句提示
+// ============================================
+// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯)
+// ============================================
 function updateSuccessDesc() {
     const now = new Date();
-    // 獲取香港時間的小時 (0-23)
     const hkHour = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong', hour12: false, hour: '2-digit' }), 10);
-    
     const isNightShift = (hkHour >= 0 && hkHour < 6);
-    let targetKey = 'success_desc'; // 預設顯示正常文字
+    let targetKey = 'success_desc';
 
     if (isNightShift) {
         if (isInstantOrder) {
             targetKey = 'success_night_instant';
         } else {
-            // 睇下 URL 有冇帶預約用車時間 (bdt)
             const urlParams = new URLSearchParams(window.location.search);
-            const bdtStr = urlParams.get('bdt'); // 格式: YYYY-MM-DD HH:MM
-            
+            const bdtStr = urlParams.get('bdt');
             if (bdtStr) {
-                // 抽取出預約時間的小時
-                const bdtTimePart = bdtStr.split(' ')[1]; // "HH:MM"
+                const bdtTimePart = bdtStr.split(' ')[1];
                 if (bdtTimePart) {
                     const bdtHour = parseInt(bdtTimePart.split(':')[0], 10);
-                    if (bdtHour < 6) {
-                        targetKey = 'success_night_instant'; // 用車時間在06:00前
-                    } else {
-                        targetKey = 'success_morning_booking'; // 用車時間在06:00後
-                    }
+                    targetKey = (bdtHour < 6) ? 'success_night_instant' : 'success_morning_booking';
                 } else {
-                    targetKey = 'success_morning_booking'; // 有預約時間但解析失敗，當作06:00後
+                    targetKey = 'success_morning_booking';
                 }
             } else {
-                targetKey = 'success_morning_booking'; // 冇帶時間參數，預設用早更
+                targetKey = 'success_morning_booking';
             }
         }
     }
 
-    // 更改 DOM 的 data-i18n-html 屬性，之後 applyLanguage 就會自動抓正確的文字
     const descEl = document.getElementById('success-desc-text');
-    if (descEl) {
-        descEl.setAttribute('data-i18n-html', targetKey);
-    }
-    // 彈窗部分
+    if (descEl) descEl.setAttribute('data-i18n-html', targetKey);
+
     const modalDescEl = document.getElementById('bookingModalText');
-    if (modalDescEl) {
-        modalDescEl.setAttribute('data-i18n-html', targetKey === 'success_desc' ? 'popup_desc' : targetKey);
+    if (modalDescEl) modalDescEl.setAttribute('data-i18n-html', targetKey === 'success_desc' ? 'popup_desc' : targetKey);
+}
+
+// ============================================
+// 讀取訂單資料 (SessionStorage > URL)
+// ============================================
+try {
+    const lastSub = sessionStorage.getItem('taxiLastSubmission');
+    if (lastSub) {
+        const parsed = JSON.parse(lastSub);
+        customerMessage = parsed.customerMessage || '';
+    }
+} catch(e) {}
+
+if (!customerMessage) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlData = urlParams.get('data');
+    if (urlData) {
+        try {
+            customerMessage = decodeURIComponent(urlData);
+        } catch(e) {
+            customerMessage = urlData;
+        }
     }
 }
 
-// ⭐ 初始化時先判斷要顯示咩字
-updateSuccessDesc();
+try {
+    const raw = sessionStorage.getItem('taxiChangedFields');
+    if (raw) changedFields = JSON.parse(raw);
+} catch(e) {}
 
+// ============================================
+// 語言切換與套用
+// ============================================
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('taxiLang', currentLang);
@@ -691,6 +712,9 @@ function applyLanguage() {
     }
 }
 
+// ============================================
+// 渲染訂單內容
+// ============================================
 function escapeHtml(s) {
     return String(s || '')
         .replace(/&/g, '&amp;')
@@ -704,22 +728,11 @@ function renderBookingDetails(text, changedFields) {
     if (!el) return;
 
     const prefixMap = {
-        pickup: '📍 起點：',
-        dropoff: '🏁 終點：',
-        stopovers: '🛑 ',
-        date: '📅 日期：',
-        time: '⏰ 時間：',
-        flightNo: '✈️ 航班編號：',
-        passengers: '👥 人數：',
-        luggages: '🧳 行李件數：',
-        hasPet: '🐶 寵物：',
-        hasWheelchair: '♿️ 輪椅放置尾箱：',
-        payments: '💳 付款方式：',
-        contact: '👤 聯絡人：',
-        phone: '📞 電話：',
-        carDisplayText: '🚘 預約車款：',
-        selectedFareMode: '💎 收費模式：',
-        isWechatCustomer: '💚 備注：'
+        pickup: '📍 起點：', dropoff: '🏁 終點：', stopovers: '🛑 ', date: '📅 日期：',
+        time: '⏰ 時間：', flightNo: '✈️ 航班編號：', passengers: '👥 人數：', luggages: '🧳 行李件數：',
+        hasPet: '🐶 寵物：', hasWheelchair: '♿️ 輪椅放置尾箱：', payments: '💳 付款方式：',
+        contact: '👤 聯絡人：', phone: '📞 電話：', carDisplayText: '🚘 預約車款：',
+        selectedFareMode: '💎 收費模式：', isWechatCustomer: '💚 備注：'
     };
 
     const changedPrefixes = [];
@@ -734,10 +747,7 @@ function renderBookingDetails(text, changedFields) {
         for (const prefix of changedPrefixes) {
             if (line.startsWith(prefix)) {
                 const value = line.substring(prefix.length);
-                return escapeHtml(prefix) +
-                       '<span class="changed-value">' +
-                       escapeHtml(value) +
-                       '</span>';
+                return escapeHtml(prefix) + '<span class="changed-value">' + escapeHtml(value) + '</span>';
             }
         }
         return escapeHtml(line);
@@ -746,48 +756,22 @@ function renderBookingDetails(text, changedFields) {
     el.innerHTML = htmlLines.join('\n');
 }
 
-// ⭐ 優先從 sessionStorage 讀取，避免 URL 過長導致資料丟失
-let customerMessage = '';
-try {
-    const lastSub = sessionStorage.getItem('taxiLastSubmission');
-    if (lastSub) {
-        const parsed = JSON.parse(lastSub);
-        customerMessage = parsed.customerMessage || '';
-    }
-} catch(e) {}
+// ============================================
+// ⭐ 初始化執行 (DOM 內容已存在，因為 script 在 body 底部)
+// ============================================
+updateSuccessDesc(); // 先判斷夜更/早更
 
-// 如果 sessionStorage 沒有，才 fallback 去 URL
-if (!customerMessage) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlData = urlParams.get('data');
-    if (urlData) {
-        try {
-            customerMessage = decodeURIComponent(urlData);
-        } catch(e) {
-            console.error('URL 解碼失敗:', e);
-            customerMessage = urlData;
-        }
-    }
-}
-
-isInstantOrder = (new URLSearchParams(window.location.search)).get('instant') === '1';
-
-// ⭐ 強制根據當前語言設定顯示
 if (localStorage.getItem('taxiLang') === 'en') {
     currentLang = 'en';
 }
-
-let changedFields = null;
-try {
-    const raw = sessionStorage.getItem('taxiChangedFields');
-    if (raw) changedFields = JSON.parse(raw);
-} catch(e) {}
 
 if (customerMessage) {
     renderBookingDetails(customerMessage, changedFields);
 } else {
     document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
 }
+
+applyLanguage(); // 初始套用語言
 
 function showWeComQR() {
     document.getElementById('wecom-modal').classList.remove('hidden');
@@ -812,6 +796,9 @@ function goBackToHome() {
     window.location.href = 'index.html';
 }
 
+// ============================================
+// 修改訂單相關
+// ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('updated') !== '1') return;
@@ -835,13 +822,12 @@ function goBackToHome() {
                 toast.classList.remove('is-visible');
             }, 3200);
         }, 300);
- open    });
+    });
 })();
 
 (function () {
-    const urlParams = newModal URLSearchParams(location.search);
-    const bookingId = urlParams.get() {
-('id') || sessionStorage.getItem('taxi        modalLastBookingId');
+    const urlParams = new URLSearchParams(location.search);
+    const bookingId = urlParams.get('id') || sessionStorage.getItem('taxiLastBookingId');
 
     if (!bookingId) return;
 
@@ -894,7 +880,8 @@ function goBackToHome() {
     if (!modal) return;
     var closeBtn = document.getElementById('bookingModalClose');
 
-    function.classList.add('is-open');
+    function openModal() {
+        modal.classList.add('is-open');
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('modal-lock');
     }
