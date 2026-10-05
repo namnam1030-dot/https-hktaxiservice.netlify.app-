@@ -168,7 +168,7 @@
         font-weight: 700;
     }
 
-/* ⭐ 用 zoom 等比放大整個彈窗，與 index.html 完全一致 */
+    /* ⭐ 用 zoom 等比放大整個安裝彈窗，與 index.html 完全一致 */
     #install-modal > div {
         zoom: 1.3;
     }
@@ -407,7 +407,7 @@
 </head>
 <body class="antialiased min-h-screen relative booking-success-page">
 
-    <!-- ⭐ 1. 安裝彈窗 (移到最外層) -->
+    <!-- ⭐ 1. 安裝彈窗 (移到最外層，尺寸與 index.html 一致) -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
             <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
@@ -552,7 +552,7 @@
 
 <script>
 // ============================================
-// ⭐ 最頂：語言與核心變數宣告 (防止 TDZ 錯誤)
+// ⭐ 最頂：語言與核心變數宣告 (防止 TDZ 錯誤導致全頁崩潰)
 // ============================================
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
 let isInstantOrder = (new URLSearchParams(window.location.search)).get('instant') === '1';
@@ -616,34 +616,44 @@ const translations = {
 };
 
 // ============================================
-// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯)
+// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯) - 已修復 Bug
 // ============================================
 function updateSuccessDesc() {
     const now = new Date();
+    // 獲取香港時間的小時 (0-23)
     const hkHour = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong', hour12: false, hour: '2-digit' }), 10);
     const isNightShift = (hkHour >= 0 && hkHour < 6);
-    let targetKey = 'success_desc';
+    let targetKey = 'success_desc'; // 預設顯示正常文字
 
     if (isNightShift) {
         if (isInstantOrder) {
+            // 即時訂單：夜更時段一律顯示「請直接致電」
             targetKey = 'success_night_instant';
         } else {
+            // 預約訂單：檢查用車時間 (bdt)
             const urlParams = new URLSearchParams(window.location.search);
-            const bdtStr = urlParams.get('bdt');
+            const bdtStr = urlParams.get('bdt'); // 格式: YYYY-MM-DD HH:MM
+            
             if (bdtStr) {
-                const bdtTimePart = bdtStr.split(' ')[1];
-                if (bdtTimePart) {
-                    const bdtHour = parseInt(bdtTimePart.split(':')[0], 10);
+                // ⭐ 用 Regex 提取 HH:MM，就算格式有少少偏差都捉到
+                const timeMatch = bdtStr.match(/(\d{1,2}):(\d{2})/);
+                if (timeMatch) {
+                    const bdtHour = parseInt(timeMatch[1], 10);
+                    // 用車時間在 06:00 前 → 夜更提示；06:00 後 → 早更提示
                     targetKey = (bdtHour < 6) ? 'success_night_instant' : 'success_morning_booking';
                 } else {
+                    // 有 bdt 但解析唔到，保守起見當早更
                     targetKey = 'success_morning_booking';
                 }
             } else {
-                targetKey = 'success_morning_booking';
+                // ⭐ 完全冇 bdt 參數（可能舊網址或傳遞失敗）
+                // 因為現在是夜間時段，保守起見顯示夜更提示（叫客人有急事致電）
+                targetKey = 'success_night_instant';
             }
         }
     }
 
+    // 更改 DOM 的 data-i18n-html 屬性，之後 applyLanguage 就會自動抓正確的文字
     const descEl = document.getElementById('success-desc-text');
     if (descEl) descEl.setAttribute('data-i18n-html', targetKey);
 
@@ -768,9 +778,9 @@ function renderBookingDetails(text, changedFields) {
 }
 
 // ============================================
-// ⭐ 初始化執行
+// ⭐ 初始化執行 (DOM 內容已存在，因為 script 在 body 底部)
 // ============================================
-updateSuccessDesc();
+updateSuccessDesc(); // 先判斷夜更/早更
 
 if (localStorage.getItem('taxiLang') === 'en') {
     currentLang = 'en';
@@ -782,7 +792,7 @@ if (customerMessage) {
     document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
 }
 
-applyLanguage();
+applyLanguage(); // 初始套用語言
 
 function showWeComQR() {
     document.getElementById('wecom-modal').classList.remove('hidden');
