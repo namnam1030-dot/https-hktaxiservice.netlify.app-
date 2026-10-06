@@ -943,6 +943,7 @@ function saveFormSnapshot(carDisplayText) {
         var routeData = loadRouteDataFromLocalStorage() || {};
 
         var snapshot = {
+            editingBookingId: editingBookingId || null,
             orderType: orderType,
             pickup: routeData.pickup || '',
             dropoff: routeData.dropoff || '',
@@ -1759,6 +1760,16 @@ function initEditMode() {
         return;
     }
 
+    // ⭐ 檢查是否切換到不同訂單，如果係就清除舊快照
+    var previousEditId = sessionStorage.getItem('taxiEditingBookingId');
+    if (previousEditId && previousEditId !== editId) {
+        console.log('[EditMode] 切換訂單，清除舊快照');
+        localStorage.removeItem('taxiEditPrefillData');
+        localStorage.removeItem('taxiRouteData');
+        localStorage.removeItem('taxiBookingData');
+        sessionStorage.removeItem('taxiLookupResult');
+    }
+
     editingBookingId = editId;
     try { sessionStorage.setItem('taxiEditingBookingId', editId); } catch(e) {}
 
@@ -1808,13 +1819,23 @@ function initEditMode() {
         return;
     }
 
+    // ⭐ 檢查快照是否對應當前訂單
     var hasSnapshot = false;
     try {
-        hasSnapshot = !!localStorage.getItem('taxiEditPrefillData');
+        var snapRaw = localStorage.getItem('taxiEditPrefillData');
+        if (snapRaw) {
+            var snap = JSON.parse(snapRaw);
+            if (!snap.editingBookingId || snap.editingBookingId === editingBookingId) {
+                hasSnapshot = true;
+            } else {
+                console.log('[EditMode] 快照 ID 唔匹配，清除舊快照');
+                localStorage.removeItem('taxiEditPrefillData');
+            }
+        }
     } catch(e) {}
 
     if (!hasSnapshot) {
-        console.log('[EditMode] 冇本地快照，要求輸入電話或內部密碼');
+        console.log('[EditMode] 需要驗證');
         
         var userInput = prompt(
             currentLang === 'en' 
@@ -1829,17 +1850,13 @@ function initEditMode() {
         }
 
         var trimmedInput = userInput.trim();
-        var cleanInput = trimmedInput.replace(/\D/g, '');
-        
-        var isLikelyPhone = /^[\d\s\-\+\(\)]+$/.test(trimmedInput) && cleanInput.length >= 8;
-        
-        var reqBody = { bookingId: editingBookingId };
-        if (isLikelyPhone) {
-            reqBody.phone = trimmedInput;
-        } else {
-            reqBody.accessKey = trimmedInput;
-            reqBody.phone = trimmedInput;
-        }
+
+        // ⭐ 同時傳 phone 同 accessKey，等後端自己判斷
+        var reqBody = { 
+            bookingId: editingBookingId,
+            phone: trimmedInput,
+            accessKey: trimmedInput
+        };
 
         fetch('/.netlify/functions/lookup-booking', {
             method: 'POST',
