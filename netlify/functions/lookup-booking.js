@@ -39,17 +39,11 @@ function cleanPhone(s) {
 function extractStopoversFromDescription(description) {
   if (!description) return '';
   
-  // 優先：「🛑 中途站：xxx、yyy」
   const m = description.match(/🛑\s*中途站[：:]\s*([^\n]+)/);
-  if (m) {
-    return m[1].trim();
-  }
+  if (m) return m[1].trim();
   
-  // Fallback：由「（經 xxx、yyy）」
   const routeMatch = description.match(/（經\s*([^）]+)）/);
-  if (routeMatch) {
-    return routeMatch[1].trim();
-  }
+  if (routeMatch) return routeMatch[1].trim();
   
   return '';
 }
@@ -67,16 +61,22 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || '{}');
     const inputBookingId = String(body.bookingId || '').trim();
     const inputPhone = cleanPhone(body.phone);
+    const inputAccessKey = String(body.accessKey || '').trim();
 
     if (!inputBookingId || !/^\d{4}$/.test(inputBookingId)) {
       return err(400, '請輸入 4 位數字預約編號');
     }
 
-    if (!inputPhone) {
-      return err(400, '請輸入電話號碼');
+    // ⭐ 檢查內部密碼
+    const internalKey = process.env.INTERNAL_ACCESS_KEY || '';
+    const isInternalAccess = (inputAccessKey && internalKey && inputAccessKey === internalKey);
+
+    // ⭐ 如果唔係內部密碼，就需要電話號碼
+    if (!isInternalAccess && !inputPhone) {
+      return err(400, '請輸入電話號碼或內部密碼');
     }
 
-    console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，phone:', inputPhone);
+    console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，內部訪問:', isInternalAccess ? '是' : '否');
 
     const calendar = getCalendarClient();
 
@@ -95,43 +95,43 @@ exports.handler = async (event) => {
     const ev = items[0];
     const ext = (ev.extendedProperties && ev.extendedProperties.private) || {};
 
-    // ===== 電話驗證 =====
-    let phoneMatch = false;
-    let matchSource = '';
+    // ===== 電話驗證（只適用於非內部訪問）=====
+    if (!isInternalAccess) {
+      let phoneMatch = false;
+      let matchSource = '';
 
-    if (ext.phone) {
-      if (cleanPhone(ext.phone) === inputPhone) {
-        phoneMatch = true;
-        matchSource = 'extendedProperties';
+      if (ext.phone) {
+        if (cleanPhone(ext.phone) === inputPhone) {
+          phoneMatch = true;
+          matchSource = 'extendedProperties';
+        }
       }
-    }
 
-    if (!phoneMatch) {
-      const descPhone = extractPhoneFromDescription(ev.description);
-      if (descPhone && descPhone === inputPhone) {
-        phoneMatch = true;
-        matchSource = 'description';
+      if (!phoneMatch) {
+        const descPhone = extractPhoneFromDescription(ev.description);
+        if (descPhone && descPhone === inputPhone) {
+          phoneMatch = true;
+          matchSource = 'description';
+        }
       }
-    }
 
-    if (!phoneMatch) {
-      console.log('[Lookup] 電話唔匹配');
-      return err(403, '預約編號或電話唔正確');
-    }
+      if (!phoneMatch) {
+        console.log('[Lookup] 電話唔匹配');
+        return err(403, '預約編號或電話唔正確');
+      }
 
-    console.log('[Lookup] 成功，匹配方式：', matchSource);
+      console.log('[Lookup] 成功，匹配方式：', matchSource);
+    } else {
+      console.log('[Lookup] 內部訪問，跳過電話驗證');
+    }
 
     // ===== 組裝返回資料 =====
     let orderData = {};
 
     if (ext.pickup || ext.dropoff || ext.date) {
-      // ⭐ 中途站：優先讀 extendedProperties，冇就由 description 抽
       let stopovers = ext.stopovers || '';
       if (!stopovers) {
         stopovers = extractStopoversFromDescription(ev.description);
-        if (stopovers) {
-          console.log('[Lookup] 由 description 抽到中途站：', stopovers);
-        }
       }
 
       orderData = {
@@ -201,7 +201,8 @@ exports.handler = async (event) => {
     return ok({
       success: true,
       bookingId: inputBookingId,
-      orderData: orderData
+      orderData: orderData,
+      isInternalAccess: isInternalAccess
     });
 
   } catch (error) {
