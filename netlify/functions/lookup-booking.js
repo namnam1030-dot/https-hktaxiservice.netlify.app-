@@ -72,7 +72,7 @@ exports.handler = async (event) => {
 
     // ⭐ 如果唔係內部密碼，就需要電話號碼
     if (!isInternalAccess && !inputPhone) {
-      return err(400, '請輸入電話號碼或內部密碼');
+      return err(400, '請輸入電話號碼');
     }
 
     console.log('[Lookup] 查詢 bookingId:', inputBookingId, '，內部訪問:', isInternalAccess ? '是' : '否');
