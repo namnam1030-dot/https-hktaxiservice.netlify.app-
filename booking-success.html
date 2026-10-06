@@ -16,20 +16,15 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-
     var root = document.documentElement;
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
-
     if (isLight) {
         var obs = new MutationObserver(function() {
-            if (document.body) {
-                document.body.classList.add('light-theme');
-                obs.disconnect();
-            }
+            if (document.body) { document.body.classList.add('light-theme'); obs.disconnect(); }
         });
         obs.observe(root, { childList: true });
     }
@@ -37,21 +32,9 @@
 </script>
 
 <style>
-    html[data-theme="light"],
-    html[data-theme="light"] body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-    html[data-theme="dark"],
-    html[data-theme="dark"] body {
-        background-color: #0B0B0B !important;
-        color: #FFFFFF !important;
-    }
-    html.light-theme,
-    html.light-theme body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
+    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
+    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,57 +42,16 @@
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約成功 | 八五折的士 | 24小時網約車預約確認</title>
-<meta name="description" content="您嘅的士預約訂單已成功送出。我哋會喺 5 分鐘內透過 WhatsApp 或電話回覆確認。24小時八五折的士預約服務。">
-<meta name="keywords" content="預約成功,的士預約確認,八五折的士,85折的士,24小時的士,網約的士,WhatsApp叫車">
+<meta name="description" content="您嘅的士預約訂單已成功送出。我哋會喺 5-10 分鐘內透過 WhatsApp 或電話回覆確認。">
+<meta name="keywords" content="預約成功,的士預約確認,八五折的士,85折的士,24小時的士,網約的士">
 <meta name="geo.region" content="HK">
 <meta name="geo.placename" content="Hong Kong">
-<meta name="geo.position" content="22.3193;114.1694">
-<meta name="ICBM" content="22.3193, 114.1694">
-
-<meta property="og:title" content="預約成功 | 八五折的士 | 24小時網約車">
-<meta property="og:description" content="您嘅的士預約訂單已成功送出。我哋會喺 5 分鐘內回覆確認。">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://hktaxiservice.netlify.app/booking-success.html">
-<meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
-<meta property="og:locale" content="zh_HK">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="預約成功 | 八五折的士 | 24小時網約車">
-<meta name="twitter:description" content="您嘅的士預約訂單已成功送出。我哋會喺 5 分鐘內回覆確認。">
-<meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
-
-<link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking-success.html">
-<link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking-success.html?lang=en">
-<link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking-success.html">
-<link rel="canonical" href="https://hktaxiservice.netlify.app/booking-success.html">
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "預約成功 | 八五折的士 | 24小時網約車",
-  "description": "您嘅的士預約訂單已成功送出。",
-  "url": "https://hktaxiservice.netlify.app/booking-success.html",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "24小時八五折的士預約服務",
-    "url": "https://hktaxiservice.netlify.app/"
-  },
-  "provider": {
-    "@type": "TaxiService",
-    "name": "24小時八五折的士預約服務",
-    "telephone": "+85268815441",
-    "priceRange": "HK$29起",
-    "areaServed": "Hong Kong"
-  }
-}
-</script>
+<meta name="theme-color" content="#FFF200">
 
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#FFF200">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -117,340 +59,129 @@
 
 <script>
     tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    'brand-yellow': '#FFF200',
-                    'brand-dark': '#0B0B0B',
-                    'brand-gray': '#161616',
-                    'brand-card': '#1E1E1E'
-                }
-            }
-        }
+        theme: { extend: { colors: {
+            'brand-yellow': '#FFF200', 'brand-dark': '#0B0B0B',
+            'brand-gray': '#161616', 'brand-card': '#1E1E1E'
+        }}}
     }
 </script>
 
 <style>
-    body { 
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-    }
-
-    .success-title {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        line-height: 1.3;
-        flex-wrap: wrap;
-    }
-    .success-title__emoji {
-        font-size: 1em;
-        line-height: 1;
-        display: inline-flex;
-        align-items: center;
-    }
-    .success-desc {
-        line-height: 1.6;
-    }
-
-    #booking-details {
-        line-height: 1.8;
-        word-break: break-word;
-        white-space: pre-wrap;
-        font-family: ui-monospace, 'PingFang HK', monospace;
-    }
-    .changed-value {
-        color: #ef4444;
-        font-weight: 700;
-    }
-    html.light-theme body .changed-value {
-        color: #dc2626 !important;
-        font-weight: 700;
-    }
-
-    /* ⭐ 用 zoom 等比放大整個安裝彈窗，與 index.html 完全一致 */
-    #install-modal > div {
-        zoom: 1.3;
-    }
+    body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
+    .success-title { display: flex; align-items: center; justify-content: center; gap: 0.5rem; line-height: 1.3; flex-wrap: wrap; }
+    .success-title__emoji { font-size: 1em; line-height: 1; display: inline-flex; align-items: center; }
+    .success-desc { line-height: 1.6; }
+    #booking-details { line-height: 1.8; word-break: break-word; white-space: pre-wrap; font-family: ui-monospace, 'PingFang HK', monospace; }
+    .changed-value { color: #ef4444; font-weight: 700; }
+    html.light-theme body .changed-value { color: #dc2626 !important; font-weight: 700; }
+    #install-modal > div { zoom: 1.3; }
 
     .booking-modal {
-        position: fixed;
-        inset: 0;
-        z-index: 100;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        background: rgba(0, 0, 0, .75);
-        opacity: 0;
-        visibility: hidden;
+        position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+        padding: 20px; background: rgba(0, 0, 0, .75); opacity: 0; visibility: hidden;
         transition: opacity .3s ease, visibility .3s ease;
     }
-    .booking-modal.is-open {
-        opacity: 1;
-        visibility: visible;
-    }
+    .booking-modal.is-open { opacity: 1; visibility: visible; }
     .booking-modal__box {
-        width: 100%;
-        max-width: 400px;
-        padding: 36px 28px 28px;
-        background: #161616;
-        border: 2px solid #22c55e;
-        border-radius: 20px;
-        text-align: center;
+        width: 100%; max-width: 400px; padding: 36px 28px 28px; background: #161616;
+        border: 2px solid #22c55e; border-radius: 20px; text-align: center;
         box-shadow: 0 16px 48px rgba(0, 0, 0, .5);
-        transform: translateY(24px) scale(.95);
-        transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+        transform: translateY(24px) scale(.95); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
     }
-    .booking-modal.is-open .booking-modal__box {
-        transform: translateY(0) scale(1);
-    }
+    .booking-modal.is-open .booking-modal__box { transform: translateY(0) scale(1); }
     .booking-modal__icon {
-        width: 76px;
-        height: 76px;
-        margin: 0 auto 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 38px;
-        color: #fff;
-        background: #22c55e;
-        border-radius: 50%;
+        width: 76px; height: 76px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center;
+        font-size: 38px; color: #fff; background: #22c55e; border-radius: 50%;
         animation: bookingPop .5s ease .15s both;
     }
-    @keyframes bookingPop {
-        0% { transform: scale(0); }
-        70% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
-    .booking-modal__title {
-        margin: 0 0 14px;
-        font-size: 27px;
-        font-weight: 700;
-        color: #4ade80;
-        line-height: 1.4;
-    }
-    .booking-modal__text {
-        margin: 0 0 28px;
-        font-size: 21px;
-        line-height: 1.7;
-        color: #d1d5db;
-    }
-    .booking-modal__btn {
-        width: 100%;
-        padding: 16px;
-        font-size: 22px;
-        font-weight: 700;
-        color: #000;
-        background: #FFF200;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: opacity .2s ease;
-    }
+    @keyframes bookingPop { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .booking-modal__title { margin: 0 0 14px; font-size: 27px; font-weight: 700; color: #4ade80; line-height: 1.4; }
+    .booking-modal__text { margin: 0 0 28px; font-size: 21px; line-height: 1.7; color: #d1d5db; }
+    .booking-modal__btn { width: 100%; padding: 16px; font-size: 22px; font-weight: 700; color: #000; background: #FFF200; border: none; border-radius: 12px; cursor: pointer; transition: opacity .2s ease; }
     .booking-modal__btn:active { opacity: .85; }
     body.modal-lock { overflow: hidden; }
-
     @media (max-width: 380px) {
         .booking-modal__title { font-size: 24px; }
         .booking-modal__text  { font-size: 19px; }
         .booking-modal__btn   { font-size: 20px; }
     }
+    body.booking-success-page .mini-float-toggle { pointer-events: auto !important; cursor: pointer !important; }
 
-    body.booking-success-page .mini-float-toggle {
-        pointer-events: auto !important;
-        cursor: pointer !important;
-    }
+    .wechat-query-btn { background-color: #07C160 !important; color: #FFFFFF !important; border: none !important; }
+    .wechat-query-btn:hover { background-color: #06AD56 !important; opacity: 1 !important; }
+    html.light-theme body .wechat-query-btn { background-color: #07C160 !important; color: #FFFFFF !important; }
 
-    .wechat-query-btn {
-        background-color: #07C160 !important;
-        color: #FFFFFF !important;
-        border: none !important;
-    }
-    .wechat-query-btn:hover {
-        background-color: #06AD56 !important;
-        opacity: 1 !important;
-    }
-    html.light-theme body .wechat-query-btn {
-        background-color: #07C160 !important;
-        color: #FFFFFF !important;
-    }
-    html.light-theme body .wechat-query-btn:hover {
-        background-color: #06AD56 !important;
-    }
-
-    html.light-theme body .bg-green-600\/20 {
-        background-color: rgba(34, 197, 94, 0.12) !important;
-    }
-    html.light-theme body .border-green-500 {
-        border-color: #16A34A !important;
-    }
-    html.light-theme body .text-green-300 {
-        color: #15803D !important;
-        font-weight: bold !important;
-    }
-    html.light-theme body .text-green-400 {
-        color: #16A34A !important;
-    }
-    html.light-theme body .bg-black\/60 {
-        background-color: #F9FAFB !important;
-        border-color: #E5E7EB !important;
-    }
-    html.light-theme body #booking-details {
-        color: #000000 !important;
-    }
-    html.light-theme body button[onclick="goBackToHome()"] {
-        background-color: #E5E7EB !important;
-        color: #000000 !important;
-    }
-    html.light-theme body button[onclick="goBackToHome()"]:hover {
-        background-color: #D1D5DB !important;
-    }
-    html.light-theme body a[href^="tel:"] {
-        background-color: #3B82F6 !important;
-        color: #FFFFFF !important;
-    }
-    html.light-theme body a[href*="wa.me"] {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-    }
-    html.light-theme body #wecom-modal > div {
-        background-color: #FFFFFF !important;
-    }
-    html.light-theme body #wecom-modal h3 {
-        color: #000000 !important;
-    }
-    html.light-theme body #wecom-modal p {
-        color: #4B5563 !important;
-    }
-    html.light-theme body .booking-modal {
-        background: rgba(0, 0, 0, .6);
-    }
-    html.light-theme body .booking-modal__box {
-        background: #FFFFFF !important;
-        border-color: #16A34A !important;
-    }
-    html.light-theme body .booking-modal__title {
-        color: #15803D !important;
-    }
-    html.light-theme body .booking-modal__text {
-        color: #374151 !important;
-    }
-    html.light-theme body .booking-modal__btn {
-        border: 1px solid #000000 !important;
-    }
-
-    html.light-theme body #booking-id-row {
-        background-color: #FFF200 !important;
-        border-color: #000000 !important;
-    }
-    html.light-theme body #booking-id-display {
-        color: #000000 !important;
-    }
-    html.light-theme body #booking-id-label {
-        color: #000000 !important;
-    }
+    html.light-theme body .bg-green-600\/20 { background-color: rgba(34, 197, 94, 0.12) !important; }
+    html.light-theme body .border-green-500 { border-color: #16A34A !important; }
+    html.light-theme body .text-green-300 { color: #15803D !important; font-weight: bold !important; }
+    html.light-theme body .text-green-400 { color: #16A34A !important; }
+    html.light-theme body .bg-black\/60 { background-color: #F9FAFB !important; border-color: #E5E7EB !important; }
+    html.light-theme body #booking-details { color: #000000 !important; }
+    html.light-theme body button[onclick="goBackToHome()"] { background-color: #E5E7EB !important; color: #000000 !important; }
+    html.light-theme body button[onclick="goBackToHome()"]:hover { background-color: #D1D5DB !important; }
+    html.light-theme body a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; }
+    html.light-theme body a[href*="wa.me"] { background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important; }
+    html.light-theme body #wecom-modal > div { background-color: #FFFFFF !important; }
+    html.light-theme body #wecom-modal h3 { color: #000000 !important; }
+    html.light-theme body #wecom-modal p { color: #4B5563 !important; }
+    html.light-theme body .booking-modal__box { background: #FFFFFF !important; border-color: #16A34A !important; }
+    html.light-theme body .booking-modal__title { color: #15803D !important; }
+    html.light-theme body .booking-modal__text { color: #374151 !important; }
+    html.light-theme body .booking-modal__btn { border: 1px solid #000000 !important; }
+    html.light-theme body #booking-id-row { background-color: #FFF200 !important; border-color: #000000 !important; }
+    html.light-theme body #booking-id-display { color: #000000 !important; }
+    html.light-theme body #booking-id-label { color: #000000 !important; }
 
     #back-toast {
-        position: fixed;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.9);
-        color: #FFFFFF;
-        padding: 12px 20px;
-        border-radius: 12px;
-        font-size: 16px;
-        z-index: 200;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9); color: #FFFFFF; padding: 12px 20px; border-radius: 12px;
+        font-size: 16px; z-index: 200; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
     }
     #back-toast.is-visible { opacity: 1; }
-    html.light-theme body #back-toast {
-        background: rgba(30, 30, 30, 0.95);
-        color: #FFFFFF;
-    }
 
     #updated-toast {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-100px);
-        background: #22c55e;
-        color: #FFFFFF;
-        padding: 14px 22px;
-        border-radius: 12px;
-        font-size: 18px;
-        font-weight: 700;
-        z-index: 300;
-        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);
-        white-space: nowrap;
-        opacity: 0;
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+        background: #22c55e; color: #FFFFFF; padding: 14px 22px; border-radius: 12px;
+        font-size: 18px; font-weight: 700; z-index: 300; box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);
+        white-space: nowrap; opacity: 0;
         transition: transform 0.35s cubic-bezier(.34, 1.56, .64, 1), opacity 0.3s ease;
-        pointer-events: none;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        pointer-events: none; display: flex; align-items: center; gap: 10px;
     }
-    #updated-toast.is-visible {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-    }
-    #updated-toast i {
-        font-size: 22px;
-    }
+    #updated-toast.is-visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #updated-toast i { font-size: 22px; }
 </style>
 </head>
 <body class="antialiased min-h-screen relative booking-success-page">
 
-    <!-- ⭐ 1. 安裝彈窗 (移到最外層，尺寸與 index.html 一致) -->
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
             <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="text-brand-yellow text-3xl mb-3">
-                <i class="fa-solid fa-circle-down animate-bounce"></i>
-            </div>
+            <div class="text-brand-yellow text-3xl mb-3"><i class="fa-solid fa-circle-down animate-bounce"></i></div>
             <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
-            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
-                為了方便下次叫車，您可以將本服務加到手機主畫面：
-            </p>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">為了方便下次叫車，您可以將本服務加到手機主畫面：</p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
-                了解，關閉
-            </button>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">了解，關閉</button>
         </div>
     </div>
 
-    <!-- ⭐ 2. WeChat 彈窗 (移到最外層) -->
     <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-green-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
-            <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="text-green-500 text-4xl mb-3">
-                <i class="fa-brands fa-weixin"></i>
-            </div>
+            <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-green-500 text-4xl mb-3"><i class="fa-brands fa-weixin"></i></div>
             <h3 class="text-2xl font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
             <p class="text-xl text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
             <div class="bg-white p-3 rounded-xl mb-4 inline-block">
                 <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
             </div>
-            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl" data-i18n="btn_close">
-                關閉
-            </button>
+            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl" data-i18n="btn_close">關閉</button>
         </div>
     </div>
 
-    <!-- ⭐ 3. 主內容容器 (保持垂直置中) -->
     <div class="w-full min-h-screen flex flex-col items-center justify-center p-4">
         <div class="w-full max-w-2xl">
-
             <div class="flex justify-end mb-2">
                 <div id="mini-float" class="minimized">
                     <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
@@ -458,34 +189,28 @@
                     </button>
                     <div class="mini-float-btns">
                         <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
-                        <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
-                            <i class="fa-solid fa-mobile-screen-button"></i>
-                        </button>
-                        <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色">
-                            <i class="fa-solid fa-circle-half-stroke"></i>
-                        </button>
+                        <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面"><i class="fa-solid fa-mobile-screen-button"></i></button>
+                        <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色"><i class="fa-solid fa-circle-half-stroke"></i></button>
                     </div>
                 </div>
             </div>
 
             <div class="bg-green-600/20 border-2 border-green-500 rounded-2xl p-6">
-
                 <div class="text-center mb-6">
-                    <i class="fa-solid fa-check-circle text-green-400 text-5xl mb-3"></i>
-                    <h1 class="text-green-300 font-bold text-3xl mb-2 success-title">
+                    <i class="fa-solid fa-check-circle text-green- <400 text-5pxl mb-3"></i>
+                    class <h1 class="text="text-green-gray-300 font-bold text-3xl mb-2 success-title">
                         <span class="success-title__emoji">✅</span>
                         <span data-i18n="success_title">預約訂單已成功送出！</span>
                     </h1>
                     <p class="text-gray-300 text-xl mt-2 success-desc" id="success-desc-text" data-i18n-html="success_desc">
-                        我哋會喺 5 分鐘內透過<br>WhatsApp 或電話回覆確認
+                        我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認
                     </p>
                 </div>
 
                 <div id="booking-id-row" class="hidden bg-black/40 border border-gray-700 rounded-xl p-4 mb-4 text-center">
                     <div id="booking-id-label" class="text-xl text-gray-300 mb-2" data-i18n="booking_id_label">你的預約編號</div>
                     <div id="booking-id-display" class="text-brand-yellow font-mono font-bold text-4xl tracking-widest">—</div>
-                    <button type="button" id="edit-booking-btn" onclick="goEditBooking()"
-                        class="mt-3 w-full bg-brand-yellow text-black font-bold py-2 rounded-lg text-base flex items-center justify-center gap-2 shadow-md">
+                    <button type="button" id="edit-booking-btn" onclick="goEditBooking()" class="mt-3 w-full bg-brand-yellow text-black font-bold py-2 rounded-lg text-base flex items-center justify-center gap-2 shadow-md">
                         <i class="fa-solid fa-pen-to-square"></i>
                         <span data-i18n="btn_edit_booking">修改資料</span>
                     </button>
@@ -501,23 +226,18 @@
                 </div>
 
                 <div class="flex flex-col gap-2 mb-4">
-                    <p class="text-gray-400 text-xl font-bold text-center mb-1" data-i18n="success_contact_prompt">
-                        如有急需，可以直接聯絡我哋：
-                    </p>
-                                 
-                    <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E5%89%9B%E5%89%9B%E6%8F%90%E4%BA%A4%E4%BA%86%E9%A0%90%E7%B4%84%EF%BC%8C%E6%83%B3%E6%9F%A5%E8%A9%A2%E7%8B%80%E6%85%8B" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
+                   -400 text-xl font-bold text-center mb-1" data-i18n="success_contact_prompt">如有急需，可以直接聯絡我哋：</p>
+                    <a href="https://wa.me/85268815441" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                         <i class="fa-brands fa-whatsapp text-xl"></i> <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
                     </a>
-                    
                     <button onclick="showWeComQR()" class="wechat-query-btn w-full font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                         <i class="fa-brands fa-weixin text-xl"></i> <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
                     </button>
-
                     <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                         <i class="fa-solid fa-phone text-xl"></i> <span data-i18n="btn_call_now">致電 6881 5441</span>
                     </a>
                 </div>
-                
+
                 <button onclick="goBackToHome()" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-2xl flex items-center justify-center gap-2 transition shadow-md">
                     <i class="fa-solid fa-arrow-left text-xl"></i> <span data-i18n="btn_back_home">返回主頁</span>
                 </button>
@@ -525,21 +245,12 @@
         </div>
     </div>
 
-    <!-- ⭐ 4. 其他彈窗與 Toast (移到最外層) -->
     <div class="booking-modal" id="bookingModal" aria-hidden="true">
         <div class="booking-modal__box" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
-            <div class="booking-modal__icon">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <h2 class="booking-modal__title" id="bookingModalTitle" data-i18n="popup_title">
-                預約訂單已成功送出！
-            </h2>
-            <p class="booking-modal__text" id="bookingModalText" data-i18n-html="popup_desc">
-                我哋會喺 5 分鐘內透過<br>WhatsApp 或電話回覆確認
-            </p>
-            <button type="button" class="booking-modal__btn" id="bookingModalClose" data-i18n="popup_btn">
-                知道喇
-            </button>
+            <div class="booking-modal__icon"><i class="fa-solid fa-check"></i></div>
+            <h2 class="booking-modal__title" id="bookingModalTitle" data-i18n="popup_title">預約訂單已成功送出！</h2>
+            <p class="booking-modal__text" id="bookingModalText" data-i18n-html="popup_desc">我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認</p>
+            <button type="button" class="booking-modal__btn" id="bookingModalClose" data-i18n="popup_btn">知道喇</button>
         </div>
     </div>
 
@@ -551,22 +262,16 @@
     </div>
 
 <script>
-// ============================================
-// ⭐ 最頂：語言與核心變數宣告 (防止 TDZ 錯誤導致全頁崩潰)
-// ============================================
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
 let isInstantOrder = (new URLSearchParams(window.location.search)).get('instant') === '1';
 let customerMessage = '';
 let changedFields = null;
 
-// ============================================
-// 語言翻譯字典
-// ============================================
 const translations = {
     zh: {
         success_title: "預約訂單已成功送出！",
-        success_desc: "我哋會喺 5分鐘內透過 <br>WhatsApp 或電話回覆確認",
-        success_night_instant: "00:00-07:00夜更時段，<br>如5分鐘內沒收到我哋回覆，<br>煩請直接致電，謝謝！",
+        success_desc: "我哋會喺 5-10 分鐘內透過 <br>WhatsApp 或電話回覆確認",
+        success_night_instant: "00:00-07:00夜更時段，<br>如2分鐘內沒收到我哋回覆，<br>煩請直接致電，謝謝！",
         success_morning_booking: "我們的早更同事會在明早<br>07:00-08:00回覆確認訂單，謝謝！",
         success_contact_prompt: "如有急需，可以直接聯絡我哋：",
         btn_whatsapp_inquiry: "WhatsApp 查詢",
@@ -578,7 +283,7 @@ const translations = {
         btn_close: "關閉",
         no_booking_data: "冇訂單資料",
         popup_title: "預約訂單已成功送出！",
-        popup_desc: "我哋會喺 5 分鐘內透過<br>WhatsApp 或電話回覆確認",
+        popup_desc: "我哋會喺 5-10 分鐘內透過<br>WhatsApp 或電話回覆確認",
         popup_btn: "知道喇",
         modal_title: "一鍵加入主畫面",
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
@@ -590,8 +295,8 @@ const translations = {
     },
     en: {
         success_title: "Booking Submitted Successfully!",
-        success_desc: "We will confirm via <br>WhatsApp or phone within 5 minutes",
-        success_night_instant: "00:00-07:00 Night Shift,<br>If you don't receive our reply within 5 minutes,<br>please call us directly. Thank you!",
+        success_desc: "We will confirm via <br>WhatsApp or phone within 5-10 minutes",
+        success_night_instant: "00:00-07:00 Night Shift,<br>If you don't receive our reply within 2 minutes,<br>please call us directly. Thank you!",
         success_morning_booking: "Our morning shift colleague<br>will confirm your order between 07:00-08:00 tomorrow. Thank you!",
         success_contact_prompt: "For urgent matters, contact us directly:",
         btn_whatsapp_inquiry: "WhatsApp Enquiry",
@@ -603,7 +308,7 @@ const translations = {
         btn_close: "Close",
         no_booking_data: "No booking data",
         popup_title: "Booking Submitted Successfully!",
-        popup_desc: "We will confirm via<br>WhatsApp or phone within 5 minutes",
+        popup_desc: "We will confirm via<br>WhatsApp or phone within 5-10 minutes",
         popup_btn: "Got it",
         modal_title: "Add to Home Screen",
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
@@ -615,58 +320,39 @@ const translations = {
     }
 };
 
-// ============================================
-// ⭐ 判斷顯示哪一句提示 (夜更/早更邏輯) - 終極修復版
-// ============================================
 function updateSuccessDesc() {
     const now = new Date();
-    // 獲取香港時間的小時 (0-23)
     const hkHour = parseInt(now.toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong', hour12: false, hour: '2-digit' }), 10);
     const isNightShift = (hkHour >= 0 && hkHour < 7);
-    let targetKey = 'success_desc'; // 預設顯示正常文字
+    let targetKey = 'success_desc';
 
     if (isNightShift) {
         if (isInstantOrder) {
-            // 即時訂單：夜更時段一律顯示「請直接致電」
             targetKey = 'success_night_instant';
         } else {
-            // ⭐ 策略 1: 從 sessionStorage 讀取用車時間
             let bdtStr = sessionStorage.getItem('taxiLastBdt');
-            
-            // ⭐ 策略 2: 如果失敗，嘗試從 URL 讀取
             if (!bdtStr) {
                 const urlParams = new URLSearchParams(window.location.search);
                 bdtStr = urlParams.get('bdt');
             }
-            
-            // ⭐ 策略 3: 如果仍然失敗，嘗試從 customerMessage (訂單內容) 中提取
             if (!bdtStr && customerMessage) {
-                // 尋找類似 "⏰ 時間：06:57" 或 "⏰ Time: 06:57" 的格式
                 const timeMatch = customerMessage.match(/⏰\s*(?:時間|Time)[：:]\s*(\d{1,2}):(\d{2})/);
-                if (timeMatch) {
-                    bdtStr = timeMatch[1] + ':' + timeMatch[2];
-                }
+                if (timeMatch) bdtStr = timeMatch[1] + ':' + timeMatch[2];
             }
-            
             if (bdtStr) {
-                // ⭐ 用 Regex 提取 HH:MM，就算格式有少少偏差都捉到
                 const timeMatch = bdtStr.match(/(\d{1,2}):(\d{2})/);
                 if (timeMatch) {
                     const bdtHour = parseInt(timeMatch[1], 10);
-                    // 用車時間在 07:00 前 → 夜更提示；07:00 後 → 早更提示
                     targetKey = (bdtHour < 7) ? 'success_night_instant' : 'success_morning_booking';
                 } else {
-                    // 有時間但解析唔到，保守起見當早更
                     targetKey = 'success_morning_booking';
                 }
             } else {
-                // ⭐ 完全冇時間資訊，夜間時段保守顯示夜更提示
                 targetKey = 'success_night_instant';
             }
         }
     }
 
-    // 更改 DOM 的 data-i18n-html 屬性，之後 applyLanguage 就會自動抓正確的文字
     const descEl = document.getElementById('success-desc-text');
     if (descEl) descEl.setAttribute('data-i18n-html', targetKey);
 
@@ -674,9 +360,6 @@ function updateSuccessDesc() {
     if (modalDescEl) modalDescEl.setAttribute('data-i18n-html', targetKey === 'success_desc' ? 'popup_desc' : targetKey);
 }
 
-// ============================================
-// 讀取訂單資料 (SessionStorage > URL)
-// ============================================
 try {
     const lastSub = sessionStorage.getItem('taxiLastSubmission');
     if (lastSub) {
@@ -689,11 +372,7 @@ if (!customerMessage) {
     const urlParams = new URLSearchParams(window.location.search);
     const urlData = urlParams.get('data');
     if (urlData) {
-        try {
-            customerMessage = decodeURIComponent(urlData);
-        } catch(e) {
-            customerMessage = urlData;
-        }
+        try { customerMessage = decodeURIComponent(urlData); } catch(e) { customerMessage = urlData; }
     }
 }
 
@@ -702,9 +381,6 @@ try {
     if (raw) changedFields = JSON.parse(raw);
 } catch(e) {}
 
-// ============================================
-// 語言切換與套用
-// ============================================
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('taxiLang', currentLang);
@@ -717,50 +393,31 @@ function applyLanguage() {
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.textContent = translations[currentLang][key];
-        }
+        if (translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key];
     });
-
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
-        if (translations[currentLang] && translations[currentLang][key]) {
-            el.innerHTML = translations[currentLang][key];
-        }
+        if (translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
-
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
-            el.placeholder = translations[currentLang][key];
-        }
+        if (translations[currentLang] && translations[currentLang][key] !== undefined) el.placeholder = translations[currentLang][key];
     });
 
     var label = document.getElementById('booking-id-label');
     if (label) {
-        if (isInstantOrder) {
-            label.textContent = currentLang === 'en' ? 'Your Order ID' : '你的訂單編號';
-        } else {
-            label.textContent = currentLang === 'en' ? 'Your Booking ID' : '你的預約編號';
-        }
+        if (isInstantOrder) label.textContent = currentLang === 'en' ? 'Your Order ID' : '你的訂單編號';
+        else label.textContent = currentLang === 'en' ? 'Your Booking ID' : '你的預約編號';
     }
 }
 
-// ============================================
-// 渲染訂單內容
-// ============================================
 function escapeHtml(s) {
-    return String(s || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function renderBookingDetails(text, changedFields) {
     const el = document.getElementById('booking-details');
     if (!el) return;
-
     const prefixMap = {
         pickup: '📍 起點：', dropoff: '🏁 終點：', stopovers: '🛑 ', date: '📅 日期：',
         time: '⏰ 時間：', flightNo: '✈️ 航班編號：', passengers: '👥 人數：', luggages: '🧳 行李件數：',
@@ -768,14 +425,12 @@ function renderBookingDetails(text, changedFields) {
         contact: '👤 聯絡人：', phone: '📞 電話：', carDisplayText: '🚘 預約車款：',
         selectedFareMode: '💎 收費模式：', isWechatCustomer: '💚 備注：'
     };
-
     const changedPrefixes = [];
     if (changedFields && typeof changedFields === 'object') {
         for (const key of Object.keys(changedFields)) {
             if (prefixMap[key]) changedPrefixes.push(prefixMap[key]);
         }
     }
-
     const lines = String(text || '').split('\n');
     const htmlLines = lines.map(line => {
         for (const prefix of changedPrefixes) {
@@ -786,34 +441,20 @@ function renderBookingDetails(text, changedFields) {
         }
         return escapeHtml(line);
     });
-
     el.innerHTML = htmlLines.join('\n');
 }
 
-// ============================================
-// ⭐ 初始化執行 (DOM 內容已存在，因為 script 在 body 底部)
-// ============================================
-updateSuccessDesc(); // 先判斷夜更/早更
+updateSuccessDesc();
 
-if (localStorage.getItem('taxiLang') === 'en') {
-    currentLang = 'en';
-}
+if (localStorage.getItem('taxiLang') === 'en') currentLang = 'en';
 
-if (customerMessage) {
-    renderBookingDetails(customerMessage, changedFields);
-} else {
-    document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
-}
+if (customerMessage) renderBookingDetails(customerMessage, changedFields);
+else document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
 
-applyLanguage(); // 初始套用語言
+applyLanguage();
 
-function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
-}
-
-function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
-}
+function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
+function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
 function goBackToHome() {
     localStorage.removeItem('taxiRouteData');
@@ -826,36 +467,29 @@ function goBackToHome() {
     sessionStorage.removeItem('bookingUpdatePopupShown');
     sessionStorage.removeItem('taxiLastSuccessUrl');
     sessionStorage.removeItem('taxiChangedFields');
-    sessionStorage.removeItem('taxiLastBdt'); // ⭐ 清理時間記錄
+    sessionStorage.removeItem('taxiInternalAccess');
+    sessionStorage.removeItem('taxiFormOrderType');
+    sessionStorage.removeItem('taxiFormDate');
+    sessionStorage.removeItem('taxiFormTime');
     sessionStorage.setItem('taxiLeftSuccessPage', '1');
     window.location.href = 'index.html';
 }
 
-// ============================================
-// 修改訂單相關
-// ============================================
 (function () {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get('updated') !== '1') return;
-
     const banner = document.getElementById('updated-banner');
     if (banner) banner.classList.remove('hidden');
-
     const title = document.getElementById('bookingModalTitle');
     const text = document.getElementById('bookingModalText');
     if (title) title.textContent = currentLang === 'en' ? 'Booking Updated!' : '訂單已成功更新！';
-    if (text) text.innerHTML = currentLang === 'en'
-        ? 'Your booking has been updated.<br>We will re-confirm shortly.'
-        : '你嘅訂單已更新，<br>我哋會盡快重新確認。';
-
+    if (text) text.innerHTML = currentLang === 'en' ? 'Your booking has been updated.<br>We will re-confirm shortly.' : '你嘅訂單已更新，<br>我哋會盡快重新確認。';
     window.addEventListener('load', function () {
         setTimeout(function () {
             const toast = document.getElementById('updated-toast');
             if (!toast) return;
             toast.classList.add('is-visible');
-            setTimeout(function () {
-                toast.classList.remove('is-visible');
-            }, 3200);
+            setTimeout(function () { toast.classList.remove('is-visible'); }, 3200);
         }, 300);
     });
 })();
@@ -863,35 +497,18 @@ function goBackToHome() {
 (function () {
     const urlParams = new URLSearchParams(location.search);
     const bookingId = urlParams.get('id') || sessionStorage.getItem('taxiLastBookingId');
-
     if (!bookingId) return;
-
     try { sessionStorage.setItem('taxiLastBookingId', bookingId); } catch(e) {}
-
     const row = document.getElementById('booking-id-row');
     const display = document.getElementById('booking-id-display');
     if (row) row.classList.remove('hidden');
     if (display) display.textContent = bookingId;
 
-window.goEditBooking = function () {
+    // ⭐ 修改：設定 taxiInternalAccess 標記，保留快照
+    window.goEditBooking = function () {
         try {
             sessionStorage.setItem('taxiEditingBookingId', bookingId);
-
-            // ⭐ 判斷是否即時訂單
-            var urlParams = new URLSearchParams(location.search);
-            var isInstant = urlParams.get('instant') === '1' || isInstantOrder;
-
-            if (isInstant) {
-                // 即時訂單：保留快照，讓 booking.html 直接使用
-                console.log('[goEditBooking] 即時訂單，保留快照，直接進入修改模式');
-            } else {
-                // 預約訂單：清除舊快照，透過 API 查詢最新資料
-                localStorage.removeItem('taxiEditPrefillData');
-                localStorage.removeItem('taxiRouteData');
-                localStorage.removeItem('taxiBookingData');
-                sessionStorage.removeItem('taxiLookupResult');
-            }
-
+            sessionStorage.setItem('taxiInternalAccess', '1');
             const cleanUrl = new URL(location.href);
             cleanUrl.searchParams.delete('updated');
             sessionStorage.setItem('taxiLastSuccessUrl', cleanUrl.toString());
@@ -899,12 +516,10 @@ window.goEditBooking = function () {
         } catch(e) {}
         location.href = 'booking.html?edit=' + encodeURIComponent(bookingId);
     };
-
 })();
 
 (function () {
     history.pushState(null, '', location.href);
-
     var toastTimer = null;
     function showBackToast(msg) {
         var toast = document.getElementById('back-toast');
@@ -912,18 +527,11 @@ window.goEditBooking = function () {
         toast.textContent = msg;
         toast.classList.add('is-visible');
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(function () {
-            toast.classList.remove('is-visible');
-        }, 2500);
+        toastTimer = setTimeout(function () { toast.classList.remove('is-visible'); }, 2500);
     }
-
     window.addEventListener('popstate', function () {
         history.pushState(null, '', location.href);
-        showBackToast(
-            (typeof currentLang !== 'undefined' && currentLang === 'en')
-                ? "To book again, tap 'Back to Home' below."
-                : "如需重新預約，請按下方「返回主頁」按鈕。"
-        );
+        showBackToast((typeof currentLang !== 'undefined' && currentLang === 'en') ? "To book again, tap 'Back to Home' below." : "如需重新預約，請按下方「返回主頁」按鈕。");
     });
 })();
 
@@ -931,48 +539,24 @@ window.goEditBooking = function () {
     var modal = document.getElementById('bookingModal');
     if (!modal) return;
     var closeBtn = document.getElementById('bookingModalClose');
-
-    function openModal() {
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-lock');
-    }
-    function closeModal() {
-        modal.classList.remove('is-open');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-lock');
-    }
-
+    function openModal() { modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); document.body.classList.add('modal-lock'); }
+    function closeModal() { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); document.body.classList.remove('modal-lock'); }
     var isUpdate = new URLSearchParams(location.search).get('updated') === '1';
     var popupKey = isUpdate ? 'bookingUpdatePopupShown' : 'bookingPopupShown';
-
     if (sessionStorage.getItem(popupKey) !== '1') {
         window.addEventListener('load', function () {
-            setTimeout(function () {
-                openModal();
-                sessionStorage.setItem(popupKey, '1');
-            }, 200);
+            setTimeout(function () { openModal(); sessionStorage.setItem(popupKey, '1'); }, 200);
         });
     }
-
     closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal) closeModal();
-    });
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
-    });
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
 })();
 
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        applyLanguage();
-    }, 0);
-});
+document.addEventListener('DOMContentLoaded', function() { setTimeout(function() { applyLanguage(); }, 0); });
 
 window.addEventListener('pageshow', function(event) {
     if (!event.persisted) return;
-
     if (sessionStorage.getItem('taxiLeftSuccessPage') === '1') {
         sessionStorage.removeItem('taxiLeftSuccessPage');
         location.replace('index.html');
