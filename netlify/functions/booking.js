@@ -116,6 +116,7 @@ exports.handler = async (event) => {
       console.log('Calendar 搵唔到 bookingId，視為首次入 Calendar：', incomingBookingId);
     }
 
+    // ⭐ 即時訂單：跳過 Calendar，只發通知
     if (isInstantOrder) {
       const instantBookingId = incomingBookingId || generateBookingId();
       console.log('即時訂單，跳過 Calendar。bookingId:', instantBookingId);
@@ -128,6 +129,7 @@ exports.handler = async (event) => {
       return ok({ success: true, bookingId: instantBookingId, updated: isEdit });
     }
 
+    // 非即時訂單：正常寫入 Calendar
     const newBookingId = incomingBookingId || generateBookingId();
 
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
@@ -437,7 +439,7 @@ async function patchCalendarMessageIds(eventId, discordMessageId, telegramMessag
 }
 
 /* ============================================
-   Discord 相關（已修正付款方式位置）
+   Discord 相關（即時訂單唔加查看/修改連結）
    ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
@@ -474,14 +476,15 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
     body = header + body;
   }
 
-  // ⭐ 修正付款方式位置：將 💳 行移到 🚘 車款行之後
-  body = body.replace(/(💳[^\n]*\n)(📞[^\n]*\n)(🚘[^\n]*)/, '$2$3\n$1');
-  body = body.replace(/(💳[^\n]*\n)(👤[^\n]*\n)(🚘[^\n]*)/, '$2$3\n$1');
-  
+  // ⭐ 全部 🔸 改 🔴
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
   
-  if (bookingId && body.indexOf('查看/修改訂單') < 0) {
+  // ⭐ 判斷是否即時訂單：透過 fullMessage 入面係咪有「⚡ 即時訂單 ⚡」
+  const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
+  
+  // ⭐ 只有非即時訂單才加「查看/修改訂單」連結
+  if (!isInstantOrder && bookingId && body.indexOf('查看/修改訂單') < 0) {
     body = body.replace(
       new RegExp('🆔\\s*`' + bookingId + '`', 'g'),
       '🆔 `' + bookingId + '` | [📋 查看/修改訂單](<https://hktaxiservice.netlify.app/booking.html?edit=' + bookingId + '>)'
