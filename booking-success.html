@@ -876,13 +876,22 @@ function goBackToHome() {
 window.goEditBooking = function () {
         try {
             sessionStorage.setItem('taxiEditingBookingId', bookingId);
-            
-            // ⭐ 清除舊快照同舊路線資料，避免載入上一張單
-            localStorage.removeItem('taxiEditPrefillData');
-            localStorage.removeItem('taxiRouteData');
-            localStorage.removeItem('taxiBookingData');
-            sessionStorage.removeItem('taxiLookupResult');
-            
+
+            // ⭐ 判斷是否即時訂單
+            var urlParams = new URLSearchParams(location.search);
+            var isInstant = urlParams.get('instant') === '1' || isInstantOrder;
+
+            if (isInstant) {
+                // 即時訂單：保留快照，讓 booking.html 直接使用
+                console.log('[goEditBooking] 即時訂單，保留快照，直接進入修改模式');
+            } else {
+                // 預約訂單：清除舊快照，透過 API 查詢最新資料
+                localStorage.removeItem('taxiEditPrefillData');
+                localStorage.removeItem('taxiRouteData');
+                localStorage.removeItem('taxiBookingData');
+                sessionStorage.removeItem('taxiLookupResult');
+            }
+
             const cleanUrl = new URL(location.href);
             cleanUrl.searchParams.delete('updated');
             sessionStorage.setItem('taxiLastSuccessUrl', cleanUrl.toString());
@@ -890,6 +899,7 @@ window.goEditBooking = function () {
         } catch(e) {}
         location.href = 'booking.html?edit=' + encodeURIComponent(bookingId);
     };
+
 })();
 
 (function () {
