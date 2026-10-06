@@ -647,7 +647,7 @@
             <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
             <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
             <div class="flex flex-col gap-3">
-<button onclick="confirmUpgrade(true)" data-i18n="btn_accept_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">
+                <button onclick="confirmUpgrade(true)" data-i18n="btn_accept_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">
                     ✅ 接受免費升級
                 </button>
                 <button onclick="confirmUpgrade(false)" data-i18n="btn_decline_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-base transition">
@@ -696,7 +696,6 @@
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
 
-    <!-- ⭐ 修改太遲提示 Modal -->
     <div id="edit-too-late-modal" class="hidden fixed inset-0 z-[999] bg-black/85 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
             <div class="text-red-500 text-5xl mb-3">
@@ -737,26 +736,24 @@ var selectedFareMode = '';
 var currentBaseFare = 0;
 var currentTunnelFee = 0;
 var orderType = 'instant';
-var isShenzhenBay = false; // ⭐ 判斷起點是否深圳灣
+var isShenzhenBay = false;
 
 var upgradeChoice = null;
 var pendingBookingData = null;
 
 var editingBookingId = null;
 
-// ⭐ 獲取折扣率
 function getDiscountRate() {
     return isShenzhenBay ? 0.9 : 0.85;
 }
 
-// ⭐ 獲取折扣名稱
 function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
 }
 
 function calculateTotalFare() {
     if (currentBaseFare <= 0) return 0;
-    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
+    const rate = getDiscountRate();
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') {
             var discountedBase = Math.max(Math.round(currentBaseFare * rate), 100);
@@ -786,7 +783,7 @@ function calculateTotalFare() {
 function isMinimumCharge() {
     if (!selectedFareMode) return false;
     if (currentBaseFare <= 0) return false;
-    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
+    const rate = getDiscountRate();
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') return Math.round(currentBaseFare * rate) < 100;
         return currentBaseFare < 100;
@@ -804,8 +801,7 @@ function getMinimumChargeTotal() {
 
 var translations = {
     zh: {
-
-btn_accept_upgrade: "✅ 接受免費升級",
+        btn_accept_upgrade: "✅ 接受免費升級",
         btn_decline_upgrade: "❌ 不用，謝謝",
         btn_more_payment: "更多付款方式",
         btn_confirm_booking: "確認預約",
@@ -865,8 +861,7 @@ btn_accept_upgrade: "✅ 接受免費升級",
         btn_cancel_edit: "取消修改"
     },
     en: {
-
-btn_accept_upgrade: "✅ Accept Free Upgrade",
+        btn_accept_upgrade: "✅ Accept Free Upgrade",
         btn_decline_upgrade: "❌ No, Thanks",
         btn_more_payment: "More Options",
         btn_confirm_booking: "Confirm Booking",
@@ -1204,7 +1199,7 @@ function updateCarDisplay() {
         if (isMinimumCharge()) {
             fareModeTextEl.innerText = currentLang === 'en' ? 'Minimum Fare' : '最低消費';
         } else if (selectedFareMode === 'discount') {
-            fareModeTextEl.innerText = getDiscountLabel(); // ⭐ 使用動態折扣名稱
+            fareModeTextEl.innerText = getDiscountLabel();
         } else if (selectedFareMode === 'normal') {
             fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
         } else {
@@ -1348,9 +1343,6 @@ function submitBookingAfterUpgrade() {
     var minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
     var tunnelSuffix = currentTunnelFee > 0 ? '（已包含隧道費）' : '';
 
-    // ==========================================
-    // ⭐ 根據語言生成中/英文訊息
-    // ==========================================
     var msgLines = [];
     var isEn = (currentLang === 'en');
 
@@ -1367,10 +1359,10 @@ function submitBookingAfterUpgrade() {
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 Luggages: ' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 Pet: ✅');
         if (data.hasWheelchair) msgLines.push('♿ Wheelchair in trunk: ✅');
-        if (data.paymentStr) msgLines.push('💳 ' + data.paymentStr);
         if (data.surname) msgLines.push('👤 Contact: ' + data.surname + ' ' + data.title);
-        msgLines.push('📞 ' + data.phone);
-        msgLines.push('🚘 ' + carDisplayText);
+        msgLines.push('📞 Phone: ' + data.phone);
+        msgLines.push('🚘 Vehicle: ' + carDisplayText);
+        if (data.paymentStr) msgLines.push('💳 Payment: ' + data.paymentStr);
     } else {
         msgLines.push('📍 起點：' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s); });
@@ -1384,19 +1376,18 @@ function submitBookingAfterUpgrade() {
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 行李件數：' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 寵物：✅');
         if (data.hasWheelchair) msgLines.push('♿️ 輪椅放置尾箱：✅');
-        if (data.paymentStr) msgLines.push('💳 ' + data.paymentStr);
         if (data.surname) msgLines.push('👤 聯絡人：' + data.surname + ' ' + data.title);
-        msgLines.push('📞 ' + data.phone);
-        msgLines.push('🚘 ' + carDisplayText);
+        msgLines.push('📞 電話：' + data.phone);
+        msgLines.push('🚘 預約車款：' + carDisplayText);
+        if (data.paymentStr) msgLines.push('💳 付款方式：' + data.paymentStr);
     }
 
     if (minCharge) {
         msgLines.push((isEn ? '💰 Pricing: Minimum charge HK$' : '💰 收費模式：最低消費 HK$') + minChargeTotal + tunnelSuffix);
     } else {
-        var fareModeText = '';
-        if (selectedFareMode === 'discount') fareModeText = getDiscountLabel();
-        else fareModeText = isEn ? 'Standard' : '正價';
-        msgLines.push((isEn ? '💎 ' : '💎 ') + fareModeText + (isEn ? ' 💰Estimated Total: HK$' : ' 💰預計參考車費 HK$') + data.totalFareForWhatsApp);
+        if (selectedFareMode === 'discount') msgLines.push('💎 ' + getDiscountLabel());
+        else msgLines.push(isEn ? '💎 Pricing: Standard Metered Fare' : '💎 收費模式：💯 正價按錶收費');
+        msgLines.push(isEn ? '💰 Estimated Total: HK$' + data.totalFareForWhatsApp : '💰 預計車費總額：HK$' + data.totalFareForWhatsApp);
     }
     if (data.isWechatCustomer) msgLines.push(isEn ? '💚 Note: WeChat Customer' : '💚 備注：微訊客戶');
 
@@ -1427,7 +1418,6 @@ function submitBookingAfterUpgrade() {
     if (data.hasPet) passengerLine += ' | 🐶';
     if (data.hasWheelchair) passengerLine += ' | ♿';
     discordMsgLines.push(passengerLine);
-    if (data.paymentStr) discordMsgLines.push('💳 ' + data.paymentStr);
 
     var cleanPhone = (data.phone || '').replace(/\D/g, '');
     var phoneWithCode = cleanPhone;
@@ -1439,6 +1429,7 @@ function submitBookingAfterUpgrade() {
         discordMsgLines.push('📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
     }
     discordMsgLines.push('🚘 ' + carDisplayText);
+    if (data.paymentStr) discordMsgLines.push('💳 ' + data.paymentStr);
 
     if (minCharge) {
         discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
@@ -1560,7 +1551,6 @@ function submitBookingAfterUpgrade() {
             var updatedParam = data.updated ? '&updated=1' : '';
             var instantParam = (orderType === 'instant') ? '&instant=1' : '';
 
-            // ⭐ 帶上預約用車時間去成功頁
             var bdtParam = '';
             if (orderType === 'booking' && data.date && data.time) {
                 bdtParam = '&bdt=' + encodeURIComponent(data.date + ' ' + data.time);
@@ -1814,7 +1804,65 @@ function initEditMode() {
         switchOrderType('instant');
     }
 
-    if (!applyLookupResultIfAny()) {
+    if (applyLookupResultIfAny()) {
+        return;
+    }
+
+    var hasSnapshot = false;
+    try {
+        hasSnapshot = !!localStorage.getItem('taxiEditPrefillData');
+    } catch(e) {}
+
+    if (!hasSnapshot) {
+        console.log('[EditMode] 冇本地快照，要求輸入電話或內部密碼');
+        
+        var userInput = prompt(
+            currentLang === 'en' 
+                ? 'Please enter the phone number or internal password for booking ' + editingBookingId + ':' 
+                : '請輸入預約 ' + editingBookingId + ' 嘅電話號碼或內部密碼：'
+        );
+
+        if (!userInput || userInput.trim() === '') {
+            alert(currentLang === 'en' ? 'Input is required.' : '必須輸入資料。');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        var trimmedInput = userInput.trim();
+        var cleanInput = trimmedInput.replace(/\D/g, '');
+        
+        var isLikelyPhone = /^[\d\s\-\+\(\)]+$/.test(trimmedInput) && cleanInput.length >= 8;
+        
+        var reqBody = { bookingId: editingBookingId };
+        if (isLikelyPhone) {
+            reqBody.phone = trimmedInput;
+        } else {
+            reqBody.accessKey = trimmedInput;
+            reqBody.phone = trimmedInput;
+        }
+
+        fetch('/.netlify/functions/lookup-booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqBody)
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.success && data.orderData) {
+                sessionStorage.setItem('taxiLookupResult', JSON.stringify(data.orderData));
+                applyLookupResultIfAny();
+            } else {
+                console.error('[EditMode] 驗證失敗：', data.error);
+                alert(data.error || (currentLang === 'en' ? 'Booking ID or phone number is incorrect.' : '預約編號或電話唔正確。'));
+                window.location.href = 'index.html';
+            }
+        })
+        .catch(function(error) {
+            console.error('[EditMode] API 錯誤：', error);
+            alert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
+            window.location.href = 'index.html';
+        });
+    } else {
         restoreFormSnapshot();
     }
 }
@@ -1843,7 +1891,6 @@ function applyLookupResultIfAny() {
         };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
 
-        // ⭐ 判斷是否深圳灣
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
 
         var pickupEl = document.getElementById('booking-pickup-display');
@@ -2019,7 +2066,7 @@ function applyLookupResultIfAny() {
 }
 
 function goToEditRoute() {
-    sessionStorage.setItem('returningFromResult', '1'); // ⭐ 加呢行
+    sessionStorage.setItem('returningFromResult', '1');
     window.location.href = 'index.html';
 }
 
@@ -2049,7 +2096,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
     var routeData = loadRouteDataFromLocalStorage();
     if (routeData) {
-        // ⭐ 判斷是否深圳灣
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
         
         if (routeData.pickup) document.getElementById('booking-pickup-display').innerText = routeData.pickup;
