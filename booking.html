@@ -1009,19 +1009,21 @@ function submitBookingAfterUpgrade() {
     discordMsgLines.push('🚘 ' + carDisplayText);
     if (data.paymentStr) discordMsgLines.push('💳 ' + data.paymentStr);
 
-    if (minCharge) discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
-    else {
-        if (selectedFareMode === 'discount') discordMsgLines.push('💎 ' + getDiscountLabel());
-        else {
-            var feeModeText = '💯正價按錶收費';
+    if (minCharge) {
+        discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
+    } else {
+        var feeModeText;
+        if (selectedFareMode === 'discount') {
+            feeModeText = isShenzhenBay ? '九折' : '八五折';
+        } else {
+            feeModeText = '💯正價';
             if (selectedCarName === 'MAXUS MIFA 7') {
                 var adjustedBase = Math.max(currentBaseFare, 80);
                 var basePlusSurcharge = adjustedBase + 50;
                 if (basePlusSurcharge < 250) feeModeText = '💯正價+$50';
             } else if (selectedSurcharge > 0) feeModeText = '💯正價+$' + selectedSurcharge;
-            discordMsgLines.push('💎 ' + feeModeText);
         }
-        discordMsgLines.push('💰預計參考車費 HK$' + data.totalFareForWhatsApp);
+        discordMsgLines.push('💎 ' + feeModeText + ' | 💰預計參考車費 HK$' + data.totalFareForWhatsApp);
     }
     if (data.isWechatCustomer) discordMsgLines.push('💚 備注：微訊客戶');
     discordMsgLines.push('');
