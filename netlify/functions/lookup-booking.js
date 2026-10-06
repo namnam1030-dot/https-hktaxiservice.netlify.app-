@@ -35,7 +35,6 @@ function cleanPhone(s) {
   return String(s || '').replace(/\D/g, '');
 }
 
-// ⭐ 由 description 抽中途站
 function extractStopoversFromDescription(description) {
   if (!description) return '';
   
