@@ -108,28 +108,15 @@
     #date, #time, #flight_no { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
 
     .order-type-btn {
-        width: 100%;
-        font-weight: 700;
-        font-size: 0.875rem;
-        padding: 0.5rem 0;
-        border-radius: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.125rem;
-        min-height: 70px;
-        border: 2px solid #374151;
-        background-color: #0B0B0B;
-        color: #9CA3AF;
+        width: 100%; font-weight: 700; font-size: 0.875rem; padding: 0.5rem 0;
+        border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 0.125rem; min-height: 70px; border: 2px solid #374151;
+        background-color: #0B0B0B; color: #9CA3AF;
     }
     .order-type-btn:hover:not(.selected) { border-color: #FFF200; color: #FFF200; }
     .order-type-btn.selected {
-        background-color: #FFF200;
-        color: #000000;
-        border-color: #FFF200;
+        background-color: #FFF200; color: #000000; border-color: #FFF200;
         box-shadow: 0 10px 15px -3px rgba(255, 242, 0, 0.15);
         animation: orderBtnPulse 2s ease-in-out infinite;
     }
@@ -142,18 +129,10 @@
     html.light-theme body .order-type-btn.selected span { color: #000000 !important; opacity: 1 !important; }
 
     .wechat-cta-btn {
-        background-color: #07C160 !important;
-        color: #FFFFFF !important;
-        border: 1px solid #07C160 !important;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-        font-weight: 700;
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.5rem;
-        font-size: 0.75rem;
-        transition: background-color 0.2s ease, opacity 0.2s ease;
-        cursor: pointer;
+        background-color: #07C160 !important; color: #FFFFFF !important; border: 1px solid #07C160 !important;
+        display: inline-flex; align-items: center; gap: 0.375rem; font-weight: 700;
+        padding: 0.375rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem;
+        transition: background-color 0.2s ease, opacity 0.2s ease; cursor: pointer;
     }
     .wechat-cta-btn:hover { background-color: #06AD56 !important; border-color: #06AD56 !important; opacity: 1; }
     html.light-theme body .wechat-cta-btn { background-color: #07C160 !important; color: #FFFFFF !important; border-color: #07C160 !important; }
@@ -191,17 +170,9 @@
     html.light-theme body #upgrade-modal .text-brand-yellow { color: #000000 !important; font-weight: bold !important; }
 
     #edit-mode-banner {
-        background-color: #F59E0B;
-        color: #000000;
-        padding: 10px 14px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 15px;
-        margin-bottom: 12px;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        flex-wrap: wrap;
+        background-color: #F59E0B; color: #000000; padding: 10px 14px; border-radius: 12px;
+        font-weight: 700; font-size: 15px; margin-bottom: 12px;
+        align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
     }
     #edit-mode-banner:not(.hidden) { display: flex; }
     #edit-mode-banner button { background-color: #000000; color: #FFFFFF; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
@@ -515,7 +486,7 @@
 
 <script>
 // ============================================
-// 頁面變數 + 翻譯
+// 頁面變數
 // ============================================
 var currentLang = localStorage.getItem('taxiLang') || 'zh';
 var selectedCarName = '';
@@ -644,10 +615,8 @@ function saveFormSnapshot(carDisplayText) {
         document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
         var routeData = loadRouteDataFromLocalStorage() || {};
         var snapshot = {
-            editingBookingId: editingBookingId || null,
-            orderType: orderType,
-            pickup: routeData.pickup || '',
-            dropoff: routeData.dropoff || '',
+            editingBookingId: editingBookingId || null, orderType: orderType,
+            pickup: routeData.pickup || '', dropoff: routeData.dropoff || '',
             stopovers: (routeData.stopovers || []).join('、'),
             date: document.getElementById('date') ? document.getElementById('date').value : '',
             time: document.getElementById('time') ? document.getElementById('time').value : '',
@@ -661,9 +630,7 @@ function saveFormSnapshot(carDisplayText) {
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
-            selectedCarName: selectedCarName || '',
-            carDisplayText: carDisplayText || '',
-            selectedFareMode: selectedFareMode || ''
+            selectedCarName: selectedCarName || '', carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
         };
         localStorage.setItem('taxiEditPrefillData', JSON.stringify(snapshot));
     } catch(e) { console.error('[Snapshot] 保存失敗：', e); }
@@ -753,15 +720,81 @@ function computeChangedFields(carDisplayText) {
     } catch(e) { console.error('[ChangedFields] 計算失敗：', e); return null; }
 }
 
-// ⭐ 跳去 fleet 前保存表單狀態
-function goToFleetPage() {
+// ⭐ 保存所有表單資料到 sessionStorage
+function saveAllFormData() {
     try {
-        sessionStorage.setItem('taxiFormOrderType', orderType);
-        var dateEl = document.getElementById('date');
-        var timeEl = document.getElementById('time');
-        if (dateEl) sessionStorage.setItem('taxiFormDate', dateEl.value);
-        if (timeEl) sessionStorage.setItem('taxiFormTime', timeEl.value);
-    } catch(e) {}
+        var payments = [];
+        document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
+        var formData = {
+            orderType: orderType,
+            date: document.getElementById('date') ? document.getElementById('date').value : '',
+            time: document.getElementById('time') ? document.getElementById('time').value : '',
+            flightNo: document.getElementById('flight_no') ? document.getElementById('flight_no').value : '',
+            passengers: document.getElementById('passengers') ? document.getElementById('passengers').value : '2 人',
+            luggages: document.getElementById('luggages') ? document.getElementById('luggages').value : '0 件',
+            hasPet: document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false,
+            hasWheelchair: document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false,
+            payments: payments,
+            contactTitle: document.getElementById('contact_title') ? document.getElementById('contact_title').value : '',
+            contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
+            phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
+            isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false
+        };
+        sessionStorage.setItem('taxiFormData', JSON.stringify(formData));
+        console.log('[saveAllFormData] 已保存所有表單資料');
+    } catch(e) { console.error('[saveAllFormData] 失敗：', e); }
+}
+
+// ⭐ 從 sessionStorage 恢復所有表單資料
+function restoreAllFormData() {
+    try {
+        var raw = sessionStorage.getItem('taxiFormData');
+        if (!raw) return false;
+        var formData = JSON.parse(raw);
+        console.log('[restoreAllFormData] 讀取表單資料：', formData);
+
+        if (formData.orderType === 'booking' || formData.orderType === 'instant') {
+            switchOrderType(formData.orderType);
+        }
+        if (formData.date) { var el = document.getElementById('date'); if (el) el.value = formData.date; }
+        if (formData.time) { var el = document.getElementById('time'); if (el) el.value = formData.time; }
+        if (formData.flightNo) { var el = document.getElementById('flight_no'); if (el) el.value = formData.flightNo; }
+        if (formData.passengers) { var el = document.getElementById('passengers'); if (el) el.value = formData.passengers; }
+        if (formData.luggages) { var el = document.getElementById('luggages'); if (el) el.value = formData.luggages; }
+        var petEl = document.getElementById('has_pet'); if (petEl) petEl.checked = !!formData.hasPet;
+        var wheelEl = document.getElementById('has_wheelchair'); if (wheelEl) wheelEl.checked = !!formData.hasWheelchair;
+
+        var paymentArr = Array.isArray(formData.payments) ? formData.payments : [];
+        if (paymentArr.length > 0) {
+            document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { el.checked = false; });
+            var hasNonCash = false;
+            document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
+                if (paymentArr.indexOf(el.value) >= 0) {
+                    el.checked = true;
+                    if (el.value !== '現金') hasNonCash = true;
+                }
+            });
+            if (hasNonCash) {
+                var more = document.getElementById('more-payment-options');
+                if (more) more.classList.remove('hidden');
+            }
+        }
+        if (formData.contactTitle) { var el = document.getElementById('contact_title'); if (el) el.value = formData.contactTitle; }
+        if (formData.contactSurname) { var el = document.getElementById('contact_surname'); if (el) el.value = formData.contactSurname; }
+        if (formData.phone) { var el = document.getElementById('phone'); if (el) el.value = formData.phone; }
+        var wxEl = document.getElementById('is_wechat_customer'); if (wxEl) wxEl.checked = !!formData.isWechatCustomer;
+
+        return true;
+    } catch(e) { console.error('[restoreAllFormData] 失敗：', e); return false; }
+}
+
+function clearAllFormData() {
+    try { sessionStorage.removeItem('taxiFormData'); } catch(e) {}
+}
+
+// ⭐ 跳去 fleet 前保存所有表單資料
+function goToFleetPage() {
+    saveAllFormData();
     window.location.href = 'fleet.html';
 }
 
@@ -1051,11 +1084,7 @@ function submitBookingAfterUpgrade() {
             else sessionStorage.removeItem('taxiChangedFields');
             sessionStorage.removeItem('taxiEditingBookingId');
             sessionStorage.removeItem('taxiInternalAccess');
-            try {
-                sessionStorage.removeItem('taxiFormOrderType');
-                sessionStorage.removeItem('taxiFormDate');
-                sessionStorage.removeItem('taxiFormTime');
-            } catch(e) {}
+            clearAllFormData(); // ⭐ 提交成功清空表單暫存
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
             var updatedParam = data.updated ? '&updated=1' : '';
@@ -1275,11 +1304,7 @@ function initEditMode() {
         }
 
         var trimmedInput = userInput.trim();
-        var reqBody = {
-            bookingId: editingBookingId,
-            phone: trimmedInput,
-            accessKey: trimmedInput
-        };
+        var reqBody = { bookingId: editingBookingId, phone: trimmedInput, accessKey: trimmedInput };
 
         fetch('/.netlify/functions/lookup-booking', {
             method: 'POST',
@@ -1323,10 +1348,7 @@ function initEditMode() {
     var orderDataForCheck = null;
     try {
         var lookupRaw = sessionStorage.getItem('taxiLookupResult');
-        if (lookupRaw) {
-            hasLookupResult = true;
-            orderDataForCheck = JSON.parse(lookupRaw);
-        }
+        if (lookupRaw) { hasLookupResult = true; orderDataForCheck = JSON.parse(lookupRaw); }
     } catch(e) {}
 
     var hasSnapshot = false;
@@ -1357,18 +1379,14 @@ function initEditMode() {
     }
 
     if (hasLookupResult) {
-        if (applyLookupResultIfAny()) {
-            console.log('[EditMode] 內部訪問，跳過 45 分鐘檢查');
-        }
+        if (applyLookupResultIfAny()) { console.log('[EditMode] 內部訪問，跳過 45 分鐘檢查'); }
         return;
     }
-
     if (hasSnapshot) {
         restoreFormSnapshot();
         console.log('[EditMode] 內部訪問，跳過 45 分鐘檢查');
         return;
     }
-
     console.log('[EditMode] 內部訪問但冇本地資料，返回主頁');
     window.location.href = 'index.html';
 }
@@ -1462,11 +1480,7 @@ function goToEditRoute() {
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiInternalAccess');
-    try {
-        sessionStorage.removeItem('taxiFormOrderType');
-        sessionStorage.removeItem('taxiFormDate');
-        sessionStorage.removeItem('taxiFormTime');
-    } catch(e) {}
+    clearAllFormData();
     var lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
     if (lastSuccessUrl) window.location.href = lastSuccessUrl;
     else window.location.href = 'booking-success.html';
@@ -1517,32 +1531,16 @@ window.addEventListener('DOMContentLoaded', function() {
     checkShowFlightField();
     applyLanguage();
 
-    // ⭐ 1. 先設定默認：即時訂單（會加 .selected class 令按鈕變黃色）
+    // ⭐ 1. 默認即時訂單（令按鈕變黃色）
     switchOrderType('instant');
 
-    // ⭐ 2. 進入編輯模式（如有 edit 參數，會覆蓋上面嘅設定）
+    // ⭐ 2. 進入編輯模式（如有 edit 參數）
     initEditMode();
 
-    // ⭐ 3. 如果從 fleet 返回，恢復用戶之前嘅選擇
-    var savedFormType = null, savedFormDate = null, savedFormTime = null;
-    try {
-        savedFormType = sessionStorage.getItem('taxiFormOrderType');
-        savedFormDate = sessionStorage.getItem('taxiFormDate');
-        savedFormTime = sessionStorage.getItem('taxiFormTime');
-    } catch(e) {}
-
-    if (savedFormType === 'booking' || savedFormType === 'instant') {
-        switchOrderType(savedFormType);
+    // ⭐ 3. 從 fleet 返回時，恢復所有表單資料
+    if (restoreAllFormData()) {
+        console.log('[DOMContentLoaded] 已恢復所有表單資料');
     }
-    if (savedFormDate && dateInput) dateInput.value = savedFormDate;
-    if (savedFormTime && timeInput) timeInput.value = savedFormTime;
-
-    // 用完即清空
-    try {
-        sessionStorage.removeItem('taxiFormOrderType');
-        sessionStorage.removeItem('taxiFormDate');
-        sessionStorage.removeItem('taxiFormTime');
-    } catch(e) {}
 
     if (dateInput) {
         dateInput.addEventListener('change', function() {
