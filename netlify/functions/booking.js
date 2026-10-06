@@ -6,7 +6,6 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
-// ⭐ Telegram 設定
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -393,7 +392,6 @@ async function updateGoogleCalendar(existing, data) {
   const calendar = getCalendarClient();
   const resource = buildCalendarEvent(data, existing.bookingId, existing.discordMessageId);
   
-  // ⭐ 保留 telegramMessageId
   if (existing.telegramMessageId) {
     if (!resource.extendedProperties) resource.extendedProperties = {};
     if (!resource.extendedProperties.private) resource.extendedProperties.private = {};
@@ -439,7 +437,7 @@ async function patchCalendarMessageIds(eventId, discordMessageId, telegramMessag
 }
 
 /* ============================================
-   Discord 相關
+   Discord 相關（已修正付款方式位置）
    ============================================ */
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
@@ -476,10 +474,13 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
     body = header + body;
   }
 
+  // ⭐ 修正付款方式位置：將 💳 行移到 🚘 車款行之後
+  body = body.replace(/(💳[^\n]*\n)(📞[^\n]*\n)(🚘[^\n]*)/, '$2$3\n$1');
+  body = body.replace(/(💳[^\n]*\n)(👤[^\n]*\n)(🚘[^\n]*)/, '$2$3\n$1');
+  
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
   
-  // ⭐ 在 ID 旁邊加「查看/修改訂單」鏈接
   if (bookingId && body.indexOf('查看/修改訂單') < 0) {
     body = body.replace(
       new RegExp('🆔\\s*`' + bookingId + '`', 'g'),
