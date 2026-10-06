@@ -1704,12 +1704,10 @@ function isTooLateToEdit(orderData) {
     var timeStr = '';
 
     if (orderData) {
-        // ⭐ 直接從傳入嘅訂單資料讀取
         if (orderData.orderType === 'instant') return false;
         dateStr = orderData.date || '';
         timeStr = orderData.time || '';
     } else {
-        // 原本邏輯：從 sessionStorage / localStorage 讀取
         try {
             var lookupRaw = sessionStorage.getItem('taxiLookupResult');
             if (lookupRaw) {
@@ -1764,7 +1762,6 @@ function initEditMode() {
         return;
     }
 
-    // ⭐ 檢查是否切換到不同訂單
     var previousEditId = sessionStorage.getItem('taxiEditingBookingId');
     if (previousEditId && previousEditId !== editId) {
         console.log('[EditMode] 切換訂單，清除舊快照');
@@ -1788,7 +1785,6 @@ function initEditMode() {
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
-    // ⭐ 先檢查本地資料
     var hasLookupResult = false;
     var orderDataForCheck = null;
     try {
@@ -1828,10 +1824,8 @@ function initEditMode() {
         switchOrderType('instant');
     }
 
-    // ⭐ 情況 1：已經有 lookup result（例如從「查詢預約」流程進入）
     if (hasLookupResult) {
         if (applyLookupResultIfAny()) {
-            // ⭐ 資料載入成功之後，才檢查時間
             if (isTooLateToEdit(orderDataForCheck)) {
                 showEditTooLateModal();
             }
@@ -1839,17 +1833,14 @@ function initEditMode() {
         return;
     }
 
-    // ⭐ 情況 2：有快照（例如即時訂單改完之後）
     if (hasSnapshot) {
         restoreFormSnapshot();
-        // ⭐ 資料載入成功之後，才檢查時間
         if (isTooLateToEdit()) {
             showEditTooLateModal();
         }
         return;
     }
 
-    // ⭐ 情況 3：冇任何本地資料 → 透過 API 查詢（例如從 Telegram / Discord 進入）
     console.log('[EditMode] 冇本地資料，需要驗證');
     
     var userInput = prompt(
@@ -1883,7 +1874,6 @@ function initEditMode() {
             var orderData = data.orderData;
             sessionStorage.setItem('taxiLookupResult', JSON.stringify(orderData));
             applyLookupResultIfAny();
-            // ⭐ 查詢成功、資料載入之後，才檢查時間
             if (isTooLateToEdit(orderData)) {
                 showEditTooLateModal();
             }
@@ -1898,11 +1888,6 @@ function initEditMode() {
         alert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
         window.location.href = 'index.html';
     });
-}
-
- else {
-        restoreFormSnapshot();
-    }
 }
 
 function applyLookupResultIfAny() {
