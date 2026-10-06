@@ -154,40 +154,28 @@ exports.handler = async (event) => {
 };
 
 /* ============================================
-   Telegram 發送（修正版：完美處理 diff 同 <code>）
+   Telegram 發送
    ============================================ */
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
 
-  // 1. 處理三反引號代碼塊（```diff ... ```）→ 直接變成純文字
   result = result.replace(/```(\w*)\n?([\s\S]*?)```/g, function(m, lang, code) {
     return String(code).trim();
   });
 
-  // 2. 處理單反引號 inline code
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // 3. 轉換 Discord 嘅 [文字](<網址>)
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '<a href="$2">$1</a>');
-
-  // 4. 轉換普通 markdown [文字](網址)
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-
-  // 5. 轉換 **粗體**
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
-  // 6. 保護已轉好嘅 HTML tag
   const placeholders = [];
   result = result.replace(/<a href="[^"]+">[^<]+<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
     return '\u0000' + (placeholders.length - 1) + '\u0000';
   });
 
-  // 7. Escape 剩低嘅 & < >
   result = result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  // 8. 還原 HTML tag
   result = result.replace(/\u0000(\d+)\u0000/g, function(_, idx) {
     return placeholders[parseInt(idx, 10)];
   });
@@ -404,6 +392,14 @@ async function addToGoogleCalendar(data, bookingId, discordMessageId) {
 async function updateGoogleCalendar(existing, data) {
   const calendar = getCalendarClient();
   const resource = buildCalendarEvent(data, existing.bookingId, existing.discordMessageId);
+  
+  // ⭐ 保留 telegramMessageId
+  if (existing.telegramMessageId) {
+    if (!resource.extendedProperties) resource.extendedProperties = {};
+    if (!resource.extendedProperties.private) resource.extendedProperties.private = {};
+    resource.extendedProperties.private.telegramMessageId = existing.telegramMessageId;
+  }
+  
   const result = await calendar.events.patch({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     eventId: existing.eventId,
@@ -482,6 +478,15 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
+  
+  // ⭐ 在 ID 旁邊加「查看/修改訂單」鏈接
+  if (bookingId && body.indexOf('查看/修改訂單') < 0) {
+    body = body.replace(
+      new RegExp('🆔\\s*`' + bookingId + '`', 'g'),
+      '🆔 `' + bookingId + '` | [📋 查看/修改訂單](<https://hktaxiservice.netlify.app/booking.html?edit=' + bookingId + '>)'
+    );
+  }
+  
   return body;
 }
 
