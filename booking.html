@@ -135,124 +135,57 @@
     html { font-size: 130%; }
     body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
     .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
-    input, select {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-    }
-    #date, #time, #flight_no {
-        padding-top: 0.25rem !important;
-        padding-bottom: 0.25rem !important;
-    }
+    input, select { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+    #date, #time, #flight_no { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
 
     .order-type-btn {
-        width: 100%;
-        font-weight: 700;
-        font-size: 0.875rem;
-        padding: 0.5rem 0;
-        border-radius: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.125rem;
-        min-height: 70px;
-        border: 2px solid #374151;
-        background-color: #0B0B0B;
-        color: #9CA3AF;
+        width: 100%; font-weight: 700; font-size: 0.875rem; padding: 0.5rem 0;
+        border-radius: 0.75rem; cursor: pointer; transition: all 0.2s ease;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 0.125rem; min-height: 70px; border: 2px solid #374151;
+        background-color: #0B0B0B; color: #9CA3AF;
     }
-    .order-type-btn:hover:not(.selected) {
-        border-color: #FFF200;
-        color: #FFF200;
-    }
+    .order-type-btn:hover:not(.selected) { border-color: #FFF200; color: #FFF200; }
     .order-type-btn.selected {
-        background-color: #FFF200;
-        color: #000000;
-        border-color: #FFF200;
+        background-color: #FFF200; color: #000000; border-color: #FFF200;
         box-shadow: 0 10px 15px -3px rgba(255, 242, 0, 0.15);
         animation: orderBtnPulse 2s ease-in-out infinite;
     }
-    @keyframes orderBtnPulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.82; }
-    }
+    @keyframes orderBtnPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.82; } }
 
     html.light-theme body .order-type-btn:not(.selected) {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-        border-color: #D1D5DB !important;
+        background-color: #FFFFFF !important; color: #000000 !important; border-color: #D1D5DB !important;
     }
-    html.light-theme body .order-type-btn:not(.selected) span {
-        color: #000000 !important;
-        opacity: 1 !important;
-    }
-    html.light-theme body .order-type-btn:not(.selected):hover {
-        border-color: #000000 !important;
-        color: #000000 !important;
-    }
+    html.light-theme body .order-type-btn:not(.selected) span { color: #000000 !important; opacity: 1 !important; }
+    html.light-theme body .order-type-btn:not(.selected):hover { border-color: #000000 !important; color: #000000 !important; }
     html.light-theme body .order-type-btn.selected {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
+        background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     }
-    html.light-theme body .order-type-btn.selected span {
-        color: #000000 !important;
-        opacity: 1 !important;
-    }
+    html.light-theme body .order-type-btn.selected span { color: #000000 !important; opacity: 1 !important; }
 
     .wechat-cta-btn {
-        background-color: #07C160 !important;
-        color: #FFFFFF !important;
-        border: 1px solid #07C160 !important;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-        font-weight: 700;
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.5rem;
-        font-size: 0.75rem;
-        transition: background-color 0.2s ease, opacity 0.2s ease;
-        cursor: pointer;
+        background-color: #07C160 !important; color: #FFFFFF !important; border: 1px solid #07C160 !important;
+        display: inline-flex; align-items: center; gap: 0.375rem; font-weight: 700;
+        padding: 0.375rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem;
+        transition: background-color 0.2s ease, opacity 0.2s ease; cursor: pointer;
     }
-    .wechat-cta-btn:hover {
-        background-color: #06AD56 !important;
-        border-color: #06AD56 !important;
-        opacity: 1;
-    }
-    html.light-theme body .wechat-cta-btn {
-        background-color: #07C160 !important;
-        color: #FFFFFF !important;
-        border-color: #07C160 !important;
-    }
-    html.light-theme body .wechat-cta-btn:hover {
-        background-color: #06AD56 !important;
-        border-color: #06AD56 !important;
-    }
+    .wechat-cta-btn:hover { background-color: #06AD56 !important; border-color: #06AD56 !important; opacity: 1; }
+    html.light-theme body .wechat-cta-btn { background-color: #07C160 !important; color: #FFFFFF !important; border-color: #07C160 !important; }
+    html.light-theme body .wechat-cta-btn:hover { background-color: #06AD56 !important; border-color: #06AD56 !important; }
 
     html.light-theme body #booking-section a[href="index.html"],
     html.light-theme body #booking-section a[href="fleet.html"],
     html.light-theme body #booking-section button[onclick*="index.html"],
     html.light-theme body #booking-section button[onclick*="fleet.html"] {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
+        background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important;
     }
-    html.light-theme body #booking-submit-btn {
-        border: 1px solid #000000 !important;
-    }
-    html.light-theme body .bg-green-600\/10 {
-        background-color: rgba(22, 163, 74, 0.1) !important;
-    }
-    html.light-theme body .text-green-400 {
-        color: #15803D !important;
-    }
+    html.light-theme body #booking-submit-btn { border: 1px solid #000000 !important; }
+    html.light-theme body .bg-green-600\/10 { background-color: rgba(22, 163, 74, 0.1) !important; }
+    html.light-theme body .text-green-400 { color: #15803D !important; }
 
     html.light-theme body .text-gray-200,
-    html.light-theme body .text-gray-300 {
-        color: #000000 !important;
-    }
+    html.light-theme body .text-gray-300 { color: #000000 !important; }
 
     html.light-theme body input[type="text"],
     html.light-theme body input[type="tel"],
@@ -266,9 +199,7 @@
     html.light-theme body #luggages,
     html.light-theme body #contact_title,
     html.light-theme body #contact_surname {
-        background-color: #FFFFFF !important;
-        border-color: #D1D5DB !important;
-        color: #000000 !important;
+        background-color: #FFFFFF !important; border-color: #D1D5DB !important; color: #000000 !important;
     }
     html.light-theme body input[type="text"]:focus,
     html.light-theme body input[type="tel"]:focus,
@@ -282,109 +213,41 @@
     html.light-theme body #luggages:focus,
     html.light-theme body #contact_title:focus,
     html.light-theme body #contact_surname:focus {
-        background-color: #FFFFFF !important;
-        border-color: #000000 !important;
+        background-color: #FFFFFF !important; border-color: #000000 !important;
     }
-    html.light-theme body #datetime-container > div > div {
-        background-color: #FFFFFF !important;
-        border-color: #D1D5DB !important;
-    }
+    html.light-theme body #datetime-container > div > div { background-color: #FFFFFF !important; border-color: #D1D5DB !important; }
 
-    html.light-theme body #phone {
-        background-color: rgba(255, 242, 0, 0.35) !important;
-        border-color: rgba(0, 0, 0, 0.3) !important;
-        color: #000000 !important;
-    }
-    html.light-theme body #phone:focus {
-        background-color: rgba(255, 242, 0, 0.5) !important;
-        border-color: #000000 !important;
-    }
+    html.light-theme body #phone { background-color: rgba(255, 242, 0, 0.35) !important; border-color: rgba(0, 0, 0, 0.3) !important; color: #000000 !important; }
+    html.light-theme body #phone:focus { background-color: rgba(255, 242, 0, 0.5) !important; border-color: #000000 !important; }
 
-    html.light-theme body #upgrade-modal > div {
-        background-color: #FFFFFF !important;
-        border-color: #000000 !important;
-    }
-    html.light-theme body #upgrade-modal h3 {
-        color: #000000 !important;
-    }
-    html.light-theme body #upgrade-modal p {
-        color: #374151 !important;
-    }
-    html.light-theme body #upgrade-modal .text-brand-yellow {
-        color: #000000 !important;
-        font-weight: bold !important;
-    }
+    html.light-theme body #upgrade-modal > div { background-color: #FFFFFF !important; border-color: #000000 !important; }
+    html.light-theme body #upgrade-modal h3 { color: #000000 !important; }
+    html.light-theme body #upgrade-modal p { color: #374151 !important; }
+    html.light-theme body #upgrade-modal .text-brand-yellow { color: #000000 !important; font-weight: bold !important; }
 
     #edit-mode-banner {
-        background-color: #F59E0B;
-        color: #000000;
-        padding: 10px 14px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 15px;
-        margin-bottom: 12px;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        flex-wrap: wrap;
+        background-color: #F59E0B; color: #000000; padding: 10px 14px; border-radius: 12px;
+        font-weight: 700; font-size: 15px; margin-bottom: 12px;
+        align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
     }
-    #edit-mode-banner:not(.hidden) {
-        display: flex;
-    }
+    #edit-mode-banner:not(.hidden) { display: flex; }
     #edit-mode-banner button {
-        background-color: #000000;
-        color: #FFFFFF;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 13px;
-        cursor: pointer;
-        white-space: nowrap;
+        background-color: #000000; color: #FFFFFF; border: none; padding: 6px 12px;
+        border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap;
     }
 
-    html.light-theme body #edit-too-late-modal > div {
-        background-color: #FFFFFF !important;
-        border-color: #dc2626 !important;
-    }
-    html.light-theme body #edit-too-late-modal h3 {
-        color: #000000 !important;
-    }
-    html.light-theme body #edit-too-late-modal p {
-        color: #374151 !important;
-    }
+    html.light-theme body #edit-too-late-modal > div { background-color: #FFFFFF !important; border-color: #dc2626 !important; }
+    html.light-theme body #edit-too-late-modal h3 { color: #000000 !important; }
+    html.light-theme body #edit-too-late-modal p { color: #374151 !important; }
+    html.light-theme body #edit-too-late-back-btn { background-color: #E5E7EB !important; color: #000000 !important; }
+    html.light-theme body #edit-too-late-back-btn:hover { background-color: #D1D5DB !important; }
 
-    html.light-theme body #edit-too-late-back-btn {
-        background-color: #E5E7EB !important;
-        color: #000000 !important;
-    }
-    html.light-theme body #edit-too-late-back-btn:hover {
-        background-color: #D1D5DB !important;
-    }
-
-    #edit-too-late-modal a[href^="tel:"] {
-        background-color: #3B82F6 !important;
-        color: #FFFFFF !important;
-        border: none !important;
-    }
-    #edit-too-late-modal a[href^="tel:"]:hover {
-        background-color: #2563EB !important;
-    }
-    html.light-theme body #edit-too-late-modal a[href^="tel:"] {
-        background-color: #3B82F6 !important;
-        color: #FFFFFF !important;
-        border: none !important;
-    }
-    html.light-theme body #edit-too-late-modal a[href^="tel:"]:hover {
-        background-color: #2563EB !important;
-    }
-    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"] {
-        background-color: #3B82F6 !important;
-        color: #FFFFFF !important;
-    }
-    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"]:hover {
-        background-color: #2563EB !important;
-    }
+    #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; border: none !important; }
+    #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
+    html.light-theme body #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; border: none !important; }
+    html.light-theme body #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
+    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; }
+    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
 </style>
 </head>
 <body class="antialiased">
@@ -671,22 +534,16 @@
                     <div class="text-green-500 text-3xl mb-3">
                         <i class="fa-brands fa-weixin"></i>
                     </div>
-
                     <h3 id="wecom-modal-title" class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p id="wecom-modal-desc" class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
-
                     <div class="bg-white p-3 rounded-xl mb-2 inline-block">
                         <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
-
                     <p class="text-[11px] text-gray-400 mb-4">
                         <i class="fa-solid fa-hand-pointer"></i>
                         <span data-i18n="wecom_qr_hint">手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取</span>
                     </p>
-
-                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
-                        關閉
-                    </button>
+                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">關閉</button>
                 </div>
             </div>
             <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
@@ -698,12 +555,9 @@
 
     <div id="edit-too-late-modal" class="hidden fixed inset-0 z-[999] bg-black/85 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
-            <div class="text-red-500 text-5xl mb-3">
-                <i class="fa-solid fa-clock"></i>
-            </div>
+            <div class="text-red-500 text-5xl mb-3"><i class="fa-solid fa-clock"></i></div>
             <h3 class="text-2xl font-extrabold text-white mb-3">距離出發時間不足 45 分鐘</h3>
             <p class="text-lg text-gray-300 mb-6 leading-relaxed">如需更改訂單請與我們聯絡。</p>
-
             <div class="flex flex-col gap-3">
                 <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp 查詢
@@ -740,13 +594,9 @@ var isShenzhenBay = false;
 
 var upgradeChoice = null;
 var pendingBookingData = null;
-
 var editingBookingId = null;
 
-function getDiscountRate() {
-    return isShenzhenBay ? 0.9 : 0.85;
-}
-
+function getDiscountRate() { return isShenzhenBay ? 0.9 : 0.85; }
 function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
 }
@@ -939,9 +789,7 @@ function saveFormSnapshot(carDisplayText) {
         document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
             if (el.checked) payments.push(el.value);
         });
-
         var routeData = loadRouteDataFromLocalStorage() || {};
-
         var snapshot = {
             editingBookingId: editingBookingId || null,
             orderType: orderType,
@@ -964,7 +812,6 @@ function saveFormSnapshot(carDisplayText) {
             carDisplayText: carDisplayText || '',
             selectedFareMode: selectedFareMode || ''
         };
-
         localStorage.setItem('taxiEditPrefillData', JSON.stringify(snapshot));
         console.log('[Snapshot] 已保存表單快照');
     } catch(e) {
@@ -975,39 +822,18 @@ function saveFormSnapshot(carDisplayText) {
 function restoreFormSnapshot() {
     try {
         var raw = localStorage.getItem('taxiEditPrefillData');
-        if (!raw) {
-            console.log('[Snapshot] 冇快照，唔預填');
-            return;
-        }
+        if (!raw) { console.log('[Snapshot] 冇快照，唔預填'); return; }
         var s = JSON.parse(raw);
         console.log('[Snapshot] 讀取快照：', s);
 
-        if (s.orderType === 'booking') {
-            switchOrderType('booking');
-        } else if (s.orderType === 'instant') {
-            switchOrderType('instant');
-        }
+        if (s.orderType === 'booking') switchOrderType('booking');
+        else if (s.orderType === 'instant') switchOrderType('instant');
 
-        if (s.date) {
-            var dateEl = document.getElementById('date');
-            if (dateEl) dateEl.value = s.date;
-        }
-        if (s.time) {
-            var timeEl = document.getElementById('time');
-            if (timeEl) timeEl.value = s.time;
-        }
-        if (s.flightNo) {
-            var elFn = document.getElementById('flight_no');
-            if (elFn) elFn.value = s.flightNo;
-        }
-        if (s.passengers) {
-            var elP = document.getElementById('passengers');
-            if (elP) elP.value = s.passengers;
-        }
-        if (s.luggages) {
-            var elL = document.getElementById('luggages');
-            if (elL) elL.value = s.luggages;
-        }
+        if (s.date) { var dateEl = document.getElementById('date'); if (dateEl) dateEl.value = s.date; }
+        if (s.time) { var timeEl = document.getElementById('time'); if (timeEl) timeEl.value = s.time; }
+        if (s.flightNo) { var elFn = document.getElementById('flight_no'); if (elFn) elFn.value = s.flightNo; }
+        if (s.passengers) { var elP = document.getElementById('passengers'); if (elP) elP.value = s.passengers; }
+        if (s.luggages) { var elL = document.getElementById('luggages'); if (elL) elL.value = s.luggages; }
 
         var petEl = document.getElementById('has_pet');
         if (petEl) petEl.checked = !!s.hasPet;
@@ -1015,15 +841,11 @@ function restoreFormSnapshot() {
         if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
 
         var paymentArr = [];
-        if (typeof s.payments === 'string') {
-            paymentArr = s.payments.split(' / ').filter(Boolean);
-        } else if (Array.isArray(s.payments)) {
-            paymentArr = s.payments;
-        }
+        if (typeof s.payments === 'string') paymentArr = s.payments.split(' / ').filter(Boolean);
+        else if (Array.isArray(s.payments)) paymentArr = s.payments;
+
         if (paymentArr.length > 0) {
-            document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
-                el.checked = false;
-            });
+            document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { el.checked = false; });
             var hasNonCash = false;
             document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
                 if (paymentArr.indexOf(el.value) >= 0) {
@@ -1037,22 +859,11 @@ function restoreFormSnapshot() {
             }
         }
 
-        if (s.contactTitle) {
-            var elCt = document.getElementById('contact_title');
-            if (elCt) elCt.value = s.contactTitle;
-        }
-        if (s.contactSurname) {
-            var elCs = document.getElementById('contact_surname');
-            if (elCs) elCs.value = s.contactSurname;
-        }
-        if (s.phone) {
-            var elPh = document.getElementById('phone');
-            if (elPh) elPh.value = s.phone;
-        }
-
+        if (s.contactTitle) { var elCt = document.getElementById('contact_title'); if (elCt) elCt.value = s.contactTitle; }
+        if (s.contactSurname) { var elCs = document.getElementById('contact_surname'); if (elCs) elCs.value = s.contactSurname; }
+        if (s.phone) { var elPh = document.getElementById('phone'); if (elPh) elPh.value = s.phone; }
         var wxEl = document.getElementById('is_wechat_customer');
         if (wxEl) wxEl.checked = !!s.isWechatCustomer;
-
         console.log('[Snapshot] 已預填完成');
     } catch(e) {
         console.error('[Snapshot] 預填失敗：', e);
@@ -1064,13 +875,9 @@ function computeChangedFields(carDisplayText) {
         var raw = localStorage.getItem('taxiEditPrefillData');
         if (!raw) return null;
         var old = JSON.parse(raw);
-
         var routeData = loadRouteDataFromLocalStorage() || {};
-
         var payments = [];
-        document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
-            if (el.checked) payments.push(el.value);
-        });
+        document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
 
         var cur = {
             pickup: routeData.pickup || '',
@@ -1093,23 +900,10 @@ function computeChangedFields(carDisplayText) {
         };
 
         var labels = {
-            pickup: '起點',
-            dropoff: '終點',
-            stopovers: '中途站',
-            date: '日期',
-            time: '時間',
-            flightNo: '航班編號',
-            passengers: '人數',
-            luggages: '行李件數',
-            hasPet: '寵物',
-            hasWheelchair: '輪椅',
-            payments: '付款方式',
-            contactTitle: '稱謂',
-            contactSurname: '聯絡人',
-            phone: '電話',
-            isWechatCustomer: '微信客戶',
-            carDisplayText: '預約車款',
-            selectedFareMode: '收費模式'
+            pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間',
+            flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物',
+            hasWheelchair: '輪椅', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人',
+            phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式'
         };
 
         function fmt(val, key) {
@@ -1124,20 +918,14 @@ function computeChangedFields(carDisplayText) {
 
         var changed = {};
         Object.keys(labels).forEach(function(key) {
-            var oldRaw = old[key];
-            var newRaw = cur[key];
-            var oldStr = fmt(oldRaw, key);
-            var newStr = fmt(newRaw, key);
-            if (oldStr !== newStr) {
-                changed[key] = { label: labels[key], old: oldStr, new: newStr };
-            }
+            var oldStr = fmt(old[key], key);
+            var newStr = fmt(cur[key], key);
+            if (oldStr !== newStr) changed[key] = { label: labels[key], old: oldStr, new: newStr };
         });
 
         if (changed.contactTitle || changed.contactSurname) {
-            var oldTitle = old.contactTitle || '';
-            var oldSur = old.contactSurname || '';
-            var newTitle = cur.contactTitle || '';
-            var newSur = cur.contactSurname || '';
+            var oldTitle = old.contactTitle || '', oldSur = old.contactSurname || '';
+            var newTitle = cur.contactTitle || '', newSur = cur.contactSurname || '';
             changed['contact'] = {
                 label: '聯絡人',
                 old: (oldSur + oldTitle).trim() || '（空）',
@@ -1146,7 +934,6 @@ function computeChangedFields(carDisplayText) {
             delete changed.contactTitle;
             delete changed.contactSurname;
         }
-
         return Object.keys(changed).length > 0 ? changed : null;
     } catch(e) {
         console.error('[ChangedFields] 計算失敗：', e);
@@ -1154,8 +941,10 @@ function computeChangedFields(carDisplayText) {
     }
 }
 
+// ⭐ switchOrderType 加入保存到 localStorage
 function switchOrderType(type) {
     orderType = type;
+    try { localStorage.setItem('taxiOrderType', type); } catch(e) {}
     var instantBtn = document.getElementById('btn-instant-order');
     var bookingBtn = document.getElementById('btn-booking-order');
     var datetimeContainer = document.getElementById('datetime-container');
@@ -1172,17 +961,13 @@ function switchOrderType(type) {
 
 function loadBookingDataFromLocalStorage() {
     var saved = localStorage.getItem('taxiBookingData');
-    if (saved) {
-        try { return JSON.parse(saved); } catch(e) { return null; }
-    }
+    if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
     return null;
 }
 
 function loadRouteDataFromLocalStorage() {
     var saved = localStorage.getItem('taxiRouteData');
-    if (saved) {
-        try { return JSON.parse(saved); } catch(e) { return null; }
-    }
+    if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
     return null;
 }
 
@@ -1197,15 +982,10 @@ function updateCarDisplay() {
     }
 
     if (fareModeTextEl) {
-        if (isMinimumCharge()) {
-            fareModeTextEl.innerText = currentLang === 'en' ? 'Minimum Fare' : '最低消費';
-        } else if (selectedFareMode === 'discount') {
-            fareModeTextEl.innerText = getDiscountLabel();
-        } else if (selectedFareMode === 'normal') {
-            fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
-        } else {
-            fareModeTextEl.innerText = '-';
-        }
+        if (isMinimumCharge()) fareModeTextEl.innerText = currentLang === 'en' ? 'Minimum Fare' : '最低消費';
+        else if (selectedFareMode === 'discount') fareModeTextEl.innerText = getDiscountLabel();
+        else if (selectedFareMode === 'normal') fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
+        else fareModeTextEl.innerText = '-';
     }
 
     if (priceTextEl) {
@@ -1214,16 +994,9 @@ function updateCarDisplay() {
     }
 }
 
-function togglePaymentOptions() {
-    document.getElementById('more-payment-options').classList.toggle('hidden');
-}
-
-function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
-}
-function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
-}
+function togglePaymentOptions() { document.getElementById('more-payment-options').classList.toggle('hidden'); }
+function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
+function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -1234,7 +1007,6 @@ function toggleLanguage() {
 function applyLanguage() {
     var btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
-
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
         if (translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key];
@@ -1275,9 +1047,7 @@ function checkPassengerLimit() {
             selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
             if (selectedFareMode === 'discount') selectedFareMode = 'normal';
             updateCarDisplay();
-            alert(currentLang === 'en'
-                ? "5+ passengers: auto-switched to MAXUS MIFA 7 (6-seater)."
-                : "乘客人數為 5 人或以上，已自動為你切換至 MAXUS MIFA 7（6 座位）。");
+            alert(currentLang === 'en' ? "5+ passengers: auto-switched to MAXUS MIFA 7." : "乘客人數為 5 人或以上，已自動為你切換至 MAXUS MIFA 7。");
         }
     }
 }
@@ -1287,29 +1057,13 @@ function showUpgradeModal(carType, passengerCount) {
     var title = document.getElementById('upgrade-modal-title');
     var text = document.getElementById('upgrade-modal-text');
     upgradeChoice = null;
-
     if (carType === '豐田混能的士') {
         title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        text.innerHTML = currentLang === 'zh'
-            ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？'
-            : 'You selected <span class="text-brand-yellow font-bold text-lg">Toyota Hybrid Taxi</span><br><br>You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
+        text.innerHTML = currentLang === 'zh' ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' : 'You selected Toyota Hybrid Taxi. May be upgraded FREE. Accept?';
     } else if (carType === 'MAXUS MIFA 7') {
         title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        if (passengerCount === 5) {
-            text.innerHTML = currentLang === 'zh'
-                ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>你嘅人數係 5 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至其他五/六人車款<br>請問是否接受？'
-                : 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>You have 5 passengers. You may be upgraded to other 5/6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
-        } else if (passengerCount === 6) {
-            text.innerHTML = currentLang === 'zh'
-                ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>你嘅人數係 6 人，有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> 至其他六人車款<br>請問是否接受？'
-                : 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>You have 6 passengers. You may be upgraded to other 6-seater vehicles for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
-        } else {
-            text.innerHTML = currentLang === 'zh'
-                ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？'
-                : 'You selected <span class="text-brand-yellow font-bold text-lg">MAXUS MIFA 7</span><br><br>You may be upgraded to a higher-tier vehicle for <span class="text-brand-yellow font-bold text-lg">FREE</span>.<br><br>Do you accept?';
-        }
+        text.innerHTML = currentLang === 'zh' ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' : 'You selected MAXUS MIFA 7. May be upgraded FREE. Accept?';
     }
-
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1327,35 +1081,24 @@ function confirmUpgrade(choice) {
 function submitBookingAfterUpgrade() {
     var data = pendingBookingData;
     var carDisplayText = data.selectedCarName;
-
     if (data.selectedCarName === '豐田混能的士') {
         carDisplayText = upgradeChoice ? '接受混能以上任何車款' : '‼️只接受豐田混能的士‼️';
     } else if (data.selectedCarName === 'MAXUS MIFA 7') {
-        if (data.passengerCount === 5) {
-            carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
-        } else if (data.passengerCount === 6) {
-            carDisplayText = upgradeChoice ? '接受任何六人車款' : '‼️只接受MIFA 7‼️';
-        } else {
-            carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
-        }
+        carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
     }
 
     var minCharge = isMinimumCharge();
     var minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
     var tunnelSuffix = currentTunnelFee > 0 ? '（已包含隧道費）' : '';
-
-    var msgLines = [];
     var isEn = (currentLang === 'en');
 
+    var msgLines = [];
     if (isEn) {
         msgLines.push('📍 Pickup: ' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
         msgLines.push('🏁 Dropoff: ' + data.dropoff);
         if (data.flightNo) msgLines.push('✈️ Flight: ' + data.flightNo);
-        if (orderType === 'booking') {
-            msgLines.push('📅 Date: ' + data.date);
-            msgLines.push('⏰ Time: ' + data.timeStringFormatted);
-        }
+        if (orderType === 'booking') { msgLines.push('📅 Date: ' + data.date); msgLines.push('⏰ Time: ' + data.timeStringFormatted); }
         msgLines.push('👥 Passengers: ' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 Luggages: ' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 Pet: ✅');
@@ -1369,10 +1112,7 @@ function submitBookingAfterUpgrade() {
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s); });
         msgLines.push('🏁 終點：' + data.dropoff);
         if (data.flightNo) msgLines.push('✈️ 航班編號：' + data.flightNo);
-        if (orderType === 'booking') {
-            msgLines.push('📅 日期：' + data.date);
-            msgLines.push('⏰ 時間：' + data.timeStringFormatted);
-        }
+        if (orderType === 'booking') { msgLines.push('📅 日期：' + data.date); msgLines.push('⏰ 時間：' + data.timeStringFormatted); }
         msgLines.push('👥 人數：' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 行李件數：' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 寵物：✅');
@@ -1391,14 +1131,10 @@ function submitBookingAfterUpgrade() {
         msgLines.push(isEn ? '💰 Estimated Total: HK$' + data.totalFareForWhatsApp : '💰 預計車費總額：HK$' + data.totalFareForWhatsApp);
     }
     if (data.isWechatCustomer) msgLines.push(isEn ? '💚 Note: WeChat Customer' : '💚 備注：微訊客戶');
-
     var customerMessage = msgLines.join('\n');
 
     var discordMsgLines = [];
-    if (orderType === 'instant') {
-        discordMsgLines.push('⚡ 即時訂單 ⚡');
-        discordMsgLines.push('');
-    }
+    if (orderType === 'instant') { discordMsgLines.push('⚡ 即時訂單 ⚡'); discordMsgLines.push(''); }
     var routeLine = '🚕 ' + data.pickup + ' → ' + data.dropoff;
     if (data.stopoverTexts && data.stopoverTexts.length > 0) {
         var stops = data.stopoverTexts.map(function(s) { return s.replace(/中途站\d+:\s*/, ''); }).join('、');
@@ -1408,11 +1144,8 @@ function submitBookingAfterUpgrade() {
     if (data.flightNo) discordMsgLines.push('✈️ 航班：' + data.flightNo);
     if (orderType === 'booking') {
         var dateObj = new Date(data.date);
-        var weekdays = currentLang === 'zh'
-            ? ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-            : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        var weekday = weekdays[dateObj.getDay()];
-        discordMsgLines.push('📅 ' + data.date + '（' + weekday + '）⏰ ' + data.timeStringFormatted);
+        var weekdays = currentLang === 'zh' ? ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        discordMsgLines.push('📅 ' + data.date + '（' + weekdays[dateObj.getDay()] + '）⏰ ' + data.timeStringFormatted);
     }
     var passengerLine = '👥 ' + data.passengers;
     if (data.luggages && data.luggages !== '0 件') passengerLine += ' | 🧳 ' + data.luggages;
@@ -1435,17 +1168,14 @@ function submitBookingAfterUpgrade() {
     if (minCharge) {
         discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
     } else {
-        if (selectedFareMode === 'discount') {
-            discordMsgLines.push('💎 ' + getDiscountLabel());
-        } else {
+        if (selectedFareMode === 'discount') discordMsgLines.push('💎 ' + getDiscountLabel());
+        else {
             var feeModeText = '💯正價按錶收費';
             if (selectedCarName === 'MAXUS MIFA 7') {
                 var adjustedBase = Math.max(currentBaseFare, 80);
                 var basePlusSurcharge = adjustedBase + 50;
                 if (basePlusSurcharge < 250) feeModeText = '💯正價+$50';
-            } else if (selectedSurcharge > 0) {
-                feeModeText = '💯正價+$' + selectedSurcharge;
-            }
+            } else if (selectedSurcharge > 0) feeModeText = '💯正價+$' + selectedSurcharge;
             discordMsgLines.push('💎 ' + feeModeText);
         }
         discordMsgLines.push('💰預計參考車費 HK$' + data.totalFareForWhatsApp);
@@ -1453,14 +1183,10 @@ function submitBookingAfterUpgrade() {
     if (data.isWechatCustomer) discordMsgLines.push('💚 備注：微訊客戶');
     discordMsgLines.push('');
     discordMsgLines.push('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
-
     var fullMessage = discordMsgLines.join('\n');
 
     var changedFields = null;
-    if (editingBookingId) {
-        changedFields = computeChangedFields(carDisplayText);
-        console.log('[ChangedFields] 結果：', changedFields);
-    }
+    if (editingBookingId) { changedFields = computeChangedFields(carDisplayText); }
 
     var bookingData = {
         pickup: data.pickup,
@@ -1504,7 +1230,6 @@ function submitBookingAfterUpgrade() {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-lg"></i> ' + translations[currentLang].btn_sending_booking;
     }
-
     sessionStorage.setItem('taxiSubmitting', '1');
 
     fetch('/.netlify/functions/booking', {
@@ -1516,7 +1241,6 @@ function submitBookingAfterUpgrade() {
     .then(function(data) {
         if (data.success) {
             saveFormSnapshot(carDisplayText);
-
             try {
                 sessionStorage.setItem('taxiLastSubmission', JSON.stringify({
                     timestamp: Date.now(),
@@ -1527,41 +1251,28 @@ function submitBookingAfterUpgrade() {
                 }));
             } catch(e) {}
             sessionStorage.removeItem('taxiSubmitting');
-
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fa-solid fa-check text-lg"></i> ' + (currentLang === 'en' ? 'Submitted' : '已提交');
             }
-
             var encodedData = encodeURIComponent(customerMessage);
             var newBookingId = data.bookingId || '';
-
-            if (newBookingId) {
-                try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {}
-            }
-
-            if (changedFields) {
-                try { sessionStorage.setItem('taxiChangedFields', JSON.stringify(changedFields)); } catch(e) {}
-            } else {
-                sessionStorage.removeItem('taxiChangedFields');
-            }
-
+            if (newBookingId) { try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {} }
+            if (changedFields) { try { sessionStorage.setItem('taxiChangedFields', JSON.stringify(changedFields)); } catch(e) {} }
+            else { sessionStorage.removeItem('taxiChangedFields'); }
             sessionStorage.removeItem('taxiEditingBookingId');
+            sessionStorage.removeItem('taxiInternalAccess');
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
             var updatedParam = data.updated ? '&updated=1' : '';
             var instantParam = (orderType === 'instant') ? '&instant=1' : '';
-
             var bdtParam = '';
             if (orderType === 'booking' && data.date && data.time) {
                 bdtParam = '&bdt=' + encodeURIComponent(data.date + ' ' + data.time);
                 sessionStorage.setItem('taxiLastBdt', data.date + ' ' + data.time);
-            } else {
-                sessionStorage.removeItem('taxiLastBdt');
-            }
+            } else { sessionStorage.removeItem('taxiLastBdt'); }
 
             window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam + instantParam + bdtParam);
-
         } else {
             sessionStorage.removeItem('taxiSubmitting');
             if (submitBtn) {
@@ -1584,18 +1295,13 @@ function submitBookingAfterUpgrade() {
 
 function submitBooking(event) {
     event.preventDefault();
-
     if (sessionStorage.getItem('taxiSubmitting') === '1') {
         alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...');
         return;
     }
-
     checkPassengerLimit();
+    if (!selectedFareMode) { alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！"); return; }
 
-    if (!selectedFareMode) {
-        alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
-        return;
-    }
     var routeData = loadRouteDataFromLocalStorage();
     if (!routeData || !routeData.pickup || !routeData.dropoff) {
         alert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！");
@@ -1603,10 +1309,7 @@ function submitBooking(event) {
     }
     var phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
     var cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 8) {
-        alert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！");
-        return;
-    }
+    if (cleanPhone.length < 8) { alert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！"); return; }
 
     var stopoverTexts = [];
     if (routeData.stopovers) {
@@ -1620,21 +1323,14 @@ function submitBooking(event) {
     if (orderType === 'booking') {
         if (!date) { alert(currentLang === 'en' ? "Please select a date!" : "請選擇預約日期！"); return; }
         var selectedDate = new Date(date);
-        var today = new Date();
-        today.setHours(0, 0, 0, 0);
-        var maxAllowedDate = new Date(today);
-        maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
-        if (selectedDate < today || selectedDate > maxAllowedDate) {
-            alert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！");
-            return;
-        }
+        var today = new Date(); today.setHours(0, 0, 0, 0);
+        var maxAllowedDate = new Date(today); maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
+        if (selectedDate < today || selectedDate > maxAllowedDate) { alert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！"); return; }
         if (!time) { alert(currentLang === 'en' ? "Please select a time!" : "請選擇預約時間！"); return; }
         var targetDateTime = new Date(date + 'T' + time);
         var diffMinutes = (targetDateTime.getTime() - Date.now()) / (1000 * 60);
         if (diffMinutes < 15) {
-            alert(currentLang === 'en'
-                ? "⚠️ Booking time must be at least 15 minutes later.\nPlease use Instant Order instead."
-                : "⚠️ 預約時間必須在15分鐘之後！\n如少於15分鐘，請使用「即時訂單」。");
+            alert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！");
             return;
         }
     }
@@ -1660,34 +1356,19 @@ function submitBooking(event) {
         var parts = date.split('-').map(Number);
         var partsT = time.split(':').map(Number);
         var tdt = new Date(parts[0], parts[1] - 1, parts[2], partsT[0], partsT[1]);
-        if ((tdt - now) / (1000 * 60) <= 15) {
-            timeStringFormatted = time + ' ‼️⚠️ *即時用車* ⚠️‼️';
-        }
+        if ((tdt - now) / (1000 * 60) <= 15) timeStringFormatted = time + ' ‼️⚠️ *即時用車* ⚠️‼️';
     }
     if (orderType === 'instant') timeStringFormatted = '即時用車（15分鐘內）';
 
     var totalFareForWhatsApp = calculateTotalFare();
 
     pendingBookingData = {
-        pickup: routeData.pickup,
-        dropoff: routeData.dropoff,
-        stopoverTexts: stopoverTexts,
-        flightNo: flightNo,
-        date: date,
-        time: time,
-        timeStringFormatted: timeStringFormatted,
-        passengers: passengers,
-        passengerCount: passengerCount,
-        luggages: luggages,
-        hasPet: hasPet,
-        hasWheelchair: hasWheelchair,
-        surname: surname,
-        title: title,
-        phone: phone,
-        paymentStr: paymentStr,
-        totalFareForWhatsApp: totalFareForWhatsApp,
-        selectedCarName: selectedCarName,
-        isWechatCustomer: isWechatCustomer
+        pickup: routeData.pickup, dropoff: routeData.dropoff, stopoverTexts: stopoverTexts,
+        flightNo: flightNo, date: date, time: time, timeStringFormatted: timeStringFormatted,
+        passengers: passengers, passengerCount: passengerCount, luggages: luggages,
+        hasPet: hasPet, hasWheelchair: hasWheelchair, surname: surname, title: title,
+        phone: phone, paymentStr: paymentStr, totalFareForWhatsApp: totalFareForWhatsApp,
+        selectedCarName: selectedCarName, isWechatCustomer: isWechatCustomer
     };
 
     if (selectedCarName === '豐田混能的士' || selectedCarName === 'MAXUS MIFA 7') {
@@ -1700,6 +1381,13 @@ function submitBooking(event) {
 }
 
 function isTooLateToEdit(orderData) {
+    try {
+        if (sessionStorage.getItem('taxiInternalAccess') === '1') {
+            console.log('[isTooLateToEdit] 內部訪問，跳過 45 分鐘檢查');
+            return false;
+        }
+    } catch(e) {}
+
     var dateStr = '';
     var timeStr = '';
 
@@ -1717,7 +1405,6 @@ function isTooLateToEdit(orderData) {
                 timeStr = o.time || '';
             }
         } catch(e) {}
-
         if (!dateStr || !timeStr) {
             try {
                 var snapRaw = localStorage.getItem('taxiEditPrefillData');
@@ -1730,22 +1417,16 @@ function isTooLateToEdit(orderData) {
             } catch(e) {}
         }
     }
-
     if (!dateStr || !timeStr) return false;
-
     var target = new Date(dateStr + 'T' + timeStr + ':00+08:00');
     if (isNaN(target.getTime())) return false;
-
     var diffMin = (target.getTime() - Date.now()) / (1000 * 60);
     return diffMin < 45;
 }
 
 function showEditTooLateModal() {
     var modal = document.getElementById('edit-too-late-modal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
+    if (modal) { modal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
     var banner = document.getElementById('edit-mode-banner');
     if (banner) banner.classList.add('hidden');
     var submitBtn = document.getElementById('booking-submit-btn');
@@ -1758,6 +1439,7 @@ function initEditMode() {
 
     if (!editId) {
         sessionStorage.removeItem('taxiEditingBookingId');
+        sessionStorage.removeItem('taxiInternalAccess');
         editingBookingId = null;
         return;
     }
@@ -1769,6 +1451,7 @@ function initEditMode() {
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
         sessionStorage.removeItem('taxiLookupResult');
+        sessionStorage.removeItem('taxiInternalAccess');
     }
 
     editingBookingId = editId;
@@ -1789,10 +1472,7 @@ function initEditMode() {
     var orderDataForCheck = null;
     try {
         var lookupRaw = sessionStorage.getItem('taxiLookupResult');
-        if (lookupRaw) {
-            hasLookupResult = true;
-            orderDataForCheck = JSON.parse(lookupRaw);
-        }
+        if (lookupRaw) { hasLookupResult = true; orderDataForCheck = JSON.parse(lookupRaw); }
     } catch(e) {}
 
     var hasSnapshot = false;
@@ -1826,23 +1506,18 @@ function initEditMode() {
 
     if (hasLookupResult) {
         if (applyLookupResultIfAny()) {
-            if (isTooLateToEdit(orderDataForCheck)) {
-                showEditTooLateModal();
-            }
+            if (isTooLateToEdit(orderDataForCheck)) showEditTooLateModal();
         }
         return;
     }
 
     if (hasSnapshot) {
         restoreFormSnapshot();
-        if (isTooLateToEdit()) {
-            showEditTooLateModal();
-        }
+        if (isTooLateToEdit()) showEditTooLateModal();
         return;
     }
 
     console.log('[EditMode] 冇本地資料，需要驗證');
-    
     var userInput = prompt(
         currentLang === 'en' 
             ? 'Please enter the phone number or internal password for booking ' + editingBookingId + ':' 
@@ -1856,12 +1531,7 @@ function initEditMode() {
     }
 
     var trimmedInput = userInput.trim();
-
-    var reqBody = { 
-        bookingId: editingBookingId,
-        phone: trimmedInput,
-        accessKey: trimmedInput
-    };
+    var reqBody = { bookingId: editingBookingId, phone: trimmedInput, accessKey: trimmedInput };
 
     fetch('/.netlify/functions/lookup-booking', {
         method: 'POST',
@@ -1873,10 +1543,14 @@ function initEditMode() {
         if (data.success && data.orderData) {
             var orderData = data.orderData;
             sessionStorage.setItem('taxiLookupResult', JSON.stringify(orderData));
-            applyLookupResultIfAny();
-            if (isTooLateToEdit(orderData)) {
-                showEditTooLateModal();
+            if (data.isInternalAccess === true) {
+                sessionStorage.setItem('taxiInternalAccess', '1');
+                console.log('[EditMode] 內部訪問，已設置 flag 跳過 45 分鐘檢查');
+            } else {
+                sessionStorage.removeItem('taxiInternalAccess');
             }
+            applyLookupResultIfAny();
+            if (isTooLateToEdit(orderData)) showEditTooLateModal();
         } else {
             console.error('[EditMode] 驗證失敗：', data.error);
             alert(data.error || (currentLang === 'en' ? 'Booking ID or phone number is incorrect.' : '預約編號或電話唔正確。'));
@@ -1894,26 +1568,20 @@ function applyLookupResultIfAny() {
     try {
         var raw = sessionStorage.getItem('taxiLookupResult');
         if (!raw) return false;
-
         var o = JSON.parse(raw);
         console.log('[Lookup] 用 server 資料預填：', o);
 
         var stopoversArr = [];
         if (o.stopovers) {
-            stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) {
-                return s.trim();
-            }).filter(Boolean);
+            stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) { return s.trim(); }).filter(Boolean);
         }
         var routeData = {
-            pickup: o.pickup || '',
-            pickupPlaceId: '',
-            dropoff: o.dropoff || '',
-            dropoffPlaceId: '',
+            pickup: o.pickup || '', pickupPlaceId: '',
+            dropoff: o.dropoff || '', dropoffPlaceId: '',
             stopovers: stopoversArr,
             stopoverPlaceIds: stopoversArr.map(function() { return ''; })
         };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
-
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
 
         var pickupEl = document.getElementById('booking-pickup-display');
@@ -1932,39 +1600,16 @@ function applyLookupResultIfAny() {
 
         switchOrderType('booking');
 
-        if (typeof o.baseFare === 'number' && o.baseFare > 0) {
-            currentBaseFare = o.baseFare;
-        }
-        if (typeof o.tunnelFee === 'number' && o.tunnelFee >= 0) {
-            currentTunnelFee = o.tunnelFee;
-        }
-        if (typeof o.surcharge === 'number' && o.surcharge >= 0) {
-            selectedSurcharge = o.surcharge;
-        }
-        if (o.selectedFareMode === 'discount' || o.selectedFareMode === 'normal') {
-            selectedFareMode = o.selectedFareMode;
-        }
+        if (typeof o.baseFare === 'number' && o.baseFare > 0) currentBaseFare = o.baseFare;
+        if (typeof o.tunnelFee === 'number' && o.tunnelFee >= 0) currentTunnelFee = o.tunnelFee;
+        if (typeof o.surcharge === 'number' && o.surcharge >= 0) selectedSurcharge = o.surcharge;
+        if (o.selectedFareMode === 'discount' || o.selectedFareMode === 'normal') selectedFareMode = o.selectedFareMode;
 
-        if (o.date) {
-            var elD = document.getElementById('date');
-            if (elD) elD.value = o.date;
-        }
-        if (o.time) {
-            var elT = document.getElementById('time');
-            if (elT) elT.value = o.time;
-        }
-        if (o.flightNo) {
-            var elF = document.getElementById('flight_no');
-            if (elF) elF.value = o.flightNo;
-        }
-        if (o.passengers) {
-            var elP = document.getElementById('passengers');
-            if (elP) elP.value = o.passengers;
-        }
-        if (o.luggages) {
-            var elL = document.getElementById('luggages');
-            if (elL) elL.value = o.luggages;
-        }
+        if (o.date) { var elD = document.getElementById('date'); if (elD) elD.value = o.date; }
+        if (o.time) { var elT = document.getElementById('time'); if (elT) elT.value = o.time; }
+        if (o.flightNo) { var elF = document.getElementById('flight_no'); if (elF) elF.value = o.flightNo; }
+        if (o.passengers) { var elP = document.getElementById('passengers'); if (elP) elP.value = o.passengers; }
+        if (o.luggages) { var elL = document.getElementById('luggages'); if (elL) elL.value = o.luggages; }
 
         var petEl = document.getElementById('has_pet');
         if (petEl) petEl.checked = !!o.hasPet;
@@ -1974,9 +1619,7 @@ function applyLookupResultIfAny() {
         if (o.payments) {
             var paymentArr = String(o.payments).split(' / ').filter(Boolean);
             if (paymentArr.length > 0) {
-                document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
-                    el.checked = false;
-                });
+                document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { el.checked = false; });
                 var hasNonCash = false;
                 document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
                     if (paymentArr.indexOf(el.value) >= 0) {
@@ -1991,95 +1634,57 @@ function applyLookupResultIfAny() {
             }
         }
 
-        if (o.contactTitle) {
-            var elCt = document.getElementById('contact_title');
-            if (elCt) elCt.value = o.contactTitle;
-        }
-        if (o.contactSurname) {
-            var elCs = document.getElementById('contact_surname');
-            if (elCs) elCs.value = o.contactSurname;
-        }
-        if (o.phone) {
-            var elPh = document.getElementById('phone');
-            if (elPh) elPh.value = o.phone;
-        }
-
+        if (o.contactTitle) { var elCt = document.getElementById('contact_title'); if (elCt) elCt.value = o.contactTitle; }
+        if (o.contactSurname) { var elCs = document.getElementById('contact_surname'); if (elCs) elCs.value = o.contactSurname; }
+        if (o.phone) { var elPh = document.getElementById('phone'); if (elPh) elPh.value = o.phone; }
         var wxEl = document.getElementById('is_wechat_customer');
         if (wxEl) wxEl.checked = !!o.isWechatCustomer;
 
         if (o.carDisplayText) {
             var cd = String(o.carDisplayText);
             if (cd.indexOf('MIFA') >= 0) {
-                selectedCarName = 'MAXUS MIFA 7';
-                selectedCarNameEn = 'MAXUS MIFA 7';
-                selectedSurcharge = 50;
-                selectedMinFare = 130;
-                selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)';
-                selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
+                selectedCarName = 'MAXUS MIFA 7'; selectedCarNameEn = 'MAXUS MIFA 7';
+                selectedSurcharge = 50; selectedMinFare = 130;
+                selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)'; selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
             } else if (cd.indexOf('E9') >= 0) {
-                selectedCarName = '廣汽 E9';
-                selectedCarNameEn = 'GAC E9';
-                selectedSurcharge = 100;
-                selectedMinFare = 180;
-                selectedFeeMode = '附加費 HK$100 (最低消費 HK$180)';
-                selectedFeeModeEn = 'Surcharge HK$100 (Min. Fare HK$180)';
+                selectedCarName = '廣汽 E9'; selectedCarNameEn = 'GAC E9';
+                selectedSurcharge = 100; selectedMinFare = 180;
+                selectedFeeMode = '附加費 HK$100 (最低消費 HK$180)'; selectedFeeModeEn = 'Surcharge HK$100 (Min. Fare HK$180)';
             } else if (cd.indexOf('大黃蜂') >= 0 || cd.indexOf('Bumblebee') >= 0) {
-                selectedCarName = '吉利大黃蜂';
-                selectedCarNameEn = 'Geely Bumblebee';
-                selectedSurcharge = 80;
-                selectedMinFare = 160;
-                selectedFeeMode = '附加費 HK$80 (最低消費 HK$160)';
-                selectedFeeModeEn = 'Surcharge HK$80 (Min. Fare HK$160)';
+                selectedCarName = '吉利大黃蜂'; selectedCarNameEn = 'Geely Bumblebee';
+                selectedSurcharge = 80; selectedMinFare = 160;
+                selectedFeeMode = '附加費 HK$80 (最低消費 HK$160)'; selectedFeeModeEn = 'Surcharge HK$80 (Min. Fare HK$160)';
             } else if (cd.indexOf('NOAH') >= 0 || cd.indexOf('輪椅') >= 0) {
-                selectedCarName = '豐田 NOAH 輪椅的士';
-                selectedCarNameEn = 'Toyota NOAH Wheelchair Taxi';
-                selectedSurcharge = 150;
-                selectedMinFare = 230;
-                selectedFeeMode = '附加費 HK$150 (最低消費 HK$230)';
-                selectedFeeModeEn = 'Surcharge HK$150 (Min. Fare HK$230)';
+                selectedCarName = '豐田 NOAH 輪椅的士'; selectedCarNameEn = 'Toyota NOAH Wheelchair Taxi';
+                selectedSurcharge = 150; selectedMinFare = 230;
+                selectedFeeMode = '附加費 HK$150 (最低消費 HK$230)'; selectedFeeModeEn = 'Surcharge HK$150 (Min. Fare HK$230)';
             } else {
-                selectedCarName = '豐田混能的士';
-                selectedCarNameEn = 'Toyota Hybrid Taxi';
-                selectedSurcharge = 0;
-                selectedMinFare = 0;
-                selectedFeeMode = '標準收費・無附加費';
-                selectedFeeModeEn = 'Standard Fare · No Surcharge';
+                selectedCarName = '豐田混能的士'; selectedCarNameEn = 'Toyota Hybrid Taxi';
+                selectedSurcharge = 0; selectedMinFare = 0;
+                selectedFeeMode = '標準收費・無附加費'; selectedFeeModeEn = 'Standard Fare · No Surcharge';
             }
         }
 
         if (o.feeMode) {
-            if (String(o.feeMode).indexOf('八五折') >= 0 || String(o.feeMode).indexOf('九折') >= 0) {
-                selectedFareMode = 'discount';
-            } else {
-                selectedFareMode = 'normal';
-            }
+            if (String(o.feeMode).indexOf('八五折') >= 0 || String(o.feeMode).indexOf('九折') >= 0) selectedFareMode = 'discount';
+            else selectedFareMode = 'normal';
         }
 
         updateCarDisplay();
 
         try {
             var bookingSnapshot = {
-                selectedCarName: selectedCarName,
-                selectedCarNameEn: selectedCarNameEn,
-                selectedSurcharge: selectedSurcharge,
-                selectedMinFare: selectedMinFare,
-                selectedFeeMode: selectedFeeMode,
-                selectedFeeModeEn: selectedFeeModeEn,
-                selectedFareMode: selectedFareMode,
-                currentBaseFare: currentBaseFare,
-                currentTunnelFee: currentTunnelFee
+                selectedCarName: selectedCarName, selectedCarNameEn: selectedCarNameEn,
+                selectedSurcharge: selectedSurcharge, selectedMinFare: selectedMinFare,
+                selectedFeeMode: selectedFeeMode, selectedFeeModeEn: selectedFeeModeEn,
+                selectedFareMode: selectedFareMode, currentBaseFare: currentBaseFare, currentTunnelFee: currentTunnelFee
             };
             localStorage.setItem('taxiBookingData', JSON.stringify(bookingSnapshot));
-            console.log('[Lookup] 已同步 taxiBookingData');
-        } catch(e) {
-            console.error('[Lookup] 同步 taxiBookingData 失敗：', e);
-        }
+        } catch(e) {}
 
         localStorage.removeItem('taxiEditPrefillData');
         saveFormSnapshot(o.carDisplayText || '');
-
         sessionStorage.removeItem('taxiLookupResult');
-
         console.log('[Lookup] 預填完成');
         return true;
     } catch(e) {
@@ -2095,12 +1700,13 @@ function goToEditRoute() {
 
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
+    sessionStorage.removeItem('taxiInternalAccess');
+    localStorage.removeItem('taxiOrderType');
+    localStorage.removeItem('taxiDate');
+    localStorage.removeItem('taxiTime');
     var lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
-    if (lastSuccessUrl) {
-        window.location.href = lastSuccessUrl;
-    } else {
-        window.location.href = 'booking-success.html';
-    }
+    if (lastSuccessUrl) window.location.href = lastSuccessUrl;
+    else window.location.href = 'booking-success.html';
 }
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -2120,7 +1726,6 @@ window.addEventListener('DOMContentLoaded', function() {
     var routeData = loadRouteDataFromLocalStorage();
     if (routeData) {
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
-        
         if (routeData.pickup) document.getElementById('booking-pickup-display').innerText = routeData.pickup;
         if (routeData.dropoff) document.getElementById('booking-dropoff-display').innerText = routeData.dropoff;
         if (routeData.stopovers && routeData.stopovers.length > 0) {
@@ -2143,43 +1748,54 @@ window.addEventListener('DOMContentLoaded', function() {
 
     var maxDate = new Date(now);
     maxDate.setDate(maxDate.getDate() + 4);
-    var maxYear = maxDate.getFullYear();
-    var maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
-    var maxDay = String(maxDate.getDate()).padStart(2, '0');
-    var maxFormattedDate = maxYear + '-' + maxMonth + '-' + maxDay;
+    var maxFormattedDate = maxDate.getFullYear() + '-' + String(maxDate.getMonth() + 1).padStart(2, '0') + '-' + String(maxDate.getDate()).padStart(2, '0');
     if (dateInput) dateInput.max = maxFormattedDate;
 
-    var hours = String(now.getHours()).padStart(2, '0');
-    var minutes = String(now.getMinutes()).padStart(2, '0');
-    var formattedTime = hours + ':' + minutes;
+    var formattedTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-    if (dateInput) dateInput.value = formattedDate;
-    if (timeInput) timeInput.value = formattedTime;
+    // ⭐ 恢復 date/time（如果有保存值）
+    var savedDateInit = null, savedTimeInit = null;
+    try {
+        savedDateInit = localStorage.getItem('taxiDate');
+        savedTimeInit = localStorage.getItem('taxiTime');
+    } catch(e) {}
+    if (dateInput) dateInput.value = savedDateInit || formattedDate;
+    if (timeInput) timeInput.value = savedTimeInit || formattedTime;
 
     if (dateInput) {
         dateInput.addEventListener('change', function() {
+            try { localStorage.setItem('taxiDate', this.value); } catch(e) {}
             if (!this.value) return;
             var selDate = new Date(this.value);
-            var today = new Date();
-            today.setHours(0, 0, 0, 0);
-            var maxAllowedDate = new Date(today);
-            maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
+            var today = new Date(); today.setHours(0, 0, 0, 0);
+            var maxAllowedDate = new Date(today); maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
             if (selDate < today) {
                 alert(currentLang === 'en' ? "⚠️ Booking date cannot be in the past!" : "⚠️ 預約日期不能係過去！");
-                this.value = '';
-                this.focus();
+                this.value = ''; this.focus();
             } else if (selDate > maxAllowedDate) {
                 alert(currentLang === 'en' ? "⚠️ Booking date cannot exceed 3 days!" : "⚠️ 預約日期不能超過三日！");
-                this.value = '';
-                this.focus();
+                this.value = ''; this.focus();
             }
+        });
+    }
+
+    if (timeInput) {
+        timeInput.addEventListener('change', function() {
+            try { localStorage.setItem('taxiTime', this.value); } catch(e) {}
         });
     }
 
     checkPassengerLimit();
     checkShowFlightField();
     applyLanguage();
-    switchOrderType('instant');
+
+    // ⭐ 恢復 orderType
+    var savedOrderType = 'instant';
+    try {
+        var storedType = localStorage.getItem('taxiOrderType');
+        if (storedType === 'booking' || storedType === 'instant') savedOrderType = storedType;
+    } catch(e) {}
+    switchOrderType(savedOrderType);
 
     initEditMode();
 
@@ -2197,6 +1813,9 @@ window.addEventListener('DOMContentLoaded', function() {
                     localStorage.removeItem('taxiRouteData');
                     localStorage.removeItem('taxiBookingData');
                     localStorage.removeItem('taxiEditPrefillData');
+                    localStorage.removeItem('taxiOrderType');
+                    localStorage.removeItem('taxiDate');
+                    localStorage.removeItem('taxiTime');
                     sessionStorage.removeItem('taxiLastSubmission');
                     window.location.replace('index.html');
                 }
