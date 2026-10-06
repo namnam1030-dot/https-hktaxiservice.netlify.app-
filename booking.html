@@ -16,20 +16,15 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-
     var root = document.documentElement;
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
-
     if (isLight) {
         var obs = new MutationObserver(function() {
-            if (document.body) {
-                document.body.classList.add('light-theme');
-                obs.disconnect();
-            }
+            if (document.body) { document.body.classList.add('light-theme'); obs.disconnect(); }
         });
         obs.observe(root, { childList: true });
     }
@@ -37,21 +32,9 @@
 </script>
 
 <style>
-    html[data-theme="light"],
-    html[data-theme="light"] body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-    html[data-theme="dark"],
-    html[data-theme="dark"] body {
-        background-color: #0B0B0B !important;
-        color: #FFFFFF !important;
-    }
-    html.light-theme,
-    html.light-theme body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
+    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
+    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,30 +42,26 @@
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>預約的士 | 八五折的士 | 24小時網約車預約 | 機場口岸接送</title>
-<meta name="description" content="24小時八五折（85折）的士預約表格。填寫用車日期、時間、起點終點、乘客人數，即可確認預約。支援現金、PayMe、八達通、支付寶、微信、轉數快、信用卡。WhatsApp一鍵叫車。">
+<meta name="description" content="24小時八五折（85折）的士預約表格。填寫用車日期、時間、起點終點、乘客人數，即可確認預約。">
 <meta name="keywords" content="預約的士,網約的士,八五折的士,85折的士,六座位的士,機場的士,口岸的士,24小時的士,WhatsApp叫車">
 <meta name="geo.region" content="HK">
 <meta name="geo.placename" content="Hong Kong">
 <meta name="geo.position" content="22.3193;114.1694">
 <meta name="ICBM" content="22.3193, 114.1694">
-
 <meta property="og:title" content="預約的士 | 八五折的士 | 24小時網約車預約">
 <meta property="og:description" content="24小時八五折的士預約表格。機場口岸接送、長途跨區、豪華六座位的士。WhatsApp一鍵叫車。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://hktaxiservice.netlify.app/booking.html">
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
-
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="預約的士 | 八五折的士 | 24小時網約車預約">
 <meta name="twitter:description" content="24小時八五折的士預約表格。機場口岸接送、長途跨區、豪華六座位的士。WhatsApp一鍵叫車。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
-
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/booking.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/booking.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/booking.html">
 <link rel="canonical" href="https://hktaxiservice.netlify.app/booking.html">
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -90,32 +69,18 @@
   "name": "預約的士 | 八五折的士 | 24小時網約車預約",
   "description": "24小時八五折的士預約表格。填寫用車日期、時間、起點終點、乘客人數，即可確認預約。",
   "url": "https://hktaxiservice.netlify.app/booking.html",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "24小時八五折的士預約服務",
-    "url": "https://hktaxiservice.netlify.app/"
-  },
-  "provider": {
-    "@type": "TaxiService",
-    "name": "24小時八五折的士預約服務",
-    "telephone": "+85268815441",
-    "priceRange": "HK$29起",
-    "areaServed": "Hong Kong",
-    "paymentAccepted": ["現金", "PayMe", "八達通", "微信支付", "支付寶", "轉數快", "信用卡"]
-  }
+  "isPartOf": { "@type": "WebSite", "name": "24小時八五折的士預約服務", "url": "https://hktaxiservice.netlify.app/" },
+  "provider": { "@type": "TaxiService", "name": "24小時八五折的士預約服務", "telephone": "+85268815441", "priceRange": "HK$29起", "areaServed": "Hong Kong", "paymentAccepted": ["現金", "PayMe", "八達通", "微信支付", "支付寶", "轉數快", "信用卡"] }
 }
 </script>
-
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="theme.css">
-
 <script>
     tailwind.config = {
         theme: {
@@ -130,7 +95,6 @@
         }
     }
 </script>
-
 <style>
     html { font-size: 130%; }
     body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
@@ -153,15 +117,10 @@
     }
     @keyframes orderBtnPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.82; } }
 
-    html.light-theme body .order-type-btn:not(.selected) {
-        background-color: #FFFFFF !important; color: #000000 !important; border-color: #D1D5DB !important;
-    }
+    html.light-theme body .order-type-btn:not(.selected) { background-color: #FFFFFF !important; color: #000000 !important; border-color: #D1D5DB !important; }
     html.light-theme body .order-type-btn:not(.selected) span { color: #000000 !important; opacity: 1 !important; }
     html.light-theme body .order-type-btn:not(.selected):hover { border-color: #000000 !important; color: #000000 !important; }
-    html.light-theme body .order-type-btn.selected {
-        background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    }
+    html.light-theme body .order-type-btn.selected { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; }
     html.light-theme body .order-type-btn.selected span { color: #000000 !important; opacity: 1 !important; }
 
     .wechat-cta-btn {
@@ -183,40 +142,20 @@
     html.light-theme body #booking-submit-btn { border: 1px solid #000000 !important; }
     html.light-theme body .bg-green-600\/10 { background-color: rgba(22, 163, 74, 0.1) !important; }
     html.light-theme body .text-green-400 { color: #15803D !important; }
+    html.light-theme body .text-gray-200, html.light-theme body .text-gray-300 { color: #000000 !important; }
 
-    html.light-theme body .text-gray-200,
-    html.light-theme body .text-gray-300 { color: #000000 !important; }
-
-    html.light-theme body input[type="text"],
-    html.light-theme body input[type="tel"],
-    html.light-theme body input[type="date"],
-    html.light-theme body input[type="time"],
-    html.light-theme body select,
-    html.light-theme body #flight_no,
-    html.light-theme body #date,
-    html.light-theme body #time,
-    html.light-theme body #passengers,
-    html.light-theme body #luggages,
-    html.light-theme body #contact_title,
-    html.light-theme body #contact_surname {
+    html.light-theme body input[type="text"], html.light-theme body input[type="tel"],
+    html.light-theme body input[type="date"], html.light-theme body input[type="time"],
+    html.light-theme body select, html.light-theme body #flight_no,
+    html.light-theme body #date, html.light-theme body #time,
+    html.light-theme body #passengers, html.light-theme body #luggages,
+    html.light-theme body #contact_title, html.light-theme body #contact_surname {
         background-color: #FFFFFF !important; border-color: #D1D5DB !important; color: #000000 !important;
     }
-    html.light-theme body input[type="text"]:focus,
-    html.light-theme body input[type="tel"]:focus,
-    html.light-theme body input[type="date"]:focus,
-    html.light-theme body input[type="time"]:focus,
-    html.light-theme body select:focus,
-    html.light-theme body #flight_no:focus,
-    html.light-theme body #date:focus,
-    html.light-theme body #time:focus,
-    html.light-theme body #passengers:focus,
-    html.light-theme body #luggages:focus,
-    html.light-theme body #contact_title:focus,
-    html.light-theme body #contact_surname:focus {
+    html.light-theme body input:focus, html.light-theme body select:focus {
         background-color: #FFFFFF !important; border-color: #000000 !important;
     }
     html.light-theme body #datetime-container > div > div { background-color: #FFFFFF !important; border-color: #D1D5DB !important; }
-
     html.light-theme body #phone { background-color: rgba(255, 242, 0, 0.35) !important; border-color: rgba(0, 0, 0, 0.3) !important; color: #000000 !important; }
     html.light-theme body #phone:focus { background-color: rgba(255, 242, 0, 0.5) !important; border-color: #000000 !important; }
 
@@ -225,360 +164,254 @@
     html.light-theme body #upgrade-modal p { color: #374151 !important; }
     html.light-theme body #upgrade-modal .text-brand-yellow { color: #000000 !important; font-weight: bold !important; }
 
-    #edit-mode-banner {
-        background-color: #F59E0B; color: #000000; padding: 10px 14px; border-radius: 12px;
-        font-weight: 700; font-size: 15px; margin-bottom: 12px;
-        align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
-    }
+    #edit-mode-banner { background-color: #F59E0B; color: #000000; padding: 10px 14px; border-radius: 12px; font-weight: 700; font-size: 15px; margin-bottom: 12px; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     #edit-mode-banner:not(.hidden) { display: flex; }
-    #edit-mode-banner button {
-        background-color: #000000; color: #FFFFFF; border: none; padding: 6px 12px;
-        border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap;
-    }
+    #edit-mode-banner button { background-color: #000000; color: #FFFFFF; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
 
     html.light-theme body #edit-too-late-modal > div { background-color: #FFFFFF !important; border-color: #dc2626 !important; }
     html.light-theme body #edit-too-late-modal h3 { color: #000000 !important; }
     html.light-theme body #edit-too-late-modal p { color: #374151 !important; }
     html.light-theme body #edit-too-late-back-btn { background-color: #E5E7EB !important; color: #000000 !important; }
     html.light-theme body #edit-too-late-back-btn:hover { background-color: #D1D5DB !important; }
-
     #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; border: none !important; }
     #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
-    html.light-theme body #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; border: none !important; }
-    html.light-theme body #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
-    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; }
-    html[data-theme="dark"] body #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
+    html.light-theme body #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; }
 </style>
 </head>
 <body class="antialiased">
 
-    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
-        <div class="w-full px-1 flex justify-between items-center">
-            <div class="flex items-center">
-                <a href="index.html">
-                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
-                </a>
-            </div>
-
-            <div class="flex flex-col items-center justify-center">
-                <a href="index.html">
-                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
-                </a>
-                <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
-                    <i class="fa-solid fa-phone text-small"></i> 6881 5441
-                </a>
-            </div>
-
-            <div class="flex items-center pr-1">
-                <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
-                    <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
-                </button>
-            </div>
+<header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
+    <div class="w-full px-1 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="index.html"><img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'"></a>
         </div>
-    </header>
-
-    <div id="mini-float" class="minimized">
-        <div class="mini-float-btns">
-            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
-            <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
-                <i class="fa-solid fa-mobile-screen-button"></i>
-            </button>
-            <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色">
-                <i class="fa-solid fa-circle-half-stroke"></i>
-            </button>
+        <div class="flex flex-col items-center justify-center">
+            <a href="index.html"><img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'"></a>
+            <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1"><i class="fa-solid fa-phone text-small"></i> 6881 5441</a>
+        </div>
+        <div class="flex items-center pr-1">
+            <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵"><i class="fa-solid fa-sliders" id="mini-float-icon"></i></button>
         </div>
     </div>
+</header>
 
-    <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
-            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="text-brand-yellow text-3xl mb-3">
-                <i class="fa-solid fa-circle-down animate-bounce"></i>
+<div id="mini-float" class="minimized">
+    <div class="mini-float-btns">
+        <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
+        <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面"><i class="fa-solid fa-mobile-screen-button"></i></button>
+        <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </div>
+</div>
+
+<div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+        <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+        <div class="text-brand-yellow text-3xl mb-3"><i class="fa-solid fa-circle-down animate-bounce"></i></div>
+        <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
+        <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">為了方便下次叫車，您可以將本服務加到手機主畫面：</p>
+        <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
+        <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">了解，關閉</button>
+    </div>
+</div>
+
+<section id="booking-section" class="w-full px-0 py-0 m-0">
+    <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
+
+        <div id="edit-mode-banner" class="hidden">
+            <span><i class="fa-solid fa-pen-to-square"></i> <span data-i18n="edit_mode_text">修改模式：正在修改預約</span> <strong id="edit-mode-id"></strong></span>
+            <button type="button" onclick="cancelEditMode()" data-i18n="btn_cancel_edit">取消修改</button>
+        </div>
+
+        <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
+                <button type="button" onclick="goToEditRoute()" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
+                    <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
+                </button>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
-            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
-                為了方便下次叫車，您可以將本服務加到手機主畫面：
-            </p>
-            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
-            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
-                了解，關閉
+            <div class="text-xs text-gray-300 space-y-1">
+                <div><span class="text-gray-400" data-i18n="pickup_label">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>
+                <div id="booking-stopover-display-wrapper" class="hidden"><span class="text-gray-400" data-i18n="stopover_label">中途站：</span><span id="booking-stopover-display" class="text-white font-medium">-</span></div>
+                <div><span class="text-gray-400" data-i18n="dropoff_label">目的地：</span><span id="booking-dropoff-display" class="text-white font-medium">-</span></div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
+                <div class="text-xs">
+                    <span class="text-gray-400 block mb-0.5" data-i18n="summary_car_label">目前選定車型</span>
+                    <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">請選擇車款</span>
+                </div>
+                <div class="text-right text-xs">
+                    <span class="text-gray-400 block mb-0.5" data-i18n="estimated_fare_label">預計車費</span>
+                    <span id="selected-price-text" class="text-brand-yellow font-bold text-sm">有待計算</span>
+                    <div id="selected-price-note" class="hidden text-[11px] text-brand-yellow font-medium mt-1"></div>
+                </div>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
+                <div class="text-xs">
+                    <span class="text-gray-400 block mb-0.5" data-i18n="fee_mode_label">收費模式</span>
+                    <span id="selected-fare-mode-text" class="text-brand-yellow font-bold text-sm">-</span>
+                </div>
+                <button type="button" onclick="goToFleetPage()" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-car"></i> <span data-i18n="btn_change_car">選擇其他車款</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <button type="button" id="btn-instant-order" onclick="switchOrderType('instant')" class="order-type-btn">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-bolt"></i> <span data-i18n="instant_order">即時訂單</span> <i class="fa-solid fa-bolt"></i></span>
+                <span class="text-[11px] font-medium opacity-70" data-i18n="instant_note">15分鐘內用車</span>
+            </button>
+            <button type="button" id="btn-booking-order" onclick="switchOrderType('booking')" class="order-type-btn">
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar-days"></i> <span data-i18n="booking_order">預約訂單</span></span>
+                <span class="text-[11px] font-medium opacity-70" data-i18n="booking_note">接受最多3日內</span>
             </button>
         </div>
-    </div>
 
-    <section id="booking-section" class="w-full px-0 py-0 m-0">
-        <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
+        <form id="booking-form" onsubmit="submitBooking(event)" class="space-y-3 text-sm">
 
-            <div id="edit-mode-banner" class="hidden">
-                <span><i class="fa-solid fa-pen-to-square"></i> <span data-i18n="edit_mode_text">修改模式：正在修改預約</span> <strong id="edit-mode-id"></strong></span>
-                <button type="button" onclick="cancelEditMode()" data-i18n="btn_cancel_edit">取消修改</button>
+            <div id="field-flight-container" class="hidden">
+                <label class="block text-xs font-bold text-gray-300 mb-0.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
+                <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-lg py-1 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
             </div>
 
-            <div class="bg-black/50 p-4 rounded-xl border border-brand-yellow/30 mb-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs text-gray-400" data-i18n="summary_route_label">路線摘要</span>
-                    <button type="button" onclick="goToEditRoute()" class="inline-flex items-center gap-1.5 bg-brand-yellow text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow-lg transition cursor-pointer">
-                        <i class="fa-solid fa-route"></i> <span data-i18n="btn_edit_route">修改路線</span>
-                    </button>
-                </div>
-                <div class="text-xs text-gray-300 space-y-1">
-                    <div><span class="text-gray-400" data-i18n="pickup_label">起點：</span><span id="booking-pickup-display" class="text-white font-medium">-</span></div>
-                    <div id="booking-stopover-display-wrapper" class="hidden"><span class="text-gray-400" data-i18n="stopover_label">中途站：</span><span id="booking-stopover-display" class="text-white font-medium">-</span></div>
-                    <div><span class="text-gray-400" data-i18n="dropoff_label">目的地：</span><span id="booking-dropoff-display" class="text-white font-medium">-</span></div>
-                </div>
-                <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
-                    <div class="text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="summary_car_label">目前選定車型</span>
-                        <span id="selected-car-text" class="text-brand-yellow font-bold text-sm">請選擇車款</span>
+            <div id="datetime-container" class="hidden">
+                <div class="grid grid-cols-1 gap-2 w-full">
+                    <div class="bg-brand-dark border border-gray-800 rounded-lg py-1 px-2 transition hover:border-brand-yellow/50">
+                        <label class="block text-xs font-bold text-gray-400 mb-0 flex items-center"><i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span></label>
+                        <input type="date" id="date" class="w-full bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
                     </div>
-                    <div class="text-right text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="estimated_fare_label">預計車費</span>
-                        <span id="selected-price-text" class="text-brand-yellow font-bold text-sm">有待計算</span>
-                        <div id="selected-price-note" class="hidden text-[11px] text-brand-yellow font-medium mt-1"></div>
+                    <div class="bg-brand-dark border border-gray-800 rounded-lg py-1 px-2 transition hover:border-brand-yellow/50">
+                        <label class="block text-xs font-bold text-gray-400 mb-0 flex items-center"><i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span></label>
+                        <input type="time" id="time" class="w-full bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
                     </div>
-                </div>
-                <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
-                    <div class="text-xs">
-                        <span class="text-gray-400 block mb-0.5" data-i18n="fee_mode_label">收費模式</span>
-                        <span id="selected-fare-mode-text" class="text-brand-yellow font-bold text-sm">-</span>
-                    </div>
-                    <button type="button" onclick="window.location.href='fleet.html'" class="bg-brand-yellow text-black font-bold px-3 py-2 rounded-xl text-xs shadow-lg cursor-pointer flex items-center gap-1">
-                        <i class="fa-solid fa-car"></i> <span data-i18n="btn_change_car">選擇其他車款</span>
-                    </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <button type="button" id="btn-instant-order" onclick="switchOrderType('instant')" class="order-type-btn">
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-bolt"></i> <span data-i18n="instant_order">即時訂單</span> <i class="fa-solid fa-bolt"></i>
-                    </span>
-                    <span class="text-[11px] font-medium opacity-70" data-i18n="instant_note">15分鐘內用車</span>
-                </button>
-                <button type="button" id="btn-booking-order" onclick="switchOrderType('booking')" class="order-type-btn">
-                    <span class="flex items-center gap-1.5">
-                        <i class="fa-regular fa-calendar-days"></i> <span data-i18n="booking_order">預約訂單</span>
-                    </span>
-                    <span class="text-[11px] font-medium opacity-70" data-i18n="booking_note">接受最多3日內</span>
-                </button>
-            </div>
-
-            <form id="booking-form" onsubmit="submitBooking(event)" class="space-y-3 text-sm">
-
-                <div id="field-flight-container" class="hidden">
-                    <label class="block text-xs font-bold text-gray-300 mb-0.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
-                    <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-lg py-1 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                </div>
-
-                <div id="datetime-container" class="hidden">
-                    <div class="grid grid-cols-1 gap-2 w-full">
-                        <div class="bg-brand-dark border border-gray-800 rounded-lg py-1 px-2 transition hover:border-brand-yellow/50">
-                            <label class="block text-xs font-bold text-gray-400 mb-0 flex items-center">
-                                <i class="fa-regular fa-calendar-days text-brand-yellow mr-1.5"></i><span data-i18n="label_date">用車日期</span>
-                            </label>
-                            <input type="date" id="date" class="w-full bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
-                        </div>
-
-                        <div class="bg-brand-dark border border-gray-800 rounded-lg py-1 px-2 transition hover:border-brand-yellow/50">
-                            <label class="block text-xs font-bold text-gray-400 mb-0 flex items-center">
-                                <i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span>
-                            </label>
-                            <input type="time" id="time" class="w-full bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數（選填）</span></label>
-                        <select id="passengers" onchange="checkPassengerLimit()" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                            <option value="1 人" data-i18n="p1">1 人</option>
-                            <option value="2 人" selected data-i18n="p2">2 人</option>
-                            <option value="3 人" data-i18n="p3">3 人</option>
-                            <option value="4 人" data-i18n="p4">4 人</option>
-                            <option value="5 人" data-i18n="p5">5 人</option>
-                            <option value="6 人" data-i18n="p6">6 人</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-suitcase text-brand-yellow mr-1.5"></i><span data-i18n="label_luggages">行李件數（選填）</span></label>
-                        <select id="luggages" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                            <option value="0 件" selected data-i18n="l0">0 件</option>
-                            <option value="1 件" data-i18n="l1">1 件</option>
-                            <option value="2 件" data-i18n="l2">2 件</option>
-                            <option value="3 件" data-i18n="l3">3 件</option>
-                            <option value="4 件+" data-i18n="l4">4 件+</option>
-                            <option value="5 件+" data-i18n="l5">5 件+</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl py-2 px-4">
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
-                        <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-                        <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span data-i18n="label_has_pet">有寵物</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
-                        <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
-                        <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span data-i18n="label_has_wheelchair">輪椅放尾箱</span>
-                    </label>
-                </div>
-
+            <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1.5">
-                        <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
-                        <span data-i18n="label_payment_method">選擇付款方式（選填）</span>
-                    </label>
-                    <div class="flex items-center gap-2">
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer">
-                            <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow"> <span data-i18n="pay_cash">現金</span>
-                        </label>
-                        <button type="button" onclick="togglePaymentOptions()" class="text-brand-yellow text-sm underline">
-                            <span data-i18n="btn_more_payment">更多付款方式</span>
-                        </button>
-                    </div>
-                    <div id="more-payment-options" class="hidden grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_payme">PayMe</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="微信" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_wechat">微信</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="支付寶" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_alipay">支付寶</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_octopus">八達通</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n="pay_fps">轉數快</span>
-                        </label>
-                        <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition">
-                            <input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow focus:ring-brand-yellow"> <span data-i18n-html="pay_credit">信用卡<br>(需另加手續費)</span>
-                        </label>
-                    </div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數（選填）</span></label>
+                    <select id="passengers" onchange="checkPassengerLimit()" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <option value="1 人">1 人</option><option value="2 人" selected>2 人</option><option value="3 人">3 人</option>
+                        <option value="4 人">4 人</option><option value="5 人">5 人</option><option value="6 人">6 人</option>
+                    </select>
                 </div>
-
-                <div class="grid grid-cols-5 gap-3">
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂（選填）</span></label>
-                        <select id="contact_title" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                            <option value="">-</option>
-                            <option value="先生" data-i18n="title_mr">先生</option>
-                            <option value="小姐" data-i18n="title_ms">小姐</option>
-                        </select>
-                    </div>
-                    <div class="col-span-3">
-                        <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人（選填）</span></label>
-                        <input type="text" id="contact_surname" data-i18n-placeholder="ph_contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                    </div>
-                </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-gray-300 mb-1">
-                        <i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i>
-                        <span data-i18n="label_phone">聯絡電話 (WhatsApp / 微信 接收確認)</span>
+                    <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-suitcase text-brand-yellow mr-1.5"></i><span data-i18n="label_luggages">行李件數（選填）</span></label>
+                    <select id="luggages" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <option value="0 件" selected>0 件</option><option value="1 件">1 件</option><option value="2 件">2 件</option>
+                        <option value="3 件">3 件</option><option value="4 件+">4 件+</option><option value="5 件+">5 件+</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6 bg-brand-dark border border-gray-800 rounded-xl py-2 px-4">
+                <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
+                    <input type="checkbox" id="has_pet" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+                    <i class="fa-solid fa-paw text-brand-yellow text-base"></i> <span>有寵物</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-gray-200 text-xs font-bold">
+                    <input type="checkbox" id="has_wheelchair" value="是" class="rounded text-brand-yellow focus:ring-brand-yellow w-4 h-4">
+                    <i class="fa-solid fa-wheelchair text-brand-yellow text-base"></i> <span>輪椅放尾箱</span>
+                </label>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-300 mb-1.5"><i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i><span data-i18n="label_payment_method">選擇付款方式（選填）</span></label>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer">
+                        <input type="checkbox" name="payment_method" value="現金" checked class="rounded text-brand-yellow"> <span>現金</span>
                     </label>
-                    <input type="tel" id="phone" required data-i18n-placeholder="ph_phone" placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                    <button type="button" onclick="togglePaymentOptions()" class="text-brand-yellow text-sm underline"><span data-i18n="btn_more_payment">更多付款方式</span></button>
+                </div>
+                <div id="more-payment-options" class="hidden grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition"><input type="checkbox" name="payment_method" value="PayMe" class="rounded text-brand-yellow"> <span>PayMe</span></label>
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition"><input type="checkbox" name="payment_method" value="微信" class="rounded text-brand-yellow"> <span>微信</span></label>
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition"><input type="checkbox" name="payment_method" value="支付寶" class="rounded text-brand-yellow"> <span>支付寶</span></label>
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition"><input type="checkbox" name="payment_method" value="八達通" class="rounded text-brand-yellow"> <span>八達通</span></label>
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition"><input type="checkbox" name="payment_method" value="轉數快" class="rounded text-brand-yellow"> <span>轉數快</span></label>
+                    <label class="flex items-center gap-2 bg-brand-dark border border-gray-800 py-2 px-3 rounded-xl text-xs cursor-pointer hover:border-brand-yellow transition"><input type="checkbox" name="payment_method" value="信用卡(需另加手續費)" class="rounded text-brand-yellow"> <span>信用卡<br>(需另加手續費)</span></label>
+                </div>
+            </div>
 
-                    <div class="mt-2 bg-green-600/10 border border-green-500/50 rounded-xl px-3 py-1.5">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="is_wechat_customer" class="rounded text-[#07C160] focus:ring-[#07C160] w-5 h-5 cursor-pointer flex-shrink-0">
-                            <span class="text-green-400 font-bold text-xs flex-1" data-i18n="wechat_note_title">我想用微信聯絡</span>
-                            <button type="button" onclick="showWeComQR()" class="wechat-cta-btn flex-shrink-0">
-                                <i class="fa-brands fa-weixin"></i>
-                                <span data-i18n="btn_add_wechat_now">立即加微信</span>
-                            </button>
-                        </div>
+            <div class="grid grid-cols-5 gap-3">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-venus-mars text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_title">稱謂（選填）</span></label>
+                    <select id="contact_title" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <option value="">-</option><option value="先生">先生</option><option value="小姐">小姐</option>
+                    </select>
+                </div>
+                <div class="col-span-3">
+                    <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-user-tag text-brand-yellow mr-1.5"></i><span data-i18n="label_contact_surname">聯絡人（選填）</span></label>
+                    <input type="text" id="contact_surname" placeholder="例：陳" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-phone text-brand-yellow mr-1.5"></i><span data-i18n="label_phone">聯絡電話 (WhatsApp / 微信 接收確認)</span></label>
+                <input type="tel" id="phone" required placeholder="例：9123 4567" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                <div class="mt-2 bg-green-600/10 border border-green-500/50 rounded-xl px-3 py-1.5">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="is_wechat_customer" class="rounded text-[#07C160] focus:ring-[#07C160] w-5 h-5 cursor-pointer flex-shrink-0">
+                        <span class="text-green-400 font-bold text-xs flex-1">我想用微信聯絡</span>
+                        <button type="button" onclick="showWeComQR()" class="wechat-cta-btn flex-shrink-0"><i class="fa-brands fa-weixin"></i><span>立即加微信</span></button>
                     </div>
                 </div>
-
-                <button type="submit" id="booking-submit-btn" class="w-full bg-brand-yellow text-black font-extrabold text-base py-2.5 rounded-xl mt-3 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
-                    <i class="fa-solid fa-calendar-check text-lg"></i> <span data-i18n="btn_confirm_booking">確認預約</span>
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
-            <div class="text-brand-yellow text-3xl mb-3">
-                <i class="fa-solid fa-gift"></i>
             </div>
-            <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
-            <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
-            <div class="flex flex-col gap-3">
-                <button onclick="confirmUpgrade(true)" data-i18n="btn_accept_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">
-                    ✅ 接受免費升級
-                </button>
-                <button onclick="confirmUpgrade(false)" data-i18n="btn_decline_upgrade" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-base transition">
-                    ❌ 不用，謝謝
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
-        <div class="flex justify-center items-center gap-3 mb-6">
-            <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
-                <i class="fa-brands fa-weixin text-lg"></i> WeChat
+            <button type="submit" id="booking-submit-btn" class="w-full bg-brand-yellow text-black font-extrabold text-base py-2.5 rounded-xl mt-3 hover:opacity-95 transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-yellow/10">
+                <i class="fa-solid fa-calendar-check text-lg"></i> <span data-i18n="btn_confirm_booking">確認預約</span>
             </button>
+        </form>
+    </div>
+</section>
 
-            <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-                <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
-                    <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                    <div class="text-green-500 text-3xl mb-3">
-                        <i class="fa-brands fa-weixin"></i>
-                    </div>
-                    <h3 id="wecom-modal-title" class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
-                    <p id="wecom-modal-desc" class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
-                    <div class="bg-white p-3 rounded-xl mb-2 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
-                    </div>
-                    <p class="text-[11px] text-gray-400 mb-4">
-                        <i class="fa-solid fa-hand-pointer"></i>
-                        <span data-i18n="wecom_qr_hint">手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取</span>
-                    </p>
-                    <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">關閉</button>
-                </div>
-            </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black transition font-bold text-xs flex items-center justify-center gap-2 shadow-md">
-                <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
-            </a>
-        </div>
-        <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
-    </footer>
-
-    <div id="edit-too-late-modal" class="hidden fixed inset-0 z-[999] bg-black/85 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
-            <div class="text-red-500 text-5xl mb-3"><i class="fa-solid fa-clock"></i></div>
-            <h3 class="text-2xl font-extrabold text-white mb-3">距離出發時間不足 45 分鐘</h3>
-            <p class="text-lg text-gray-300 mb-6 leading-relaxed">如需更改訂單請與我們聯絡。</p>
-            <div class="flex flex-col gap-3">
-                <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
-                    <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp 查詢
-                </a>
-                <button onclick="showWeComQR()" class="wechat-query-btn w-full font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
-                    <i class="fa-brands fa-weixin text-xl"></i> WeChat 查詢
-                </button>
-                <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
-                    <i class="fa-solid fa-phone text-xl"></i> 致電 6881 5441
-                </a>
-                <button id="edit-too-late-back-btn" onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md">
-                    <i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁
-                </button>
-            </div>
+<div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+    <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
+        <div class="text-brand-yellow text-3xl mb-3"><i class="fa-solid fa-gift"></i></div>
+        <h3 id="upgrade-modal-title" class="text-xl font-extrabold text-white mb-4">免費升級提示</h3>
+        <p id="upgrade-modal-text" class="text-base text-gray-300 mb-6 leading-relaxed"></p>
+        <div class="flex flex-col gap-3">
+            <button onclick="confirmUpgrade(true)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-lg transition">✅ 接受免費升級</button>
+            <button onclick="confirmUpgrade(false)" class="w-full bg-brand-yellow text-black font-extrabold py-3 rounded-xl text-base transition">❌ 不用，謝謝</button>
         </div>
     </div>
+</div>
+
+<footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
+    <div class="flex justify-center items-center gap-3 mb-6">
+        <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full border border-green-500 bg-green-600/10 hover:bg-green-600 hover:text-white text-green-400 font-bold text-xs flex items-center justify-center gap-2 transition shadow-md"><i class="fa-brands fa-weixin text-lg"></i> WeChat</button>
+        <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+            <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+                <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+                <div class="text-green-500 text-3xl mb-3"><i class="fa-brands fa-weixin"></i></div>
+                <h3 class="text-lg font-bold text-white mb-2">掃描二維碼添加企業微信</h3>
+                <p class="text-xs text-gray-300 mb-4">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
+                <div class="bg-white p-3 rounded-xl mb-2 inline-block">
+                    <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                </div>
+                <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer">關閉</button>
+            </div>
+        </div>
+        <a href="https://wa.me/85268815441" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full bg-brand-yellow text-black transition font-bold text-xs flex items-center justify-center gap-2 shadow-md"><i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp</a>
+    </div>
+    <p class="text-xs text-gray-600">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
+</footer>
+
+<div id="edit-too-late-modal" class="hidden fixed inset-0 z-[999] bg-black/85 flex items-center justify-center p-4">
+    <div class="bg-brand-gray border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
+        <div class="text-red-500 text-5xl mb-3"><i class="fa-solid fa-clock"></i></div>
+        <h3 class="text-2xl font-extrabold text-white mb-3">距離出發時間不足 45 分鐘</h3>
+        <p class="text-lg text-gray-300 mb-6 leading-relaxed">如需更改訂單請與我們聯絡。</p>
+        <div class="flex flex-col gap-3">
+            <a href="https://wa.me/85268815441" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md"><i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp 查詢</a>
+            <button onclick="showWeComQR()" class="wechat-query-btn w-full font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md"><i class="fa-brands fa-weixin text-xl"></i> WeChat 查詢</button>
+            <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md"><i class="fa-solid fa-phone text-xl"></i> 致電 6881 5441</a>
+            <button id="edit-too-late-back-btn" onclick="window.location.href='index.html'" class="w-full bg-gray-700 text-white font-bold py-3 rounded-xl text-lg flex items-center justify-center gap-2 shadow-md"><i class="fa-solid fa-arrow-left text-xl"></i> 返回主頁</button>
+        </div>
+    </div>
+</div>
 
 <script>
-// ============================================
-// 頁面變數 + 翻譯
-// ============================================
 var currentLang = localStorage.getItem('taxiLang') || 'zh';
 var selectedCarName = '';
 var selectedCarNameEn = '';
@@ -591,7 +424,6 @@ var currentBaseFare = 0;
 var currentTunnelFee = 0;
 var orderType = 'instant';
 var isShenzhenBay = false;
-
 var upgradeChoice = null;
 var pendingBookingData = null;
 var editingBookingId = null;
@@ -603,7 +435,7 @@ function getDiscountLabel() {
 
 function calculateTotalFare() {
     if (currentBaseFare <= 0) return 0;
-    const rate = getDiscountRate();
+    var rate = getDiscountRate();
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') {
             var discountedBase = Math.max(Math.round(currentBaseFare * rate), 100);
@@ -614,26 +446,20 @@ function calculateTotalFare() {
             }
             return discountedBase + discountTunnelFee;
         }
-        var minBaseFare = 100;
-        var adjustedBase = Math.max(currentBaseFare, minBaseFare);
-        return adjustedBase + currentTunnelFee;
+        return Math.max(currentBaseFare, 100) + currentTunnelFee;
     }
     if (selectedCarName === 'MAXUS MIFA 7') {
-        var minBaseFare2 = 80;
-        var adjustedBase2 = Math.max(currentBaseFare, minBaseFare2);
+        var adjustedBase2 = Math.max(currentBaseFare, 80);
         var basePlusSurcharge = adjustedBase2 + 50;
         if (basePlusSurcharge >= 250) return basePlusSurcharge - 50 + currentTunnelFee;
         return basePlusSurcharge + currentTunnelFee;
     }
-    var minBaseFare3 = 80;
-    var adjustedBase3 = Math.max(currentBaseFare, minBaseFare3);
-    return adjustedBase3 + selectedSurcharge + currentTunnelFee;
+    return Math.max(currentBaseFare, 80) + selectedSurcharge + currentTunnelFee;
 }
 
 function isMinimumCharge() {
-    if (!selectedFareMode) return false;
-    if (currentBaseFare <= 0) return false;
-    const rate = getDiscountRate();
+    if (!selectedFareMode || currentBaseFare <= 0) return false;
+    var rate = getDiscountRate();
     if (selectedCarName === '豐田混能的士') {
         if (selectedFareMode === 'discount') return Math.round(currentBaseFare * rate) < 100;
         return currentBaseFare < 100;
@@ -651,124 +477,48 @@ function getMinimumChargeTotal() {
 
 var translations = {
     zh: {
-        btn_accept_upgrade: "✅ 接受免費升級",
-        btn_decline_upgrade: "❌ 不用，謝謝",
-        btn_more_payment: "更多付款方式",
-        btn_confirm_booking: "確認預約",
-        btn_sending_booking: "正在送出預約...",
-        btn_call_now: "致電 6881 5441",
-        btn_whatsapp_inquiry: "WhatsApp 查詢",
-        btn_edit_route: "修改路線",
-        btn_change_car: "選擇其他車款",
-        btn_add_home: "APPS",
-        modal_title: "一鍵加入主畫面",
-        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
-        btn_close_guide: "關閉",
-        summary_route_label: "路線摘要",
-        summary_car_label: "目前選定車型",
-        estimated_fare_label: "預計車費",
-        fee_mode_label: "收費模式",
-        pickup_label: "起點：",
-        stopover_label: "中途站：",
-        dropoff_label: "目的地：",
-        instant_order: "即時訂單",
-        instant_note: "15分鐘內用車",
-        booking_order: "預約訂單",
-        booking_note: "接受最多3日內",
-        label_flight: "航班編號 (選填，如適用)",
-        ph_flight: "例：CX250 (司機會自動監察航班時間)",
-        label_date: "用車日期",
-        label_time: "用車時間",
-        label_passengers: "乘客人數（選填）",
-        label_luggages: "行李件數（選填）",
-        label_has_pet: "有寵物",
-        label_has_wheelchair: "輪椅放尾箱",
-        label_contact_title: "稱謂（選填）",
-        title_mr: "先生",
-        title_ms: "小姐",
-        label_contact_surname: "聯絡人（選填）",
-        ph_contact_surname: "例：陳",
-        label_payment_method: "選擇付款方式（選填）",
-        pay_cash: "現金",
-        pay_credit: "信用卡<br>(需另加手續費)",
-        pay_wechat: "微信",
-        pay_alipay: "支付寶",
-        pay_octopus: "八達通",
-        pay_payme: "PayMe",
-        pay_fps: "轉數快",
-        label_phone: "聯絡電話 (WhatsApp / 微信 接收確認)",
-        ph_phone: "例：9123 4567",
+        btn_accept_upgrade: "✅ 接受免費升級", btn_decline_upgrade: "❌ 不用，謝謝",
+        btn_more_payment: "更多付款方式", btn_confirm_booking: "確認預約", btn_sending_booking: "正在送出預約...",
+        btn_call_now: "致電 6881 5441", btn_whatsapp_inquiry: "WhatsApp 查詢", btn_edit_route: "修改路線",
+        btn_change_car: "選擇其他車款", btn_add_home: "APPS", modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：", btn_close_guide: "關閉",
+        summary_route_label: "路線摘要", summary_car_label: "目前選定車型", estimated_fare_label: "預計車費",
+        fee_mode_label: "收費模式", pickup_label: "起點：", stopover_label: "中途站：", dropoff_label: "目的地：",
+        instant_order: "即時訂單", instant_note: "15分鐘內用車", booking_order: "預約訂單", booking_note: "接受最多3日內",
+        label_flight: "航班編號 (選填，如適用)", ph_flight: "例：CX250", label_date: "用車日期", label_time: "用車時間",
+        label_passengers: "乘客人數（選填）", label_luggages: "行李件數（選填）", label_has_pet: "有寵物", label_has_wheelchair: "輪椅放尾箱",
+        label_contact_title: "稱謂（選填）", title_mr: "先生", title_ms: "小姐", label_contact_surname: "聯絡人（選填）",
+        ph_contact_surname: "例：陳", label_payment_method: "選擇付款方式（選填）", pay_cash: "現金",
+        pay_credit: "信用卡<br>(需另加手續費)", pay_wechat: "微信", pay_alipay: "支付寶", pay_octopus: "八達通",
+        pay_payme: "PayMe", pay_fps: "轉數快", label_phone: "聯絡電話 (WhatsApp / 微信 接收確認)", ph_phone: "例：9123 4567",
         p1: "1 人", p2: "2 人", p3: "3 人", p4: "4 人", p5: "5 人", p6: "6 人",
         l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
-        wecom_modal_title: "掃描二維碼添加企業微信",
-        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
-        wecom_qr_hint: "手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
-        wechat_note_title: "我想用微信聯絡",
-        btn_add_wechat_now: "立即加微信",
-        edit_mode_text: "修改模式：正在修改預約",
-        btn_cancel_edit: "取消修改"
+        wecom_modal_title: "掃描二維碼添加企業微信", wecom_modal_desc: "請使用微信掃描以下二維碼",
+        wecom_qr_hint: "手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取", whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 版權所有。", wechat_note_title: "我想用微信聯絡", btn_add_wechat_now: "立即加微信",
+        edit_mode_text: "修改模式：正在修改預約", btn_cancel_edit: "取消修改"
     },
     en: {
-        btn_accept_upgrade: "✅ Accept Free Upgrade",
-        btn_decline_upgrade: "❌ No, Thanks",
-        btn_more_payment: "More Options",
-        btn_confirm_booking: "Confirm Booking",
-        btn_sending_booking: "Sending Booking...",
-        btn_call_now: "Call 6881 5441",
-        btn_whatsapp_inquiry: "WhatsApp Enquiry",
-        btn_edit_route: "Edit Route",
-        btn_change_car: "Change Vehicle",
-        btn_add_home: "APPS",
-        modal_title: "Add to Home Screen",
-        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
-        btn_close_guide: "Close",
-        summary_route_label: "Route Summary",
-        summary_car_label: "Selected Vehicle",
-        estimated_fare_label: "Estimated Fare",
-        fee_mode_label: "Pricing Mode",
-        pickup_label: "Pickup: ",
-        stopover_label: "Stopover: ",
-        dropoff_label: "Destination: ",
-        instant_order: "Instant Order",
-        instant_note: "Within 15 mins",
-        booking_order: "Booking Order",
-        booking_note: "Up to 3 days",
-        label_flight: "Flight Number (Optional)",
-        ph_flight: "e.g., CX250 (Driver monitors flight time)",
-        label_date: "Service Date",
-        label_time: "Service Time",
-        label_passengers: "Passengers (Optional)",
-        label_luggages: "Luggages (Optional)",
-        label_has_pet: "Pets on board?",
-        label_has_wheelchair: "Wheelchair in trunk?",
-        label_contact_title: "Title (Optional)",
-        title_mr: "Mr.",
-        title_ms: "Ms.",
-        label_contact_surname: "Contact (Optional)",
-        ph_contact_surname: "e.g., Chan",
-        label_payment_method: "Payment Method (Optional)",
-        pay_cash: "Cash",
-        pay_credit: "Credit Card<br>(Surcharge applies)",
-        pay_wechat: "WeChat Pay",
-        pay_alipay: "Alipay",
-        pay_octopus: "Octopus",
-        pay_payme: "PayMe",
-        pay_fps: "FPS",
-        label_phone: "Contact Phone (WhatsApp / WeChat Confirmation)",
-        ph_phone: "e.g., 9123 4567",
+        btn_accept_upgrade: "✅ Accept Free Upgrade", btn_decline_upgrade: "❌ No, Thanks",
+        btn_more_payment: "More Options", btn_confirm_booking: "Confirm Booking", btn_sending_booking: "Sending...",
+        btn_call_now: "Call 6881 5441", btn_whatsapp_inquiry: "WhatsApp Enquiry", btn_edit_route: "Edit Route",
+        btn_change_car: "Change Vehicle", btn_add_home: "APPS", modal_title: "Add to Home Screen",
+        modal_desc: "Add this service to your phone's home screen:", btn_close_guide: "Close",
+        summary_route_label: "Route Summary", summary_car_label: "Selected Vehicle", estimated_fare_label: "Estimated Fare",
+        fee_mode_label: "Pricing Mode", pickup_label: "Pickup: ", stopover_label: "Stopover: ", dropoff_label: "Destination: ",
+        instant_order: "Instant Order", instant_note: "Within 15 mins", booking_order: "Booking Order", booking_note: "Up to 3 days",
+        label_flight: "Flight Number (Optional)", ph_flight: "e.g., CX250", label_date: "Service Date", label_time: "Service Time",
+        label_passengers: "Passengers (Optional)", label_luggages: "Luggages (Optional)", label_has_pet: "Pets?", label_has_wheelchair: "Wheelchair?",
+        label_contact_title: "Title (Optional)", title_mr: "Mr.", title_ms: "Ms.", label_contact_surname: "Contact (Optional)",
+        ph_contact_surname: "e.g., Chan", label_payment_method: "Payment Method (Optional)", pay_cash: "Cash",
+        pay_credit: "Credit Card", pay_wechat: "WeChat Pay", pay_alipay: "Alipay", pay_octopus: "Octopus",
+        pay_payme: "PayMe", pay_fps: "FPS", label_phone: "Contact Phone", ph_phone: "e.g., 9123 4567",
         p1: "1 Person", p2: "2 People", p3: "3 People", p4: "4 People", p5: "5 People", p6: "6 People",
         l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
-        wecom_modal_title: "Scan QR Code to Add WeCom",
-        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
-        wecom_qr_hint: "Mobile: Long press to save → Open WeChat Scan → Pick from album",
-        whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
-        wechat_note_title: "Contact me via WeChat",
-        btn_add_wechat_now: "Add WeChat Now",
-        edit_mode_text: "Edit Mode: Editing booking",
-        btn_cancel_edit: "Cancel Edit"
+        wecom_modal_title: "Scan QR Code to Add WeCom", wecom_modal_desc: "Scan the QR code below",
+        wecom_qr_hint: "Mobile: Long press to save → WeChat Scan", whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 All Rights Reserved.", wechat_note_title: "Contact me via WeChat", btn_add_wechat_now: "Add WeChat Now",
+        edit_mode_text: "Edit Mode: Editing booking", btn_cancel_edit: "Cancel Edit"
     }
 };
 
@@ -786,15 +536,11 @@ function getRecentSubmission() {
 function saveFormSnapshot(carDisplayText) {
     try {
         var payments = [];
-        document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
-            if (el.checked) payments.push(el.value);
-        });
+        document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
         var routeData = loadRouteDataFromLocalStorage() || {};
         var snapshot = {
-            editingBookingId: editingBookingId || null,
-            orderType: orderType,
-            pickup: routeData.pickup || '',
-            dropoff: routeData.dropoff || '',
+            editingBookingId: editingBookingId || null, orderType: orderType,
+            pickup: routeData.pickup || '', dropoff: routeData.dropoff || '',
             stopovers: (routeData.stopovers || []).join('、'),
             date: document.getElementById('date') ? document.getElementById('date').value : '',
             time: document.getElementById('time') ? document.getElementById('time').value : '',
@@ -808,66 +554,42 @@ function saveFormSnapshot(carDisplayText) {
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
-            selectedCarName: selectedCarName || '',
-            carDisplayText: carDisplayText || '',
-            selectedFareMode: selectedFareMode || ''
+            selectedCarName: selectedCarName || '', carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
         };
         localStorage.setItem('taxiEditPrefillData', JSON.stringify(snapshot));
-        console.log('[Snapshot] 已保存表單快照');
-    } catch(e) {
-        console.error('[Snapshot] 保存失敗：', e);
-    }
+    } catch(e) { console.error('[Snapshot] 保存失敗：', e); }
 }
 
 function restoreFormSnapshot() {
     try {
         var raw = localStorage.getItem('taxiEditPrefillData');
-        if (!raw) { console.log('[Snapshot] 冇快照，唔預填'); return; }
+        if (!raw) return;
         var s = JSON.parse(raw);
-        console.log('[Snapshot] 讀取快照：', s);
-
         if (s.orderType === 'booking') switchOrderType('booking');
         else if (s.orderType === 'instant') switchOrderType('instant');
-
         if (s.date) { var dateEl = document.getElementById('date'); if (dateEl) dateEl.value = s.date; }
         if (s.time) { var timeEl = document.getElementById('time'); if (timeEl) timeEl.value = s.time; }
         if (s.flightNo) { var elFn = document.getElementById('flight_no'); if (elFn) elFn.value = s.flightNo; }
         if (s.passengers) { var elP = document.getElementById('passengers'); if (elP) elP.value = s.passengers; }
         if (s.luggages) { var elL = document.getElementById('luggages'); if (elL) elL.value = s.luggages; }
-
-        var petEl = document.getElementById('has_pet');
-        if (petEl) petEl.checked = !!s.hasPet;
-        var wheelEl = document.getElementById('has_wheelchair');
-        if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
-
+        var petEl = document.getElementById('has_pet'); if (petEl) petEl.checked = !!s.hasPet;
+        var wheelEl = document.getElementById('has_wheelchair'); if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
         var paymentArr = [];
         if (typeof s.payments === 'string') paymentArr = s.payments.split(' / ').filter(Boolean);
         else if (Array.isArray(s.payments)) paymentArr = s.payments;
-
         if (paymentArr.length > 0) {
             document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { el.checked = false; });
             var hasNonCash = false;
             document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
-                if (paymentArr.indexOf(el.value) >= 0) {
-                    el.checked = true;
-                    if (el.value !== '現金') hasNonCash = true;
-                }
+                if (paymentArr.indexOf(el.value) >= 0) { el.checked = true; if (el.value !== '現金') hasNonCash = true; }
             });
-            if (hasNonCash) {
-                var more = document.getElementById('more-payment-options');
-                if (more) more.classList.remove('hidden');
-            }
+            if (hasNonCash) { var more = document.getElementById('more-payment-options'); if (more) more.classList.remove('hidden'); }
         }
-
         if (s.contactTitle) { var elCt = document.getElementById('contact_title'); if (elCt) elCt.value = s.contactTitle; }
         if (s.contactSurname) { var elCs = document.getElementById('contact_surname'); if (elCs) elCs.value = s.contactSurname; }
         if (s.phone) { var elPh = document.getElementById('phone'); if (elPh) elPh.value = s.phone; }
-        var wxEl = document.getElementById('is_wechat_customer');
-        if (wxEl) wxEl.checked = !!s.isWechatCustomer;
-        console.log('[Snapshot] 已預填完成');
-    } catch(e) {
-        console.error('[Snapshot] 預填失敗：', e);
-    }
+        var wxEl = document.getElementById('is_wechat_customer'); if (wxEl) wxEl.checked = !!s.isWechatCustomer;
+    } catch(e) { console.error('[Snapshot] 預填失敗：', e); }
 }
 
 function computeChangedFields(carDisplayText) {
@@ -878,10 +600,8 @@ function computeChangedFields(carDisplayText) {
         var routeData = loadRouteDataFromLocalStorage() || {};
         var payments = [];
         document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
-
         var cur = {
-            pickup: routeData.pickup || '',
-            dropoff: routeData.dropoff || '',
+            pickup: routeData.pickup || '', dropoff: routeData.dropoff || '',
             stopovers: (routeData.stopovers || []).join('、'),
             date: document.getElementById('date') ? document.getElementById('date').value : '',
             time: document.getElementById('time') ? document.getElementById('time').value : '',
@@ -895,17 +615,9 @@ function computeChangedFields(carDisplayText) {
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
-            carDisplayText: carDisplayText || '',
-            selectedFareMode: selectedFareMode || ''
+            carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
         };
-
-        var labels = {
-            pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間',
-            flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物',
-            hasWheelchair: '輪椅', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人',
-            phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式'
-        };
-
+        var labels = { pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', hasWheelchair: '輪椅', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式' };
         function fmt(val, key) {
             if (typeof val === 'boolean') return val ? '✅' : '❌';
             if (key === 'selectedFareMode') {
@@ -915,36 +627,38 @@ function computeChangedFields(carDisplayText) {
             }
             return String(val || '').trim() || '（空）';
         }
-
         var changed = {};
         Object.keys(labels).forEach(function(key) {
             var oldStr = fmt(old[key], key);
             var newStr = fmt(cur[key], key);
             if (oldStr !== newStr) changed[key] = { label: labels[key], old: oldStr, new: newStr };
         });
-
         if (changed.contactTitle || changed.contactSurname) {
             var oldTitle = old.contactTitle || '', oldSur = old.contactSurname || '';
             var newTitle = cur.contactTitle || '', newSur = cur.contactSurname || '';
-            changed['contact'] = {
-                label: '聯絡人',
-                old: (oldSur + oldTitle).trim() || '（空）',
-                new: (newSur + newTitle).trim() || '（空）'
-            };
+            changed['contact'] = { label: '聯絡人', old: (oldSur + oldTitle).trim() || '（空）', new: (newSur + newTitle).trim() || '（空）' };
             delete changed.contactTitle;
             delete changed.contactSurname;
         }
         return Object.keys(changed).length > 0 ? changed : null;
-    } catch(e) {
-        console.error('[ChangedFields] 計算失敗：', e);
-        return null;
-    }
+    } catch(e) { console.error('[ChangedFields] 計算失敗：', e); return null; }
 }
 
-// ⭐ switchOrderType 加入保存到 localStorage
+// ⭐ 新增：跳去 fleet 前保存表單狀態
+function goToFleetPage() {
+    try {
+        sessionStorage.setItem('taxiFormOrderType', orderType);
+        var dateEl = document.getElementById('date');
+        var timeEl = document.getElementById('time');
+        if (dateEl) sessionStorage.setItem('taxiFormDate', dateEl.value);
+        if (timeEl) sessionStorage.setItem('taxiFormTime', timeEl.value);
+        console.log('[goToFleetPage] 已保存: orderType=' + orderType);
+    } catch(e) {}
+    window.location.href = 'fleet.html';
+}
+
 function switchOrderType(type) {
     orderType = type;
-    try { localStorage.setItem('taxiOrderType', type); } catch(e) {}
     var instantBtn = document.getElementById('btn-instant-order');
     var bookingBtn = document.getElementById('btn-booking-order');
     var datetimeContainer = document.getElementById('datetime-container');
@@ -975,19 +689,16 @@ function updateCarDisplay() {
     var carTextEl = document.getElementById('selected-car-text');
     var priceTextEl = document.getElementById('selected-price-text');
     var fareModeTextEl = document.getElementById('selected-fare-mode-text');
-
     if (carTextEl) {
         if (selectedCarName) carTextEl.innerText = currentLang === 'en' ? selectedCarNameEn : selectedCarName;
         else carTextEl.innerText = currentLang === 'en' ? 'Please Select Vehicle' : '請選擇車款';
     }
-
     if (fareModeTextEl) {
         if (isMinimumCharge()) fareModeTextEl.innerText = currentLang === 'en' ? 'Minimum Fare' : '最低消費';
         else if (selectedFareMode === 'discount') fareModeTextEl.innerText = getDiscountLabel();
         else if (selectedFareMode === 'normal') fareModeTextEl.innerText = currentLang === 'en' ? 'Standard Metered Fare' : '正價按錶收費';
         else fareModeTextEl.innerText = '-';
     }
-
     if (priceTextEl) {
         if (currentBaseFare > 0) priceTextEl.innerText = 'HK$ ' + calculateTotalFare();
         else priceTextEl.innerText = currentLang === 'en' ? 'To be calculated' : '有待計算';
@@ -1010,10 +721,6 @@ function applyLanguage() {
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
         if (translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key];
-    });
-    document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
-        var key = el.getAttribute('data-i18n-html');
-        if (translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
         var key = el.getAttribute('data-i18n-placeholder');
@@ -1039,10 +746,8 @@ function checkPassengerLimit() {
     var passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
     if (passengerVal > 4) {
         if (selectedCarName === '豐田混能的士' || !selectedCarName) {
-            selectedCarName = 'MAXUS MIFA 7';
-            selectedCarNameEn = 'MAXUS MIFA 7';
-            selectedSurcharge = 50;
-            selectedMinFare = 130;
+            selectedCarName = 'MAXUS MIFA 7'; selectedCarNameEn = 'MAXUS MIFA 7';
+            selectedSurcharge = 50; selectedMinFare = 130;
             selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)';
             selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
             if (selectedFareMode === 'discount') selectedFareMode = 'normal';
@@ -1059,10 +764,10 @@ function showUpgradeModal(carType, passengerCount) {
     upgradeChoice = null;
     if (carType === '豐田混能的士') {
         title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        text.innerHTML = currentLang === 'zh' ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' : 'You selected Toyota Hybrid Taxi. May be upgraded FREE. Accept?';
+        text.innerHTML = currentLang === 'zh' ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>豐田混能的士</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span><br>至更高階車款<br>請問是否接受？' : 'You selected Toyota Hybrid Taxi. May be upgraded FREE. Accept?';
     } else if (carType === 'MAXUS MIFA 7') {
         title.textContent = currentLang === 'zh' ? '免費升級提示' : 'Free Upgrade Offer';
-        text.innerHTML = currentLang === 'zh' ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span> <br>至更高階車款<br>請問是否接受？' : 'You selected MAXUS MIFA 7. May be upgraded FREE. Accept?';
+        text.innerHTML = currentLang === 'zh' ? '你選擇咗 <span class="text-brand-yellow font-bold text-lg"><br>MAXUS MIFA 7</span><br>有機會被 <span class="text-brand-yellow font-bold text-lg"><br>免費升級</span><br>至更高階車款<br>請問是否接受？' : 'You selected MAXUS MIFA 7. May be upgraded FREE. Accept?';
     }
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
@@ -1081,18 +786,15 @@ function confirmUpgrade(choice) {
 function submitBookingAfterUpgrade() {
     var data = pendingBookingData;
     var carDisplayText = data.selectedCarName;
-    if (data.selectedCarName === '豐田混能的士') {
-        carDisplayText = upgradeChoice ? '接受混能以上任何車款' : '‼️只接受豐田混能的士‼️';
-    } else if (data.selectedCarName === 'MAXUS MIFA 7') {
-        carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
-    }
+    if (data.selectedCarName === '豐田混能的士') carDisplayText = upgradeChoice ? '接受混能以上任何車款' : '‼️只接受豐田混能的士‼️';
+    else if (data.selectedCarName === 'MAXUS MIFA 7') carDisplayText = upgradeChoice ? '接受任何五/六人車款' : '‼️只接受MIFA 7‼️';
 
     var minCharge = isMinimumCharge();
     var minChargeTotal = minCharge ? getMinimumChargeTotal() : 0;
     var tunnelSuffix = currentTunnelFee > 0 ? '（已包含隧道費）' : '';
     var isEn = (currentLang === 'en');
-
     var msgLines = [];
+
     if (isEn) {
         msgLines.push('📍 Pickup: ' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
@@ -1102,7 +804,7 @@ function submitBookingAfterUpgrade() {
         msgLines.push('👥 Passengers: ' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 Luggages: ' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 Pet: ✅');
-        if (data.hasWheelchair) msgLines.push('♿ Wheelchair in trunk: ✅');
+        if (data.hasWheelchair) msgLines.push('♿ Wheelchair: ✅');
         if (data.surname) msgLines.push('👤 Contact: ' + data.surname + ' ' + data.title);
         msgLines.push('📞 Phone: ' + data.phone);
         msgLines.push('🚘 Vehicle: ' + carDisplayText);
@@ -1123,9 +825,8 @@ function submitBookingAfterUpgrade() {
         if (data.paymentStr) msgLines.push('💳 付款方式：' + data.paymentStr);
     }
 
-    if (minCharge) {
-        msgLines.push((isEn ? '💰 Pricing: Minimum charge HK$' : '💰 收費模式：最低消費 HK$') + minChargeTotal + tunnelSuffix);
-    } else {
+    if (minCharge) msgLines.push((isEn ? '💰 Pricing: Minimum charge HK$' : '💰 收費模式：最低消費 HK$') + minChargeTotal + tunnelSuffix);
+    else {
         if (selectedFareMode === 'discount') msgLines.push('💎 ' + getDiscountLabel());
         else msgLines.push(isEn ? '💎 Pricing: Standard Metered Fare' : '💎 收費模式：💯 正價按錶收費');
         msgLines.push(isEn ? '💰 Estimated Total: HK$' + data.totalFareForWhatsApp : '💰 預計車費總額：HK$' + data.totalFareForWhatsApp);
@@ -1157,17 +858,13 @@ function submitBookingAfterUpgrade() {
     var phoneWithCode = cleanPhone;
     if (phoneWithCode.length === 8) phoneWithCode = '852' + phoneWithCode;
 
-    if (data.surname) {
-        discordMsgLines.push('👤 ' + data.surname + data.title + ' | 📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
-    } else {
-        discordMsgLines.push('📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
-    }
+    if (data.surname) discordMsgLines.push('👤 ' + data.surname + data.title + ' | 📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
+    else discordMsgLines.push('📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
     discordMsgLines.push('🚘 ' + carDisplayText);
     if (data.paymentStr) discordMsgLines.push('💳 ' + data.paymentStr);
 
-    if (minCharge) {
-        discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
-    } else {
+    if (minCharge) discordMsgLines.push('💰 收費模式：最低消費 HK$' + minChargeTotal + tunnelSuffix);
+    else {
         if (selectedFareMode === 'discount') discordMsgLines.push('💎 ' + getDiscountLabel());
         else {
             var feeModeText = '💯正價按錶收費';
@@ -1186,43 +883,22 @@ function submitBookingAfterUpgrade() {
     var fullMessage = discordMsgLines.join('\n');
 
     var changedFields = null;
-    if (editingBookingId) { changedFields = computeChangedFields(carDisplayText); }
+    if (editingBookingId) changedFields = computeChangedFields(carDisplayText);
 
     var bookingData = {
-        pickup: data.pickup,
-        stopover: data.stopoverTexts.join(' / '),
-        stopoverTexts: data.stopoverTexts,
-        dropoff: data.dropoff,
-        date: data.date || '',
-        time: data.time || '',
-        timeFormatted: data.timeStringFormatted || '',
-        passengers: data.passengers,
-        luggages: data.luggages,
-        hasPet: data.hasPet,
-        hasWheelchair: data.hasWheelchair,
-        surname: data.surname,
-        title: data.title,
-        phone: data.phone,
-        paymentMethod: data.paymentStr,
-        carType: carDisplayText,
-        totalFare: data.totalFareForWhatsApp,
-        flightNo: data.flightNo,
-        upgradeOption: carDisplayText,
+        pickup: data.pickup, stopover: data.stopoverTexts.join(' / '), stopoverTexts: data.stopoverTexts,
+        dropoff: data.dropoff, date: data.date || '', time: data.time || '',
+        timeFormatted: data.timeStringFormatted || '', passengers: data.passengers, luggages: data.luggages,
+        hasPet: data.hasPet, hasWheelchair: data.hasWheelchair, surname: data.surname, title: data.title,
+        phone: data.phone, paymentMethod: data.paymentStr, carType: carDisplayText,
+        totalFare: data.totalFareForWhatsApp, flightNo: data.flightNo, upgradeOption: carDisplayText,
         feeMode: minCharge ? '最低消費' : (selectedFareMode === 'discount' ? getDiscountLabel() : '正價按錶收費'),
-        isMinimumCharge: minCharge,
-        minimumChargeTotal: minChargeTotal,
-        surcharge: selectedSurcharge,
-        tunnelFee: currentTunnelFee,
-        fullMessage: fullMessage,
-        customerMessage: customerMessage,
-        orderType: orderType,
-        isWechatCustomer: data.isWechatCustomer === true,
-        bookingId: editingBookingId || undefined,
-        changedFields: changedFields || undefined,
-        currentBaseFare: currentBaseFare,
-        currentTunnelFee: currentTunnelFee,
-        selectedFareMode: selectedFareMode,
-        selectedCarName: selectedCarName
+        isMinimumCharge: minCharge, minimumChargeTotal: minChargeTotal, surcharge: selectedSurcharge,
+        tunnelFee: currentTunnelFee, fullMessage: fullMessage, customerMessage: customerMessage,
+        orderType: orderType, isWechatCustomer: data.isWechatCustomer === true,
+        bookingId: editingBookingId || undefined, changedFields: changedFields || undefined,
+        currentBaseFare: currentBaseFare, currentTunnelFee: currentTunnelFee,
+        selectedFareMode: selectedFareMode, selectedCarName: selectedCarName
     };
 
     var submitBtn = document.getElementById('booking-submit-btn');
@@ -1259,9 +935,15 @@ function submitBookingAfterUpgrade() {
             var newBookingId = data.bookingId || '';
             if (newBookingId) { try { sessionStorage.setItem('taxiLastBookingId', newBookingId); } catch(e) {} }
             if (changedFields) { try { sessionStorage.setItem('taxiChangedFields', JSON.stringify(changedFields)); } catch(e) {} }
-            else { sessionStorage.removeItem('taxiChangedFields'); }
+            else sessionStorage.removeItem('taxiChangedFields');
             sessionStorage.removeItem('taxiEditingBookingId');
             sessionStorage.removeItem('taxiInternalAccess');
+            // ⭐ 提交成功後清空臨時表單狀態
+            try {
+                sessionStorage.removeItem('taxiFormOrderType');
+                sessionStorage.removeItem('taxiFormDate');
+                sessionStorage.removeItem('taxiFormTime');
+            } catch(e) {}
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
             var updatedParam = data.updated ? '&updated=1' : '';
@@ -1270,7 +952,7 @@ function submitBookingAfterUpgrade() {
             if (orderType === 'booking' && data.date && data.time) {
                 bdtParam = '&bdt=' + encodeURIComponent(data.date + ' ' + data.time);
                 sessionStorage.setItem('taxiLastBdt', data.date + ' ' + data.time);
-            } else { sessionStorage.removeItem('taxiLastBdt'); }
+            } else sessionStorage.removeItem('taxiLastBdt');
 
             window.location.replace('booking-success.html?data=' + encodedData + idParam + updatedParam + instantParam + bdtParam);
         } else {
@@ -1295,26 +977,18 @@ function submitBookingAfterUpgrade() {
 
 function submitBooking(event) {
     event.preventDefault();
-    if (sessionStorage.getItem('taxiSubmitting') === '1') {
-        alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...');
-        return;
-    }
+    if (sessionStorage.getItem('taxiSubmitting') === '1') { alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...'); return; }
     checkPassengerLimit();
     if (!selectedFareMode) { alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！"); return; }
 
     var routeData = loadRouteDataFromLocalStorage();
-    if (!routeData || !routeData.pickup || !routeData.dropoff) {
-        alert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！");
-        return;
-    }
+    if (!routeData || !routeData.pickup || !routeData.dropoff) { alert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！"); return; }
     var phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
     var cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length < 8) { alert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！"); return; }
 
     var stopoverTexts = [];
-    if (routeData.stopovers) {
-        routeData.stopovers.forEach(function(s, i) { stopoverTexts.push('中途站' + (i+1) + ': ' + s); });
-    }
+    if (routeData.stopovers) routeData.stopovers.forEach(function(s, i) { stopoverTexts.push('中途站' + (i+1) + ': ' + s); });
 
     var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
     var date = document.getElementById('date') ? document.getElementById('date').value : '';
@@ -1329,10 +1003,7 @@ function submitBooking(event) {
         if (!time) { alert(currentLang === 'en' ? "Please select a time!" : "請選擇預約時間！"); return; }
         var targetDateTime = new Date(date + 'T' + time);
         var diffMinutes = (targetDateTime.getTime() - Date.now()) / (1000 * 60);
-        if (diffMinutes < 15) {
-            alert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！");
-            return;
-        }
+        if (diffMinutes < 15) { alert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！"); return; }
     }
 
     var passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
@@ -1371,13 +1042,9 @@ function submitBooking(event) {
         selectedCarName: selectedCarName, isWechatCustomer: isWechatCustomer
     };
 
-    if (selectedCarName === '豐田混能的士' || selectedCarName === 'MAXUS MIFA 7') {
-        showUpgradeModal(selectedCarName, passengerCount);
-        return;
-    } else {
-        upgradeChoice = null;
-        submitBookingAfterUpgrade();
-    }
+    if (selectedCarName === '豐田混能的士' || selectedCarName === 'MAXUS MIFA 7') { showUpgradeModal(selectedCarName, passengerCount); return; }
+    upgradeChoice = null;
+    submitBookingAfterUpgrade();
 }
 
 function isTooLateToEdit(orderData) {
@@ -1388,21 +1055,17 @@ function isTooLateToEdit(orderData) {
         }
     } catch(e) {}
 
-    var dateStr = '';
-    var timeStr = '';
-
+    var dateStr = '', timeStr = '';
     if (orderData) {
         if (orderData.orderType === 'instant') return false;
-        dateStr = orderData.date || '';
-        timeStr = orderData.time || '';
+        dateStr = orderData.date || ''; timeStr = orderData.time || '';
     } else {
         try {
             var lookupRaw = sessionStorage.getItem('taxiLookupResult');
             if (lookupRaw) {
                 var o = JSON.parse(lookupRaw);
                 if (o.orderType === 'instant') return false;
-                dateStr = o.date || '';
-                timeStr = o.time || '';
+                dateStr = o.date || ''; timeStr = o.time || '';
             }
         } catch(e) {}
         if (!dateStr || !timeStr) {
@@ -1411,8 +1074,7 @@ function isTooLateToEdit(orderData) {
                 if (snapRaw) {
                     var s = JSON.parse(snapRaw);
                     if (s.orderType === 'instant') return false;
-                    dateStr = s.date || '';
-                    timeStr = s.time || '';
+                    dateStr = s.date || ''; timeStr = s.time || '';
                 }
             } catch(e) {}
         }
@@ -1436,7 +1098,6 @@ function showEditTooLateModal() {
 function initEditMode() {
     var params = new URLSearchParams(location.search);
     var editId = params.get('edit');
-
     if (!editId) {
         sessionStorage.removeItem('taxiEditingBookingId');
         sessionStorage.removeItem('taxiInternalAccess');
@@ -1446,7 +1107,6 @@ function initEditMode() {
 
     var previousEditId = sessionStorage.getItem('taxiEditingBookingId');
     if (previousEditId && previousEditId !== editId) {
-        console.log('[EditMode] 切換訂單，清除舊快照');
         localStorage.removeItem('taxiEditPrefillData');
         localStorage.removeItem('taxiRouteData');
         localStorage.removeItem('taxiBookingData');
@@ -1484,9 +1144,7 @@ function initEditMode() {
             if (!snap.editingBookingId || snap.editingBookingId === editingBookingId) {
                 hasSnapshot = true;
                 if (snap.orderType) snapOrderType = snap.orderType;
-            } else {
-                localStorage.removeItem('taxiEditPrefillData');
-            }
+            } else localStorage.removeItem('taxiEditPrefillData');
         }
     } catch(e) {}
 
@@ -1494,44 +1152,26 @@ function initEditMode() {
 
     if (originalOrderType === 'booking') {
         var instantBtn = document.getElementById('btn-instant-order');
-        if (instantBtn) {
-            instantBtn.disabled = true;
-            instantBtn.style.opacity = '0.4';
-            instantBtn.style.pointerEvents = 'none';
-        }
+        if (instantBtn) { instantBtn.disabled = true; instantBtn.style.opacity = '0.4'; instantBtn.style.pointerEvents = 'none'; }
         switchOrderType('booking');
-    } else {
-        switchOrderType('instant');
-    }
+    } else switchOrderType('instant');
 
     if (hasLookupResult) {
-        if (applyLookupResultIfAny()) {
-            if (isTooLateToEdit(orderDataForCheck)) showEditTooLateModal();
-        }
+        if (applyLookupResultIfAny()) { if (isTooLateToEdit(orderDataForCheck)) showEditTooLateModal(); }
         return;
     }
+    if (hasSnapshot) { restoreFormSnapshot(); if (isTooLateToEdit()) showEditTooLateModal(); return; }
 
-    if (hasSnapshot) {
-        restoreFormSnapshot();
-        if (isTooLateToEdit()) showEditTooLateModal();
-        return;
-    }
-
-    console.log('[EditMode] 冇本地資料，需要驗證');
     var userInput = prompt(
-        currentLang === 'en' 
-            ? 'Please enter the phone number or internal password for booking ' + editingBookingId + ':' 
-            : '請輸入預約 ' + editingBookingId + ' 嘅電話號碼或內部密碼：'
+        currentLang === 'en' ? 'Please enter the phone number or internal password for booking ' + editingBookingId + ':' : '請輸入預約 ' + editingBookingId + ' 嘅電話號碼或內部密碼：'
     );
-
     if (!userInput || userInput.trim() === '') {
         alert(currentLang === 'en' ? 'Input is required.' : '必須輸入資料。');
         window.location.href = 'index.html';
         return;
     }
 
-    var trimmedInput = userInput.trim();
-    var reqBody = { bookingId: editingBookingId, phone: trimmedInput, accessKey: trimmedInput };
+    var reqBody = { bookingId: editingBookingId, phone: userInput.trim(), accessKey: userInput.trim() };
 
     fetch('/.netlify/functions/lookup-booking', {
         method: 'POST',
@@ -1545,10 +1185,8 @@ function initEditMode() {
             sessionStorage.setItem('taxiLookupResult', JSON.stringify(orderData));
             if (data.isInternalAccess === true) {
                 sessionStorage.setItem('taxiInternalAccess', '1');
-                console.log('[EditMode] 內部訪問，已設置 flag 跳過 45 分鐘檢查');
-            } else {
-                sessionStorage.removeItem('taxiInternalAccess');
-            }
+                console.log('[EditMode] 內部訪問，跳過 45 分鐘檢查');
+            } else sessionStorage.removeItem('taxiInternalAccess');
             applyLookupResultIfAny();
             if (isTooLateToEdit(orderData)) showEditTooLateModal();
         } else {
@@ -1569,18 +1207,9 @@ function applyLookupResultIfAny() {
         var raw = sessionStorage.getItem('taxiLookupResult');
         if (!raw) return false;
         var o = JSON.parse(raw);
-        console.log('[Lookup] 用 server 資料預填：', o);
-
         var stopoversArr = [];
-        if (o.stopovers) {
-            stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) { return s.trim(); }).filter(Boolean);
-        }
-        var routeData = {
-            pickup: o.pickup || '', pickupPlaceId: '',
-            dropoff: o.dropoff || '', dropoffPlaceId: '',
-            stopovers: stopoversArr,
-            stopoverPlaceIds: stopoversArr.map(function() { return ''; })
-        };
+        if (o.stopovers) stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) { return s.trim(); }).filter(Boolean);
+        var routeData = { pickup: o.pickup || '', pickupPlaceId: '', dropoff: o.dropoff || '', dropoffPlaceId: '', stopovers: stopoversArr, stopoverPlaceIds: stopoversArr.map(function() { return ''; }) };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
 
@@ -1594,9 +1223,7 @@ function applyLookupResultIfAny() {
         if (stopoversArr.length > 0) {
             if (stopoverDisplay) stopoverDisplay.innerText = stopoversArr.join(' ➔ ');
             if (stopoverWrapper) stopoverWrapper.classList.remove('hidden');
-        } else {
-            if (stopoverWrapper) stopoverWrapper.classList.add('hidden');
-        }
+        } else if (stopoverWrapper) stopoverWrapper.classList.add('hidden');
 
         switchOrderType('booking');
 
@@ -1611,10 +1238,8 @@ function applyLookupResultIfAny() {
         if (o.passengers) { var elP = document.getElementById('passengers'); if (elP) elP.value = o.passengers; }
         if (o.luggages) { var elL = document.getElementById('luggages'); if (elL) elL.value = o.luggages; }
 
-        var petEl = document.getElementById('has_pet');
-        if (petEl) petEl.checked = !!o.hasPet;
-        var wheelEl = document.getElementById('has_wheelchair');
-        if (wheelEl) wheelEl.checked = !!o.hasWheelchair;
+        var petEl = document.getElementById('has_pet'); if (petEl) petEl.checked = !!o.hasPet;
+        var wheelEl = document.getElementById('has_wheelchair'); if (wheelEl) wheelEl.checked = !!o.hasWheelchair;
 
         if (o.payments) {
             var paymentArr = String(o.payments).split(' / ').filter(Boolean);
@@ -1622,75 +1247,40 @@ function applyLookupResultIfAny() {
                 document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { el.checked = false; });
                 var hasNonCash = false;
                 document.querySelectorAll('input[name="payment_method"]').forEach(function(el) {
-                    if (paymentArr.indexOf(el.value) >= 0) {
-                        el.checked = true;
-                        if (el.value !== '現金') hasNonCash = true;
-                    }
+                    if (paymentArr.indexOf(el.value) >= 0) { el.checked = true; if (el.value !== '現金') hasNonCash = true; }
                 });
-                if (hasNonCash) {
-                    var more = document.getElementById('more-payment-options');
-                    if (more) more.classList.remove('hidden');
-                }
+                if (hasNonCash) { var more = document.getElementById('more-payment-options'); if (more) more.classList.remove('hidden'); }
             }
         }
-
         if (o.contactTitle) { var elCt = document.getElementById('contact_title'); if (elCt) elCt.value = o.contactTitle; }
         if (o.contactSurname) { var elCs = document.getElementById('contact_surname'); if (elCs) elCs.value = o.contactSurname; }
         if (o.phone) { var elPh = document.getElementById('phone'); if (elPh) elPh.value = o.phone; }
-        var wxEl = document.getElementById('is_wechat_customer');
-        if (wxEl) wxEl.checked = !!o.isWechatCustomer;
+        var wxEl = document.getElementById('is_wechat_customer'); if (wxEl) wxEl.checked = !!o.isWechatCustomer;
 
         if (o.carDisplayText) {
             var cd = String(o.carDisplayText);
-            if (cd.indexOf('MIFA') >= 0) {
-                selectedCarName = 'MAXUS MIFA 7'; selectedCarNameEn = 'MAXUS MIFA 7';
-                selectedSurcharge = 50; selectedMinFare = 130;
-                selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)'; selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
-            } else if (cd.indexOf('E9') >= 0) {
-                selectedCarName = '廣汽 E9'; selectedCarNameEn = 'GAC E9';
-                selectedSurcharge = 100; selectedMinFare = 180;
-                selectedFeeMode = '附加費 HK$100 (最低消費 HK$180)'; selectedFeeModeEn = 'Surcharge HK$100 (Min. Fare HK$180)';
-            } else if (cd.indexOf('大黃蜂') >= 0 || cd.indexOf('Bumblebee') >= 0) {
-                selectedCarName = '吉利大黃蜂'; selectedCarNameEn = 'Geely Bumblebee';
-                selectedSurcharge = 80; selectedMinFare = 160;
-                selectedFeeMode = '附加費 HK$80 (最低消費 HK$160)'; selectedFeeModeEn = 'Surcharge HK$80 (Min. Fare HK$160)';
-            } else if (cd.indexOf('NOAH') >= 0 || cd.indexOf('輪椅') >= 0) {
-                selectedCarName = '豐田 NOAH 輪椅的士'; selectedCarNameEn = 'Toyota NOAH Wheelchair Taxi';
-                selectedSurcharge = 150; selectedMinFare = 230;
-                selectedFeeMode = '附加費 HK$150 (最低消費 HK$230)'; selectedFeeModeEn = 'Surcharge HK$150 (Min. Fare HK$230)';
-            } else {
-                selectedCarName = '豐田混能的士'; selectedCarNameEn = 'Toyota Hybrid Taxi';
-                selectedSurcharge = 0; selectedMinFare = 0;
-                selectedFeeMode = '標準收費・無附加費'; selectedFeeModeEn = 'Standard Fare · No Surcharge';
-            }
+            if (cd.indexOf('MIFA') >= 0) { selectedCarName = 'MAXUS MIFA 7'; selectedCarNameEn = 'MAXUS MIFA 7'; selectedSurcharge = 50; selectedMinFare = 130; selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)'; selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)'; }
+            else if (cd.indexOf('E9') >= 0) { selectedCarName = '廣汽 E9'; selectedCarNameEn = 'GAC E9'; selectedSurcharge = 100; selectedMinFare = 180; selectedFeeMode = '附加費 HK$100 (最低消費 HK$180)'; selectedFeeModeEn = 'Surcharge HK$100 (Min. Fare HK$180)'; }
+            else if (cd.indexOf('大黃蜂') >= 0 || cd.indexOf('Bumblebee') >= 0) { selectedCarName = '吉利大黃蜂'; selectedCarNameEn = 'Geely Bumblebee'; selectedSurcharge = 80; selectedMinFare = 160; selectedFeeMode = '附加費 HK$80 (最低消費 HK$160)'; selectedFeeModeEn = 'Surcharge HK$80 (Min. Fare HK$160)'; }
+            else if (cd.indexOf('NOAH') >= 0 || cd.indexOf('輪椅') >= 0) { selectedCarName = '豐田 NOAH 輪椅的士'; selectedCarNameEn = 'Toyota NOAH Wheelchair Taxi'; selectedSurcharge = 150; selectedMinFare = 230; selectedFeeMode = '附加費 HK$150 (最低消費 HK$230)'; selectedFeeModeEn = 'Surcharge HK$150 (Min. Fare HK$230)'; }
+            else { selectedCarName = '豐田混能的士'; selectedCarNameEn = 'Toyota Hybrid Taxi'; selectedSurcharge = 0; selectedMinFare = 0; selectedFeeMode = '標準收費・無附加費'; selectedFeeModeEn = 'Standard Fare · No Surcharge'; }
         }
-
         if (o.feeMode) {
             if (String(o.feeMode).indexOf('八五折') >= 0 || String(o.feeMode).indexOf('九折') >= 0) selectedFareMode = 'discount';
             else selectedFareMode = 'normal';
         }
-
         updateCarDisplay();
 
         try {
-            var bookingSnapshot = {
-                selectedCarName: selectedCarName, selectedCarNameEn: selectedCarNameEn,
-                selectedSurcharge: selectedSurcharge, selectedMinFare: selectedMinFare,
-                selectedFeeMode: selectedFeeMode, selectedFeeModeEn: selectedFeeModeEn,
-                selectedFareMode: selectedFareMode, currentBaseFare: currentBaseFare, currentTunnelFee: currentTunnelFee
-            };
+            var bookingSnapshot = { selectedCarName: selectedCarName, selectedCarNameEn: selectedCarNameEn, selectedSurcharge: selectedSurcharge, selectedMinFare: selectedMinFare, selectedFeeMode: selectedFeeMode, selectedFeeModeEn: selectedFeeModeEn, selectedFareMode: selectedFareMode, currentBaseFare: currentBaseFare, currentTunnelFee: currentTunnelFee };
             localStorage.setItem('taxiBookingData', JSON.stringify(bookingSnapshot));
         } catch(e) {}
 
         localStorage.removeItem('taxiEditPrefillData');
         saveFormSnapshot(o.carDisplayText || '');
         sessionStorage.removeItem('taxiLookupResult');
-        console.log('[Lookup] 預填完成');
         return true;
-    } catch(e) {
-        console.error('[Lookup] 預填失敗：', e);
-        return false;
-    }
+    } catch(e) { console.error('[Lookup] 預填失敗：', e); return false; }
 }
 
 function goToEditRoute() {
@@ -1701,9 +1291,11 @@ function goToEditRoute() {
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiInternalAccess');
-    localStorage.removeItem('taxiOrderType');
-    localStorage.removeItem('taxiDate');
-    localStorage.removeItem('taxiTime');
+    try {
+        sessionStorage.removeItem('taxiFormOrderType');
+        sessionStorage.removeItem('taxiFormDate');
+        sessionStorage.removeItem('taxiFormTime');
+    } catch(e) {}
     var lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
     if (lastSuccessUrl) window.location.href = lastSuccessUrl;
     else window.location.href = 'booking-success.html';
@@ -1722,7 +1314,6 @@ window.addEventListener('DOMContentLoaded', function() {
         currentBaseFare = bookingData.currentBaseFare || 0;
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
-
     var routeData = loadRouteDataFromLocalStorage();
     if (routeData) {
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
@@ -1733,38 +1324,56 @@ window.addEventListener('DOMContentLoaded', function() {
             document.getElementById('booking-stopover-display-wrapper').classList.remove('hidden');
         }
     }
-
     updateCarDisplay();
 
     var dateInput = document.getElementById('date');
     var timeInput = document.getElementById('time');
 
     var now = new Date();
-    var year = now.getFullYear();
-    var month = String(now.getMonth() + 1).padStart(2, '0');
-    var day = String(now.getDate()).padStart(2, '0');
-    var formattedDate = year + '-' + month + '-' + day;
+    var formattedDate = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
     if (dateInput) dateInput.min = formattedDate;
-
-    var maxDate = new Date(now);
-    maxDate.setDate(maxDate.getDate() + 4);
+    var maxDate = new Date(now); maxDate.setDate(maxDate.getDate() + 4);
     var maxFormattedDate = maxDate.getFullYear() + '-' + String(maxDate.getMonth() + 1).padStart(2, '0') + '-' + String(maxDate.getDate()).padStart(2, '0');
     if (dateInput) dateInput.max = maxFormattedDate;
-
     var formattedTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-    // ⭐ 恢復 date/time（如果有保存值）
-    var savedDateInit = null, savedTimeInit = null;
+    // ⭐ 檢查是否從 fleet 返回，恢復表單狀態
+    var savedFormType = null, savedFormDate = null, savedFormTime = null;
     try {
-        savedDateInit = localStorage.getItem('taxiDate');
-        savedTimeInit = localStorage.getItem('taxiTime');
+        savedFormType = sessionStorage.getItem('taxiFormOrderType');
+        savedFormDate = sessionStorage.getItem('taxiFormDate');
+        savedFormTime = sessionStorage.getItem('taxiFormTime');
     } catch(e) {}
-    if (dateInput) dateInput.value = savedDateInit || formattedDate;
-    if (timeInput) timeInput.value = savedTimeInit || formattedTime;
+
+    // 先設默認值
+    if (dateInput) dateInput.value = formattedDate;
+    if (timeInput) timeInput.value = formattedTime;
+    orderType = 'instant';
+
+    checkPassengerLimit();
+    checkShowFlightField();
+    applyLanguage();
+
+    // 初始化 edit mode（這裡可能會 switchOrderType）
+    initEditMode();
+
+    // ⭐ 從 fleet 返回時，覆蓋成用戶之前嘅選擇
+    if (savedFormType === 'booking' || savedFormType === 'instant') {
+        console.log('[DOMContentLoaded] 從 fleet 返回，恢復表單狀態 orderType=' + savedFormType);
+        switchOrderType(savedFormType);
+    }
+    if (savedFormDate && dateInput) dateInput.value = savedFormDate;
+    if (savedFormTime && timeInput) timeInput.value = savedFormTime;
+
+    // ⭐ 用完即清空，避免影響下次
+    try {
+        sessionStorage.removeItem('taxiFormOrderType');
+        sessionStorage.removeItem('taxiFormDate');
+        sessionStorage.removeItem('taxiFormTime');
+    } catch(e) {}
 
     if (dateInput) {
         dateInput.addEventListener('change', function() {
-            try { localStorage.setItem('taxiDate', this.value); } catch(e) {}
             if (!this.value) return;
             var selDate = new Date(this.value);
             var today = new Date(); today.setHours(0, 0, 0, 0);
@@ -1779,33 +1388,11 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (timeInput) {
-        timeInput.addEventListener('change', function() {
-            try { localStorage.setItem('taxiTime', this.value); } catch(e) {}
-        });
-    }
-
-    checkPassengerLimit();
-    checkShowFlightField();
-    applyLanguage();
-
-    // ⭐ 恢復 orderType
-    var savedOrderType = 'instant';
-    try {
-        var storedType = localStorage.getItem('taxiOrderType');
-        if (storedType === 'booking' || storedType === 'instant') savedOrderType = storedType;
-    } catch(e) {}
-    switchOrderType(savedOrderType);
-
-    initEditMode();
-
     if (!editingBookingId) {
         var recent = getRecentSubmission();
         if (recent) {
             setTimeout(function() {
-                var msg = currentLang === 'en'
-                    ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home"
-                    : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
+                var msg = currentLang === 'en' ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home" : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
                 if (confirm(msg)) {
                     var encoded = encodeURIComponent(recent.customerMessage || '');
                     window.location.replace('booking-success.html?data=' + encoded);
@@ -1813,9 +1400,6 @@ window.addEventListener('DOMContentLoaded', function() {
                     localStorage.removeItem('taxiRouteData');
                     localStorage.removeItem('taxiBookingData');
                     localStorage.removeItem('taxiEditPrefillData');
-                    localStorage.removeItem('taxiOrderType');
-                    localStorage.removeItem('taxiDate');
-                    localStorage.removeItem('taxiTime');
                     sessionStorage.removeItem('taxiLastSubmission');
                     window.location.replace('index.html');
                 }
@@ -1826,11 +1410,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').then(function(reg) {
-            console.log('SW Registered!', reg);
-        }).catch(function(err) {
-            console.log('SW Registration Failed!', err);
-        });
+        navigator.serviceWorker.register('/sw.js').then(function(reg) { console.log('SW Registered!', reg); }).catch(function(err) { console.log('SW Registration Failed!', err); });
     });
 }
 </script>
