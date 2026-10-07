@@ -1,7 +1,7 @@
 [build]
   functions = "netlify/functions"
   publish = "."
-  command = "node -e \"const fs=require('fs');const v=Date.now();let s=fs.readFileSync('sw.js','utf8');s=s.replace(/__BUILD_VERSION__/g,v);fs.writeFileSync('sw.js',s);\""
+  command = "npm run build && node -e \"const fs=require('fs');const v=Date.now();let s=fs.readFileSync('sw.js','utf8');s=s.replace(/__BUILD_VERSION__/g,v);fs.writeFileSync('sw.js',s);\""
 
 [build.environment]
   NODE_VERSION = "18"
@@ -38,17 +38,23 @@
     Cache-Control = "public, max-age=0, must-revalidate"
 
 # =========================================================
-# theme.css / theme.js：每次檢查
+# theme.css / theme.js / tailwind-compiled.css：長 cache
+# 靠 CACHE_NAME（__BUILD_VERSION__）把關，每次 build 自動清
 # =========================================================
 [[headers]]
   for = "/theme.css"
   [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/theme.js"
   [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/tailwind-compiled.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 # =========================================================
 # 圖片：長 cache

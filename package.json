@@ -4,9 +4,12 @@
   "description": "24小時的士預約服務",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'No build step needed'"
+    "build": "tailwindcss -i ./input.css -o ./tailwind-compiled.css --minify"
   },
   "dependencies": {
     "googleapis": "^128.0.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
   }
 }

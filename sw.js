@@ -1,10 +1,10 @@
-// ✅ 完整版（HTML / CSS / JS 網路優先，圖片快取優先，離線可用）
+// ✅ HTML：網絡優先（確保反閃黑邏輯最新）
+// ✅ CSS / JS：緩存優先（加快載入，靠 CACHE_NAME 把關更新）
+// ✅ 圖片 / 字體：緩存優先
 const CACHE_NAME = 'taxi-service-__BUILD_VERSION__';
 const urlsToCache = [
   '/',
   '/index.html',
-  // ⭐ theme.css / theme.js 唔預緩存（避免 install 時撞到舊 HTTP cache）
-  //    佢哋有自己嘅 network-first handler，第一次請求時會自動 cache
   '/logo.jpeg',
   '/icon.jpeg',
   '/icon192.jpeg',
@@ -67,7 +67,6 @@ function fetchFresh(request) {
   try {
     return fetch(request, { cache: 'reload' });
   } catch (e) {
-    // 舊瀏覽器唔支援 cache option，fallback 用普通 fetch
     return fetch(request);
   }
 }
@@ -78,17 +77,13 @@ function fetchFresh(request) {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // 只處理同源請求（Google Maps / FontAwesome / Tailwind CDN 等跳過）
-  if (url.origin !== self.location.origin) {
-    return;
-  }
+  // 只處理同源請求
+  if (url.origin !== self.location.origin) return;
 
-  // 只處理 GET（POST / PUT 等直接交返俾瀏覽器）
-  if (event.request.method !== 'GET') {
-    return;
-  }
+  // 只處理 GET
+  if (event.request.method !== 'GET') return;
 
-  // ── 1) HTML：網路優先（reload 模式），失敗先 fallback cache ──
+  // ── 1) HTML：網絡優先（確保反閃黑邏輯最新）──
   if (isHTML(event.request)) {
     event.respondWith(
       fetchFresh(event.request)
@@ -106,23 +101,25 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ── 2) CSS / JS：網路優先（reload 模式）⭐ 斷尾關鍵 ──
+  // ── 2) CSS / JS：緩存優先（加快載入）⭐ 改動位置 ──
+  //      靠 CACHE_NAME 每次 build 一變就清空，唔怕舊版
   if (isCSSorJS(url)) {
     event.respondWith(
-      fetchFresh(event.request)
-        .then(response => {
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        return fetchFresh(event.request).then(response => {
           if (response && response.ok) {
             const copy = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
           }
           return response;
-        })
-        .catch(() => caches.match(event.request))
+        });
+      })
     );
     return;
   }
 
-  // ── 3) 圖片 / 字體：快取優先（快，唔常變）──
+  // ── 3) 圖片 / 字體：緩存優先（不變）──
   if (isStaticAsset(url)) {
     event.respondWith(
       caches.match(event.request).then(cached => {
@@ -140,7 +137,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ── 4) 其他同源請求：network-first fallback cache ──
+  // ── 4) 其他同源請求：網絡優先 fallback cache ──
   event.respondWith(
     fetch(event.request)
       .then(response => {
