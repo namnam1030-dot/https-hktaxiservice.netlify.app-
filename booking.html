@@ -1086,7 +1086,8 @@ function submitBookingAfterUpgrade() {
             else sessionStorage.removeItem('taxiChangedFields');
             sessionStorage.removeItem('taxiEditingBookingId');
             sessionStorage.removeItem('taxiInternalAccess');
-            clearAllFormData(); // ⭐ 提交成功清空表單暫存
+            sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：提交成功清除驗證標記
+            clearAllFormData();
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
             var updatedParam = data.updated ? '&updated=1' : '';
@@ -1245,6 +1246,7 @@ function initEditMode() {
     if (!editId) {
         sessionStorage.removeItem('taxiEditingBookingId');
         sessionStorage.removeItem('taxiInternalAccess');
+        sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：非編輯模式清除驗證標記
         editingBookingId = null;
         return;
     }
@@ -1256,6 +1258,7 @@ function initEditMode() {
         localStorage.removeItem('taxiBookingData');
         sessionStorage.removeItem('taxiLookupResult');
         sessionStorage.removeItem('taxiInternalAccess');
+        sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：切換到不同訂單，清除舊驗證
     }
 
     editingBookingId = editId;
@@ -1272,17 +1275,21 @@ function initEditMode() {
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
+    // ⭐ 方案 B：檢查 3 個來源
+    //   1) taxiInternalAccess — 內部員工（從成功頁「修改資料」）
+    //   2) taxiLookupResult  — 首頁查詢剛驗證完（flag 未清）
+    //   3) taxiEditVerified  — 之前驗證過同一個 editId（跨頁保留）
     var hasInternalAccess = false;
     var hasLookupResult = false;
+    var hasEditVerified = false;
     try {
         if (sessionStorage.getItem('taxiInternalAccess') === '1') hasInternalAccess = true;
         if (sessionStorage.getItem('taxiLookupResult')) hasLookupResult = true;
+        if (sessionStorage.getItem('taxiEditVerified') === editId) hasEditVerified = true;
     } catch(e) {}
 
     // ⭐ 外部進入（從 Telegram / Discord）→ 清除本地資料，強制要求密碼
-    // ⭐ 如果係從首頁「查詢/修改預約」過嚟（已驗證過），就唔再彈 prompt
-    if (!hasInternalAccess && !hasLookupResult) {
-
+    if (!hasInternalAccess && !hasLookupResult && !hasEditVerified) {
         console.log('[EditMode] 外部進入，清除本地資料並要求密碼');
         localStorage.removeItem('taxiEditPrefillData');
         localStorage.removeItem('taxiRouteData');
@@ -1322,6 +1329,8 @@ function initEditMode() {
             if (data.success && data.orderData) {
                 var orderData = data.orderData;
                 sessionStorage.setItem('taxiLookupResult', JSON.stringify(orderData));
+                // ⭐ 方案 B：驗證成功，設定跨頁保留標記
+                sessionStorage.setItem('taxiEditVerified', editingBookingId);
 
                 if (data.isInternalAccess === true) {
                     sessionStorage.setItem('taxiInternalAccess', '1');
@@ -1347,14 +1356,18 @@ function initEditMode() {
         return;
     }
 
-    // ⭐ 內部訪問（從成功頁按「修改資料」）
-    console.log('[EditMode] 內部訪問，用本地資料');
+    // ⭐ 內部訪問 / 已查詢過 / 之前驗證過
+    console.log('[EditMode] 內部訪問 / 已驗證，用本地資料');
 
-    var hasLookupResult = false;
-    var orderDataForCheck = null;
+    // ⭐ 方案 B：內部訪問都設返標記（令之後跨頁返回唔會再彈）
+    if (hasInternalAccess) {
+        try { sessionStorage.setItem('taxiEditVerified', editingBookingId); } catch(e) {}
+    }
+
+    var hasLookupResult2 = false;
     try {
         var lookupRaw = sessionStorage.getItem('taxiLookupResult');
-        if (lookupRaw) { hasLookupResult = true; orderDataForCheck = JSON.parse(lookupRaw); }
+        if (lookupRaw) { hasLookupResult2 = true; }
     } catch(e) {}
 
     var hasSnapshot = false;
@@ -1370,7 +1383,7 @@ function initEditMode() {
         }
     } catch(e) {}
 
-    var originalOrderType = hasLookupResult ? 'booking' : snapOrderType;
+    var originalOrderType = hasLookupResult2 ? 'booking' : snapOrderType;
 
     if (originalOrderType === 'booking') {
         var instantBtn = document.getElementById('btn-instant-order');
@@ -1384,7 +1397,7 @@ function initEditMode() {
         switchOrderType('instant');
     }
 
-    if (hasLookupResult) {
+    if (hasLookupResult2) {
         if (applyLookupResultIfAny()) { console.log('[EditMode] 內部訪問，跳過 45 分鐘檢查'); }
         return;
     }
@@ -1486,6 +1499,7 @@ function goToEditRoute() {
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiInternalAccess');
+    sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：取消修改清除驗證標記
     clearAllFormData();
     var lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
     if (lastSuccessUrl) window.location.href = lastSuccessUrl;
