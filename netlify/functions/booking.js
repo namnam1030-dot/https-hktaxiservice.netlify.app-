@@ -36,13 +36,15 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
+// ⭐ 修改：由 startsWith('💰') 改成 indexOf('💰') >= 0
+//    兼容「💎 八五折 | 💰預計參考車費 HK$xxx」呢種合併行格式
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   if (text.indexOf('🆔') >= 0) return text;
   const lines = text.split('\n');
   let insertIndex = -1;
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i].trim().startsWith('💰')) {
+    if (lines[i].indexOf('💰') >= 0) {
       insertIndex = i + 1;
       break;
     }
@@ -393,13 +395,13 @@ async function addToGoogleCalendar(data, bookingId, discordMessageId) {
 async function updateGoogleCalendar(existing, data) {
   const calendar = getCalendarClient();
   const resource = buildCalendarEvent(data, existing.bookingId, existing.discordMessageId);
-  
+
   if (existing.telegramMessageId) {
     if (!resource.extendedProperties) resource.extendedProperties = {};
     if (!resource.extendedProperties.private) resource.extendedProperties.private = {};
     resource.extendedProperties.private.telegramMessageId = existing.telegramMessageId;
   }
-  
+
   const result = await calendar.events.patch({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     eventId: existing.eventId,
@@ -479,10 +481,10 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   // ⭐ 全部 🔸 改 🔴
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
-  
+
   // ⭐ 判斷是否即時訂單：透過 fullMessage 入面係咪有「⚡ 即時訂單 ⚡」
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
-  
+
   // ⭐ 只有非即時訂單才加「查看/修改訂單」連結
   if (!isInstantOrder && bookingId && body.indexOf('查看/修改訂單') < 0) {
     body = body.replace(
@@ -490,7 +492,7 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
       '🆔 `' + bookingId + '` | [📋 查看/修改訂單](<https://hktaxiservice.netlify.app/booking.html?edit=' + bookingId + '>)'
     );
   }
-  
+
   return body;
 }
 
