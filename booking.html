@@ -1279,7 +1279,7 @@ function initEditMode() {
     //   1) taxiInternalAccess — 內部員工（從成功頁「修改資料」）
     //   2) taxiLookupResult  — 首頁查詢剛驗證完（flag 未清）
     //   3) taxiEditVerified  — 之前驗證過同一個 editId（跨頁保留）
-    var hasInternalAccess = false;
+var hasInternalAccess = false;
     var hasLookupResult = false;
     var hasEditVerified = false;
     try {
@@ -1287,6 +1287,11 @@ function initEditMode() {
         if (sessionStorage.getItem('taxiLookupResult')) hasLookupResult = true;
         if (sessionStorage.getItem('taxiEditVerified') === editId) hasEditVerified = true;
     } catch(e) {}
+
+    // ⭐ 只要通過任何一種驗證，就立即設定跨頁保留標記
+    if (hasInternalAccess || hasLookupResult || hasEditVerified) {
+        try { sessionStorage.setItem('taxiEditVerified', editingBookingId); } catch(e) {}
+    }
 
     // ⭐ 外部進入（從 Telegram / Discord）→ 清除本地資料，強制要求密碼
     if (!hasInternalAccess && !hasLookupResult && !hasEditVerified) {
