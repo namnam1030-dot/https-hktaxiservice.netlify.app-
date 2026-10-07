@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
-<!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -18,22 +17,15 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-
     var root = document.documentElement;
-
     root.classList.toggle('light-theme', isLight);
-
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
-
     if (isLight) {
         var obs = new MutationObserver(function() {
-            if (document.body) {
-                document.body.classList.add('light-theme');
-                obs.disconnect();
-            }
+            if (document.body) { document.body.classList.add('light-theme'); obs.disconnect(); }
         });
         obs.observe(root, { childList: true });
     }
@@ -41,56 +33,35 @@
 </script>
 
 <style>
-    html[data-theme="light"],
-    html[data-theme="light"] body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-    html[data-theme="dark"],
-    html[data-theme="dark"] body {
-        background-color: #0B0B0B !important;
-        color: #FFFFFF !important;
-    }
-
-    html.light-theme,
-    html.light-theme body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
+    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
+    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>選擇車款 | 八五折的士 | 豪華六座位的士 | 輪椅的士 | 機場口岸接送</title>
-
 <meta name="description" content="選擇您的士車款：豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。八五折優惠，豪華六座位的士，24小時機場口岸接送。">
-
 <meta name="keywords" content="車款的士,六座位的士,豪華的士,輪椅的士,混能的士,八五折的士,85折的士,MAXUS MIFA 7,廣汽E9,吉利大黃蜂,豐田NOAH,機場的士,口岸的士">
-
 <meta name="geo.region" content="HK">
 <meta name="geo.placename" content="Hong Kong">
 <meta name="geo.position" content="22.3193;114.1694">
 <meta name="ICBM" content="22.3193, 114.1694">
-
 <meta property="og:title" content="選擇車款 | 八五折的士 | 豪華六座位的士">
 <meta property="og:description" content="豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。八五折優惠，24小時機場口岸接送。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://hktaxiservice.netlify.app/fleet.html">
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
-
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="選擇車款 | 八五折的士 | 豪華六座位的士">
 <meta name="twitter:description" content="豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。八五折優惠。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
-
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/fleet.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/fleet.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/fleet.html">
-
 <link rel="canonical" href="https://hktaxiservice.netlify.app/fleet.html">
 
 <script type="application/ld+json">
@@ -100,18 +71,8 @@
   "name": "選擇車款 | 八五折的士 | 豪華六座位的士",
   "description": "選擇您的士車款：豐田混能的士、MAXUS MIFA 7、廣汽E9、吉利大黃蜂、豐田NOAH輪椅的士。",
   "url": "https://hktaxiservice.netlify.app/fleet.html",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "24小時八五折的士預約服務",
-    "url": "https://hktaxiservice.netlify.app/"
-  },
-  "provider": {
-    "@type": "TaxiService",
-    "name": "24小時八五折的士預約服務",
-    "telephone": "+85268815441",
-    "priceRange": "HK$29起",
-    "areaServed": "Hong Kong"
-  }
+  "isPartOf": { "@type": "WebSite", "name": "24小時八五折的士預約服務", "url": "https://hktaxiservice.netlify.app/" },
+  "provider": { "@type": "TaxiService", "name": "24小時八五折的士預約服務", "telephone": "+85268815441", "priceRange": "HK$29起", "areaServed": "Hong Kong" }
 }
 </script>
 
@@ -122,24 +83,15 @@
 <meta name="theme-color" content="#FFF200">
 
 <link rel="stylesheet" href="tailwind-compiled.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="theme.css">
 
 <style>
     html { font-size: 130%; }
-    body { 
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-    }
-    .text-xs, .text-\[11px\] {
-        font-size: 18px !important;
-        line-height: 1.5;
-    }
+    body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
+    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
 
-    /* ===== 車款卡片專屬 ===== */
-    .car-image {
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
+    .car-image { cursor: pointer; transition: transform 0.2s; }
     .car-image:hover { transform: scale(1.08); }
     .car-image-container { position: relative; }
     .car-image-container::after {
@@ -157,89 +109,41 @@
         justify-content: center;
     }
 
-    /* ===== 即減優惠動畫 ===== */
     @keyframes pulse-red {
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.8; transform: scale(1.05); }
     }
     .instant-discount-badge { animation: pulse-red 1.5s infinite; }
 
-    /* ===== 豐田正價/八五折按鈕 ===== */
     .toyota-mode-btn-active {
-        background-color: #FFF200;
-        color: #000000;
-        font-weight: 700;
+        background-color: #FFF200; color: #000000; font-weight: 700;
         box-shadow: 0 2px 6px rgba(255,242,0,0.4);
     }
     .toyota-mode-btn-inactive {
-        background-color: transparent;
-        color: #FFF200;
+        background-color: transparent; color: #FFF200;
         border: 1px solid rgba(255,242,0,0.4);
     }
     .toyota-mode-btn-active,
-    .toyota-mode-btn-inactive {
-        font-size: 18px !important;
-        line-height: 1.5;
-    }
+    .toyota-mode-btn-inactive { font-size: 18px !important; line-height: 1.5; }
 
-    /* ===== 選中效果 ===== */
-    .car-card.selected-car {
-        outline: 2px solid #FFF200;
-        outline-offset: 0;
-    }
-    html.light-theme body .car-card.selected-car {
-        outline: 2px solid #000000;
-    }
+    .car-card.selected-car { outline: 2px solid #FFF200; outline-offset: 0; }
+    html.light-theme body .car-card.selected-car { outline: 2px solid #000000; }
 
-    /* ===== 淺色主題專屬覆蓋 ===== */
-    html.light-theme body .car-card {
-        background-color: #FFFFFF !important;
-        border-color: #D1D5DB !important;
-    }
-    html.light-theme body .car-card:hover {
-        border-color: #000000 !important;
-    }
-    html.light-theme body .bg-neutral-950 {
-        background-color: #F3F4F6 !important;
-    }
-    html.light-theme body .toyota-mode-btn-active {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-    }
-    html.light-theme body .toyota-mode-btn-inactive {
-        background-color: transparent !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-    }
-    html.light-theme body button[onclick="backToBooking()"] {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-    }
+    html.light-theme body .car-card { background-color: #FFFFFF !important; border-color: #D1D5DB !important; }
+    html.light-theme body .car-card:hover { border-color: #000000 !important; }
+    html.light-theme body .bg-neutral-950 { background-color: #F3F4F6 !important; }
+    html.light-theme body .toyota-mode-btn-active { background-color: #FFF200 !important; color: #000000 !important; }
+    html.light-theme body .toyota-mode-btn-inactive { background-color: transparent !important; color: #000000 !important; border: 1px solid #000000 !important; }
+    html.light-theme body button[onclick="backToBooking()"] { background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important; }
     html.light-theme body button[onclick^="selectCarAndGoToBooking"],
-    html.light-theme body button[onclick="selectToyotaCar()"] {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-    }
+    html.light-theme body button[onclick="selectToyotaCar()"] { background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important; }
 
-/* ⭐ 修改模式橫幅 */
     #edit-mode-banner {
-        background-color: #F59E0B;
-        color: #000000;
-        padding: 10px 14px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
+        background-color: #F59E0B; color: #000000; padding: 10px 14px; border-radius: 12px;
+        font-weight: 700; font-size: 15px; display: flex; align-items: center;
+        gap: 8px; flex-wrap: wrap;
     }
-    /* ⭐ 覆蓋 display: flex，令 .hidden 生效 */
-    #edit-mode-banner.hidden {
-        display: none !important;
-    }
+    #edit-mode-banner.hidden { display: none !important; }
 </style>
 </head>
 <body class="antialiased">
@@ -248,19 +152,17 @@
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
-                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
+                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="90" height="90" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
-
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
-                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="240" height="30" class="h-[30px] object-contain" onerror="this.style.display='none'">
                 </a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
             </div>
-
             <div class="flex items-center pr-1">
                 <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
                     <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
@@ -301,9 +203,9 @@
         </div>
     </div>
 
+    <main>
     <section id="fleet-section" class="w-full px-2 pt-0 pb-0 mt-0">
 
-        <!-- ⭐ PART 2：修改模式橫幅 -->
         <div id="edit-mode-banner" class="hidden mt-2 mb-2">
             <i class="fa-solid fa-pen-to-square"></i>
             <span data-i18n="edit_mode_text">修改模式：正在修改預約</span>
@@ -356,7 +258,7 @@
                     <div class="flex flex-col items-center gap-1.5 shrink-0">
                         <div class="car-image-container">
                             <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('comf.jpeg', '豐田混能的士')">
-                                <img src="comf.jpeg" alt="豐田混能的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Taxi'">
+                                <img src="comf.jpeg" alt="豐田混能的士" width="80" height="80" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Taxi'">
                             </div>
                         </div>
                         <button type="button" onclick="selectToyotaCar()" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
@@ -395,7 +297,7 @@
                     <div class="flex flex-col items-center gap-1.5 shrink-0">
                         <div class="car-image-container">
                             <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('m7.jpeg', 'MAXUS MIFA 7')">
-                                <img src="m7.jpeg" alt="MAXUS MIFA 7" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=MAXUS'">
+                                <img src="m7.jpeg" alt="MAXUS MIFA 7" width="80" height="80" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=MAXUS'">
                             </div>
                         </div>
                         <button type="button" onclick="selectCarAndGoToBooking('MAXUS MIFA 7', '附加費 HK$50 (最低消費 HK$130)', 50, 130, 'MAXUS MIFA 7', 'Surcharge HK$50 (Min. Fare HK$130)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
@@ -425,7 +327,7 @@
                     <div class="flex flex-col items-center gap-1.5 shrink-0">
                         <div class="car-image-container">
                             <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('e9.jpeg', '廣汽 E9')">
-                                <img src="e9.jpeg" alt="廣汽 E9" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=GAC'">
+                                <img src="e9.jpeg" alt="廣汽 E9" width="80" height="80" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=GAC'">
                             </div>
                         </div>
                         <button type="button" onclick="selectCarAndGoToBooking('廣汽 E9', '附加費 HK$100 (最低消費 HK$180)', 100, 180, 'GAC E9', 'Surcharge HK$100 (Min. Fare HK$180)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
@@ -455,7 +357,7 @@
                     <div class="flex flex-col items-center gap-1.5 shrink-0">
                         <div class="car-image-container">
                             <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('bee.jpeg', '吉利大黃蜂')">
-                                <img src="bee.jpeg" alt="吉利大黃蜂" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Geely'">
+                                <img src="bee.jpeg" alt="吉利大黃蜂" width="80" height="80" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=Geely'">
                             </div>
                         </div>
                         <button type="button" onclick="selectCarAndGoToBooking('吉利大黃蜂', '附加費 HK$80 (最低消費 HK$160)', 80, 160, 'Geely Bumblebee', 'Surcharge HK$80 (Min. Fare HK$160)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
@@ -485,7 +387,7 @@
                     <div class="flex flex-col items-center gap-1.5 shrink-0">
                         <div class="car-image-container">
                             <div class="w-20 h-20 bg-neutral-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 car-image" onclick="openImageModal('NOAH.jpeg', '豐田 NOAH 輪椅的士')">
-                                <img src="NOAH.jpeg" alt="豐田 NOAH 輪椅的士" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=NOAH'">
+                                <img src="NOAH.jpeg" alt="豐田 NOAH 輪椅的士" width="80" height="80" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/80x80/000/fff?text=NOAH'">
                             </div>
                         </div>
                         <button type="button" onclick="selectCarAndGoToBooking('豐田 NOAH 輪椅的士', '附加費 HK$150 (最低消費 HK$230)', 150, 230, 'Toyota NOAH Wheelchair Taxi', 'Surcharge HK$150 (Min. Fare HK$230)')" class="bg-brand-yellow text-black font-bold px-2 py-1 rounded-lg text-[11px] shadow-lg cursor-pointer flex items-center gap-0.5">
@@ -497,6 +399,7 @@
 
         </div>
     </section>
+    </main>
 
     <div id="image-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onclick="closeImageModal()">
         <div class="max-w-2xl w-full text-center relative" onclick="event.stopPropagation()">
@@ -525,7 +428,7 @@
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">
                         關閉
@@ -540,9 +443,6 @@
     </footer>
 
 <script>
-// ============================================
-// 頁面變數
-// ============================================
 let currentLang = localStorage.getItem('taxiLang') || 'zh';
 let selectedCarName = '';
 let selectedCarNameEn = '';
@@ -554,21 +454,16 @@ let selectedFareMode = 'normal';
 let previewFareMode = 'normal';
 let currentBaseFare = 0;
 let currentTunnelFee = 0;
-let isShenzhenBay = false; // ⭐ 新增：判斷起點是否深圳灣
+let isShenzhenBay = false;
 
-// ⭐ 新增：獲取折扣率
 function getDiscountRate() {
     return isShenzhenBay ? 0.9 : 0.85;
 }
 
-// ⭐ 新增：獲取折扣名稱
 function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Off' : '九折') : (currentLang === 'en' ? '15% Off' : '八五折');
 }
 
-// ============================================
-// 翻譯物件
-// ============================================
 const translations = {
     zh: {
         fleet_title: "選擇車款類型",
@@ -644,9 +539,6 @@ const translations = {
     }
 };
 
-// ============================================
-// ⭐ PART 2：修改模式 helper
-// ============================================
 function goToBookingPage() {
     const editId = sessionStorage.getItem('taxiEditingBookingId');
     const suffix = editId ? `?edit=${encodeURIComponent(editId)}` : '';
@@ -660,16 +552,11 @@ function isEditMode() {
 function initEditMode() {
     const editId = sessionStorage.getItem('taxiEditingBookingId');
     if (!editId) return;
-
     const banner = document.getElementById('edit-mode-banner');
     const idDisplay = document.getElementById('edit-mode-id');
     if (banner) banner.classList.remove('hidden');
     if (idDisplay) idDisplay.textContent = ' ' + editId;
 }
-
-// ============================================
-// 頁面專屬函數
-// ============================================
 
 function openImageModal(imageSrc, carName) {
     document.getElementById('modal-image').src = imageSrc;
@@ -683,17 +570,13 @@ function closeImageModal() {
 
 function loadBookingDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiBookingData');
-    if (saved) {
-        try { return JSON.parse(saved); } catch(e) { return null; }
-    }
+    if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
     return null;
 }
 
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
-    if (saved) {
-        try { return JSON.parse(saved); } catch(e) { return null; }
-    }
+    if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
     return null;
 }
 
@@ -714,7 +597,7 @@ function saveBookingDataToLocalStorage() {
 
 function backToBooking() {
     if (selectedCarName) {
-        const rate = getDiscountRate(); // ⭐ 使用動態折扣率
+        const rate = getDiscountRate();
         if (selectedCarName === '豐田混能的士' && selectedFareMode === 'discount') {
             const discountedBase = Math.round(currentBaseFare * rate);
             if (discountedBase <= 100) selectedFareMode = 'normal';
@@ -725,7 +608,7 @@ function backToBooking() {
 }
 
 function setToyotaFareMode(mode) {
-    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
+    const rate = getDiscountRate();
     if (mode === 'discount' && currentBaseFare > 0) {
         const discountedBase = Math.round(currentBaseFare * rate);
         if (discountedBase <= 100) {
@@ -750,7 +633,6 @@ function updateToyotaModeButtons() {
     const discountedBase = Math.round(currentBaseFare * rate);
     const discountAvailable = currentBaseFare > 0 && discountedBase > 100;
 
-    // ⭐ 更新按鈕文字
     if (discountLabel) {
         discountLabel.innerText = getDiscountLabel();
     }
@@ -798,7 +680,6 @@ function renderCarCardsVisual(activeName) {
     document.querySelectorAll('.car-card').forEach(card => {
         card.classList.remove('border-brand-yellow', 'selected-car');
         card.style.borderColor = '';
-
         const badge = card.querySelector('.badge-container');
         if (badge) {
             const cardCarName = card.dataset.car || '';
@@ -806,7 +687,6 @@ function renderCarCardsVisual(activeName) {
             else badge.classList.add('hidden');
         }
     });
-
     if (activeName && activeName !== '') {
         document.querySelectorAll('.car-card').forEach(card => {
             if ((card.dataset.car || '') === activeName) card.classList.add('selected-car');
@@ -829,14 +709,13 @@ function updateCarCardFees() {
         return;
     }
 
-    const rate = getDiscountRate(); // ⭐ 使用動態折扣率
+    const rate = getDiscountRate();
 
-    // 豐田混能
     const car1El = document.getElementById('car1-fee-display');
     if (car1El) {
         let fare;
         if (previewFareMode === 'discount') {
-            const discountedBase = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
+            const discountedBase = Math.round(currentBaseFare * rate);
             if (discountedBase > 100) {
                 let discountTunnelFee = 0;
                 if (currentTunnelFee > 0) {
@@ -855,7 +734,6 @@ function updateCarCardFees() {
         car1El.innerHTML = `HK$ ${fare}`;
     }
 
-    // MIFA 7
     const car2El = document.getElementById('car2-fee-display');
     const car2BadgeRow = document.getElementById('car2-badge-row');
     const car2DiscountRow = document.getElementById('car2-discount-row');
@@ -880,21 +758,18 @@ function updateCarCardFees() {
         }
     }
 
-    // 廣汽 E9
     const car3El = document.getElementById('car3-fee-display');
     if (car3El) {
         const adjustedBase = Math.max(currentBaseFare, 80);
         car3El.innerHTML = `HK$ ${adjustedBase + 100 + currentTunnelFee}`;
     }
 
-    // 吉利大黃蜂
     const car4El = document.getElementById('car4-fee-display');
     if (car4El) {
         const adjustedBase = Math.max(currentBaseFare, 80);
         car4El.innerHTML = `HK$ ${adjustedBase + 80 + currentTunnelFee}`;
     }
 
-    // NOAH 輪椅
     const car5El = document.getElementById('car5-fee-display');
     if (car5El) {
         const adjustedBase = Math.max(currentBaseFare, 80);
@@ -918,14 +793,12 @@ function applyLanguage() {
             el.textContent = translations[currentLang][key];
         }
     });
-
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
         if (translations[currentLang] && translations[currentLang][key]) {
             el.innerHTML = translations[currentLang][key];
         }
     });
-
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         if (translations[currentLang] && translations[currentLang][key]) {
@@ -933,24 +806,15 @@ function applyLanguage() {
         }
     });
 
-    // ⭐ 更新折扣按鈕文字
     const discountLabel = document.getElementById('toyota-discount-label');
     if (discountLabel) discountLabel.innerText = getDiscountLabel();
 
     updateCarCardFees();
 }
 
-function showWeComQR() {
-    document.getElementById('wecom-modal').classList.remove('hidden');
-}
+function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
+function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
-function closeWeComQR() {
-    document.getElementById('wecom-modal').classList.add('hidden');
-}
-
-// ============================================
-// 頁面初始化
-// ============================================
 window.addEventListener('DOMContentLoaded', () => {
     initEditMode();
 
@@ -967,7 +831,6 @@ window.addEventListener('DOMContentLoaded', () => {
         currentTunnelFee = bookingData.currentTunnelFee || 0;
     }
     
-    // ⭐ 初始化時判斷是否深圳灣
     const routeData = loadRouteDataFromLocalStorage();
     if (routeData && routeData.pickup) {
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);

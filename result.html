@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
-<!-- ✅✅✅ 反黑閃終極版 ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -18,22 +16,15 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
-
     var root = document.documentElement;
-
     root.classList.toggle('light-theme', isLight);
-
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
-
     if (isLight) {
         var obs = new MutationObserver(function() {
-            if (document.body) {
-                document.body.classList.add('light-theme');
-                obs.disconnect();
-            }
+            if (document.body) { document.body.classList.add('light-theme'); obs.disconnect(); }
         });
         obs.observe(root, { childList: true });
     }
@@ -41,54 +32,33 @@
 </script>
 
 <style>
-    html[data-theme="light"],
-    html[data-theme="light"] body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-    html[data-theme="dark"],
-    html[data-theme="dark"] body {
-        background-color: #0B0B0B !important;
-        color: #FFFFFF !important;
-    }
-
-    html.light-theme,
-    html.light-theme body {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
+    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
+    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士</title>
-
 <meta name="description" content="查看您的士路線規劃同預計車費。系統自動偵測隧道費，支援八五折優惠。24小時機場口岸接送，豪華六座位的士。">
-
 <meta name="keywords" content="車費預計,的士路線,八五折的士,85折的士,隧道費,機場的士,口岸的士,24小時的士,網約的士">
-
 <meta name="geo.region" content="HK">
 <meta name="geo.placename" content="Hong Kong">
 <meta name="geo.position" content="22.3193;114.1694">
 <meta name="ICBM" content="22.3193, 114.1694">
-
 <meta property="og:title" content="車費預計結果 | 八五折的士 | 路線規劃">
 <meta property="og:description" content="查看您的士路線規劃同預計車費。系統自動偵測隧道費，支援八五折優惠。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://hktaxiservice.netlify.app/result.html">
 <meta property="og:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
 <meta property="og:locale" content="zh_HK">
-
 <link rel="canonical" href="https://hktaxiservice.netlify.app/result.html">
-
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士">
 <meta name="twitter:description" content="查看您的士路線規劃同預計車費。系統自動偵測隧道費，支援八五折優惠。">
 <meta name="twitter:image" content="https://hktaxiservice.netlify.app/logo.jpeg">
-
 <link rel="alternate" hreflang="zh-HK" href="https://hktaxiservice.netlify.app/result.html">
 <link rel="alternate" hreflang="en-HK" href="https://hktaxiservice.netlify.app/result.html?lang=en">
 <link rel="alternate" hreflang="x-default" href="https://hktaxiservice.netlify.app/result.html">
@@ -100,18 +70,8 @@
   "name": "車費預計結果 | 八五折的士",
   "description": "查看您的士路線規劃同預計車費。系統自動偵測隧道費，支援八五折優惠。",
   "url": "https://hktaxiservice.netlify.app/result.html",
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "24小時八五折的士預約服務",
-    "url": "https://hktaxiservice.netlify.app/"
-  },
-  "provider": {
-    "@type": "TaxiService",
-    "name": "24小時八五折的士預約服務",
-    "telephone": "+85268815441",
-    "priceRange": "HK$29起",
-    "areaServed": "Hong Kong"
-  }
+  "isPartOf": { "@type": "WebSite", "name": "24小時八五折的士預約服務", "url": "https://hktaxiservice.netlify.app/" },
+  "provider": { "@type": "TaxiService", "name": "24小時八五折的士預約服務", "telephone": "+85268815441", "priceRange": "HK$29起", "areaServed": "Hong Kong" }
 }
 </script>
 
@@ -122,131 +82,63 @@
 <meta name="theme-color" content="#FFF200">
 
 <link rel="stylesheet" href="tailwind-compiled.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="theme.css">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" defer></script>
 
 <style>
-    html { 
-        font-size: 130%; 
-    }
-    body { 
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; 
-    }
-    .text-xs, .text-\[11px\] {
-        font-size: 18px !important;
-        line-height: 1.5;
-    }
+    html { font-size: 130%; }
+    body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
+    .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
     .pac-container {
-        background-color: #1E1E1E;
-        color: #ffffff;
-        border: 1px solid #333;
-        border-radius: 0.5rem;
-        font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        z-index: 9999;
+        background-color: #1E1E1E; color: #ffffff; border: 1px solid #333;
+        border-radius: 0.5rem; font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); z-index: 9999;
     }
-    .pac-item {
-        color: #ccc;
-        border-top: 1px solid #333;
-        padding: 8px 12px;
-        cursor: pointer;
-    }
+    .pac-item { color: #ccc; border-top: 1px solid #333; padding: 8px 12px; cursor: pointer; }
     .pac-item:hover { background-color: #333; }
     .pac-item-query { color: #FFF200; font-size: 17px; }
-
-    /* ===== 淺色主題 ===== */
     html.light-theme body .pac-container {
-        background-color: #FFFFFF;
-        color: #000000;
-        border-color: #D1D5DB;
+        background-color: #FFFFFF; color: #000000; border-color: #D1D5DB;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
     }
-    html.light-theme body .pac-item {
-        color: #374151;
-        border-top-color: #E5E7EB;
-    }
+    html.light-theme body .pac-item { color: #374151; border-top-color: #E5E7EB; }
     html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
     html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
-
     html.light-theme body #voice-btn,
     html.light-theme body button[onclick*="clearAllInputs"],
     html.light-theme body button[onclick*="swapLocations"],
     html.light-theme body #add-stop-btn,
     html.light-theme body button[onclick*="removeStopoverField"],
     html.light-theme body button[onclick*="calculateAndGoToResult"] {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
+        background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important;
     }
-
-    html.light-theme body #route-options-list button {
-        background-color: #F3F4F6 !important;
-        border-color: #D1D5DB !important;
-        color: #374151 !important;
-    }
-    html.light-theme body #route-options-list button[class*="bg-brand-yellow"] {
-        background-color: rgba(255, 242, 0, 0.5) !important;
-        border-color: #000000 !important;
-        color: #000000 !important;
-    }
-    html.light-theme body .bg-sky-900\/30 {
-        background-color: rgba(14, 165, 233, 0.1) !important;
-    }
-    html.light-theme body .border-sky-500\/50 {
-        border-color: #0EA5E9 !important;
-    }
-    html.light-theme body .text-sky-200,
-    html.light-theme body .text-sky-300,
-    html.light-theme body .text-sky-400 {
-        color: #0369A1 !important;
-    }
-    html.light-theme body .hover\:border-brand-yellow:hover {
-        border-color: #000000 !important;
-    }
-
+    html.light-theme body #route-options-list button { background-color: #F3F4F6 !important; border-color: #D1D5DB !important; color: #374151 !important; }
+    html.light-theme body #route-options-list button[class*="bg-brand-yellow"] { background-color: rgba(255, 242, 0, 0.5) !important; border-color: #000000 !important; color: #000000 !important; }
+    html.light-theme body .bg-sky-900\/30 { background-color: rgba(14, 165, 233, 0.1) !important; }
+    html.light-theme body .border-sky-500\/50 { border-color: #0EA5E9 !important; }
+    html.light-theme body .text-sky-200, html.light-theme body .text-sky-300, html.light-theme body .text-sky-400 { color: #0369A1 !important; }
+    html.light-theme body .hover\:border-brand-yellow:hover { border-color: #000000 !important; }
     html.light-theme body #detected-tunnels-container,
     html.light-theme body #detected-tunnels-container *,
     html.light-theme body #detected-tunnels-container .text-sky-200,
     html.light-theme body #detected-tunnels-container .text-sky-300,
     html.light-theme body #detected-tunnels-container .text-sky-400,
     html.light-theme body #detected-tunnels-container .text-white,
-    html.light-theme body #detected-tunnels-container #detected-tunnels-list {
-        color: #0369A1 !important;
-    }
-
+    html.light-theme body #detected-tunnels-container #detected-tunnels-list { color: #0369A1 !important; }
     html.light-theme body #res-tunnel-row,
     html.light-theme body #res-tunnel-row *,
-    html.light-theme body #res-tunnel-row .text-sky-300 {
-        color: #0369A1 !important;
-    }
-
+    html.light-theme body #res-tunnel-row .text-sky-300 { color: #0369A1 !important; }
     html.light-theme body #discount-option-container,
     html.light-theme body .space-y-3 > label.bg-brand-dark,
     html.light-theme body label.bg-brand-dark,
-    html.light-theme body .bg-brand-dark {
-        background-color: #FFFFFF !important;
-        background: #FFFFFF !important;
-        border-color: #D1D5DB !important;
-    }
-
-    html.light-theme body input[type="checkbox"],
-    html.light-theme body .fare-mode-checkbox {
-        color-scheme: light !important;
-        accent-color: #000000 !important;
-        background-color: #FFFFFF !important;
-    }
-
+    html.light-theme body .bg-brand-dark { background-color: #FFFFFF !important; background: #FFFFFF !important; border-color: #D1D5DB !important; }
+    html.light-theme body input[type="checkbox"], html.light-theme body .fare-mode-checkbox { color-scheme: light !important; accent-color: #000000 !important; background-color: #FFFFFF !important; }
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
-    html.light-theme body #discount-option-container:hover {
-        border-color: #000000 !important;
-    }
+    html.light-theme body #discount-option-container:hover { border-color: #000000 !important; }
 </style>
 
     <script>
-    // ============================================
-    // 1. 變數宣告
-    // ============================================
     let selectedCarName = '';
     let selectedCarNameEn = '';
     let selectedSurcharge = 0;
@@ -261,11 +153,8 @@
     let currentBaseFare = 0;
     let currentTunnelFee = 0;
     let routeData = null;
-    let isShenzhenBay = false; // ⭐ 新增：判斷起點是否深圳灣
+    let isShenzhenBay = false;
 
-    // ============================================
-    // 2. 翻譯物件
-    // ============================================
     const translations = {
         zh: {
             result_title: "路線規劃結果",
@@ -350,31 +239,25 @@
         }
     };
 
-    // ⭐ 新增：獲取折扣率函數
     function getDiscountRate() {
         if (!routeData || !routeData.pickup) return 0.85;
         var p = routeData.pickup;
         return (p.indexOf('深圳灣') >= 0 || p.indexOf('深圳湾') >= 0) ? 0.9 : 0.85;
     }
 
-    // ⭐ 新增：獲取折扣名稱
     function getDiscountLabel() {
         return isShenzhenBay ? (currentLang === 'en' ? '10% Discount Offer' : '九折優惠') : (currentLang === 'en' ? '15% Discount Offer' : '八五折優惠');
     }
 
     function loadRouteDataFromLocalStorage() {
         const saved = localStorage.getItem('taxiRouteData');
-        if (saved) {
-            try { return JSON.parse(saved); } catch(e) { return null; }
-        }
+        if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
         return null;
     }
 
     function loadBookingDataFromLocalStorage() {
         const saved = localStorage.getItem('taxiBookingData');
-        if (saved) {
-            try { return JSON.parse(saved); } catch(e) { return null; }
-        }
+        if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
         return null;
     }
 
@@ -396,10 +279,10 @@
         localStorage.setItem('taxiBookingData', JSON.stringify(data));
     }
 
-function goBackToInput() {
-    sessionStorage.setItem('returningFromResult', '1'); // ⭐ 加呢行
-    window.location.href = 'index.html';
-}
+    function goBackToInput() {
+        sessionStorage.setItem('returningFromResult', '1');
+        window.location.href = 'index.html';
+    }
 
     function goToFleetPage() {
         if (!selectedCarName) {
@@ -428,13 +311,8 @@ function goBackToInput() {
         window.location.href = 'booking.html' + suffix;
     }
 
-    function showWeComQR() {
-        document.getElementById('wecom-modal').classList.remove('hidden');
-    }
-
-    function closeWeComQR() {
-        document.getElementById('wecom-modal').classList.add('hidden');
-    }
+    function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
+    function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
     function selectCar(name, feeText, surcharge, minFare, nameEn, feeTextEn, skipRecalculate = false) {
         selectedCarName = name;
@@ -466,87 +344,48 @@ function goBackToInput() {
     function normalizeLocation(loc, isPickup = false) {
         if (!loc) return "";
         let trimmed = loc.trim();
-
-        if (/二號客運大樓|二号客运大楼|機場t2|机场t2|terminal\s*2/i.test(trimmed)) {
-            return new google.maps.LatLng(22.316333, 113.937611);
-        }
-        if (/一號客運大樓|一号客运大楼|機場t1|机场t1|terminal\s*1|hkia/i.test(trimmed)) {
-            return new google.maps.LatLng(22.315500, 113.936361);
-        }
-
+        if (/二號客運大樓|二号客运大楼|機場t2|机场t2|terminal\s*2/i.test(trimmed)) return new google.maps.LatLng(22.316333, 113.937611);
+        if (/一號客運大樓|一号客运大楼|機場t1|机场t1|terminal\s*1|hkia/i.test(trimmed)) return new google.maps.LatLng(22.315500, 113.936361);
         let cleaned = trimmed.replace(/[\s\-\(\)（）,，。\.、]/g, "");
-
-        const airportPickupKeywords = [
-            "機場", "机场", "香港國際機場", "香港国际机场", "赤鱲角機場", "赤鱲角机场", "赤腊角机场",
-            "機場1號停車場", "机场1号停车场", "機場一號停車場", "机场一号停车场",
-            "機場2號停車場", "机场2号停车场", "機場二號停車場", "机场二号停车场"
-        ];
-        if (isPickup && airportPickupKeywords.includes(cleaned)) {
-            return new google.maps.LatLng(22.313625, 113.936071);
-        }
-
-        const airportDropoffKeywords = [
-            "機場", "机场", "香港國際機場", "香港国际机场", "赤鱲角機場", "赤鱲角机场", "赤腊角机场"
-        ];
-        if (!isPickup && airportDropoffKeywords.includes(cleaned)) {
-            return new google.maps.LatLng(22.315500, 113.936361);
-        }
-
+        const airportPickupKeywords = ["機場", "机场", "香港國際機場", "香港国际机场", "赤鱲角機場", "赤鱲角机场", "赤腊角机场", "機場1號停車場", "机场1号停车场", "機場一號停車場", "机场一号停车场", "機場2號停車場", "机场2号停车场", "機場二號停車場", "机场二号停车场"];
+        if (isPickup && airportPickupKeywords.includes(cleaned)) return new google.maps.LatLng(22.313625, 113.936071);
+        const airportDropoffKeywords = ["機場", "机场", "香港國際機場", "香港国际机场", "赤鱲角機場", "赤鱲角机场", "赤腊角机场"];
+        if (!isPickup && airportDropoffKeywords.includes(cleaned)) return new google.maps.LatLng(22.315500, 113.936361);
         if (trimmed.includes("迪士尼")) return "迪士尼樂園度假區的士站";
         if (trimmed.includes("蓮塘") || trimmed.includes("香園圍") || trimmed.includes("香園圍口岸")) return new google.maps.LatLng(22.553780, 114.153662);
         if (trimmed.includes("愉景灣")) return "愉景灣的士站";
         if (trimmed.includes("落馬洲")) return "落馬洲支線出入境管制站";
         if (trimmed.includes("深圳灣")) return new google.maps.LatLng(22.475889, 113.955944);
-
         return trimmed;
     }
 
-function processRoutes(routes, isShenzhenBay) {
-    if (!routes || routes.length === 0) return [];
-    
-    // ⭐ 只有 1 條路線，直接顯示
-    if (routes.length === 1) {
-        routes[0].customLabel = "最佳路線";
-        return [routes[0]];
-    }
-    
-    // ⭐ 計算每條路線嘅總時間同總距離
-    let routeMetrics = routes.map((r, idx) => {
-        let dur = 0, dist = 0;
-        r.legs.forEach(leg => { dur += leg.duration.value; dist += leg.distance.value; });
-        return { index: idx, route: r, dur: dur, dist: dist };
-    });
-    
-    // ⭐ 搵出最快同最短
-    let fastest = [...routeMetrics].sort((a, b) => a.dur - b.dur)[0];
-    let shortest = [...routeMetrics].sort((a, b) => a.dist - b.dist)[0];
-    
-    // ============================================
-    // 情況 A：最快同最短係同一條
-    // ============================================
-    if (fastest.index === shortest.index) {
-        fastest.route.customLabel = "⚡ 最快及最短路線";
-        
-        // ⭐ 從剩餘路線中揀一條替代（按時間排序，取第二快）
-        let others = routeMetrics.filter(m => m.index !== fastest.index);
-        
-        if (others.length > 0) {
-            let alternative = [...others].sort((a, b) => a.dur - b.dur)[0];
-            alternative.route.customLabel = "📏 替代路線";
-            return [fastest.route, alternative.route];
+    function processRoutes(routes, isShenzhenBay) {
+        if (!routes || routes.length === 0) return [];
+        if (routes.length === 1) {
+            routes[0].customLabel = "最佳路線";
+            return [routes[0]];
         }
-        
-        // 冇其他路線，只顯示一條
-        return [fastest.route];
+        let routeMetrics = routes.map((r, idx) => {
+            let dur = 0, dist = 0;
+            r.legs.forEach(leg => { dur += leg.duration.value; dist += leg.distance.value; });
+            return { index: idx, route: r, dur: dur, dist: dist };
+        });
+        let fastest = [...routeMetrics].sort((a, b) => a.dur - b.dur)[0];
+        let shortest = [...routeMetrics].sort((a, b) => a.dist - b.dist)[0];
+        if (fastest.index === shortest.index) {
+            fastest.route.customLabel = "⚡ 最快及最短路線";
+            let others = routeMetrics.filter(m => m.index !== fastest.index);
+            if (others.length > 0) {
+                let alternative = [...others].sort((a, b) => a.dur - b.dur)[0];
+                alternative.route.customLabel = "📏 替代路線";
+                return [fastest.route, alternative.route];
+            }
+            return [fastest.route];
+        }
+        fastest.route.customLabel = "⚡ 最快路線";
+        shortest.route.customLabel = "📏 最短路線";
+        return [fastest.route, shortest.route];
     }
-    
-    // ============================================
-    // 情況 B：最快同最短係唔同路線
-    // ============================================
-    fastest.route.customLabel = "⚡ 最快路線";
-    shortest.route.customLabel = "📏 最短路線";
-    return [fastest.route, shortest.route];
-}
 
     const tunnelDatabase = [
         { name: "紅隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300 },
@@ -597,10 +436,7 @@ function processRoutes(routes, isShenzhenBay) {
         let pickupVal = routeData.pickup || '';
         let dropoffVal = routeData.dropoff || '';
         let stopoverTexts = routeData.stopovers || [];
-        
-        // ⭐ 判斷是否深圳灣起點
         isShenzhenBay = (pickupVal.indexOf('深圳灣') >= 0 || pickupVal.indexOf('深圳湾') >= 0);
-
         if (!pickupVal || !dropoffVal) {
             alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
             window.location.href = 'index.html';
@@ -618,7 +454,6 @@ function processRoutes(routes, isShenzhenBay) {
 
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
-
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
         let waypoints = [];
@@ -758,7 +593,7 @@ function processRoutes(routes, isShenzhenBay) {
     function handleFareModeSelection(mode) {
         const normalCheckbox = document.getElementById('fare-mode-normal');
         const discountCheckbox = document.getElementById('fare-mode-discount');
-        const rate = getDiscountRate(); // ⭐ 獲取動態折扣率
+        const rate = getDiscountRate();
 
         if (mode === 'normal') {
             if (normalCheckbox.checked) {
@@ -767,7 +602,7 @@ function processRoutes(routes, isShenzhenBay) {
             } else selectedFareMode = '';
         } else if (mode === 'discount') {
             if (discountCheckbox.checked) {
-                let discountedBaseFare = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
+                let discountedBaseFare = Math.round(currentBaseFare * rate);
                 if (discountedBaseFare <= 100) {
                     alert(currentLang === 'en' ? "Discount is not applicable for this trip (minimum fare not reached)" : "此行程未達到折扣優惠的最低消費要求");
                     discountCheckbox.checked = false;
@@ -791,21 +626,18 @@ function processRoutes(routes, isShenzhenBay) {
         const normalFareNote = document.getElementById('normal-fare-note');
         const discountFareNote = document.getElementById('discount-fare-note');
         const discountContainer = document.getElementById('discount-option-container');
-        const rate = getDiscountRate(); // ⭐ 獲取動態折扣率
+        const rate = getDiscountRate();
 
         let normalFare = currentBaseFare + currentTunnelFee + selectedSurcharge;
         if (currentBaseFare <= 100) normalFare = 100 + currentTunnelFee + selectedSurcharge;
         if (normalFareVal) normalFareVal.innerText = normalFare;
 
         if (normalFareNote) {
-            if (currentBaseFare <= 100) {
-                normalFareNote.innerText = currentLang === 'en' ? 'Minimum fare HK$100 applied' : '已包含最低消費 HK$100';
-            } else {
-                normalFareNote.innerText = currentLang === 'en' ? 'Includes tunnel fee or minimum fare' : '已包含隧道費或最低消費';
-            }
+            if (currentBaseFare <= 100) normalFareNote.innerText = currentLang === 'en' ? 'Minimum fare HK$100 applied' : '已包含最低消費 HK$100';
+            else normalFareNote.innerText = currentLang === 'en' ? 'Includes tunnel fee or minimum fare' : '已包含隧道費或最低消費';
         }
 
-        let discountedBaseFare = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
+        let discountedBaseFare = Math.round(currentBaseFare * rate);
         let discountEligible = discountedBaseFare > 100;
         let discountTunnelFee = 0;
         if (currentTunnelFee > 0) {
@@ -815,11 +647,8 @@ function processRoutes(routes, isShenzhenBay) {
         let discountFare = discountedBaseFare + discountTunnelFee;
         if (discountContainer) discountContainer.style.display = '';
 
-        // ⭐ 更新折扣名稱
         const discountLabelEl = document.querySelector('[data-i18n="fare_discount_label"]');
-        if (discountLabelEl) {
-            discountLabelEl.innerText = getDiscountLabel();
-        }
+        if (discountLabelEl) discountLabelEl.innerText = getDiscountLabel();
 
         if (discountEligible) {
             if (discountContainer) { discountContainer.style.opacity = '1'; discountContainer.style.pointerEvents = 'auto'; }
@@ -827,18 +656,14 @@ function processRoutes(routes, isShenzhenBay) {
                 discountFareVal.innerText = `HK$ ${discountFare}`;
                 discountFareVal.className = 'text-brand-yellow font-bold text-base';
             }
-            if (discountFareNote) {
-                discountFareNote.innerText = currentLang === 'en' ? 'One-way tunnel fee, free baggage and pet fees' : '單程隧道費、免行李及寵物費';
-            }
+            if (discountFareNote) discountFareNote.innerText = currentLang === 'en' ? 'One-way tunnel fee, free baggage and pet fees' : '單程隧道費、免行李及寵物費';
         } else {
             if (discountContainer) { discountContainer.style.opacity = '0.5'; discountContainer.style.pointerEvents = 'none'; }
             if (discountFareVal) {
                 discountFareVal.innerText = currentLang === 'en' ? 'Not Applicable' : '不適用';
                 discountFareVal.className = 'text-gray-400 font-bold text-sm';
             }
-            if (discountFareNote) {
-                discountFareNote.innerText = currentLang === 'en' ? 'Minimum fare not reached' : '未達到最低消費要求';
-            }
+            if (discountFareNote) discountFareNote.innerText = currentLang === 'en' ? 'Minimum fare not reached' : '未達到最低消費要求';
             if (selectedFareMode === 'discount') {
                 selectedFareMode = 'normal';
                 document.getElementById('fare-mode-discount').checked = false;
@@ -856,14 +681,11 @@ function processRoutes(routes, isShenzhenBay) {
         const discountCheckbox = document.getElementById('fare-mode-discount');
         if (currentBaseFare <= 0) return;
         if (discountContainer) discountContainer.style.display = '';
-        const rate = getDiscountRate(); // ⭐ 獲取動態折扣率
-        let discountedBaseFare = Math.round(currentBaseFare * rate); // ⭐ 使用動態折扣率
+        const rate = getDiscountRate();
+        let discountedBaseFare = Math.round(currentBaseFare * rate);
 
-        // ⭐ 更新折扣名稱
         const discountLabelEl = document.querySelector('[data-i18n="fare_discount_label"]');
-        if (discountLabelEl) {
-            discountLabelEl.innerText = getDiscountLabel();
-        }
+        if (discountLabelEl) discountLabelEl.innerText = getDiscountLabel();
 
         if (discountedBaseFare > 100) {
             if (discountContainer) { discountContainer.style.opacity = '1'; discountContainer.style.pointerEvents = 'auto'; }
@@ -882,12 +704,9 @@ function processRoutes(routes, isShenzhenBay) {
 
     function initMap() {
         routeData = loadRouteDataFromLocalStorage();
-        
-        // ⭐ 初始化時判斷是否深圳灣
         if (routeData && routeData.pickup) {
             isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
         }
-
         const bookingData = loadBookingDataFromLocalStorage();
         if (bookingData) {
             selectedCarName = bookingData.selectedCarName || '';
@@ -909,9 +728,6 @@ function processRoutes(routes, isShenzhenBay) {
         }
     }
 
-    // ============================================
-    // 語言系統
-    // ============================================
     let currentLang = localStorage.getItem('taxiLang') || 'zh';
 
     function toggleLanguage() {
@@ -968,13 +784,13 @@ function processRoutes(routes, isShenzhenBay) {
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
-                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
+                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="90" height="90" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
-                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="240" height="30" class="h-[30px] object-contain" onerror="this.style.display='none'">
                 </a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
@@ -1021,6 +837,7 @@ function processRoutes(routes, isShenzhenBay) {
         </div>
     </div>
 
+    <main>
     <section id="result-section" class="w-full px-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 shadow-2xl">
             
@@ -1160,6 +977,7 @@ function processRoutes(routes, isShenzhenBay) {
             </div>
         </div>
     </section>
+    </main>
 
     <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
@@ -1178,7 +996,7 @@ function processRoutes(routes, isShenzhenBay) {
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                         關閉
@@ -1193,16 +1011,12 @@ function processRoutes(routes, isShenzhenBay) {
     </footer>
 
 <script>
-// ============================================
-// 頁面初始化（theme.js 已自動初始化主題 / 浮標）
-// ============================================
 window.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 });
 </script>
 <script src="theme.js"></script>
 <script>
-// ⭐ 偵測到新 SW 接管時，自動 reload 一次（確保見到最新版）
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {

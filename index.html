@@ -141,8 +141,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
+<!-- ⭐ Tailwind 本地編譯版（取代 CDN） -->
 <link rel="stylesheet" href="tailwind-compiled.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- ⭐ FontAwesome 非同步載入（唔阻塞算繪） -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="theme.css">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
 
@@ -440,13 +442,13 @@
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
-                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
+                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="90" height="90" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
-                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="240" height="30" class="h-[30px] object-contain" onerror="this.style.display='none'">
                 </a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
@@ -493,6 +495,7 @@
         </div>
     </div>
 
+    <main>
     <div class="w-full px-0 bg-brand-dark border-b border-gray-800">
         <div class="max-w-4xl mx-auto px-4 py-3 text-center">
             <h1 class="text-lg md:text-xl font-extrabold text-white leading-relaxed" data-i18n-html="hero_title">
@@ -618,7 +621,9 @@
             </button>
         </div>
     </section>
-<footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
+    </main>
+
+    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <div class="flex justify-center items-center gap-3 mb-6">
             <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
@@ -635,7 +640,7 @@
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                         關閉
@@ -1591,7 +1596,6 @@ function submitLookup() {
 
     if (errEl) errEl.textContent = '';
 
-    // 提交前再檢查鎖定狀態
     if (isLookupLocked()) {
         var remainingMin = getLookupLockRemainingMinutes();
         if (errEl) errEl.textContent = currentLang === 'en'

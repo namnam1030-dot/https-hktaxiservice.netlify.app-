@@ -82,7 +82,7 @@
 <meta name="theme-color" content="#FFF200">
 
 <link rel="stylesheet" href="tailwind-compiled.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="theme.css">
 
 <style>
@@ -176,10 +176,10 @@
     <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md">
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
-                <a href="index.html"><img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'"></a>
+                <a href="index.html"><img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="90" height="90" class="h-[90px] object-contain" onerror="this.style.display='none'"></a>
             </div>
             <div class="flex flex-col items-center justify-center">
-                <a href="index.html"><img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'"></a>
+                <a href="index.html"><img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="240" height="30" class="h-[30px] object-contain" onerror="this.style.display='none'"></a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
@@ -215,6 +215,7 @@
         </div>
     </div>
 
+    <main>
     <section id="booking-section" class="w-full px-0 py-0 m-0">
         <div class="bg-brand-gray border-y border-gray-800 p-4 md:p-6 shadow-2xl">
 
@@ -406,6 +407,7 @@
             </form>
         </div>
     </section>
+    </main>
 
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
@@ -431,7 +433,7 @@
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-2 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <p class="text-[11px] text-gray-400 mb-4">
                         <i class="fa-solid fa-hand-pointer"></i>
@@ -470,9 +472,6 @@
     </div>
 
 <script>
-// ============================================
-// 頁面變數
-// ============================================
 var currentLang = localStorage.getItem('taxiLang') || 'zh';
 var selectedCarName = '';
 var selectedCarNameEn = '';
@@ -705,7 +704,6 @@ function computeChangedFields(carDisplayText) {
     } catch(e) { console.error('[ChangedFields] 計算失敗：', e); return null; }
 }
 
-// ⭐ 保存所有表單資料到 sessionStorage
 function saveAllFormData() {
     try {
         var payments = [];
@@ -730,7 +728,6 @@ function saveAllFormData() {
     } catch(e) { console.error('[saveAllFormData] 失敗：', e); }
 }
 
-// ⭐ 從 sessionStorage 恢復所有表單資料
 function restoreAllFormData() {
     try {
         var raw = sessionStorage.getItem('taxiFormData');
@@ -777,7 +774,6 @@ function clearAllFormData() {
     try { sessionStorage.removeItem('taxiFormData'); } catch(e) {}
 }
 
-// ⭐ 跳去 fleet 前保存所有表單資料
 function goToFleetPage() {
     saveAllFormData();
     window.location.href = 'fleet.html';
@@ -1071,7 +1067,7 @@ function submitBookingAfterUpgrade() {
             else sessionStorage.removeItem('taxiChangedFields');
             sessionStorage.removeItem('taxiEditingBookingId');
             sessionStorage.removeItem('taxiInternalAccess');
-            sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：提交成功清除驗證標記
+            sessionStorage.removeItem('taxiEditVerified');
             clearAllFormData();
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
@@ -1231,7 +1227,7 @@ function initEditMode() {
     if (!editId) {
         sessionStorage.removeItem('taxiEditingBookingId');
         sessionStorage.removeItem('taxiInternalAccess');
-        sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：非編輯模式清除驗證標記
+        sessionStorage.removeItem('taxiEditVerified');
         editingBookingId = null;
         return;
     }
@@ -1243,7 +1239,7 @@ function initEditMode() {
         localStorage.removeItem('taxiBookingData');
         sessionStorage.removeItem('taxiLookupResult');
         sessionStorage.removeItem('taxiInternalAccess');
-        sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：切換到不同訂單，清除舊驗證
+        sessionStorage.removeItem('taxiEditVerified');
     }
 
     editingBookingId = editId;
@@ -1260,11 +1256,7 @@ function initEditMode() {
         if (span) span.textContent = currentLang === 'en' ? 'Update Booking' : '更新預約';
     }
 
-    // ⭐ 方案 B：檢查 3 個來源
-    //   1) taxiInternalAccess — 內部員工（從成功頁「修改資料」）
-    //   2) taxiLookupResult  — 首頁查詢剛驗證完（flag 未清）
-    //   3) taxiEditVerified  — 之前驗證過同一個 editId（跨頁保留）
-var hasInternalAccess = false;
+    var hasInternalAccess = false;
     var hasLookupResult = false;
     var hasEditVerified = false;
     try {
@@ -1273,12 +1265,10 @@ var hasInternalAccess = false;
         if (sessionStorage.getItem('taxiEditVerified') === editId) hasEditVerified = true;
     } catch(e) {}
 
-    // ⭐ 只要通過任何一種驗證，就立即設定跨頁保留標記
     if (hasInternalAccess || hasLookupResult || hasEditVerified) {
         try { sessionStorage.setItem('taxiEditVerified', editingBookingId); } catch(e) {}
     }
 
-    // ⭐ 外部進入（從 Telegram / Discord）→ 清除本地資料，強制要求密碼
     if (!hasInternalAccess && !hasLookupResult && !hasEditVerified) {
         console.log('[EditMode] 外部進入，清除本地資料並要求密碼');
         localStorage.removeItem('taxiEditPrefillData');
@@ -1297,7 +1287,7 @@ var hasInternalAccess = false;
         var userInput = prompt(
             currentLang === 'en'
                 ? 'Please enter the phone number or internal password for booking ' + editingBookingId + ':'
-                : '請輸入預約 ' + editingBookingId + ' 嘅電話號碼：'
+                : '請輸入預約 ' + editingBookingId + ' 嘅電話號碼或內部密碼：'
         );
 
         if (!userInput || userInput.trim() === '') {
@@ -1319,7 +1309,6 @@ var hasInternalAccess = false;
             if (data.success && data.orderData) {
                 var orderData = data.orderData;
                 sessionStorage.setItem('taxiLookupResult', JSON.stringify(orderData));
-                // ⭐ 方案 B：驗證成功，設定跨頁保留標記
                 sessionStorage.setItem('taxiEditVerified', editingBookingId);
 
                 if (data.isInternalAccess === true) {
@@ -1346,13 +1335,7 @@ var hasInternalAccess = false;
         return;
     }
 
-    // ⭐ 內部訪問 / 已查詢過 / 之前驗證過
-    console.log('[EditMode] 內部訪問 / 已驗證，用本地資料');
-
-    // ⭐ 方案 B：內部訪問都設返標記（令之後跨頁返回唔會再彈）
-    if (hasInternalAccess) {
-        try { sessionStorage.setItem('taxiEditVerified', editingBookingId); } catch(e) {}
-    }
+    console.log('[EditMode] 內部訪問 / 已查詢，用本地資料');
 
     var hasLookupResult2 = false;
     try {
@@ -1489,7 +1472,7 @@ function goToEditRoute() {
 function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiInternalAccess');
-    sessionStorage.removeItem('taxiEditVerified'); // ⭐ 方案 B：取消修改清除驗證標記
+    sessionStorage.removeItem('taxiEditVerified');
     clearAllFormData();
     var lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
     if (lastSuccessUrl) window.location.href = lastSuccessUrl;
@@ -1541,13 +1524,10 @@ window.addEventListener('DOMContentLoaded', function() {
     checkShowFlightField();
     applyLanguage();
 
-    // ⭐ 1. 默認即時訂單（令按鈕變黃色）
     switchOrderType('instant');
 
-    // ⭐ 2. 進入編輯模式（如有 edit 參數）
     initEditMode();
 
-    // ⭐ 3. 從 fleet 返回時，恢復所有表單資料
     if (restoreAllFormData()) {
         console.log('[DOMContentLoaded] 已恢復所有表單資料');
     }
