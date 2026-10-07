@@ -1273,12 +1273,16 @@ function initEditMode() {
     }
 
     var hasInternalAccess = false;
+    var hasLookupResult = false;
     try {
         if (sessionStorage.getItem('taxiInternalAccess') === '1') hasInternalAccess = true;
+        if (sessionStorage.getItem('taxiLookupResult')) hasLookupResult = true;
     } catch(e) {}
 
     // ⭐ 外部進入（從 Telegram / Discord）→ 清除本地資料，強制要求密碼
-    if (!hasInternalAccess) {
+    // ⭐ 如果係從首頁「查詢/修改預約」過嚟（已驗證過），就唔再彈 prompt
+    if (!hasInternalAccess && !hasLookupResult) {
+
         console.log('[EditMode] 外部進入，清除本地資料並要求密碼');
         localStorage.removeItem('taxiEditPrefillData');
         localStorage.removeItem('taxiRouteData');
