@@ -137,16 +137,18 @@
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
     html.light-theme body #discount-option-container:hover { border-color: #000000 !important; }
 
-    /* ⭐ MIFA 7 優惠 Banner 淺色主題 */
+    /* ⭐ MIFA 7 優惠 Banner 淺色主題背景 */
     html.light-theme body #mifa-discount-banner {
         background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15)) !important;
         border-color: #dc2626 !important;
     }
-    html.light-theme body #mifa-discount-banner .text-red-300 {
-        color: #b91c1c !important;
+
+    /* ⭐ MIFA 7 Banner 紅色文字（兩行都紅色） */
+    .mifa-banner-text {
+        color: #fca5a5;
     }
-    html.light-theme body #mifa-discount-banner .text-white {
-        color: #000000 !important;
+    html.light-theme body .mifa-banner-text {
+        color: #b91c1c !important;
     }
 
     /* ⭐ 豪華六座的士按鈕閃動效果（有優惠時） */
@@ -221,6 +223,8 @@
             btn_view_fleet: "選擇車款類型",
             btn_select_6seater: "豪華六座的士",
             btn_upgrade_label: "升級優惠",
+            mifa_banner_title: "恭喜你已獲得升級優惠！",
+            mifa_banner_sub: "滿 HK$250 即減 HK$50！",
             btn_quick_query: "立即預約",
             btn_quick_query_note: "預設豐田混能的士",
             btn_add_home: "APPS",
@@ -263,6 +267,8 @@
             btn_view_fleet: "Select Vehicle Type",
             btn_select_6seater: "Luxury 6-Seater",
             btn_upgrade_label: "Upgrade Offer",
+            mifa_banner_title: "Congratulations! You've got an upgrade offer!",
+            mifa_banner_sub: "Spend HK$250, save HK$50!",
             btn_quick_query: "BOOK NOW",
             btn_quick_query_note: "Default: Toyota Hybrid Taxi",
             btn_add_home: "APPS",
@@ -742,7 +748,7 @@
         updateFareModeDisplay();
     }
 
-    /* ⭐ MIFA 7 優惠 Banner + 按鈕切換邏輯（用 innerHTML 動態改，唔改 HTML 結構） */
+    /* ⭐ MIFA 7 優惠 Banner + 按鈕切換邏輯（用 innerHTML 動態改） */
     function updateMifaDiscountBanner() {
         var banner = document.getElementById('mifa-discount-banner');
         var fleetBtn = document.getElementById('fleet-btn');
@@ -763,7 +769,7 @@
                 var upgradeLabel = (currentLang === 'en') ? 'Upgrade Offer' : '升級優惠';
                 var fleetLabel = (currentLang === 'en') ? 'Luxury 6-Seater' : '豪華六座的士';
                 fleetBtn.innerHTML = '<span class="flex flex-col items-center justify-center gap-0.5 leading-tight">' +
-                    '<span class="text-[13px]">' + upgradeLabel + '</span>' +
+                    '<span class="text-base">' + upgradeLabel + '</span>' +
                     '<span class="flex items-center gap-1.5 text-base"><i class="fa-solid fa-car"></i> ' + fleetLabel + '</span>' +
                     '</span>';
                 fleetBtn.classList.add('mifa-fleet-btn-blink');
@@ -1046,8 +1052,8 @@
                     <div class="flex items-center gap-3">
                         <div class="text-red-400 text-3xl animate-pulse leading-none">🎉</div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-white font-extrabold text-base leading-relaxed">今次行程有升級豪華六座的士優惠！</p>
-                            <p class="text-red-300 font-extrabold text-base leading-relaxed mt-0.5">滿 HK$250 即減 HK$50！</p>
+                            <p class="mifa-banner-text font-extrabold text-base leading-relaxed" data-i18n="mifa_banner_title">恭喜你已獲得升級優惠！</p>
+                            <p class="mifa-banner-text font-extrabold text-base leading-relaxed mt-0.5" data-i18n="mifa_banner_sub">滿 HK$250 即減 HK$50！</p>
                         </div>
                     </div>
                 </div>
