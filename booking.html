@@ -301,8 +301,8 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-300 mb-1"><i class="fa-solid fa-users text-brand-yellow mr-1.5"></i><span data-i18n="label_passengers">乘客人數（選填）</span></label>
                         <select id="passengers" onchange="checkPassengerLimit()" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
-                            <option value="1 人" data-i18n="p1">1 人</option>
-                            <option value="2 人" selected data-i18n="p2">2 人</option>
+                            <option value="1 人" selected data-i18n="p1">1 人</option>
+                            <option value="2 人" data-i18n="p2">2 人</option>
                             <option value="3 人" data-i18n="p3">3 人</option>
                             <option value="4 人" data-i18n="p4">4 人</option>
                             <option value="5 人" data-i18n="p5">5 人</option>
@@ -555,8 +555,7 @@ var translations = {
         l0: "0 件", l1: "1 件", l2: "2 件", l3: "3 件", l4: "4 件+", l5: "5 件+",
         wecom_modal_title: "掃描二維碼添加企業微信", wecom_modal_desc: "請使用微信掃描以下二維碼",
         wecom_qr_hint: "手機用戶：長按圖片儲存 → 打開微信「掃一掃」→ 從相簿選取", whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士",
-        wechat_note_title: "我想用微信聯絡", btn_add_wechat_now: "立即加微信",
+        footer_copy: "© 2026 版權所有。", wechat_note_title: "我想用微信聯絡", btn_add_wechat_now: "立即加微信",
         edit_mode_text: "修改模式：正在修改預約", btn_cancel_edit: "取消修改"
     },
     en: {
@@ -578,8 +577,7 @@ var translations = {
         l0: "0 pcs", l1: "1 pc", l2: "2 pcs", l3: "3 pcs", l4: "4+ pcs", l5: "5+ pcs",
         wecom_modal_title: "Scan QR Code to Add WeCom", wecom_modal_desc: "Scan the QR code below",
         wecom_qr_hint: "Mobile: Long press to save → WeChat Scan", whatsapp_inquiry: "WhatsApp",
-        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi",
-        wechat_note_title: "Contact me via WeChat", btn_add_wechat_now: "Add WeChat Now",
+        footer_copy: "© 2026 All Rights Reserved.", wechat_note_title: "Contact me via WeChat", btn_add_wechat_now: "Add WeChat Now",
         edit_mode_text: "Edit Mode: Editing booking", btn_cancel_edit: "Cancel Edit"
     }
 };
@@ -715,7 +713,7 @@ function saveAllFormData() {
             date: document.getElementById('date') ? document.getElementById('date').value : '',
             time: document.getElementById('time') ? document.getElementById('time').value : '',
             flightNo: document.getElementById('flight_no') ? document.getElementById('flight_no').value : '',
-            passengers: document.getElementById('passengers') ? document.getElementById('passengers').value : '2 人',
+            passengers: document.getElementById('passengers') ? document.getElementById('passengers').value : '1 人',
             luggages: document.getElementById('luggages') ? document.getElementById('luggages').value : '0 件',
             hasPet: document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false,
             hasWheelchair: document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false,
@@ -871,7 +869,7 @@ function checkShowFlightField() {
 
 function checkPassengerLimit() {
     var passengersSelect = document.getElementById('passengers');
-    var passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 2;
+    var passengerVal = passengersSelect ? parseInt(passengersSelect.value) : 1;
     if (passengerVal > 4) {
         if (selectedCarName === '豐田混能的士' || !selectedCarName) {
             selectedCarName = 'MAXUS MIFA 7';
@@ -925,13 +923,19 @@ function submitBookingAfterUpgrade() {
     var isEn = (currentLang === 'en');
     var msgLines = [];
 
+    // ⭐ 只有「1人 + 0行李 + 冇寵物 + 冇輪椅」時才唔顯示人數
+    var hidePaxLine = (data.passengers === '1 人'
+                    && (!data.luggages || data.luggages === '0 件')
+                    && !data.hasPet
+                    && !data.hasWheelchair);
+
     if (isEn) {
         msgLines.push('📍 Pickup: ' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
         msgLines.push('🏁 Dropoff: ' + data.dropoff);
         if (data.flightNo) msgLines.push('✈️ Flight: ' + data.flightNo);
         if (orderType === 'booking') { msgLines.push('📅 Date: ' + data.date); msgLines.push('⏰ Time: ' + data.timeStringFormatted); }
-        msgLines.push('👥 Passengers: ' + data.passengers);
+        if (!hidePaxLine) msgLines.push('👥 Passengers: ' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 Luggages: ' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 Pet: ✅');
         if (data.hasWheelchair) msgLines.push('♿ Wheelchair: ✅');
@@ -945,7 +949,7 @@ function submitBookingAfterUpgrade() {
         msgLines.push('🏁 終點：' + data.dropoff);
         if (data.flightNo) msgLines.push('✈️ 航班編號：' + data.flightNo);
         if (orderType === 'booking') { msgLines.push('📅 日期：' + data.date); msgLines.push('⏰ 時間：' + data.timeStringFormatted); }
-        msgLines.push('👥 人數：' + data.passengers);
+        if (!hidePaxLine) msgLines.push('👥 人數：' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 行李件數：' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 寵物：✅');
         if (data.hasWheelchair) msgLines.push('♿️ 輪椅放置尾箱：✅');
@@ -978,11 +982,15 @@ function submitBookingAfterUpgrade() {
         var weekdays = currentLang === 'zh' ? ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         discordMsgLines.push('📅 ' + data.date + '（' + weekdays[dateObj.getDay()] + '）⏰ ' + data.timeStringFormatted);
     }
-    var passengerLine = '👥 ' + data.passengers;
-    if (data.luggages && data.luggages !== '0 件') passengerLine += ' | 🧳 ' + data.luggages;
-    if (data.hasPet) passengerLine += ' | 🐶';
-    if (data.hasWheelchair) passengerLine += ' | ♿';
-    discordMsgLines.push(passengerLine);
+
+    // ⭐ 客人資料同一行顯示（1人+0行李+冇寵物+冇輪椅 時完全唔顯示）
+    if (!hidePaxLine) {
+        var passengerLine = '👥 ' + data.passengers;
+        if (data.luggages && data.luggages !== '0 件') passengerLine += ' | 🧳 ' + data.luggages;
+        if (data.hasPet) passengerLine += ' | 🐶';
+        if (data.hasWheelchair) passengerLine += ' | ♿';
+        discordMsgLines.push(passengerLine);
+    }
 
     var cleanPhone = (data.phone || '').replace(/\D/g, '');
     var phoneWithCode = cleanPhone;
