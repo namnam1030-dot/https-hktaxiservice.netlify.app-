@@ -163,7 +163,7 @@
         }
     }
     .mifa-fleet-btn-blink {
-        animation: mifaFleetBtnBlink 1.2s ease-in-out infinite;
+        animation: mifaFleetBtnBlink 1.2s ease-in-out infinite !important;
     }
     .mifa-fleet-btn-blink:hover {
         animation-play-state: paused;
@@ -742,15 +742,12 @@
         updateFareModeDisplay();
     }
 
-    /* ⭐ MIFA 7 優惠 Banner + 按鈕切換邏輯 */
+    /* ⭐ MIFA 7 優惠 Banner + 按鈕切換邏輯（用 innerHTML 動態改，唔改 HTML 結構） */
     function updateMifaDiscountBanner() {
         var banner = document.getElementById('mifa-discount-banner');
-        var fleetBtnNormal = document.getElementById('fleet-btn-normal');
-        var fleetBtnUpgrade = document.getElementById('fleet-btn-upgrade');
-        var fleetBtnMain = document.getElementById('fleet-btn-main');
+        var fleetBtn = document.getElementById('fleet-btn');
         if (!banner) return;
 
-        // ⭐ 優惠條件：Math.max(base, 80) + 50 >= 250（唔包含隧道費）
         var adjustedBase = Math.max(currentBaseFare, 80);
         var basePlusSurcharge = adjustedBase + 50;
         var eligible = (basePlusSurcharge >= 250) && (selectedCarName !== 'MAXUS MIFA 7');
@@ -762,17 +759,23 @@
 
             banner.classList.remove('hidden');
 
-            // 按鈕切換為「升級優惠 / 豪華六座的士」+ 閃動
-            if (fleetBtnNormal) fleetBtnNormal.classList.add('hidden');
-            if (fleetBtnUpgrade) fleetBtnUpgrade.classList.remove('hidden');
-            if (fleetBtnMain) fleetBtnMain.classList.add('mifa-fleet-btn-blink');
+            if (fleetBtn) {
+                var upgradeLabel = (currentLang === 'en') ? 'Upgrade Offer' : '升級優惠';
+                var fleetLabel = (currentLang === 'en') ? 'Luxury 6-Seater' : '豪華六座的士';
+                fleetBtn.innerHTML = '<span class="flex flex-col items-center justify-center gap-0.5 leading-tight">' +
+                    '<span class="text-[13px]">' + upgradeLabel + '</span>' +
+                    '<span class="flex items-center gap-1.5 text-base"><i class="fa-solid fa-car"></i> ' + fleetLabel + '</span>' +
+                    '</span>';
+                fleetBtn.classList.add('mifa-fleet-btn-blink');
+            }
         } else {
             banner.classList.add('hidden');
 
-            // 按鈕回復正常
-            if (fleetBtnNormal) fleetBtnNormal.classList.remove('hidden');
-            if (fleetBtnUpgrade) fleetBtnUpgrade.classList.add('hidden');
-            if (fleetBtnMain) fleetBtnMain.classList.remove('mifa-fleet-btn-blink');
+            if (fleetBtn) {
+                var fleetLabel2 = (currentLang === 'en') ? 'Luxury 6-Seater' : '豪華六座的士';
+                fleetBtn.innerHTML = '<i class="fa-solid fa-car"></i> ' + fleetLabel2;
+                fleetBtn.classList.remove('mifa-fleet-btn-blink');
+            }
         }
     }
 
@@ -808,11 +811,12 @@
         currentLang = currentLang === 'zh' ? 'en' : 'zh';
         localStorage.setItem('taxiLang', currentLang);
         applyLanguage();
+        if (typeof updateMifaDiscountBanner === 'function') updateMifaDiscountBanner();
     }
 
     function applyLanguage() {
         const btn = document.getElementById('lang-toggle-btn');
-        if (btn) btn.inner="Text = currentLang === 'zh' ? 'EN' : '繁';
+        if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
 
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
@@ -881,7 +885,7 @@
 
     <div id="mini-float" class="minimized">
         <div class="mini-float-btns">
-            <button onclick="toggleLanguage()" idlang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
+            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
             <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
                 <i class="fa-solid fa-mobile-screen-button"></i>
             </button>
@@ -1037,7 +1041,7 @@
                     </div>
                 </div>
 
-                <!-- ⭐ MIFA 7 優惠提示 Banner（簡化版：只有 2 行文字，無按鈕） -->
+                <!-- ⭐ MIFA 7 優惠提示 Banner（只有 2 行文字，無按鈕） -->
                 <div id="mifa-discount-banner" class="hidden mt-4 p-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl shadow-lg">
                     <div class="flex items-center gap-3">
                         <div class="text-red-400 text-3xl animate-pulse leading-none">🎉</div>
@@ -1049,18 +1053,8 @@
                 </div>
 
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    <button type="button" onclick="goToFleetPage()" id="fleet-btn-main" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-                        <span id="fleet-btn-normal" class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-car"></i>
-                            <span data-i18n="btn_select_6seater">豪華六座的士</span>
-                        </span>
-                        <span id="fleet-btn-upgrade" class="hidden flex-col items-center gap-0.5 leading-tight">
-                            <span class="text-[13px]" data-i18n="btn_upgrade_label">升級優惠</span>
-                            <span class="flex items-center gap-1.5">
-                                <i class="fa-solid fa-car"></i>
-                                <span data-i18n="btn_select_6seater">豪華六座的士</span>
-                            </span>
-                        </span>
+                    <button type="button" onclick="goToFleetPage()" id="fleet-btn" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-car"></i> 豪華六座的士
                     </button>
                     <button type="button" onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-4 py-3 rounded-xl font-bold transition cursor-pointer inline-flex flex-col items-center justify-center gap-0.5 shadow-md">
                         <span class="flex items-center gap-1.5 text-base font-extrabold">
