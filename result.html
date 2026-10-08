@@ -136,6 +136,18 @@
     html.light-theme body input[type="checkbox"], html.light-theme body .fare-mode-checkbox { color-scheme: light !important; accent-color: #000000 !important; background-color: #FFFFFF !important; }
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
     html.light-theme body #discount-option-container:hover { border-color: #000000 !important; }
+
+    /* ⭐ MIFA 7 優惠 Banner 淺色主題 */
+    html.light-theme body #mifa-discount-banner {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15)) !important;
+        border-color: #dc2626 !important;
+    }
+    html.light-theme body #mifa-discount-banner .text-red-300 {
+        color: #b91c1c !important;
+    }
+    html.light-theme body #mifa-discount-banner .text-white {
+        color: #000000 !important;
+    }
 </style>
 
     <script>
@@ -322,6 +334,7 @@
         selectedFeeMode = feeText;
         selectedFeeModeEn = feeTextEn;
         if (currentBaseFare > 0) updateFareModeDisplay();
+        if (typeof updateMifaDiscountBanner === 'function') updateMifaDiscountBanner();
     }
 
     function calculateTaxiBaseFare(km) {
@@ -504,6 +517,7 @@
                 displaySelectedRoute(result, 0, isShenzhenBayRoute);
             } else {
                 alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+                sessionStorage.setItem('returningFromResult', '1');
                 window.location.href = 'index.html';
             }
         });
@@ -588,6 +602,7 @@
 
         updateFareModeDisplay();
         updateFareModeAvailability();
+        updateMifaDiscountBanner();
     }
 
     function handleFareModeSelection(mode) {
@@ -702,6 +717,29 @@
         updateFareModeDisplay();
     }
 
+    /* ⭐ MIFA 7 優惠 Banner 顯示邏輯 */
+    function updateMifaDiscountBanner() {
+        var banner = document.getElementById('mifa-discount-banner');
+        if (!banner) return;
+
+        // ⭐ 優惠條件：Math.max(base, 80) + 50 >= 250（唔包含隧道費）
+        var adjustedBase = Math.max(currentBaseFare, 80);
+        var basePlusSurcharge = adjustedBase + 50;
+        var eligible = (basePlusSurcharge >= 250) && (selectedCarName !== 'MAXUS MIFA 7');
+
+        if (eligible) {
+            // 優惠後價錢 = base + 隧道費（即係免咗 $50 附加費）
+            var discountFare = adjustedBase + currentTunnelFee;
+
+            var priceEl = document.getElementById('mifa-discount-price');
+            if (priceEl) priceEl.innerText = discountFare;
+
+            banner.classList.remove('hidden');
+        } else {
+            banner.classList.add('hidden');
+        }
+    }
+
     function initMap() {
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
@@ -784,14 +822,14 @@
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
-<img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="191" height="90" class="h-[90px] object-contain" onerror="this.style.display='none'">
+                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
-<img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="178" height="30" class="h-[30px] object-contain" onerror="this.style.display='none'">
-</a>
+                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                </a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
@@ -963,6 +1001,23 @@
                     </div>
                 </div>
 
+                <!-- ⭐ MIFA 7 優惠提示 Banner -->
+                <div id="mifa-discount-banner" class="hidden mt-4 p-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl shadow-lg">
+                    <div class="flex items-start gap-3">
+                        <div class="text-red-400 text-3xl animate-pulse leading-none mt-0.5">🎉</div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-red-300 font-extrabold text-base mb-1">💡 呢個行程有優惠！</p>
+                            <p class="text-white text-sm leading-relaxed mb-2">
+                                MAXUS MIFA 7 滿 HK$250 即減 HK$50！<br>
+                                優惠後只需 <span class="text-brand-yellow font-bold text-lg">HK$ <span id="mifa-discount-price">0</span></span>
+                            </p>
+                            <button type="button" onclick="goToFleetPage()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-pointer shadow-md transition inline-flex items-center gap-1.5">
+                                <i class="fa-solid fa-car"></i> 選用 MIFA 7 優惠
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mt-4 grid grid-cols-2 gap-3">
                     <button type="button" onclick="goToFleetPage()" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-car"></i> <span data-i18n="btn_select_6seater">選擇六人車款</span>
@@ -996,7 +1051,7 @@
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" style="aspect-ratio: 1/1;" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                         關閉

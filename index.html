@@ -442,13 +442,13 @@
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
-<img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="191" height="90" class="h-[90px] object-contain" onerror="this.style.display='none'">
+<img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
-<img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="178" height="30" class="h-[30px] object-contain" onerror="this.style.display='none'">
+<img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
                 </a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
@@ -640,7 +640,7 @@
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" style="aspect-ratio: 1/1;" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                         關閉
@@ -845,12 +845,44 @@ function calculateAndGoToResult() {
     }
 
     Promise.all(tasks).then(function() {
+        // ⭐ 檢查所有輸入欄位係咪都有 placeId（即係從下拉選單揀選過）
+        var missingFields = [];
+        fields.forEach(function(f) {
+            if (!f.el.dataset.placeId) {
+                missingFields.push(f.val);
+            }
+        });
+
+        if (missingFields.length > 0) {
+            // Geocode 失敗，唔跳去 result.html，提示用戶從下拉選單揀
+            var msg = currentLang === 'en'
+                ? "Cannot find the following location(s). Please select from the dropdown list:\n\n• " + missingFields.join('\n• ')
+                : "以下地點搵唔到，請從下拉選單中揀選正確嘅地址：\n\n• " + missingFields.join('\n• ');
+            alert(msg);
+
+            // 恢復按鈕狀態
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.innerHTML = '<i class="fa-solid fa-route mr-1"></i> <span>' + (currentLang === 'en' ? 'Calculate Estimated Fare' : '立即預計車費') + '</span>';
+            }
+            return;
+        }
+
         localStorage.removeItem('taxiBookingData');
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     }).catch(function() {
-        saveRouteDataToLocalStorage();
-        window.location.href = 'result.html';
+        // 網絡或例外錯誤，保留資料同按鈕狀態
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.innerHTML = '<i class="fa-solid fa-route mr-1"></i> <span>' + (currentLang === 'en' ? 'Calculate Estimated Fare' : '立即預計車費') + '</span>';
+        }
+        sessionStorage.setItem('returningFromResult', '1');
+        alert(currentLang === 'en' ? "Network error. Please try again." : "網絡錯誤，請重試。");
     });
 }
 
@@ -1741,8 +1773,6 @@ document.addEventListener('DOMContentLoaded', function() {
             el.addEventListener('click', function() { loadGoogleMaps(); });
         }
     });
-
-    // ⭐ 注意：已移除「1.5 秒背景預載」，避免同 LCP 爭頻寬
 
     var lookupModal = document.getElementById('lookup-modal');
     if (lookupModal) {
