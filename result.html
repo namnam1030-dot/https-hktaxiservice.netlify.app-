@@ -148,6 +148,35 @@
     html.light-theme body #mifa-discount-banner .text-white {
         color: #000000 !important;
     }
+
+    /* ⭐ MIFA 7 優惠按鈕閃動效果 */
+    @keyframes mifaCtaBlink {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 4px 12px rgba(255, 242, 0, 0.5);
+        }
+        50% {
+            opacity: 0.75;
+            transform: scale(1.03);
+            box-shadow: 0 6px 18px rgba(255, 242, 0, 0.8);
+        }
+    }
+    #mifa-discount-cta {
+        animation: mifaCtaBlink 1.2s ease-in-out infinite;
+        border: 2px solid #000000;
+    }
+    #mifa-discount-cta:hover {
+        animation-play-state: paused;
+        opacity: 1;
+        transform: scale(1.05);
+        box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
+    }
+    html.light-theme body #mifa-discount-cta {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border: 2px solid #000000 !important;
+    }
 </style>
 
     <script>
@@ -1007,12 +1036,13 @@
                         <div class="text-red-400 text-3xl animate-pulse leading-none mt-0.5">🎉</div>
                         <div class="flex-1 min-w-0">
                             <p class="text-red-300 font-extrabold text-base mb-1">💡 呢個行程有優惠！</p>
+                            <p class="text-white text-sm font-bold leading-relaxed">即時升級豪華六座的士</p>
+                            <p class="text-white text-sm leading-relaxed">滿 HK$250 即減 HK$50！</p>
                             <p class="text-white text-sm leading-relaxed mb-2">
-                                MAXUS MIFA 7 滿 HK$250 即減 HK$50！<br>
                                 優惠後只需 <span class="text-brand-yellow font-bold text-lg">HK$ <span id="mifa-discount-price">0</span></span>
                             </p>
-                            <button type="button" onclick="goToFleetPage()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-pointer shadow-md transition inline-flex items-center gap-1.5">
-                                <i class="fa-solid fa-car"></i> 選用 MIFA 7 優惠
+                            <button type="button" onclick="goToFleetPage()" id="mifa-discount-cta" class="bg-brand-yellow text-black font-extrabold py-2.5 px-5 rounded-lg text-base cursor-pointer shadow-md inline-flex items-center gap-1.5">
+                                <i class="fa-solid fa-car"></i> 按此獲取優惠！
                             </button>
                         </div>
                     </div>
