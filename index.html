@@ -141,10 +141,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF200">
 
+<!-- ⭐ Tailwind 本地編譯版（取代 CDN） -->
 <link rel="stylesheet" href="tailwind-compiled.css">
+<!-- ⭐ FontAwesome 非同步載入（唔阻塞算繪） -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="theme.css">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initAutocomplete" defer></script>
+<!-- ⭐ Google Maps 改為動態載入（加快首屏 LCP）-->
 
 <style>
     html { 
@@ -440,13 +442,13 @@
         <div class="w-full px-1 flex justify-between items-center">
             <div class="flex items-center">
                 <a href="index.html">
-                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
+                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" width="200" height="90" style="aspect-ratio: 200/90; height: 90px; width: auto;" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
 
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
-                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" width="178" height="30" style="aspect-ratio: 178/30; height: 30px; width: auto;" class="h-[30px] object-contain" onerror="this.style.display='none'">
                 </a>
                 <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
@@ -638,7 +640,7 @@
                     <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
                     <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
                     <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" style="aspect-ratio: 1/1;" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
                     </div>
                     <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
                         關閉
@@ -677,6 +679,31 @@
     </div>
 
 <script>
+/* ============================================
+   ⭐ Google Maps 動態載入
+   ============================================ */
+var _googleMapsLoadPromise = null;
+function loadGoogleMaps() {
+    if (_googleMapsLoadPromise) return _googleMapsLoadPromise;
+    _googleMapsLoadPromise = new Promise(function(resolve, reject) {
+        var script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK';
+        script.async = true;
+        script.defer = true;
+        script.onload = function() {
+            console.log('[Google Maps] 已載入');
+            if (typeof initAutocomplete === 'function') initAutocomplete();
+            resolve();
+        };
+        script.onerror = function() {
+            console.error('[Google Maps] 載入失敗');
+            reject(new Error('Failed to load Google Maps'));
+        };
+        document.head.appendChild(script);
+    });
+    return _googleMapsLoadPromise;
+}
+
 function saveRouteDataToLocalStorage() {
     var pickupEl = document.getElementById('calc-pickup');
     var dropoffEl = document.getElementById('calc-dropoff');
@@ -1344,7 +1371,10 @@ function findInputForPac(pc) {
 /* ============================================
    Autocomplete
    ============================================ */
+var _autocompleteInitialized = false;
 function initAutocomplete() {
+    if (_autocompleteInitialized) return;
+    _autocompleteInitialized = true;
     console.log('[TaxiRoute] initAutocomplete 已觸發');
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
@@ -1702,6 +1732,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     setupStopoverDragging();
+
+    // ⭐ 綁定輸入框 focus / click 觸發 Google Maps 動態載入
+    ['calc-pickup', 'calc-dropoff', 'calc-stopover-1', 'calc-stopover-2', 'calc-stopover-3'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('focus', function() { loadGoogleMaps(); });
+            el.addEventListener('click', function() { loadGoogleMaps(); });
+        }
+    });
+
+    // ⭐ 頁面完全載入後 1 秒，背景預載 Google Maps（唔阻塞首屏）
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            // 只在用戶未 focus 過輸入框時才預載（避免重複）
+            if (!_googleMapsLoadPromise) {
+                loadGoogleMaps();
+            }
+        }, 1500);
+    });
 
     var lookupModal = document.getElementById('lookup-modal');
     if (lookupModal) {
