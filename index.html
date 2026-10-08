@@ -845,44 +845,12 @@ function calculateAndGoToResult() {
     }
 
     Promise.all(tasks).then(function() {
-        // ⭐ 檢查所有輸入欄位係咪都有 placeId（即係從下拉選單揀選過）
-        var missingFields = [];
-        fields.forEach(function(f) {
-            if (!f.el.dataset.placeId) {
-                missingFields.push(f.val);
-            }
-        });
-
-        if (missingFields.length > 0) {
-            // Geocode 失敗，唔跳去 result.html，提示用戶從下拉選單揀
-            var msg = currentLang === 'en'
-                ? "Cannot find the following location(s). Please select from the dropdown list:\n\n• " + missingFields.join('\n• ')
-                : "以下地點搵唔到，請從下拉選單中揀選正確嘅地址：\n\n• " + missingFields.join('\n• ');
-            alert(msg);
-
-            // 恢復按鈕狀態
-            if (btn) {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-                btn.innerHTML = '<i class="fa-solid fa-route mr-1"></i> <span>' + (currentLang === 'en' ? 'Calculate Estimated Fare' : '立即預計車費') + '</span>';
-            }
-            return;
-        }
-
         localStorage.removeItem('taxiBookingData');
         saveRouteDataToLocalStorage();
         window.location.href = 'result.html';
     }).catch(function() {
-        // 網絡或例外錯誤，保留資料同按鈕狀態
-        if (btn) {
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
-            btn.innerHTML = '<i class="fa-solid fa-route mr-1"></i> <span>' + (currentLang === 'en' ? 'Calculate Estimated Fare' : '立即預計車費') + '</span>';
-        }
-        sessionStorage.setItem('returningFromResult', '1');
-        alert(currentLang === 'en' ? "Network error. Please try again." : "網絡錯誤，請重試。");
+        saveRouteDataToLocalStorage();
+        window.location.href = 'result.html';
     });
 }
 
