@@ -1742,15 +1742,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ⭐ 頁面完全載入後 1 秒，背景預載 Google Maps（唔阻塞首屏）
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            // 只在用戶未 focus 過輸入框時才預載（避免重複）
-            if (!_googleMapsLoadPromise) {
-                loadGoogleMaps();
-            }
-        }, 1500);
-    });
+    // ⭐ 注意：已移除「1.5 秒背景預載」，避免同 LCP 爭頻寬
 
     var lookupModal = document.getElementById('lookup-modal');
     if (lookupModal) {
