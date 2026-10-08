@@ -149,33 +149,27 @@
         color: #000000 !important;
     }
 
-    /* ⭐ MIFA 7 優惠按鈕閃動效果 */
-    @keyframes mifaCtaBlink {
+    /* ⭐ 豪華六座的士按鈕閃動效果（有優惠時） */
+    @keyframes mifaFleetBtnBlink {
         0%, 100% {
             opacity: 1;
             transform: scale(1);
-            box-shadow: 0 4px 12px rgba(255, 242, 0, 0.5);
+            box-shadow: 0 4px 12px rgba(255, 242, 0, 0.4);
         }
         50% {
             opacity: 0.75;
             transform: scale(1.03);
-            box-shadow: 0 6px 18px rgba(255, 242, 0, 0.8);
+            box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
         }
     }
-    #mifa-discount-cta {
-        animation: mifaCtaBlink 1.2s ease-in-out infinite;
-        border: 2px solid #000000;
+    .mifa-fleet-btn-blink {
+        animation: mifaFleetBtnBlink 1.2s ease-in-out infinite;
     }
-    #mifa-discount-cta:hover {
+    .mifa-fleet-btn-blink:hover {
         animation-play-state: paused;
         opacity: 1;
         transform: scale(1.05);
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
-    }
-    html.light-theme body #mifa-discount-cta {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border: 2px solid #000000 !important;
     }
 </style>
 
@@ -225,7 +219,8 @@
             fare_discount_note: "(只限豐田混能的士)",
             btn_reselect_route: "重新規劃路線",
             btn_view_fleet: "選擇車款類型",
-            btn_select_6seater: "選擇六人車款",
+            btn_select_6seater: "豪華六座的士",
+            btn_upgrade_label: "升級優惠",
             btn_quick_query: "立即預約",
             btn_quick_query_note: "預設豐田混能的士",
             btn_add_home: "APPS",
@@ -266,7 +261,8 @@
             fare_discount_note: "(Toyota Hybrid Taxi only)",
             btn_reselect_route: "Re-plan Route",
             btn_view_fleet: "Select Vehicle Type",
-            btn_select_6seater: "Select 6-Seater",
+            btn_select_6seater: "Luxury 6-Seater",
+            btn_upgrade_label: "Upgrade Offer",
             btn_quick_query: "BOOK NOW",
             btn_quick_query_note: "Default: Toyota Hybrid Taxi",
             btn_add_home: "APPS",
@@ -746,9 +742,12 @@
         updateFareModeDisplay();
     }
 
-    /* ⭐ MIFA 7 優惠 Banner 顯示邏輯 */
+    /* ⭐ MIFA 7 優惠 Banner + 按鈕切換邏輯 */
     function updateMifaDiscountBanner() {
         var banner = document.getElementById('mifa-discount-banner');
+        var fleetBtnNormal = document.getElementById('fleet-btn-normal');
+        var fleetBtnUpgrade = document.getElementById('fleet-btn-upgrade');
+        var fleetBtnMain = document.getElementById('fleet-btn-main');
         if (!banner) return;
 
         // ⭐ 優惠條件：Math.max(base, 80) + 50 >= 250（唔包含隧道費）
@@ -757,15 +756,23 @@
         var eligible = (basePlusSurcharge >= 250) && (selectedCarName !== 'MAXUS MIFA 7');
 
         if (eligible) {
-            // 優惠後價錢 = base + 隧道費（即係免咗 $50 附加費）
             var discountFare = adjustedBase + currentTunnelFee;
-
             var priceEl = document.getElementById('mifa-discount-price');
             if (priceEl) priceEl.innerText = discountFare;
 
             banner.classList.remove('hidden');
+
+            // 按鈕切換為「升級優惠 / 豪華六座的士」+ 閃動
+            if (fleetBtnNormal) fleetBtnNormal.classList.add('hidden');
+            if (fleetBtnUpgrade) fleetBtnUpgrade.classList.remove('hidden');
+            if (fleetBtnMain) fleetBtnMain.classList.add('mifa-fleet-btn-blink');
         } else {
             banner.classList.add('hidden');
+
+            // 按鈕回復正常
+            if (fleetBtnNormal) fleetBtnNormal.classList.remove('hidden');
+            if (fleetBtnUpgrade) fleetBtnUpgrade.classList.add('hidden');
+            if (fleetBtnMain) fleetBtnMain.classList.remove('mifa-fleet-btn-blink');
         }
     }
 
@@ -805,7 +812,7 @@
 
     function applyLanguage() {
         const btn = document.getElementById('lang-toggle-btn');
-        if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+        if (btn) btn.inner="Text = currentLang === 'zh' ? 'EN' : '繁';
 
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
@@ -874,7 +881,7 @@
 
     <div id="mini-float" class="minimized">
         <div class="mini-float-btns">
-            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
+            <button onclick="toggleLanguage()" idlang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
             <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
                 <i class="fa-solid fa-mobile-screen-button"></i>
             </button>
@@ -1030,27 +1037,30 @@
                     </div>
                 </div>
 
-                <!-- ⭐ MIFA 7 優惠提示 Banner -->
+                <!-- ⭐ MIFA 7 優惠提示 Banner（簡化版：只有 2 行文字，無按鈕） -->
                 <div id="mifa-discount-banner" class="hidden mt-4 p-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl shadow-lg">
-                    <div class="flex items-start gap-3">
-                        <div class="text-red-400 text-3xl animate-pulse leading-none mt-0.5">🎉</div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-red-400 text-3xl animate-pulse leading-none">🎉</div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-red-300 font-extrabold text-base mb-1">💡 呢個行程有優惠！</p>
-                            <p class="text-white text-sm font-bold leading-relaxed">即時升級豪華六座的士</p>
-                            <p class="text-white text-sm leading-relaxed">滿 HK$250 即減 HK$50！</p>
-                            <p class="text-white text-sm leading-relaxed mb-2">
-                                優惠後只需 <span class="text-brand-yellow font-bold text-lg">HK$ <span id="mifa-discount-price">0</span></span>
-                            </p>
-                            <button type="button" onclick="goToFleetPage()" id="mifa-discount-cta" class="bg-brand-yellow text-black font-extrabold py-2.5 px-5 rounded-lg text-base cursor-pointer shadow-md inline-flex items-center gap-1.5">
-                                <i class="fa-solid fa-car"></i> 按此獲取優惠！
-                            </button>
+                            <p class="text-white font-extrabold text-base leading-relaxed">今次行程有升級豪華六座的士優惠！</p>
+                            <p class="text-red-300 font-extrabold text-base leading-relaxed mt-0.5">滿 HK$250 即減 HK$50！</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4 grid grid-cols-2 gap-3">
-                    <button type="button" onclick="goToFleetPage()" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-car"></i> <span data-i18n="btn_select_6seater">選擇六人車款</span>
+                    <button type="button" onclick="goToFleetPage()" id="fleet-btn-main" class="w-full text-base font-extrabold text-black bg-brand-yellow py-3 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-md">
+                        <span id="fleet-btn-normal" class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-car"></i>
+                            <span data-i18n="btn_select_6seater">豪華六座的士</span>
+                        </span>
+                        <span id="fleet-btn-upgrade" class="hidden flex-col items-center gap-0.5 leading-tight">
+                            <span class="text-[13px]" data-i18n="btn_upgrade_label">升級優惠</span>
+                            <span class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-car"></i>
+                                <span data-i18n="btn_select_6seater">豪華六座的士</span>
+                            </span>
+                        </span>
                     </button>
                     <button type="button" onclick="goToBookingPage()" class="w-full bg-brand-yellow text-black px-4 py-3 rounded-xl font-bold transition cursor-pointer inline-flex flex-col items-center justify-center gap-0.5 shadow-md">
                         <span class="flex items-center gap-1.5 text-base font-extrabold">
