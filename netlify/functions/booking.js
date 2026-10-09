@@ -36,8 +36,6 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
-// ⭐ 修改：由 startsWith('💰') 改成 indexOf('💰') >= 0
-//    兼容「💎 八五折 | 💰預計參考車費 HK$xxx」呢種合併行格式
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   if (text.indexOf('🆔') >= 0) return text;
@@ -168,12 +166,20 @@ function convertToTelegramHtml(text) {
   });
 
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // ⭐ 先處理「粗體 + 連結」：**[text](url)**
+  result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, '<a href="$2"><b>$1</b></a>');
+  result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a href="$2"><b>$1</b></a>');
+
+  // 普通連結
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '<a href="$2">$1</a>');
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // 普通粗體
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
   const placeholders = [];
-  result = result.replace(/<a href="[^"]+">[^<]+<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
+  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
     return '\u0000' + (placeholders.length - 1) + '\u0000';
   });
@@ -321,7 +327,9 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
   let description = data.fullMessage || data.customerMessage
     || ('📞 電話：' + data.phone + '\n📍 ' + data.pickup + ' → ' + data.dropoff);
 
+  // ⭐ 先剝走粗體符號（**text** → text），保持日曆純文字
   description = description
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '$1')
     .replace(/\[WhatsApp\]\(<([^>]+)>\)/g, 'WhatsApp：$1')
     .replace(/^⚡ 即時訂單 ⚡\n\n/m, '')
@@ -482,7 +490,10 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 判斷是否即時訂單：透過 fullMessage 入面係咪有「⚡ 即時訂單 ⚡」
+  // ⭐ 電話號碼加粗（只影響 Discord / Telegram，日曆會剝走）
+  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, '📞 **[$1](tel:$2)**');
+
+  // ⭐ 判斷是否即時訂單
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
   // ⭐ 只有非即時訂單才加「查看/修改訂單」連結
