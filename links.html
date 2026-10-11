@@ -47,6 +47,8 @@
 
 <style>
     html { font-size: 130%; }
+    
+    /* ⭐ 已修改：由垂直居中改為頂部開始 */
     body {
         font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
         margin: 0;
@@ -54,9 +56,11 @@
         background-color: #0B0B0B;
         color: #FFFFFF;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px 16px;
+        flex-direction: column;   /* 確保由頂部向下排 */
+        align-items: center;      /* 水平居中 */
+        justify-content: flex-start; /* 👈 關鍵：由頂部開始 */
+        padding: 40px 16px 24px;  /* 頂部留 40px 空間，避免貼實瀏海 */
+        box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
     }
 
@@ -105,7 +109,6 @@
 
     html.light-theme .brand-title { color: #000000; }
 
-    /* 🔴 放大：副標題 */
     .brand-sub {
         font-size: 19px;
         font-weight: 600;
@@ -116,7 +119,6 @@
 
     html.light-theme .brand-sub { color: #4B5563; }
 
-    /* 🔴 放大 & 改成更似按鈕：電話號碼 */
     .brand-hotline {
         display: inline-flex;
         align-items: center;
@@ -174,8 +176,7 @@
     }
 
     .btn .text { display: flex; flex-direction: column; line-height: 1.35; }
-    
-    /* 🔴 放大：按鈕入面嘅細字 */
+
     .btn .text small {
         font-size: 16px;
         font-weight: 600;
@@ -287,8 +288,6 @@
         </span>
         <i class="fa-solid fa-chevron-right arrow"></i>
     </a>
-
-    <!-- ❌ 原本嘅頁尾已經喺度刪除，冇咗「24小時服務...」同「© 2026...」兩行 -->
 
 </main>
 
