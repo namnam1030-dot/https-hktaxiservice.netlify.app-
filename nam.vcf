@@ -1,6 +1,8 @@
 BEGIN:VCARD
 VERSION:3.0
+N:阿藍;24小時的士;;;
 FN:24小時的士阿藍
-TEL;TYPE=CELL:68815441
+TEL;TYPE=CELL:+85268815441
 URL:https://hktaxiservice.netlify.app/
+NOTE:24小時的士服務，歡迎WhatsApp或致電叫車。
 END:VCARD
