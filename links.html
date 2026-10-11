@@ -39,8 +39,8 @@
 })();
 </script>
 
-<title>24小時的士阿藍 | 加入電話簿・WhatsApp叫車・瀏覽網站</title>
-<meta name="description" content="24小時的士阿藍 — 一鍵加入電話簿、WhatsApp叫車或瀏覽網站。電話 6881 5441。">
+<title>24小時的士預約 | 加入電話簿・WhatsApp叫車・瀏覽網站</title>
+<meta name="description" content="24小時的士預約 — 一鍵加入電話簿、WhatsApp叫車或瀏覽網站。電話 6881 5441。">
 <meta name="robots" content="noindex, follow">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -48,7 +48,7 @@
 <style>
     html { font-size: 130%; }
     
-    /* ⭐ 已修改：由垂直居中改為頂部開始 */
+    /* ⭐ 由頂部開始排列 */
     body {
         font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
         margin: 0;
@@ -56,10 +56,10 @@
         background-color: #0B0B0B;
         color: #FFFFFF;
         display: flex;
-        flex-direction: column;   /* 確保由頂部向下排 */
-        align-items: center;      /* 水平居中 */
-        justify-content: flex-start; /* 👈 關鍵：由頂部開始 */
-        padding: 40px 16px 24px;  /* 頂部留 40px 空間，避免貼實瀏海 */
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 40px 16px 24px;
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
     }
@@ -100,11 +100,13 @@
         box-shadow: 0 8px 26px rgba(255, 242, 0, 0.55);
     }
 
+    /* 🔴 標題：唔再強制換行 */
     .brand-title {
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 800;
         margin: 0 0 10px;
         letter-spacing: 0.5px;
+        line-height: 1.3;
     }
 
     html.light-theme .brand-title { color: #000000; }
@@ -119,6 +121,7 @@
 
     html.light-theme .brand-sub { color: #4B5563; }
 
+    /* 電話號碼按鈕 */
     .brand-hotline {
         display: inline-flex;
         align-items: center;
@@ -190,7 +193,7 @@
         opacity: 0.55;
     }
 
-    /* 加入電話簿 — 深灰卡 */
+    /* 加入電話簿 */
     .btn-save {
         background-color: #1E1E1E;
         color: #FFFFFF;
@@ -207,7 +210,7 @@
     }
     html.light-theme .btn-save:hover { background-color: #FFFDE6; }
 
-    /* WhatsApp — 品牌黃主打 */
+    /* WhatsApp */
     .btn-wa {
         background-color: #FFF200;
         color: #000000;
@@ -218,7 +221,7 @@
     .btn-wa .text small { opacity: 0.75; }
     .btn-wa:hover { box-shadow: 0 8px 28px rgba(255, 242, 0, 0.55); }
 
-    /* 瀏覽網站 — 深色卡 + 黃色邊 */
+    /* 瀏覽網站 */
     .btn-web {
         background-color: #161616;
         color: #FFFFFF;
@@ -244,7 +247,9 @@
     <!-- 品牌區 -->
     <div class="brand-header">
         <div class="logo-circle">🚕</div>
-        <h1 class="brand-title">24小時的士阿藍</h1>
+        
+        <!-- 🔴 標題已取消強制換行，變返做一行 -->
+        <h1 class="brand-title">24小時的士預約</h1>
         
         <!-- 副標題 -->
         <p class="brand-sub">長途跨區・機場口岸接送<br>八五折的士 | 六座豪華的士</p>
@@ -260,7 +265,7 @@
         <span class="icon"><i class="fa-solid fa-address-book"></i></span>
         <span class="text">
             加入電話簿
-            <small>一鍵儲存「24小時的士阿藍」</small>
+            <small>一鍵儲存「24小時的士預約」</small>
         </span>
         <i class="fa-solid fa-chevron-right arrow"></i>
     </a>
