@@ -475,15 +475,11 @@
     }
 
     const tunnelDatabase = [
-        // ⭐ 紅/東/西隧：偵測用海底中段座標，via 點用入口座標
-        { name: "紅隧 (連回程)", fee: 50, discountFee: 25,
-          lat: 22.2896118, lng: 114.1823943, radius: 300,
+        { name: "紅隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300,
           viaLat: 22.3025, viaLng: 114.1825 },
-        { name: "東隧 (連回程)", fee: 50, discountFee: 25,
-          lat: 22.294889, lng: 114.22223, radius: 300,
+        { name: "東隧 (連回程)", fee: 50, discountFee: 25, lat: 22.294889, lng: 114.22223, radius: 300,
           viaLat: 22.3070, viaLng: 114.2205 },
-        { name: "西隧 (連回程)", fee: 50, discountFee: 25,
-          lat: 22.2940599, lng: 114.150204, radius: 300,
+        { name: "西隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2940599, lng: 114.150204, radius: 300,
           viaLat: 22.3075, viaLng: 114.1500 },
         { name: "大欖隧道", fee: 28, discountFee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500 },
         { name: "城門隧道", fee: 8, discountFee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300 },
@@ -491,13 +487,13 @@
         { name: "大老山隧道", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
         { name: "獅子山隧道", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
         { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 },
-        // ⭐ 屯赤隧道：真正入口座標（屯門端 + 赤鱲角端）
+        // ⭐ 屯赤隧道：雙端都要通過才當行過
         {
             name: "屯赤隧道", fee: 0, discountFee: 0,
-            lat: 22.3590, lng: 113.9560, radius: 800,
-            lat2: 22.2950, lng2: 113.9385, radius2: 800,
+            lat: 22.3590, lng: 113.9560, radius: 500,
+            lat2: 22.3150, lng2: 113.9300, radius2: 500,
             viaLat: 22.3590, viaLng: 113.9560,
-            viaLat2: 22.2950, viaLng2: 113.9385
+            viaLat2: 22.3150, viaLng2: 113.9300
         }
     ];
 
@@ -555,21 +551,16 @@
         return Array.from(result);
     }
 
-    /* =========================================================
-       ⭐ 取得 via 點：優先使用 viaLat/viaLng（陸地入口座標）
-       ========================================================= */
     function getTunnelViaPoints(tunnel, pickupVal) {
         const lat = (tunnel.viaLat !== undefined) ? tunnel.viaLat : tunnel.lat;
         const lng = (tunnel.viaLng !== undefined) ? tunnel.viaLng : tunnel.lng;
         const lat2 = (tunnel.viaLat2 !== undefined) ? tunnel.viaLat2 : tunnel.lat2;
         const lng2 = (tunnel.viaLng2 !== undefined) ? tunnel.viaLng2 : tunnel.lng2;
 
-        // 單端隧道
         if (lat2 === undefined || lng2 === undefined) {
             return [{ lat: lat, lng: lng }];
         }
 
-        // 雙端隧道（例如屯赤）
         const isAirportSide = /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(String(pickupVal || ''));
 
         if (isAirportSide) {
@@ -647,6 +638,9 @@
         calculateFareWithGoogle();
     }
 
+    /* =========================================================
+       ⭐ 雙端隧道：必須兩端都通過才算
+       ========================================================= */
     function checkTunnelsForRoute(route, isDiscount = false) {
         let matchedTunnels = [];
         let totalTunnelFee = 0;
@@ -660,20 +654,28 @@
                 if (leg.steps) leg.steps.forEach(step => { if (step.path) allPoints = allPoints.concat(step.path); });
             });
         }
-        tunnelDatabase.forEach(tunnel => {
-            const checkPoints = [{ lat: tunnel.lat, lng: tunnel.lng, radius: tunnel.radius }];
-            if (tunnel.lat2 !== undefined && tunnel.lng2 !== undefined) {
-                checkPoints.push({ lat: tunnel.lat2, lng: tunnel.lng2, radius: tunnel.radius2 || tunnel.radius });
-            }
 
+        function isNearPoint(pt, radius) {
+            const latLng = new google.maps.LatLng(pt.lat, pt.lng);
+            for (let i = 0; i < allPoints.length; i++) {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], latLng);
+                if (distance <= radius) return true;
+            }
+            return false;
+        }
+
+        tunnelDatabase.forEach(tunnel => {
+            const isDoubleEnd = (tunnel.lat2 !== undefined && tunnel.lng2 !== undefined);
             let triggered = false;
-            for (let c = 0; c < checkPoints.length && !triggered; c++) {
-                const cp = checkPoints[c];
-                const cpLatLng = new google.maps.LatLng(cp.lat, cp.lng);
-                for (let i = 0; i < allPoints.length; i++) {
-                    const distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], cpLatLng);
-                    if (distance <= cp.radius) { triggered = true; break; }
-                }
+
+            if (isDoubleEnd) {
+                // ⭐ 雙端隧道：必須兩端都通過
+                const nearA = isNearPoint({ lat: tunnel.lat, lng: tunnel.lng }, tunnel.radius);
+                const nearB = isNearPoint({ lat: tunnel.lat2, lng: tunnel.lng2 }, tunnel.radius2 || tunnel.radius);
+                triggered = (nearA && nearB);
+            } else {
+                // 單端隧道：通過一端就算
+                triggered = isNearPoint({ lat: tunnel.lat, lng: tunnel.lng }, tunnel.radius);
             }
 
             if (triggered) {
