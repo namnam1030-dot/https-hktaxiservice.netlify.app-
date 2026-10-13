@@ -475,9 +475,9 @@
     }
 
     const tunnelDatabase = [
-        { name: "紅隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300 },
-        { name: "東隧 (連回程)", fee: 50, discountFee: 25, lat: 22.294889, lng: 114.22223, radius: 300 },
-        { name: "西隧 (連回程)", fee: 50, discountFee: 25, lat: 22.2940599, lng: 114.150204, radius: 300 },
+        { name: "紅隧 (連回程)", fee: 50, discountFee: 25, lat: 22.3025, lng: 114.1825, radius: 400 },
+        { name: "東隧 (連回程)", fee: 50, discountFee: 25, lat: 22.3070, lng: 114.2205, radius: 400 },
+        { name: "西隧 (連回程)", fee: 50, discountFee: 25, lat: 22.3075, lng: 114.1500, radius: 400 },
         { name: "大欖隧道", fee: 28, discountFee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500 },
         { name: "城門隧道", fee: 8, discountFee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300 },
         { name: "香港仔隧道", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
@@ -1006,7 +1006,6 @@
     }
 
     function initMap() {
-        // ⭐ 重置隧道選擇狀態
         selectedForcedTunnel = null;
         defaultRouteTunnels = [];
 
