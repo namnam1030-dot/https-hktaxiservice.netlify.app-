@@ -242,7 +242,7 @@
             dropoff_label: "目的地：",
             tunnel_detected_label: "系統自動偵測途經隧道：",
             tunnel_select_title: "指定行車隧道（可選）：",
-            tunnel_select_hint: "點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（只有當 Google 只規劃出一條路線時才會顯示）",
+            tunnel_select_hint: "點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（只有當 Google 路線未提供其他隧道選擇時才會顯示）",
             res_distance: "全程預計距離：",
             res_duration: "預計行車時間：",
             unit_km: "公里",
@@ -288,7 +288,7 @@
             dropoff_label: "Destination: ",
             tunnel_detected_label: "System detected tunnels: ",
             tunnel_select_title: "Force Specific Tunnel (Optional):",
-            tunnel_select_hint: "Tap to force a tunnel; tap again to cancel. (Only shown when Google returns a single route)",
+            tunnel_select_hint: "Tap to force a tunnel; tap again to cancel. (Only shown when Google routes do not offer other tunnel choices)",
             res_distance: "Estimated Distance: ",
             res_duration: "Estimated Duration: ",
             unit_km: "km",
@@ -487,7 +487,6 @@
         { name: "屯赤隧道", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800 }
     ];
 
-    // ⭐ 隧道短名（去掉「(連回程)」）
     function tunnelNameToShort(fullName) {
         return String(fullName || '').replace(/\s*\(連回程\)/, '');
     }
@@ -544,8 +543,30 @@
     }
 
     /* =========================================================
+       ⭐ 檢查 Google 多條路線之間有冇「真正嘅隧道選擇」
+       回傳 true 表示路線之間有唔同隧道（即已有選擇）
+       ========================================================= */
+    function routesProvideTunnelVariety() {
+        if (!routesData || routesData.length < 2) return false;
+
+        const routeTunnelSets = routesData.map(route => {
+            const tr = checkTunnelsForRoute(route, false);
+            return new Set(tr.matchedTunnels.map(t => tunnelNameToShort(t.name)));
+        });
+
+        const first = routeTunnelSets[0];
+        for (let i = 1; i < routeTunnelSets.length; i++) {
+            const curr = routeTunnelSets[i];
+            if (first.size !== curr.size) return true;
+            for (const t of first) {
+                if (!curr.has(t)) return true;
+            }
+        }
+        return false;
+    }
+
+    /* =========================================================
        ⭐ 渲染隧道按鈕
-       ⭐ 新規則：只有當 Google 只規劃出 1 條路線時，才顯示隧道選項
        ========================================================= */
     function renderTunnelButtons() {
         const container = document.getElementById('tunnel-selector');
@@ -557,20 +578,29 @@
             return;
         }
 
-        // ⭐ 新規則：如果 Google 已規劃出多條路線（> 1 條），完全唔顯示隧道選擇
-        if (routesData.length > 1) {
+        // ⭐ 如果 Google 路線之間已經有隧道多樣性，唔使再顯示
+        if (routesProvideTunnelVariety()) {
+            console.log('[Tunnel] Google 路線已提供隧道選擇，隱藏按鈕');
             container.classList.add('hidden');
             return;
         }
 
-        const tunnels = getRelevantTunnels(routeData.pickup, routeData.dropoff);
-
-        // ⭐ 過濾：默認路線已行經嘅隧道唔顯示（除非用戶當前已選，方便取消）
-        const filtered = tunnels.filter(name => {
-            if (name === selectedForcedTunnel) return true;
-            if (defaultRouteTunnels.indexOf(name) >= 0) return false;
-            return true;
+        // ⭐ 收集所有 Google 路線使用嘅隧道
+        const usedTunnels = new Set();
+        routesData.forEach(route => {
+            const tr = checkTunnelsForRoute(route, false);
+            tr.matchedTunnels.forEach(t => usedTunnels.add(tunnelNameToShort(t.name)));
         });
+
+        const candidates = getRelevantTunnels(routeData.pickup, routeData.dropoff);
+
+        // ⭐ 過濾：只顯示未被任何 Google 路線使用嘅候選隧道（+ 當前已選嘅）
+        const filtered = candidates.filter(name => {
+            if (name === selectedForcedTunnel) return true;
+            return !usedTunnels.has(name);
+        });
+
+        console.log('[Tunnel] Google 用嘅隧道：', Array.from(usedTunnels), '／顯示按鈕：', filtered);
 
         if (filtered.length === 0) {
             container.classList.add('hidden');
@@ -598,7 +628,6 @@
     function setForcedTunnel(name) {
         selectedForcedTunnel = (selectedForcedTunnel === name) ? null : name;
 
-        // ⭐ 如果係取消（變回默認），清空 defaultRouteTunnels，等下次規劃時重新計算
         if (!selectedForcedTunnel) {
             defaultRouteTunnels = [];
         }
@@ -671,7 +700,6 @@
         let waypoints = [];
         stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
 
-        // ⭐ 加入強制途經隧道（via 途經點）
         if (selectedForcedTunnel) {
             const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
             if (tunnel) {
@@ -695,14 +723,11 @@
                 routesData = processRoutes(result.routes, isShenzhenBayRoute);
                 result.routes = routesData;
 
-                // ⭐ 如果係默認路線（冇指定隧道），計算默認經過嘅隧道
                 if (!selectedForcedTunnel && routesData.length > 0) {
                     const tr = checkTunnelsForRoute(routesData[0], false);
                     defaultRouteTunnels = tr.matchedTunnels.map(t => tunnelNameToShort(t.name));
-                    console.log('[Tunnel] 默認路線經過嘅隧道：', defaultRouteTunnels);
                 }
 
-                // ⭐ 路線返嚟之後才渲染隧道按鈕
                 renderTunnelButtons();
 
                 document.getElementById('loading-indicator').classList.add('hidden');
@@ -1147,7 +1172,7 @@
                         <i class="fa-solid fa-road text-brand-yellow"></i>
                         <span data-i18n="tunnel_select_title">指定行車隧道（可選）：</span>
                     </div>
-                    <p class="text-[11px] text-gray-500 mb-2" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（只有當 Google 只規劃出一條路線時才會顯示）</p>
+                    <p class="text-[11px] text-gray-500 mb-2" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（只有當 Google 路線未提供其他隧道選擇時才會顯示）</p>
                     <div id="tunnel-btns" class="flex flex-wrap gap-2"></div>
                 </div>
 
