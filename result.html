@@ -531,26 +531,21 @@
             result.add('香港仔隧道');
         }
 
-        if (/屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山/.test(text)
-            && /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(text)) {
+        // ⭐ 屯赤隧道：新界西北（屯門/元朗/天水圍）或 新界東北（大埔/粉嶺/上水/康樂園）
+        //    ↔ 機場 / 東涌 / 迪士尼 / 港珠澳
+        const isNWArea = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸/.test(text);
+        const isNEArea = /大埔|粉嶺|粉岭|上水|康樂園|康乐园|太和|白石角|科學園|科学园|沙頭角|沙头角|打鼓嶺|打鼓岭/.test(text);
+        const isAirportSide = /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(text);
+        if ((isNWArea || isNEArea) && isAirportSide) {
             result.add('屯赤隧道');
         }
 
         return Array.from(result);
     }
 
-    function estimateTunnelDetour(tunnel, originLatLng, destLatLng) {
-        if (!window.google || !google.maps.geometry) return Infinity;
-        try {
-            const tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
-            const d1 = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, tunnelLatLng);
-            const d2 = google.maps.geometry.spherical.computeDistanceBetween(tunnelLatLng, destLatLng);
-            return d1 + d2;
-        } catch(e) {
-            return Infinity;
-        }
-    }
-
+    /* =========================================================
+       ⭐ 渲染隧道按鈕
+       ========================================================= */
     function renderTunnelButtons() {
         const container = document.getElementById('tunnel-selector');
         const btnsBox = document.getElementById('tunnel-btns');
@@ -571,36 +566,10 @@
         const candidates = getRelevantTunnels(routeData.pickup, routeData.dropoff);
 
         // ⭐ 過濾：只顯示未被任何 Google 路線使用嘅候選隧道（+ 當前已選嘅）
-        let filtered = candidates.filter(name => {
+        const filtered = candidates.filter(name => {
             if (name === selectedForcedTunnel) return true;
             return !usedTunnels.has(name);
         });
-
-        // ⭐ 如果多過 1 條候選，只保留「繞路最短」嗰條
-        if (filtered.length > 1 && !selectedForcedTunnel) {
-            const route0 = routesData[0];
-            if (route0 && route0.legs && route0.legs.length > 0) {
-                const originLatLng = route0.legs[0].start_location;
-                const destLatLng = route0.legs[route0.legs.length - 1].end_location;
-
-                let shortest = null;
-                let shortestDetour = Infinity;
-                filtered.forEach(name => {
-                    const tunnel = tunnelDatabase.find(t => t.name.indexOf(name) >= 0);
-                    if (!tunnel) return;
-                    const detour = estimateTunnelDetour(tunnel, originLatLng, destLatLng);
-                    if (detour < shortestDetour) {
-                        shortestDetour = detour;
-                        shortest = name;
-                    }
-                });
-
-                if (shortest) {
-                    console.log('[Tunnel] 候選多過 1 條，只顯示繞路最短嗰條：', shortest);
-                    filtered = [shortest];
-                }
-            }
-        }
 
         console.log('[Tunnel] Google 用嘅隧道：', Array.from(usedTunnels), '／顯示按鈕：', filtered);
 
