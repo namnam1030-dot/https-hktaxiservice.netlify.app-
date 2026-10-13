@@ -440,8 +440,8 @@
         { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 },
         {
             name: "屯赤隧道", fee: 0, discountFee: 0,
-            lat: 22.3730, lng: 113.9520, radius: 800,
-            lat2: 22.3150, lng2: 113.9300, radius2: 800
+            lat: 22.3735, lng: 113.9688, radius: 800,
+            lat2: 22.3145, lng2: 113.9285, radius2: 800
         }
     ];
 
@@ -458,26 +458,20 @@
                 if (leg.steps) leg.steps.forEach(step => { if (step.path) allPoints = allPoints.concat(step.path); });
             });
         }
-
-        function isNearPoint(pt, radius) {
-            const latLng = new google.maps.LatLng(pt.lat, pt.lng);
-            for (let i = 0; i < allPoints.length; i++) {
-                const distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], latLng);
-                if (distance <= radius) return true;
-            }
-            return false;
-        }
-
         tunnelDatabase.forEach(tunnel => {
-            const isDoubleEnd = (tunnel.lat2 !== undefined && tunnel.lng2 !== undefined);
-            let triggered = false;
+            const checkPoints = [{ lat: tunnel.lat, lng: tunnel.lng, radius: tunnel.radius }];
+            if (tunnel.lat2 !== undefined && tunnel.lng2 !== undefined) {
+                checkPoints.push({ lat: tunnel.lat2, lng: tunnel.lng2, radius: tunnel.radius2 || tunnel.radius });
+            }
 
-            if (isDoubleEnd) {
-                const nearA = isNearPoint({ lat: tunnel.lat, lng: tunnel.lng }, tunnel.radius);
-                const nearB = isNearPoint({ lat: tunnel.lat2, lng: tunnel.lng2 }, tunnel.radius2 || tunnel.radius);
-                triggered = (nearA && nearB);
-            } else {
-                triggered = isNearPoint({ lat: tunnel.lat, lng: tunnel.lng }, tunnel.radius);
+            let triggered = false;
+            for (let c = 0; c < checkPoints.length && !triggered; c++) {
+                const cp = checkPoints[c];
+                const cpLatLng = new google.maps.LatLng(cp.lat, cp.lng);
+                for (let i = 0; i < allPoints.length; i++) {
+                    const distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], cpLatLng);
+                    if (distance <= cp.radius) { triggered = true; break; }
+                }
             }
 
             if (triggered) {
