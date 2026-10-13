@@ -484,7 +484,11 @@
         { name: "大老山隧道", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
         { name: "獅子山隧道", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
         { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 },
-        { name: "屯赤隧道", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800 }
+        {
+            name: "屯赤隧道", fee: 0, discountFee: 0,
+            lat: 22.3735, lng: 113.9688, radius: 800,
+            lat2: 22.3145, lng2: 113.9285, radius2: 800
+        }
     ];
 
     function tunnelNameToShort(fullName) {
@@ -531,9 +535,7 @@
             result.add('香港仔隧道');
         }
 
-        // ⭐ 屯赤隧道：新界西北（屯門/元朗/天水圍）或 新界東北（大埔/粉嶺/上水/康樂園）
-        //    ↔ 機場 / 東涌 / 迪士尼 / 港珠澳
-        const isNWArea = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸/.test(text);
+        const isNWArea = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸|深圳灣|深圳湾/.test(text);
         const isNEArea = /大埔|粉嶺|粉岭|上水|康樂園|康乐园|太和|白石角|科學園|科学园|沙頭角|沙头角|打鼓嶺|打鼓岭/.test(text);
         const isAirportSide = /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(text);
         if ((isNWArea || isNEArea) && isAirportSide) {
@@ -543,9 +545,25 @@
         return Array.from(result);
     }
 
-    /* =========================================================
-       ⭐ 渲染隧道按鈕
-       ========================================================= */
+    function getTunnelViaPoints(tunnel, pickupVal) {
+        if (tunnel.lat2 === undefined || tunnel.lng2 === undefined) {
+            return [{ lat: tunnel.lat, lng: tunnel.lng }];
+        }
+
+        const isAirportSide = /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(String(pickupVal || ''));
+
+        if (isAirportSide) {
+            return [
+                { lat: tunnel.lat2, lng: tunnel.lng2 },
+                { lat: tunnel.lat,  lng: tunnel.lng  }
+            ];
+        }
+        return [
+            { lat: tunnel.lat,  lng: tunnel.lng  },
+            { lat: tunnel.lat2, lng: tunnel.lng2 }
+        ];
+    }
+
     function renderTunnelButtons() {
         const container = document.getElementById('tunnel-selector');
         const btnsBox = document.getElementById('tunnel-btns');
@@ -556,7 +574,6 @@
             return;
         }
 
-        // ⭐ 收集所有 Google 路線使用嘅隧道
         const usedTunnels = new Set();
         routesData.forEach(route => {
             const tr = checkTunnelsForRoute(route, false);
@@ -565,7 +582,6 @@
 
         const candidates = getRelevantTunnels(routeData.pickup, routeData.dropoff);
 
-        // ⭐ 過濾：只顯示未被任何 Google 路線使用嘅候選隧道（+ 當前已選嘅）
         const filtered = candidates.filter(name => {
             if (name === selectedForcedTunnel) return true;
             return !usedTunnels.has(name);
@@ -625,12 +641,21 @@
             });
         }
         tunnelDatabase.forEach(tunnel => {
-            let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
-            let triggered = false;
-            for (let i = 0; i < allPoints.length; i++) {
-                let distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], tunnelLatLng);
-                if (distance <= tunnel.radius) { triggered = true; break; }
+            const checkPoints = [{ lat: tunnel.lat, lng: tunnel.lng, radius: tunnel.radius }];
+            if (tunnel.lat2 !== undefined && tunnel.lng2 !== undefined) {
+                checkPoints.push({ lat: tunnel.lat2, lng: tunnel.lng2, radius: tunnel.radius2 || tunnel.radius });
             }
+
+            let triggered = false;
+            for (let c = 0; c < checkPoints.length && !triggered; c++) {
+                const cp = checkPoints[c];
+                const cpLatLng = new google.maps.LatLng(cp.lat, cp.lng);
+                for (let i = 0; i < allPoints.length; i++) {
+                    const distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], cpLatLng);
+                    if (distance <= cp.radius) { triggered = true; break; }
+                }
+            }
+
             if (triggered) {
                 matchedTunnels.push(tunnel);
                 totalTunnelFee += isDiscount ? (tunnel.discountFee || tunnel.fee) : tunnel.fee;
@@ -674,9 +699,12 @@
         if (selectedForcedTunnel) {
             const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
             if (tunnel) {
-                waypoints.push({
-                    location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
-                    stopover: false
+                const viaPoints = getTunnelViaPoints(tunnel, pickupVal);
+                viaPoints.forEach(pt => {
+                    waypoints.push({
+                        location: new google.maps.LatLng(pt.lat, pt.lng),
+                        stopover: false
+                    });
                 });
             }
         }
