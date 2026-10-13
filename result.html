@@ -137,13 +137,11 @@
     html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
     html.light-theme body #discount-option-container:hover { border-color: #000000 !important; }
 
-    /* ⭐ MIFA 7 優惠 Banner 淺色主題背景 */
     html.light-theme body #mifa-discount-banner {
         background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15)) !important;
         border-color: #dc2626 !important;
     }
 
-    /* ⭐ MIFA 7 Banner 紅色文字（兩行都紅色） */
     .mifa-banner-text {
         color: #fca5a5;
     }
@@ -151,7 +149,6 @@
         color: #b91c1c !important;
     }
 
-    /* ⭐ 豪華六座的士按鈕閃動效果（有優惠時） */
     @keyframes mifaFleetBtnBlink {
         0%, 100% {
             opacity: 1;
@@ -174,7 +171,6 @@
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
     }
 
-    /* ⭐ 隧道選擇按鈕 */
     .tunnel-btn {
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
@@ -233,6 +229,7 @@
     let routeData = null;
     let isShenzhenBay = false;
     let selectedForcedTunnel = null;
+    let defaultRouteTunnels = [];
 
     const translations = {
         zh: {
@@ -245,7 +242,7 @@
             dropoff_label: "目的地：",
             tunnel_detected_label: "系統自動偵測途經隧道：",
             tunnel_select_title: "指定行車隧道（可選）：",
-            tunnel_select_hint: "點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。",
+            tunnel_select_hint: "點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（默認路線已行經嘅隧道唔會重複顯示）",
             res_distance: "全程預計距離：",
             res_duration: "預計行車時間：",
             unit_km: "公里",
@@ -291,7 +288,7 @@
             dropoff_label: "Destination: ",
             tunnel_detected_label: "System detected tunnels: ",
             tunnel_select_title: "Force Specific Tunnel (Optional):",
-            tunnel_select_hint: "Tap to force a tunnel; tap again to cancel.",
+            tunnel_select_hint: "Tap to force a tunnel; tap again to cancel. (Tunnels already used by the default route will not be shown)",
             res_distance: "Estimated Distance: ",
             res_duration: "Estimated Duration: ",
             unit_km: "km",
@@ -490,6 +487,11 @@
         { name: "屯赤隧道", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800 }
     ];
 
+    // ⭐ 隧道短名（去掉「(連回程)」）
+    function tunnelNameToShort(fullName) {
+        return String(fullName || '').replace(/\s*\(連回程\)/, '');
+    }
+
     /* =========================================================
        ⭐ 智能篩選相關隧道
        ========================================================= */
@@ -505,52 +507,44 @@
 
         const result = new Set();
 
-        // 1) 過海隧道：港島一側 + 九龍/新界/將軍澳
         if (isHKIsland && (isKowloon || isNTE || isNTW || isTKO)) {
             result.add('紅隧');
             result.add('東隧');
             result.add('西隧');
         }
 
-        // 2) 將軍澳專屬：大老山（往九龍東/沙田）+ 東隧（往港島）
         if (isTKO && (isKowloon || isNTE)) {
             result.add('大老山隧道');
         }
 
-        // 3) 九龍 ↔ 新界東：獅隧、大老山、尖山
         if (isKowloon && isNTE) {
             result.add('獅子山隧道');
             result.add('大老山隧道');
             result.add('尖山隧道');
         }
 
-        // 4) 沙田/新界東 ↔ 荃灣/新界西：城門隧道
         if (isNTE && isNTW) {
             result.add('城門隧道');
         }
 
-        // 5) 屯門/元朗/天水圍 ↔ 荃灣/九龍/港島：大欖隧道
         if (/屯門|屯门|元朗|天水圍|天水围|深井|黃金海岸|黄金海岸/.test(text) && (isKowloon || isHKIsland || isNTW)) {
             result.add('大欖隧道');
         }
 
-        // 6) 南區 ↔ 港島北/九龍：香港仔隧道
         if (isSouth && (isHKIsland || isKowloon)) {
             result.add('香港仔隧道');
         }
 
-        // 7) 屯門/元朗/天水圍 ↔ 機場/東涌/迪士尼/港珠澳：屯赤隧道
         if (/屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山/.test(text)
             && /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(text)) {
             result.add('屯赤隧道');
         }
 
-        // 8) 冇任何匹配 → 唔顯示（短途 / 同區路線唔需要指定隧道）
         return Array.from(result);
     }
 
     /* =========================================================
-       ⭐ 渲染隧道按鈕
+       ⭐ 渲染隧道按鈕（過濾走默認路線已經行經嘅隧道）
        ========================================================= */
     function renderTunnelButtons() {
         const container = document.getElementById('tunnel-selector');
@@ -564,18 +558,24 @@
 
         const tunnels = getRelevantTunnels(routeData.pickup, routeData.dropoff);
 
-        if (tunnels.length === 0) {
+        // ⭐ 過濾：默認路線已行經嘅隧道唔顯示（除非用戶當前已選，方便取消）
+        const filtered = tunnels.filter(name => {
+            if (name === selectedForcedTunnel) return true;
+            if (defaultRouteTunnels.indexOf(name) >= 0) return false;
+            return true;
+        });
+
+        if (filtered.length === 0) {
             container.classList.add('hidden');
             return;
         }
 
-        // 如果目前已選隧道唔喺新清單內，清除
-        if (selectedForcedTunnel && tunnels.indexOf(selectedForcedTunnel) < 0) {
+        if (selectedForcedTunnel && filtered.indexOf(selectedForcedTunnel) < 0) {
             selectedForcedTunnel = null;
         }
 
         btnsBox.innerHTML = '';
-        tunnels.forEach(name => {
+        filtered.forEach(name => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.tunnel = name;
@@ -591,13 +591,16 @@
     function setForcedTunnel(name) {
         selectedForcedTunnel = (selectedForcedTunnel === name) ? null : name;
 
-        // 更新按鈕視覺
+        // ⭐ 如果係取消（變回默認），清空 defaultRouteTunnels，等下次規劃時重新計算
+        if (!selectedForcedTunnel) {
+            defaultRouteTunnels = [];
+        }
+
         document.querySelectorAll('#tunnel-btns button').forEach(btn => {
             const isActive = btn.dataset.tunnel === selectedForcedTunnel;
             btn.className = 'tunnel-btn' + (isActive ? ' active' : '');
         });
 
-        // 重新規劃
         calculateFareWithGoogle();
     }
 
@@ -654,9 +657,6 @@
         }
         document.getElementById('confirm-dropoff').innerText = dropoffVal;
 
-        // ⭐ 先渲染隧道按鈕
-        renderTunnelButtons();
-
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
         let targetPickup = normalizeLocation(pickupVal, true);
@@ -670,7 +670,7 @@
             if (tunnel) {
                 waypoints.push({
                     location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
-                    stopover: false   // ⭐ JS API 正確寫法：stopover false = via waypoint
+                    stopover: false
                 });
             }
         }
@@ -680,13 +680,24 @@
             destination: targetDropoff,
             waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: !selectedForcedTunnel  // ⭐ 指定隧道時唔要替代路線
+            provideRouteAlternatives: !selectedForcedTunnel
         };
 
         directionsService.route(request, (result, status) => {
             if (status === google.maps.DirectionsStatus.OK) {
                 routesData = processRoutes(result.routes, isShenzhenBayRoute);
                 result.routes = routesData;
+
+                // ⭐ 如果係默認路線（冇指定隧道），計算默認經過嘅隧道
+                if (!selectedForcedTunnel && routesData.length > 0) {
+                    const tr = checkTunnelsForRoute(routesData[0], false);
+                    defaultRouteTunnels = tr.matchedTunnels.map(t => tunnelNameToShort(t.name));
+                    console.log('[Tunnel] 默認路線經過嘅隧道：', defaultRouteTunnels);
+                }
+
+                // ⭐ 路線返嚟之後才渲染隧道按鈕（過濾走默認經過嘅）
+                renderTunnelButtons();
+
                 document.getElementById('loading-indicator').classList.add('hidden');
                 document.getElementById('result-content').classList.remove('hidden');
 
@@ -923,7 +934,6 @@
         updateFareModeDisplay();
     }
 
-    /* ⭐ MIFA 7 優惠 Banner + 按鈕切換邏輯（用 innerHTML 動態改） */
     function updateMifaDiscountBanner() {
         var banner = document.getElementById('mifa-discount-banner');
         var fleetBtn = document.getElementById('fleet-btn');
@@ -993,7 +1003,6 @@
         localStorage.setItem('taxiLang', currentLang);
         applyLanguage();
         if (typeof updateMifaDiscountBanner === 'function') updateMifaDiscountBanner();
-        // ⭐ 語言切換後重新渲染隧道按鈕（因為標題用 i18n）
         renderTunnelButtons();
     }
 
@@ -1125,13 +1134,13 @@
                     <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
 
-                <!-- ⭐ 新增：隧道選擇區 -->
+                <!-- ⭐ 隧道選擇區 -->
                 <div id="tunnel-selector" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <div class="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1.5">
                         <i class="fa-solid fa-road text-brand-yellow"></i>
                         <span data-i18n="tunnel_select_title">指定行車隧道（可選）：</span>
                     </div>
-                    <p class="text-[11px] text-gray-500 mb-2" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。</p>
+                    <p class="text-[11px] text-gray-500 mb-2" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（默認路線已行經嘅隧道唔會重複顯示）</p>
                     <div id="tunnel-btns" class="flex flex-wrap gap-2"></div>
                 </div>
 
@@ -1234,7 +1243,6 @@
                     </div>
                 </div>
 
-                <!-- ⭐ MIFA 7 優惠提示 Banner（只有 2 行文字，無按鈕） -->
                 <div id="mifa-discount-banner" class="hidden mt-4 p-3 bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl shadow-lg">
                     <div class="flex items-center gap-3">
                         <div class="text-red-400 text-3xl animate-pulse leading-none">🎉</div>
