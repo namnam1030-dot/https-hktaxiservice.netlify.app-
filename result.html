@@ -561,6 +561,20 @@
             return;
         }
 
+        // ⭐ 如果已經指定隧道 → 只顯示該隧道（方便取消），唔顯示其他候選
+        if (selectedForcedTunnel) {
+            btnsBox.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.tunnel = selectedForcedTunnel;
+            btn.className = 'tunnel-btn active';
+            btn.innerHTML = '<i class="fa-solid fa-road"></i> ' + selectedForcedTunnel + '（點擊取消）';
+            btn.onclick = () => setForcedTunnel(selectedForcedTunnel);
+            btnsBox.appendChild(btn);
+            container.classList.remove('hidden');
+            return;
+        }
+
         // ⭐ 收集所有 Google 路線使用嘅隧道
         const usedTunnels = new Set();
         routesData.forEach(route => {
@@ -570,14 +584,11 @@
 
         const candidates = getRelevantTunnels(routeData.pickup, routeData.dropoff);
 
-        // ⭐ 過濾：只顯示未被任何 Google 路線使用嘅候選隧道（+ 當前已選嘅）
-        let filtered = candidates.filter(name => {
-            if (name === selectedForcedTunnel) return true;
-            return !usedTunnels.has(name);
-        });
+        // ⭐ 過濾：只顯示未被任何 Google 路線使用嘅候選隧道
+        let filtered = candidates.filter(name => !usedTunnels.has(name));
 
         // ⭐ 如果多過 1 條候選，只保留「繞路最短」嗰條
-        if (filtered.length > 1 && !selectedForcedTunnel) {
+        if (filtered.length > 1) {
             const route0 = routesData[0];
             if (route0 && route0.legs && route0.legs.length > 0) {
                 const originLatLng = route0.legs[0].start_location;
@@ -609,16 +620,12 @@
             return;
         }
 
-        if (selectedForcedTunnel && filtered.indexOf(selectedForcedTunnel) < 0) {
-            selectedForcedTunnel = null;
-        }
-
         btnsBox.innerHTML = '';
         filtered.forEach(name => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.tunnel = name;
-            btn.className = 'tunnel-btn' + (name === selectedForcedTunnel ? ' active' : '');
+            btn.className = 'tunnel-btn';
             btn.innerHTML = '<i class="fa-solid fa-road"></i> ' + name;
             btn.onclick = () => setForcedTunnel(name);
             btnsBox.appendChild(btn);
