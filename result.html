@@ -664,16 +664,16 @@
         let waypoints = [];
         stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
 
-        // ⭐ 加入強制途經隧道（via 途經點）
-        if (selectedForcedTunnel) {
-            const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
-            if (tunnel) {
-                waypoints.push({
-                    location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
-                    via: true
-                });
-            }
-        }
+// ⭐ 加入強制途經隧道（via 途經點）
+if (selectedForcedTunnel) {
+    const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
+    if (tunnel) {
+        waypoints.push({
+            location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
+            stopover: false   // ⭐ JS API 正確寫法：stopover false = via waypoint
+        });
+    }
+}
 
         const request = {
             origin: targetPickup,
