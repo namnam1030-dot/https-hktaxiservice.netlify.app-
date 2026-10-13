@@ -1006,6 +1006,10 @@
     }
 
     function initMap() {
+        // ⭐ 重置隧道選擇狀態，避免保留上一次嘅選擇
+        selectedForcedTunnel = null;
+        defaultRouteTunnels = [];
+
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
             isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
