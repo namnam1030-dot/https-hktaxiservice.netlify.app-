@@ -486,7 +486,8 @@
         { name: "香港仔隧道", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
         { name: "大老山隧道", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
         { name: "獅子山隧道", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
-        { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
+        { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 },
+        { name: "屯赤隧道", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800 }
     ];
 
     /* =========================================================
@@ -538,14 +539,13 @@
             result.add('香港仔隧道');
         }
 
-        // 7) 冇任何匹配 → 全部顯示（避免用戶揀唔到）
-        if (result.size === 0) {
-            tunnelDatabase.forEach(t => {
-                const shortName = t.name.replace(/\s*\(連回程\)/, '');
-                result.add(shortName);
-            });
+        // 7) 屯門/元朗/天水圍 ↔ 機場/東涌/迪士尼/港珠澳：屯赤隧道
+        if (/屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山/.test(text)
+            && /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(text)) {
+            result.add('屯赤隧道');
         }
 
+        // 8) 冇任何匹配 → 唔顯示（短途 / 同區路線唔需要指定隧道）
         return Array.from(result);
     }
 
@@ -664,16 +664,16 @@
         let waypoints = [];
         stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
 
-// ⭐ 加入強制途經隧道（via 途經點）
-if (selectedForcedTunnel) {
-    const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
-    if (tunnel) {
-        waypoints.push({
-            location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
-            stopover: false   // ⭐ JS API 正確寫法：stopover false = via waypoint
-        });
-    }
-}
+        // ⭐ 加入強制途經隧道（via 途經點）
+        if (selectedForcedTunnel) {
+            const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
+            if (tunnel) {
+                waypoints.push({
+                    location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
+                    stopover: false   // ⭐ JS API 正確寫法：stopover false = via waypoint
+                });
+            }
+        }
 
         const request = {
             origin: targetPickup,
@@ -775,7 +775,10 @@ if (selectedForcedTunnel) {
         const detectedList = document.getElementById('detected-tunnels-list');
         if (tunnelResult.matchedTunnels.length > 0) {
             detectedContainer.classList.remove('hidden');
-            let tunnelNames = tunnelResult.matchedTunnels.map(t => `${t.name} ($${t.fee})`).join('、');
+            let tunnelNames = tunnelResult.matchedTunnels.map(t => {
+                if (t.fee === 0) return `${t.name} (免費)`;
+                return `${t.name} ($${t.fee})`;
+            }).join('、');
             detectedList.innerText = tunnelNames;
         } else {
             detectedContainer.classList.add('hidden');
