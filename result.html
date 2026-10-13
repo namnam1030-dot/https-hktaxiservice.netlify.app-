@@ -170,6 +170,46 @@
         transform: scale(1.05);
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
     }
+
+    .tunnel-btn {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        border: 1px solid #374151;
+        background-color: rgba(0, 0, 0, 0.4);
+        color: #9CA3AF;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        white-space: nowrap;
+    }
+    .tunnel-btn:hover {
+        color: #FFF200;
+        border-color: #FFF200;
+    }
+    .tunnel-btn.active {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+        box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3);
+    }
+    html.light-theme body .tunnel-btn {
+        background-color: #FFFFFF !important;
+        color: #374151 !important;
+        border-color: #D1D5DB !important;
+    }
+    html.light-theme body .tunnel-btn:hover {
+        color: #000000 !important;
+        border-color: #000000 !important;
+    }
+    html.light-theme body .tunnel-btn.active {
+        background-color: #FFF200 !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+    }
 </style>
 
     <script>
@@ -188,6 +228,8 @@
     let currentTunnelFee = 0;
     let routeData = null;
     let isShenzhenBay = false;
+    let selectedForcedTunnel = null;
+    let defaultRouteTunnels = [];
 
     const translations = {
         zh: {
@@ -199,6 +241,8 @@
             stopover_label: "中途站：",
             dropoff_label: "目的地：",
             tunnel_detected_label: "系統自動偵測途經隧道：",
+            tunnel_select_title: "指定行車隧道（可選）：",
+            tunnel_select_hint: "點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（Google 已提供嘅隧道唔會重複顯示）",
             res_distance: "全程預計距離：",
             res_duration: "預計行車時間：",
             unit_km: "公里",
@@ -243,6 +287,8 @@
             stopover_label: "Stopover: ",
             dropoff_label: "Destination: ",
             tunnel_detected_label: "System detected tunnels: ",
+            tunnel_select_title: "Force Specific Tunnel (Optional):",
+            tunnel_select_hint: "Tap to force a tunnel; tap again to cancel. (Tunnels already used by Google routes will not be shown)",
             res_distance: "Estimated Distance: ",
             res_duration: "Estimated Duration: ",
             unit_km: "km",
@@ -437,8 +483,149 @@
         { name: "香港仔隧道", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300 },
         { name: "大老山隧道", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500 },
         { name: "獅子山隧道", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300 },
-        { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 }
+        { name: "尖山隧道", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200 },
+        {
+            name: "屯赤隧道", fee: 0, discountFee: 0,
+            lat: 22.3730, lng: 113.9520, radius: 800,
+            lat2: 22.3150, lng2: 113.9300, radius2: 800
+        }
     ];
+
+    function tunnelNameToShort(fullName) {
+        return String(fullName || '').replace(/\s*\(連回程\)/, '');
+    }
+
+    function getRelevantTunnels(pickup, dropoff) {
+        const text = String(pickup || '') + ' ' + String(dropoff || '');
+
+        const isHKIsland = /港島|港岛|中環|中环|灣仔|湾仔|銅鑼灣|铜锣湾|北角|鰂魚涌|鲗鱼涌|太古|西灣河|西湾河|筲箕灣|筲箕湾|柴灣|柴湾|薄扶林|堅尼地城|坚尼地城|西環|西环|上環|上环|金鐘|金钟|跑馬地|跑马地|天后|炮台山|山頂|山顶|石澳|赤柱|鴨脷洲|鸭脷洲|黃竹坑|黄竹坑|海洋公園|海洋公园|淺水灣|浅水湾|南區|南区|東區|东区|中西區|中西区|灣仔區|湾仔区|半山|數碼港|数码港|貝沙灣|贝沙湾/.test(text);
+        const isKowloon = /九龍|九龙|尖沙咀|旺角|油麻地|佐敦|深水埗|長沙灣|长沙湾|荔枝角|美孚|觀塘|观塘|牛頭角|牛头角|九龍灣|九龙湾|彩虹|鑽石山|钻石山|黃大仙|黄大仙|樂富|乐富|九龍塘|九龙塘|何文田|紅磡|红磡|土瓜灣|土瓜湾|啟德|启德|油塘|藍田|蓝田|新蒲崗|新蒲岗|慈雲山|慈云山|九龍城|九龙城|大角咀|奧運|奥运/.test(text);
+        const isNTE = /沙田|大圍|大围|火炭|馬鞍山|马鞍山|大埔|上水|粉嶺|粉岭|太和|北區|北区|白石角|科學園|科学园/.test(text);
+        const isNTW = /荃灣|荃湾|葵涌|青衣|屯門|屯门|元朗|天水圍|天水围|深井|黃金海岸|黄金海岸|東涌|东涌|機場|机场|迪士尼/.test(text);
+        const isTKO = /將軍澳|将军澳|調景嶺|调景岭|坑口|寶琳|宝琳|康城|日出康城/.test(text);
+        const isSouth = /香港仔|薄扶林|鴨脷洲|鸭脷洲|黃竹坑|黄竹坑|海洋公園|海洋公园|淺水灣|浅水湾|石澳|赤柱|南區|南区|數碼港|数码港|貝沙灣|贝沙湾/.test(text);
+
+        const result = new Set();
+
+        if (isHKIsland && (isKowloon || isNTE || isNTW || isTKO)) {
+            result.add('紅隧');
+            result.add('東隧');
+            result.add('西隧');
+        }
+
+        if (isTKO && (isKowloon || isNTE)) {
+            result.add('大老山隧道');
+        }
+
+        if (isKowloon && isNTE) {
+            result.add('獅子山隧道');
+            result.add('大老山隧道');
+            result.add('尖山隧道');
+        }
+
+        if (isNTE && isNTW) {
+            result.add('城門隧道');
+        }
+
+        if (/屯門|屯门|元朗|天水圍|天水围|深井|黃金海岸|黄金海岸/.test(text) && (isKowloon || isHKIsland || isNTW)) {
+            result.add('大欖隧道');
+        }
+
+        if (isSouth && (isHKIsland || isKowloon)) {
+            result.add('香港仔隧道');
+        }
+
+        const isNWArea = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸|深圳灣|深圳湾/.test(text);
+        const isNEArea = /大埔|粉嶺|粉岭|上水|康樂園|康乐园|太和|白石角|科學園|科学园|沙頭角|沙头角|打鼓嶺|打鼓岭/.test(text);
+        const isAirportSide = /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(text);
+        if ((isNWArea || isNEArea) && isAirportSide) {
+            result.add('屯赤隧道');
+        }
+
+        return Array.from(result);
+    }
+
+    function getTunnelViaPoints(tunnel, pickupVal) {
+        if (tunnel.lat2 === undefined || tunnel.lng2 === undefined) {
+            return [{ lat: tunnel.lat, lng: tunnel.lng }];
+        }
+
+        const isAirportSide = /機場|机场|赤鱲角|赤鱲角|東涌|东涌|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(String(pickupVal || ''));
+
+        if (isAirportSide) {
+            return [
+                { lat: tunnel.lat2, lng: tunnel.lng2 },
+                { lat: tunnel.lat,  lng: tunnel.lng  }
+            ];
+        }
+        return [
+            { lat: tunnel.lat,  lng: tunnel.lng  },
+            { lat: tunnel.lat2, lng: tunnel.lng2 }
+        ];
+    }
+
+    function renderTunnelButtons() {
+        const container = document.getElementById('tunnel-selector');
+        const btnsBox = document.getElementById('tunnel-btns');
+        if (!container || !btnsBox) return;
+
+        if (!routeData || !routeData.pickup || !routeData.dropoff) {
+            container.classList.add('hidden');
+            return;
+        }
+
+        const usedTunnels = new Set();
+        routesData.forEach(route => {
+            const tr = checkTunnelsForRoute(route, false);
+            tr.matchedTunnels.forEach(t => usedTunnels.add(tunnelNameToShort(t.name)));
+        });
+
+        const candidates = getRelevantTunnels(routeData.pickup, routeData.dropoff);
+
+        const filtered = candidates.filter(name => {
+            if (name === selectedForcedTunnel) return true;
+            return !usedTunnels.has(name);
+        });
+
+        console.log('[Tunnel] Google 用嘅隧道：', Array.from(usedTunnels), '／顯示按鈕：', filtered);
+
+        if (filtered.length === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+
+        if (selectedForcedTunnel && filtered.indexOf(selectedForcedTunnel) < 0) {
+            selectedForcedTunnel = null;
+        }
+
+        btnsBox.innerHTML = '';
+        filtered.forEach(name => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.tunnel = name;
+            btn.className = 'tunnel-btn' + (name === selectedForcedTunnel ? ' active' : '');
+            btn.innerHTML = '<i class="fa-solid fa-road"></i> ' + name;
+            btn.onclick = () => setForcedTunnel(name);
+            btnsBox.appendChild(btn);
+        });
+
+        container.classList.remove('hidden');
+    }
+
+    function setForcedTunnel(name) {
+        selectedForcedTunnel = (selectedForcedTunnel === name) ? null : name;
+
+        if (!selectedForcedTunnel) {
+            defaultRouteTunnels = [];
+        }
+
+        document.querySelectorAll('#tunnel-btns button').forEach(btn => {
+            const isActive = btn.dataset.tunnel === name;
+            btn.className = 'tunnel-btn' + (isActive ? ' active' : '');
+        });
+
+        calculateFareWithGoogle();
+    }
 
     function checkTunnelsForRoute(route, isDiscount = false) {
         let matchedTunnels = [];
@@ -454,12 +641,21 @@
             });
         }
         tunnelDatabase.forEach(tunnel => {
-            let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
-            let triggered = false;
-            for (let i = 0; i < allPoints.length; i++) {
-                let distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], tunnelLatLng);
-                if (distance <= tunnel.radius) { triggered = true; break; }
+            const checkPoints = [{ lat: tunnel.lat, lng: tunnel.lng, radius: tunnel.radius }];
+            if (tunnel.lat2 !== undefined && tunnel.lng2 !== undefined) {
+                checkPoints.push({ lat: tunnel.lat2, lng: tunnel.lng2, radius: tunnel.radius2 || tunnel.radius });
             }
+
+            let triggered = false;
+            for (let c = 0; c < checkPoints.length && !triggered; c++) {
+                const cp = checkPoints[c];
+                const cpLatLng = new google.maps.LatLng(cp.lat, cp.lng);
+                for (let i = 0; i < allPoints.length; i++) {
+                    const distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], cpLatLng);
+                    if (distance <= cp.radius) { triggered = true; break; }
+                }
+            }
+
             if (triggered) {
                 matchedTunnels.push(tunnel);
                 totalTunnelFee += isDiscount ? (tunnel.discountFee || tunnel.fee) : tunnel.fee;
@@ -500,12 +696,25 @@
         let waypoints = [];
         stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
 
+        if (selectedForcedTunnel) {
+            const tunnel = tunnelDatabase.find(t => t.name.indexOf(selectedForcedTunnel) >= 0);
+            if (tunnel) {
+                const viaPoints = getTunnelViaPoints(tunnel, pickupVal);
+                viaPoints.forEach(pt => {
+                    waypoints.push({
+                        location: new google.maps.LatLng(pt.lat, pt.lng),
+                        stopover: false
+                    });
+                });
+            }
+        }
+
         const request = {
             origin: targetPickup,
             destination: targetDropoff,
             waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: true,
+            provideRouteAlternatives: !selectedForcedTunnel,
             drivingOptions: {
                 departureTime: new Date(),
                 trafficModel: google.maps.TrafficModel.BEST_GUESS
@@ -516,6 +725,14 @@
             if (status === google.maps.DirectionsStatus.OK) {
                 routesData = processRoutes(result.routes, isShenzhenBayRoute);
                 result.routes = routesData;
+
+                if (!selectedForcedTunnel && routesData.length > 0) {
+                    const tr = checkTunnelsForRoute(routesData[0], false);
+                    defaultRouteTunnels = tr.matchedTunnels.map(t => tunnelNameToShort(t.name));
+                }
+
+                renderTunnelButtons();
+
                 document.getElementById('loading-indicator').classList.add('hidden');
                 document.getElementById('result-content').classList.remove('hidden');
 
@@ -604,7 +821,10 @@
         const detectedList = document.getElementById('detected-tunnels-list');
         if (tunnelResult.matchedTunnels.length > 0) {
             detectedContainer.classList.remove('hidden');
-            let tunnelNames = tunnelResult.matchedTunnels.map(t => `${t.name} ($${t.fee})`).join('、');
+            let tunnelNames = tunnelResult.matchedTunnels.map(t => {
+                if (t.fee === 0) return `${t.name} (免費)`;
+                return `${t.name} ($${t.fee})`;
+            }).join('、');
             detectedList.innerText = tunnelNames;
         } else {
             detectedContainer.classList.add('hidden');
@@ -786,6 +1006,10 @@
     }
 
     function initMap() {
+        // ⭐ 重置隧道選擇狀態
+        selectedForcedTunnel = null;
+        defaultRouteTunnels = [];
+
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
             isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
@@ -818,6 +1042,7 @@
         localStorage.setItem('taxiLang', currentLang);
         applyLanguage();
         if (typeof updateMifaDiscountBanner === 'function') updateMifaDiscountBanner();
+        renderTunnelButtons();
     }
 
     function applyLanguage() {
@@ -946,6 +1171,15 @@
                         <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
                     </div>
                     <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                </div>
+
+                <div id="tunnel-selector" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
+                    <div class="text-xs font-bold text-gray-300 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-road text-brand-yellow"></i>
+                        <span data-i18n="tunnel_select_title">指定行車隧道（可選）：</span>
+                    </div>
+                    <p class="text-[11px] text-gray-500 mb-2" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。（Google 已提供嘅隧道唔會重複顯示）</p>
+                    <div id="tunnel-btns" class="flex flex-wrap gap-2"></div>
                 </div>
 
                 <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-3 shadow-lg overflow-hidden"></div>
