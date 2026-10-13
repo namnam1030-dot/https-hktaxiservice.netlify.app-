@@ -181,7 +181,8 @@
     let selectedFeeModeEn = '';
     let selectedFareMode = '';
     let map = null;
-    let directionsRenderer = null;
+    let currentPolyline = null;
+    let currentMarkers = [];
     let routesData = [];
     let currentBaseFare = 0;
     let currentTunnelFee = 0;
@@ -480,7 +481,7 @@
     }
 
     /* =========================================================
-       ⭐ 將 Web Service API 回應轉為 JS API DirectionsResult 格式
+       ⭐ 將 Web Service API 回應轉為內部可用格式（唔再靠 DirectionsRenderer）
        ========================================================= */
     function convertWebServiceToJSFormat(data) {
         if (!data || !data.routes) return { routes: [] };
@@ -647,7 +648,13 @@
         }
     }
 
+    /* =========================================================
+       ⭐ 自己畫路線（唔用 DirectionsRenderer）
+       ========================================================= */
     function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute) {
+        const selectedRoute = directionsResult.routes[routeIndex];
+
+        // 初始化地圖
         if (!map) {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
@@ -656,17 +663,55 @@
                 zoomControl: true
             });
         }
-        if (!directionsRenderer) {
-            directionsRenderer = new google.maps.DirectionsRenderer({
-                map: map,
-                suppressMarkers: false,
-                polylineOptions: { strokeColor: '#FFF200', strokeWeight: 5, strokeOpacity: 0.9 }
+
+        // 清除舊路線 + 舊 markers
+        if (currentPolyline) {
+            currentPolyline.setMap(null);
+            currentPolyline = null;
+        }
+        currentMarkers.forEach(m => m.setMap(null));
+        currentMarkers = [];
+
+        // 畫新路線
+        if (selectedRoute.overview_path && selectedRoute.overview_path.length > 0) {
+            currentPolyline = new google.maps.Polyline({
+                path: selectedRoute.overview_path,
+                strokeColor: '#FFF200',
+                strokeWeight: 5,
+                strokeOpacity: 0.9,
+                map: map
             });
         }
-        directionsRenderer.setDirections(directionsResult);
-        directionsRenderer.setRouteIndex(routeIndex);
 
-        const selectedRoute = directionsResult.routes[routeIndex];
+        // 加入起點 A + 終點 B 標記
+        const firstLeg = selectedRoute.legs[0];
+        const lastLeg = selectedRoute.legs[selectedRoute.legs.length - 1];
+
+        if (firstLeg && firstLeg.start_location) {
+            currentMarkers.push(new google.maps.Marker({
+                position: firstLeg.start_location,
+                label: { text: 'A', color: '#FFFFFF', fontWeight: 'bold' },
+                map: map
+            }));
+        }
+        if (lastLeg && lastLeg.end_location) {
+            currentMarkers.push(new google.maps.Marker({
+                position: lastLeg.end_location,
+                label: { text: 'B', color: '#FFFFFF', fontWeight: 'bold' },
+                map: map
+            }));
+        }
+
+        // 調整地圖範圍
+        if (selectedRoute.bounds) {
+            map.fitBounds(selectedRoute.bounds);
+            // 避免太貼邊
+            setTimeout(() => {
+                if (map.getZoom() > 14) map.setZoom(14);
+            }, 100);
+        }
+
+        // 計算車費
         let totalMeters = 0;
         let totalSeconds = 0;
         selectedRoute.legs.forEach(leg => { totalMeters += leg.distance.value; totalSeconds += leg.duration.value; });
