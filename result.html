@@ -714,7 +714,11 @@
             destination: targetDropoff,
             waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: !selectedForcedTunnel
+            provideRouteAlternatives: !selectedForcedTunnel,
+            drivingOptions: {
+                departureTime: new Date(),
+                trafficModel: google.maps.TrafficModel.BEST_GUESS
+            }
         };
 
         directionsService.route(request, (result, status) => {
