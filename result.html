@@ -19,8 +19,8 @@
     var root = document.documentElement;
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
-    root.style.color           = isLight ? '#://000000'cdn : '#FFFFFF';
-js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
+    root.style.color           = isLight ? '#000000' : '#FFFFFF';
+    root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
     if (isLight) {
         var obs = new MutationObserver(function() {
@@ -38,7 +38,7 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="httpsflare.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士</title>
@@ -171,7 +171,6 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
     }
 
-    /* ⭐ 隧道選擇方格（4列 Grid 排版） */
     #tunnel-btns {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -461,12 +460,10 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
         if (!isPickup && airportDropoffKeywords.includes(cleaned)) return new google.maps.LatLng(22.315500, 113.936361);
         if (trimmed.includes("迪士尼")) return "迪士尼樂園度假區的士站";
         
-        // ⭐ 香園圍 / 香園圍口岸 / 蓮塘 → 精確定位
         if (trimmed.includes("香園圍") || trimmed.includes("香园围") || trimmed.includes("香園圍口岸") || trimmed.includes("香园围口岸") || trimmed.includes("蓮塘") || trimmed.includes("莲塘")) {
             return new google.maps.LatLng(22.551972, 114.153694);
         }
         
-        // ⭐ 皇崗口岸 / 新皇崗口岸 / 皇崗 → 精確定位
         if (trimmed.includes("皇崗口岸") || trimmed.includes("皇岗口岸") || trimmed.includes("新皇崗口岸") || trimmed.includes("新皇岗口岸") || trimmed.includes("皇崗") || trimmed.includes("皇岗")) {
             return new google.maps.LatLng(22.518611, 114.070361);
         }
@@ -505,9 +502,6 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
         return [fastest.route, shortest.route];
     }
 
-    /* =========================================================
-       ⭐ 隧道資料庫
-       ========================================================= */
     const tunnelDatabase = [
         { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
           lat: 22.2896118, lng: 114.1823943, radius: 300,
@@ -671,13 +665,11 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
         
-        // ⭐ 修改：中途站如果係香園圍 / 皇崗，改用地址字串 + stopover: false，確保唔會漏
+        // ⭐ 中途站：所有口岸（深圳灣、皇崗、香園圍）都用精確座標 + stopover:false，確保唔會漏
         let waypoints = [];
         stopoverTexts.forEach(s => {
-            if (s.includes("皇崗") || s.includes("皇岗")) {
-                waypoints.push({ location: '皇崗口岸', stopover: false });
-            } else if (s.includes("香園圍") || s.includes("香园围") || s.includes("蓮塘") || s.includes("莲塘")) {
-                waypoints.push({ location: '香園圍口岸', stopover: false });
+            if (s.includes("深圳灣") || s.includes("深圳湾") || s.includes("皇崗") || s.includes("皇岗") || s.includes("香園圍") || s.includes("香园围") || s.includes("蓮塘") || s.includes("莲塘")) {
+                waypoints.push({ location: normalizeLocation(s, false), stopover: false });
             } else {
                 waypoints.push({ location: normalizeLocation(s, false), stopover: true });
             }
@@ -703,7 +695,6 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
             provideRouteAlternatives: waypoints.length === 0
         };
 
-        // ⭐ 加 15 秒超時保護，防止無限卡住
         let requestTimedOut = false;
         const timeoutId = setTimeout(() => {
             requestTimedOut = true;
@@ -752,7 +743,6 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
                 displaySelectedRoute(result, 0, isShenzhenBayRoute, isHuanggangRoute);
             } else {
                 console.error('[路線] 失敗，狀態：', status);
-                // ⭐ Fallback：如果加咗 Waypoint 都失敗，試多次唔加 Waypoint 嘅版本
                 if (waypoints.length > 0) {
                     console.warn('[路線] 嘗試 Fallback：唔加 Waypoint 重新計算');
                     const fallbackRequest = {
@@ -1179,7 +1169,6 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
 
             <div id="result-content" class="hidden">
                 
-                <!-- ⭐ 地圖（已移到最上） -->
                 <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-3 shadow-lg overflow-hidden"></div>
 
                 <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
@@ -1189,7 +1178,6 @@ js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
                     <div id="route-options-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
 
-                <!-- ⭐ 隧道選擇（收合式） -->
                 <details class="mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <summary class="text-xs font-bold text-gray-300">
                         <i class="fa-solid fa-road text-brand-yellow"></i>
