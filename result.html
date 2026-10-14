@@ -466,9 +466,9 @@
             return new google.maps.LatLng(22.551972, 114.153694);
         }
         
-        // ⭐ 皇崗口岸 / 新皇崗口岸 / 皇崗 → 精確定位
+        // ⭐ 皇崗口岸 / 新皇崗口岸 / 皇崗 → 新座標 22.518611, 114.070361
         if (trimmed.includes("皇崗口岸") || trimmed.includes("皇岗口岸") || trimmed.includes("新皇崗口岸") || trimmed.includes("新皇岗口岸") || trimmed.includes("皇崗") || trimmed.includes("皇岗")) {
-            return new google.maps.LatLng(22.52097, 114.07156);
+            return new google.maps.LatLng(22.518611, 114.070361);
         }
         
         if (trimmed.includes("愉景灣")) return "愉景灣的士站";
@@ -667,6 +667,9 @@
 
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
+        // ⭐ 判斷是否為皇崗行程
+        let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
+        
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
         
@@ -724,12 +727,13 @@
                         legs.forEach(leg => { distMeters += leg.distance.value; durSeconds += leg.duration.value; });
                         let distKm = distMeters / 1000;
                         if (isShenzhenBayRoute) distKm += 2.8;
+                        if (isHuanggangRoute) distKm += 2; // ⭐ 皇崗加 2km
                         let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
-                        btn.onclick = () => selectRouteOption(index, isShenzhenBayRoute);
+                        btn.onclick = () => selectRouteOption(index, isShenzhenBayRoute, isHuanggangRoute);
                         btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
                                         <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
                         routeListContainer.appendChild(btn);
@@ -738,7 +742,7 @@
                     routeOptionsBox.classList.add('hidden');
                 }
 
-                displaySelectedRoute(result, 0, isShenzhenBayRoute);
+                displaySelectedRoute(result, 0, isShenzhenBayRoute, isHuanggangRoute);
             } else {
                 console.error('[路線] 失敗，狀態：', status);
                 // ⭐ Fallback：如果加咗 Waypoint 都失敗，試多次唔加 Waypoint 嘅版本
@@ -757,7 +761,7 @@
                             document.getElementById('loading-indicator').classList.add('hidden');
                             document.getElementById('result-content').classList.remove('hidden');
                             document.getElementById('route-options-container').classList.add('hidden');
-                            displaySelectedRoute(result2, 0, isShenzhenBayRoute);
+                            displaySelectedRoute(result2, 0, isShenzhenBayRoute, isHuanggangRoute);
                         } else {
                             alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
                             sessionStorage.setItem('returningFromResult', '1');
@@ -773,18 +777,18 @@
         });
     }
 
-    function selectRouteOption(index, isShenzhenBayRoute) {
+    function selectRouteOption(index, isShenzhenBayRoute, isHuanggangRoute) {
         const btns = document.querySelectorAll('#route-options-list button');
         btns.forEach((btn, i) => {
             if (i === index) btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-brand-yellow/20 border-brand-yellow text-white font-bold";
             else btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-black/40 border-gray-700 text-gray-400 hover:text-white";
         });
         if (directionsRenderer && directionsRenderer.getDirections()) {
-            displaySelectedRoute(directionsRenderer.getDirections(), index, isShenzhenBayRoute);
+            displaySelectedRoute(directionsRenderer.getDirections(), index, isShenzhenBayRoute, isHuanggangRoute);
         }
     }
 
-    function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute) {
+    function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute, isHuanggangRoute) {
         if (!map) {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
@@ -809,7 +813,11 @@
         selectedRoute.legs.forEach(leg => { totalMeters += leg.distance.value; totalSeconds += leg.duration.value; });
 
         let routeKm = totalMeters / 1000;
-        let finalKm = isShenzhenBayRoute ? (routeKm + 2.8) : routeKm;
+        // ⭐ 距離加成：深圳灣 +2.8km，皇崗 +2km
+        let finalKm = routeKm;
+        if (isShenzhenBayRoute) finalKm += 2.8;
+        if (isHuanggangRoute) finalKm += 2;
+        
         let durationMinutes = Math.round(totalSeconds / 60);
         let baseMeterFare = calculateTaxiBaseFare(finalKm);
         let tunnelResult = checkTunnelsForRoute(selectedRoute, false);
@@ -1165,6 +1173,9 @@
 
             <div id="result-content" class="hidden">
                 
+                <!-- ⭐ 地圖（已移到最上） -->
+                <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-3 shadow-lg overflow-hidden"></div>
+
                 <div id="route-options-container" class="hidden mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <div class="text-xs font-bold text-gray-300 mb-2 flex items-center gap-1.5">
                         <i class="fa-solid fa-signs-post text-brand-yellow"></i> <span data-i18n="route_select_title">請選擇行車路線方案 (最快 / 最短)：</span>
@@ -1182,8 +1193,6 @@
                     <p class="text-[11px] text-gray-500 mb-2 mt-1" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。</p>
                     <div id="tunnel-btns"></div>
                 </details>
-
-                <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-3 shadow-lg overflow-hidden"></div>
 
                 <div id="route-summary-text-box" class="mb-3 p-3 bg-gray-900/80 border border-gray-800 rounded-xl text-xs text-gray-300 space-y-1">
                     <div class="font-bold text-brand-yellow mb-1 flex items-center gap-1">
