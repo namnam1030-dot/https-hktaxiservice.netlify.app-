@@ -171,21 +171,31 @@
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
     }
 
-    /* ⭐ 隧道選擇方格 */
+    /* ⭐ 隧道選擇方格（4列 Grid 排版） */
+    #tunnel-btns {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* ⭐ 強制一行四格 */
+        gap: 8px;
+        margin-top: 8px;
+    }
+
     .tunnel-btn {
-        padding: 0.5rem 0.75rem;
+        width: 100%;
+        padding: 0.5rem 0;
         border-radius: 0.5rem;
-        font-size: 15px;
+        font-size: 14px; /* ⭐ 縮細至 14px，確保「大老山」等字夠位顯示 */
         font-weight: 700;
         cursor: pointer;
         transition: all 0.15s ease;
         border: 1px solid #374151;
         background-color: rgba(0, 0, 0, 0.4);
         color: #9CA3AF;
-        display: inline-flex;
+        display: flex; /* ⭐ 改用 flex 令文字同 icon 完美居中 */
         align-items: center;
+        justify-content: center; /* ⭐ 水平居中 */
         gap: 0.25rem;
-        white-space: nowrap;
+        white-space: nowrap; /* 禁止文字斷行 */
+        text-align: center;
     }
     .tunnel-btn:hover {
         color: #FFF200;
@@ -486,61 +496,54 @@
     }
 
     /* =========================================================
-       ⭐ 隧道資料庫
-       - lat/lng/radius：偵測用（保持原本，用嚟計算隧道費）
-       - entry*：用戶指定隧道時嘅 via 點（你提供嘅入口座標）
+       ⭐ 隧道資料庫（已按你要求重新排序）
        ========================================================= */
     const tunnelDatabase = [
-        // 紅隧
+        // 第一行：三條過海隧道 + 香港仔
         { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
           lat: 22.2896118, lng: 114.1823943, radius: 300,
-          entryKLN: { lat: 22.298722, lng: 114.180889 },   // 九龍往港島
-          entryISL: { lat: 22.286083, lng: 114.182917 } }, // 港島往九龍
-        // 東隧
+          entryKLN: { lat: 22.298722, lng: 114.180889 },
+          entryISL: { lat: 22.286083, lng: 114.182917 } },
         { name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
           lat: 22.294889, lng: 114.22223, radius: 300,
-          entryKLN: { lat: 22.298417, lng: 114.229306 },   // 九龍往港島
-          entryISL: { lat: 22.290806, lng: 114.214278 } }, // 港島往九龍
-        // 西隧
+          entryKLN: { lat: 22.298417, lng: 114.229306 },
+          entryISL: { lat: 22.290806, lng: 114.214278 } },
         { name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
           lat: 22.2940599, lng: 114.150204, radius: 300,
-          entryKLN: { lat: 22.298694, lng: 114.154528 },   // 九龍往港島
-          entryISL: { lat: 22.290528, lng: 114.146694 } }, // 港島往九龍
-        // 大欖隧道
-        { name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
-          lat: 22.3953506, lng: 114.0615077, radius: 500,
-          entryKLN: { lat: 22.375583, lng: 114.066611 },   // 九龍往新界
-          entryNTW: { lat: 22.406667, lng: 114.059889 } }, // 新界往九龍
-        // 城門隧道
-        { name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
-          lat: 22.3764988, lng: 114.1487468, radius: 300,
-          entryKLN: { lat: 22.381028, lng: 114.139167 },   // 九龍往新界
-          entryNTE: { lat: 22.380222, lng: 114.164917 } }, // 新界往九龍
-        // 香港仔隧道
+          entryKLN: { lat: 22.298694, lng: 114.154528 },
+          entryISL: { lat: 22.290528, lng: 114.146694 } },
         { name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
           lat: 22.2614503, lng: 114.1799975, radius: 300,
-          entryKLN: { lat: 22.265306, lng: 114.180667 },   // 九龍往南區
-          entrySouth: { lat: 22.255417, lng: 114.179806 } }, // 南區往九龍
-        // 大老山隧道
+          entryKLN: { lat: 22.265306, lng: 114.180667 },
+          entrySouth: { lat: 22.255417, lng: 114.179806 } },
+
+        // 第二行：大老山、獅隧、尖山、城隧
         { name: "大老山隧道", shortName: "大老山", fee: 20, discountFee: 20,
           lat: 22.368694, lng: 114.212944, radius: 500,
-          entryKLN: { lat: 22.342139, lng: 114.204556 },   // 九龍往新界
-          entryNTE: { lat: 22.375722, lng: 114.213500 } }, // 新界往九龍
-        // 獅子山隧道
+          entryKLN: { lat: 22.342139, lng: 114.204556 },
+          entryNTE: { lat: 22.375722, lng: 114.213500 } },
         { name: "獅子山隧道", shortName: "獅隧", fee: 8, discountFee: 8,
           lat: 22.3527046, lng: 114.1764997, radius: 300,
-          entryKLN: { lat: 22.346278, lng: 114.180917 },   // 九龍往新界
-          entryNTE: { lat: 22.356778, lng: 114.173333 } }, // 新界往九龍
-        // 尖山隧道
+          entryKLN: { lat: 22.346278, lng: 114.180917 },
+          entryNTE: { lat: 22.356778, lng: 114.173333 } },
         { name: "尖山隧道", shortName: "尖山", fee: 8, discountFee: 8,
           lat: 22.3523498, lng: 114.159581, radius: 200,
-          entryKLN: { lat: 22.347028, lng: 114.148139 },   // 九龍往新界
-          entryNTE: { lat: 22.357083, lng: 114.162389 } }, // 新界往九龍
-        // 屯赤隧道
+          entryKLN: { lat: 22.347028, lng: 114.148139 },
+          entryNTE: { lat: 22.357083, lng: 114.162389 } },
+        { name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
+          lat: 22.3764988, lng: 114.1487468, radius: 300,
+          entryKLN: { lat: 22.381028, lng: 114.139167 },
+          entryNTE: { lat: 22.380222, lng: 114.164917 } },
+
+        // 第三行：屯赤、大欖
         { name: "屯赤隧道", shortName: "屯赤", fee: 0, discountFee: 0,
           lat: 22.3545000, lng: 113.9500000, radius: 800,
-          entryNTW: { lat: 22.356278, lng: 113.953500 },      // 屯門往東涌
-          entryLantau: { lat: 22.324056, lng: 113.961000 } }  // 東涌往屯門
+          entryNTW: { lat: 22.356278, lng: 113.953500 },
+          entryLantau: { lat: 22.324056, lng: 113.961000 } },
+        { name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
+          lat: 22.3953506, lng: 114.0615077, radius: 500,
+          entryKLN: { lat: 22.375583, lng: 114.066611 },
+          entryNTW: { lat: 22.406667, lng: 114.059889 } }
     ];
 
     function tunnelNameToShort(fullName) {
@@ -1149,7 +1152,7 @@
                         <i class="fa-solid fa-chevron-down chevron text-gray-500 text-xs ml-auto"></i>
                     </summary>
                     <p class="text-[11px] text-gray-500 mb-2 mt-1" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。</p>
-                    <div id="tunnel-btns" class="flex flex-wrap gap-2 mt-2"></div>
+                    <div id="tunnel-btns"></div>
                 </details>
 
                 <div id="map" class="w-full h-56 rounded-xl border border-gray-700 mb-3 shadow-lg overflow-hidden"></div>
