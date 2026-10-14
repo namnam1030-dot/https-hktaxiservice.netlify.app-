@@ -679,27 +679,64 @@
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
+        
+        // ⭐ 開始修改：處理 waypoints 邏輯
         let waypoints = [];
         stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
 
-        // ⭐ 用戶指定隧道 → 用入口座標做 via waypoint
+        // ⭐ 檢查是否涉及香園圍 / 蓮塘 / 打鼓嶺等相關字眼，強制使用龍山隧道
+        const heungYuenWaiKeywords = ['香園圍', '香园围', '蓮塘', '莲塘', '香園圍口岸', '香园围口岸', '打鼓嶺', '打鼓岭'];
+        const allRouteText = [pickupVal, dropoffVal, ...stopoverTexts].join(' ');
+        const isHeungYuenWaiRoute = heungYuenWaiKeywords.some(k => allRouteText.includes(k));
+        const isFromHeungYuenWai = heungYuenWaiKeywords.some(k => pickupVal.includes(k));
+
+        // 準備龍山隧道座標（根據行程方向）
+        let lungShanPoint = null;
+        if (isHeungYuenWaiRoute) {
+            lungShanPoint = isFromHeungYuenWai
+                ? { lat: 22.517556, lng: 114.182889 }  // 香園圍出九龍方向
+                : { lat: 22.485778, lng: 114.155778 }; // 入香園圍方向
+        }
+
+        // 準備用戶指定隧道座標
+        let userTunnelPoint = null;
         if (selectedForcedTunnel) {
             const tunnel = tunnelDatabase.find(t => t.shortName === selectedForcedTunnel);
             if (tunnel) {
                 const entry = getTunnelEntryPoint(tunnel, pickupVal);
-                waypoints.push({
-                    location: new google.maps.LatLng(entry.lat, entry.lng),
-                    stopover: false
-                });
+                userTunnelPoint = { lat: entry.lat, lng: entry.lng };
             }
         }
+
+        // ⭐ 按行程方向決定 waypoint 順序
+        if (isHeungYuenWaiRoute && userTunnelPoint) {
+            if (isFromHeungYuenWai) {
+                // 從香園圍出發：先龍山，後用戶隧道
+                waypoints.push({ location: new google.maps.LatLng(lungShanPoint.lat, lungShanPoint.lng), stopover: false });
+                waypoints.push({ location: new google.maps.LatLng(userTunnelPoint.lat, userTunnelPoint.lng), stopover: false });
+            } else {
+                // 前往香園圍：先用戶隧道，後龍山
+                waypoints.push({ location: new google.maps.LatLng(userTunnelPoint.lat, userTunnelPoint.lng), stopover: false });
+                waypoints.push({ location: new google.maps.LatLng(lungShanPoint.lat, lungShanPoint.lng), stopover: false });
+            }
+            console.log('[路線] 香園圍行程 + 用戶指定隧道：' + (isFromHeungYuenWai ? '先龍山後' : '先' + selectedForcedTunnel + '後龍山'));
+        } else if (isHeungYuenWaiRoute) {
+            // 只有香園圍，冇用戶指定隧道
+            waypoints.push({ location: new google.maps.LatLng(lungShanPoint.lat, lungShanPoint.lng), stopover: false });
+            console.log('[路線] 香園圍行程：強制使用龍山隧道' + (isFromHeungYuenWai ? '（出九龍方向）' : '（入香園圍方向）'));
+        } else if (userTunnelPoint) {
+            // 非香園圍行程，但用戶有指定隧道
+            waypoints.push({ location: new google.maps.LatLng(userTunnelPoint.lat, userTunnelPoint.lng), stopover: false });
+            console.log('[路線] 用戶指定隧道：' + selectedForcedTunnel);
+        }
+        // ⭐ 修改結束
 
         const request = {
             origin: targetPickup,
             destination: targetDropoff,
             waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: !selectedForcedTunnel
+            provideRouteAlternatives: !selectedForcedTunnel && !isHeungYuenWaiRoute // 如果有強制隧道就唔提供替代路線
         };
 
         directionsService.route(request, (result, status) => {
