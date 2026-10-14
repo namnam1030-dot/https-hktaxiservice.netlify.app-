@@ -665,11 +665,15 @@
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
         
-        // ⭐ 中途站：所有口岸（深圳灣、皇崗、香園圍）都用精確座標 + stopover:false，確保唔會漏
+        // ⭐ 中途站：用「香港側」座標，確保 Google 一定經過，唔會漏
         let waypoints = [];
         stopoverTexts.forEach(s => {
-            if (s.includes("深圳灣") || s.includes("深圳湾") || s.includes("皇崗") || s.includes("皇岗") || s.includes("香園圍") || s.includes("香园围") || s.includes("蓮塘") || s.includes("莲塘")) {
-                waypoints.push({ location: normalizeLocation(s, false), stopover: false });
+            if (s.includes("深圳灣") || s.includes("深圳湾")) {
+                waypoints.push({ location: { lat: 22.5060, lng: 113.9468 }, stopover: false });
+            } else if (s.includes("皇崗") || s.includes("皇岗")) {
+                waypoints.push({ location: { lat: 22.5244, lng: 114.0688 }, stopover: false });
+            } else if (s.includes("香園圍") || s.includes("香园围") || s.includes("蓮塘") || s.includes("莲塘")) {
+                waypoints.push({ location: { lat: 22.551972, lng: 114.153694 }, stopover: false });
             } else {
                 waypoints.push({ location: normalizeLocation(s, false), stopover: true });
             }
