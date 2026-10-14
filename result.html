@@ -448,21 +448,6 @@
         return Math.round(fare);
     }
 
-    // ⭐ 口岸「香港側」座標（只用作中途站，避免被 Google 忽略）
-    const PORT_HK_STOPOVER = {
-        shenzhenbay:   { lat: 22.5038, lng: 113.9457 },
-        huanggang:     { lat: 22.5244, lng: 114.0688 },
-        heungyuenwai:  { lat: 22.551972, lng: 114.153694 }
-    };
-
-    function isPortText(s) {
-        return s.includes("深圳灣") || s.includes("深圳湾")
-            || s.includes("皇崗") || s.includes("皇岗")
-            || s.includes("香園圍") || s.includes("香园围")
-            || s.includes("蓮塘") || s.includes("莲塘");
-    }
-
-    // ⭐ normalizeLocation：起點/終點用你提供嘅精確座標（深圳側）
     function normalizeLocation(loc, isPickup = false) {
         if (!loc) return "";
         let trimmed = loc.trim();
@@ -475,7 +460,7 @@
         if (!isPickup && airportDropoffKeywords.includes(cleaned)) return new google.maps.LatLng(22.315500, 113.936361);
         if (trimmed.includes("迪士尼")) return "迪士尼樂園度假區的士站";
         
-        // ⭐ 起點/終點：用你提供嘅精確座標
+        // ⭐ 口岸：用你提供嘅精確座標
         if (trimmed.includes("香園圍") || trimmed.includes("香园围") || trimmed.includes("香園圍口岸") || trimmed.includes("香园围口岸") || trimmed.includes("蓮塘") || trimmed.includes("莲塘")) {
             return new google.maps.LatLng(22.551972, 114.153694);
         }
@@ -491,18 +476,11 @@
         return trimmed;
     }
 
-    // ⭐ 中途站專用：口岸用香港側座標
-    function normalizeStopoverLocation(s) {
-        if (s.includes("深圳灣") || s.includes("深圳湾")) {
-            return new google.maps.LatLng(PORT_HK_STOPOVER.shenzhenbay.lat, PORT_HK_STOPOVER.shenzhenbay.lng);
-        }
-        if (s.includes("皇崗") || s.includes("皇岗")) {
-            return new google.maps.LatLng(PORT_HK_STOPOVER.huanggang.lat, PORT_HK_STOPOVER.huanggang.lng);
-        }
-        if (s.includes("香園圍") || s.includes("香园围") || s.includes("蓮塘") || s.includes("莲塘")) {
-            return new google.maps.LatLng(PORT_HK_STOPOVER.heungyuenwai.lat, PORT_HK_STOPOVER.heungyuenwai.lng);
-        }
-        return normalizeLocation(s, false);
+    function isPortText(s) {
+        return s.includes("深圳灣") || s.includes("深圳湾")
+            || s.includes("皇崗") || s.includes("皇岗")
+            || s.includes("香園圍") || s.includes("香园围")
+            || s.includes("蓮塘") || s.includes("莲塘");
     }
 
     function processRoutes(routes, isShenzhenBay) {
@@ -693,16 +671,14 @@
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
         let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
-
-        // 起點/終點：用 normalizeLocation（你提供嘅精確座標）
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
 
-        // 中途站：口岸用香港側座標（normalizeStopoverLocation），其他照舊
+        // ⭐ 中途站：用你提供嘅精確座標 + stopover: true（強制停靠）
         let waypoints = [];
         stopoverTexts.forEach(s => {
             if (isPortText(s)) {
-                waypoints.push({ location: normalizeStopoverLocation(s), stopover: false });
+                waypoints.push({ location: normalizeLocation(s, false), stopover: true });
             } else {
                 waypoints.push({ location: normalizeLocation(s, false), stopover: true });
             }
@@ -725,7 +701,8 @@
             destination: targetDropoff,
             waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: waypoints.length === 0
+            provideRouteAlternatives: waypoints.length === 0,
+            optimizeWaypoints: false
         };
 
         let requestTimedOut = false;
