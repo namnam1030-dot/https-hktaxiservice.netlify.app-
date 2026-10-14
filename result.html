@@ -19,8 +19,8 @@
     var root = document.documentElement;
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
-    root.style.color           = isLight ? '#000000' : '#FFFFFF';
-    root.style.colorScheme     = isLight ? 'light' : 'dark';
+    root.style.color           = isLight ? '#://000000'cdn : '#FFFFFF';
+js    root.style.cloud.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
     if (isLight) {
         var obs = new MutationObserver(function() {
@@ -38,7 +38,7 @@
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preconnect" href="httpsflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
 <title>車費預計結果 | 八五折的士 | 路線規劃 | 24小時網約的士</title>
@@ -466,7 +466,7 @@
             return new google.maps.LatLng(22.551972, 114.153694);
         }
         
-        // ⭐ 皇崗口岸 / 新皇崗口岸 / 皇崗 → 新座標 22.518611, 114.070361
+        // ⭐ 皇崗口岸 / 新皇崗口岸 / 皇崗 → 精確定位
         if (trimmed.includes("皇崗口岸") || trimmed.includes("皇岗口岸") || trimmed.includes("新皇崗口岸") || trimmed.includes("新皇岗口岸") || trimmed.includes("皇崗") || trimmed.includes("皇岗")) {
             return new google.maps.LatLng(22.518611, 114.070361);
         }
@@ -667,14 +667,21 @@
 
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
-        // ⭐ 判斷是否為皇崗行程
         let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
-        
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
         
+        // ⭐ 修改：中途站如果係香園圍 / 皇崗，改用地址字串 + stopover: false，確保唔會漏
         let waypoints = [];
-        stopoverTexts.forEach(s => { waypoints.push({ location: normalizeLocation(s, false), stopover: true }); });
+        stopoverTexts.forEach(s => {
+            if (s.includes("皇崗") || s.includes("皇岗")) {
+                waypoints.push({ location: '皇崗口岸', stopover: false });
+            } else if (s.includes("香園圍") || s.includes("香园围") || s.includes("蓮塘") || s.includes("莲塘")) {
+                waypoints.push({ location: '香園圍口岸', stopover: false });
+            } else {
+                waypoints.push({ location: normalizeLocation(s, false), stopover: true });
+            }
+        });
 
         // ⭐ 用戶指定隧道（如果用戶有揀）
         if (selectedForcedTunnel) {
@@ -727,7 +734,7 @@
                         legs.forEach(leg => { distMeters += leg.distance.value; durSeconds += leg.duration.value; });
                         let distKm = distMeters / 1000;
                         if (isShenzhenBayRoute) distKm += 2.8;
-                        if (isHuanggangRoute) distKm += 2; // ⭐ 皇崗加 2km
+                        if (isHuanggangRoute) distKm += 2;
                         let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
 
                         const btn = document.createElement('button');
@@ -813,7 +820,6 @@
         selectedRoute.legs.forEach(leg => { totalMeters += leg.distance.value; totalSeconds += leg.duration.value; });
 
         let routeKm = totalMeters / 1000;
-        // ⭐ 距離加成：深圳灣 +2.8km，皇崗 +2km
         let finalKm = routeKm;
         if (isShenzhenBayRoute) finalKm += 2.8;
         if (isHuanggangRoute) finalKm += 2;
