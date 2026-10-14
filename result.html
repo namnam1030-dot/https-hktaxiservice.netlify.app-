@@ -171,6 +171,7 @@
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
     }
 
+    /* ⭐ 隧道選擇方格（4列 Grid 排版，可多選） */
     #tunnel-btns {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -180,7 +181,7 @@
 
     .tunnel-btn {
         width: 100%;
-        padding: 0.5rem 0;
+        padding: 0.5rem 0.25rem;
         border-radius: 0.5rem;
         font-size: 14px;
         font-weight: 700;
@@ -192,7 +193,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.25rem;
+        gap: 0.3rem;
         white-space: nowrap;
         text-align: center;
     }
@@ -206,6 +207,25 @@
         border-color: #000000 !important;
         box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3);
     }
+    /* ⭐ 剔選方格（Checkbox）樣式 */
+    .tunnel-checkbox {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 15px;
+        height: 15px;
+        border: 1.5px solid currentColor;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 900;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    .tunnel-btn.active .tunnel-checkbox {
+        background-color: #000000;
+        color: #FFF200;
+        border-color: #000000;
+    }
     html.light-theme body .tunnel-btn {
         background-color: #FFFFFF !important;
         color: #374151 !important;
@@ -218,6 +238,11 @@
     html.light-theme body .tunnel-btn.active {
         background-color: #FFF200 !important;
         color: #000000 !important;
+        border-color: #000000 !important;
+    }
+    html.light-theme body .tunnel-btn.active .tunnel-checkbox {
+        background-color: #000000 !important;
+        color: #FFF200 !important;
         border-color: #000000 !important;
     }
 
@@ -249,15 +274,15 @@
     let currentTunnelFee = 0;
     let routeData = null;
     let isShenzhenBay = false;
-    let selectedForcedTunnel = null;
+    let selectedForcedTunnels = []; // ⭐ 改為可多選（陣列）
 
     const translations = {
         zh: {
             result_title: "路線規劃結果",
             loading_text: "正在計算路線同車費...",
             route_select_title: "請選擇行車路線方案 (最快 / 最短)：",
-            tunnel_select_title: "指定行車隧道（選填，可展開）：",
-            tunnel_select_hint: "點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。",
+            tunnel_select_title: "選擇其他隧道（可多選）：",
+            tunnel_select_hint: "點擊選擇想行嘅隧道（可多選）；再點一次可取消。",
             confirm_route_label: "請確認查詢路線：",
             pickup_label: "起點：",
             stopover_label: "中途站：",
@@ -302,8 +327,8 @@
             loading_text: "Calculating route and fare...",
             btn_back_input: "Back to Edit Route",
             route_select_title: "Select Route Option (Fastest / Shortest):",
-            tunnel_select_title: "Force Specific Tunnel (Optional, Expandable):",
-            tunnel_select_hint: "Tap to force a tunnel; tap again to cancel.",
+            tunnel_select_title: "Select Other Tunnels (Multiple):",
+            tunnel_select_hint: "Tap to select tunnels (multiple allowed); tap again to cancel.",
             confirm_route_label: "Please confirm your route:",
             pickup_label: "Pickup: ",
             stopover_label: "Stopover: ",
@@ -476,13 +501,6 @@
         return trimmed;
     }
 
-    function isPortText(s) {
-        return s.includes("深圳灣") || s.includes("深圳湾")
-            || s.includes("皇崗") || s.includes("皇岗")
-            || s.includes("香園圍") || s.includes("香园围")
-            || s.includes("蓮塘") || s.includes("莲塘");
-    }
-
     function processRoutes(routes, isShenzhenBay) {
         if (!routes || routes.length === 0) return [];
         if (routes.length === 1) {
@@ -588,6 +606,7 @@
         return { lat: tunnel.lat, lng: tunnel.lng };
     }
 
+    // ⭐ 渲染隧道按鈕（剔選方格，可多選）
     function renderTunnelButtons() {
         const container = document.getElementById('tunnel-btns');
         if (!container) return;
@@ -597,21 +616,23 @@
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.dataset.tunnel = tunnel.shortName;
-            btn.className = 'tunnel-btn' + (selectedForcedTunnel === tunnel.shortName ? ' active' : '');
-            btn.innerHTML = '<i class="fa-solid fa-road"></i> ' + tunnel.shortName;
+            const isActive = selectedForcedTunnels.indexOf(tunnel.shortName) >= 0;
+            btn.className = 'tunnel-btn' + (isActive ? ' active' : '');
+            btn.innerHTML = '<span class="tunnel-checkbox">' + (isActive ? '✓' : '') + '</span>' + tunnel.shortName;
             btn.onclick = () => toggleTunnel(tunnel.shortName);
             container.appendChild(btn);
         });
     }
 
+    // ⭐ 多選切換
     function toggleTunnel(name) {
-        selectedForcedTunnel = (selectedForcedTunnel === name) ? null : name;
-
-        document.querySelectorAll('#tunnel-btns .tunnel-btn').forEach(btn => {
-            const isActive = btn.dataset.tunnel === selectedForcedTunnel;
-            btn.className = 'tunnel-btn' + (isActive ? ' active' : '');
-        });
-
+        const idx = selectedForcedTunnels.indexOf(name);
+        if (idx >= 0) {
+            selectedForcedTunnels.splice(idx, 1);
+        } else {
+            selectedForcedTunnels.push(name);
+        }
+        renderTunnelButtons();
         calculateFareWithGoogle();
     }
 
@@ -674,19 +695,15 @@
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
 
-        // ⭐ 中途站：用你提供嘅精確座標 + stopover: true（強制停靠）
+        // ⭐ 中途站：還原基本，直接用 normalizeLocation（口岸就靠 Google 原裝規劃）
         let waypoints = [];
         stopoverTexts.forEach(s => {
-            if (isPortText(s)) {
-                waypoints.push({ location: normalizeLocation(s, false), stopover: true });
-            } else {
-                waypoints.push({ location: normalizeLocation(s, false), stopover: true });
-            }
+            waypoints.push({ location: normalizeLocation(s, false), stopover: true });
         });
 
-        // ⭐ 用戶指定隧道
-        if (selectedForcedTunnel) {
-            const tunnel = tunnelDatabase.find(t => t.shortName === selectedForcedTunnel);
+        // ⭐ 用戶指定隧道（可多選，每個選中嘅隧道都加 waypoint）
+        selectedForcedTunnels.forEach(tunnelName => {
+            const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
             if (tunnel) {
                 const entry = getTunnelEntryPoint(tunnel, pickupVal);
                 waypoints.push({
@@ -694,7 +711,7 @@
                     stopover: false
                 });
             }
-        }
+        });
 
         const request = {
             origin: targetPickup,
@@ -1021,7 +1038,7 @@
     }
 
     function initMap() {
-        selectedForcedTunnel = null;
+        selectedForcedTunnels = []; // ⭐ 初始化為空陣列
 
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
@@ -1191,10 +1208,10 @@
                 <details class="mb-4 p-3 bg-gray-900/90 rounded-xl border border-gray-800">
                     <summary class="text-xs font-bold text-gray-300">
                         <i class="fa-solid fa-road text-brand-yellow"></i>
-                        <span data-i18n="tunnel_select_title">指定行車隧道（選填，可展開）：</span>
+                        <span data-i18n="tunnel_select_title">選擇其他隧道（可多選）：</span>
                         <i class="fa-solid fa-chevron-down chevron text-gray-500 text-xs ml-auto"></i>
                     </summary>
-                    <p class="text-[11px] text-gray-500 mb-2 mt-1" data-i18n="tunnel_select_hint">點擊指定想行嘅隧道，系統會強制規劃行該隧道；再點一次可取消。</p>
+                    <p class="text-[11px] text-gray-500 mb-2 mt-1" data-i18n="tunnel_select_hint">點擊選擇想行嘅隧道（可多選）；再點一次可取消。</p>
                     <div id="tunnel-btns"></div>
                 </details>
 
