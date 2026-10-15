@@ -545,12 +545,7 @@
                             </div>
                         </div>
                         <div class="relative flex items-center">
-                            <input type="text" id="calc-pickup" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-16 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
-                            <!-- ⭐ 獲取目前位置按鈕 -->
-                            <button type="button" id="locate-pickup-btn" onclick="getCurrentLocation('calc-pickup', 'locate-pickup-icon', 'clear-pickup-btn')" class="absolute text-gray-400 hover:text-brand-yellow text-sm cursor-pointer p-1" style="right: 32px;" title="獲取目前位置">
-                                <i class="fa-solid fa-location-crosshairs" id="locate-pickup-icon"></i>
-                            </button>
-                            <!-- 清除按鈕 -->
+                            <input type="text" id="calc-pickup" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="ph_pickup" placeholder="輸入起點..." class="w-full bg-brand-dark border border-gray-800 rounded-lg p-2.5 pr-9 text-white text-xs focus:outline-none focus:border-brand-yellow transition" oninput="toggleClearBtn('calc-pickup', 'clear-pickup-btn')">
                             <button type="button" id="clear-pickup-btn" onclick="clearInput('calc-pickup', 'clear-pickup-btn')" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs cursor-pointer p-1">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
@@ -707,103 +702,6 @@ function loadGoogleMaps() {
         document.head.appendChild(script);
     });
     return _googleMapsLoadPromise;
-}
-
-/* ============================================
-   ⭐ 獲取目前位置（反向地理編碼）
-   - 口岸附近：直接填入口岸名
-   - 香港境內：填入香港地址
-   - 識別失敗 / 香港境外：唔填座標，提示手動輸入
-   ============================================ */
-function getCurrentLocation(inputId, iconId, clearBtnId) {
-    var inputEl = document.getElementById(inputId);
-    var iconEl = document.getElementById(iconId);
-
-    if (!inputEl || !iconEl) return;
-
-    if (!navigator.geolocation) {
-        alert(currentLang === 'en' ? "Geolocation is not supported by your browser." : "您的瀏覽器不支援定位功能。");
-        return;
-    }
-
-    // 改變圖標為 loading 狀態
-    var originalClass = iconEl.className;
-    iconEl.className = "fa-solid fa-spinner fa-spin";
-
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-            var lat = position.coords.latitude;
-            var lng = position.coords.longitude;
-
-            // ⭐ 檢查是否喺口岸附近（用半徑約 3 公里判斷）
-            var distToSZBay    = Math.sqrt(Math.pow(lat - 22.475, 2) + Math.pow(lng - 113.955, 2));
-            var distToHuanggang= Math.sqrt(Math.pow(lat - 22.518, 2) + Math.pow(lng - 114.070, 2));
-            var distToHYW      = Math.sqrt(Math.pow(lat - 22.552, 2) + Math.pow(lng - 114.154, 2));
-
-            var portName = null;
-            if (distToSZBay < 0.03)          portName = '深圳灣口岸';
-            else if (distToHuanggang < 0.03) portName = '皇崗口岸';
-            else if (distToHYW < 0.03)       portName = '香園圍口岸';
-
-            if (portName) {
-                iconEl.className = originalClass;
-                inputEl.value = portName;
-                delete inputEl.dataset.placeId;
-                inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-                if (typeof toggleClearBtn === 'function') toggleClearBtn(inputId, clearBtnId);
-                return;
-            }
-
-            // ⭐ 一般情況：用 Google 反向地理編碼（限制香港）
-            if (window.google && google.maps.Geocoder) {
-                var geocoder = new google.maps.Geocoder();
-                geocoder.geocode({
-                    location: { lat: lat, lng: lng },
-                    language: 'zh-HK',
-                    region: 'HK',
-                    componentRestrictions: { country: 'HK' }
-                }, function(results, status) {
-                    iconEl.className = originalClass;
-
-                    if (status === 'OK' && results[0]) {
-                        inputEl.value = results[0].formatted_address;
-                        inputEl.dataset.placeId = results[0].place_id;
-                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-                        if (typeof toggleClearBtn === 'function') toggleClearBtn(inputId, clearBtnId);
-                    } else {
-                        // ⭐ 唔顯示座標：改為提示用戶手動輸入
-                        iconEl.className = originalClass;
-                        alert(currentLang === 'en'
-                            ? "Unable to recognise your location. Please enter the address manually."
-                            : "無法識別您嘅位置，請手動輸入地址。");
-                    }
-                });
-            } else {
-                // ⭐ Google Maps 未載入：一樣唔顯示座標，提示手動輸入
-                iconEl.className = originalClass;
-                alert(currentLang === 'en'
-                    ? "Unable to recognise your location. Please enter the address manually."
-                    : "無法識別您嘅位置，請手動輸入地址。");
-            }
-        },
-        function(error) {
-            iconEl.className = originalClass;
-            var msg = currentLang === 'en' ? "Unable to retrieve your location." : "無法獲取位置。";
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    msg = currentLang === 'en' ? "Location permission denied." : "您拒絕了定位權限，請到瀏覽器設定開啟。";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    msg = currentLang === 'en' ? "Location information unavailable." : "定位資訊無法取得。";
-                    break;
-                case error.TIMEOUT:
-                    msg = currentLang === 'en' ? "Location request timed out." : "定位請求超時。";
-                    break;
-            }
-            alert(msg);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
 }
 
 function saveRouteDataToLocalStorage() {
