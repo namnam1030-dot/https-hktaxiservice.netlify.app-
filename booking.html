@@ -487,16 +487,25 @@ var isShenzhenBay = false;
 var upgradeChoice = null;
 var pendingBookingData = null;
 var editingBookingId = null;
-var selectedForcedTunnels = [];   // ⭐ 乘客手動揀嘅隧道
-var detectedTunnels = [];         // ⭐ Google 自動偵測到嘅隧道
+var selectedForcedTunnels = [];
+var detectedTunnels = [];
 
 function getDiscountRate() { return isShenzhenBay ? 0.9 : 0.85; }
 function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
 }
 
-// ⭐ 取得最終要顯示嘅隧道（優先顯示乘客手動揀嘅，冇就顯示自動偵測到嘅）
+// ⭐ 取得最終要顯示嘅隧道（直接從 localStorage 讀取，避免全局變數丟失）
 function getFinalTunnels() {
+    var bd = loadBookingDataFromLocalStorage();
+    if (bd) {
+        if (bd.selectedForcedTunnels && bd.selectedForcedTunnels.length > 0) {
+            return bd.selectedForcedTunnels;
+        }
+        if (bd.detectedTunnels && bd.detectedTunnels.length > 0) {
+            return bd.detectedTunnels;
+        }
+    }
     if (selectedForcedTunnels && selectedForcedTunnels.length > 0) {
         return selectedForcedTunnels;
     }
@@ -937,7 +946,6 @@ function submitBookingAfterUpgrade() {
     var isEn = (currentLang === 'en');
     var msgLines = [];
 
-    // ⭐ 取得最終要顯示嘅隧道
     var finalTunnels = getFinalTunnels();
     var tunnelText = finalTunnels.length > 0 ? ' （' + finalTunnels.join('+') + '）' : '';
 
@@ -946,7 +954,6 @@ function submitBookingAfterUpgrade() {
                     && !data.hasPet
                     && !data.hasWheelchair);
 
-    // ⭐ 客戶訊息 (msgLines)
     if (isEn) {
         msgLines.push('📍 Pickup: ' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
@@ -986,11 +993,9 @@ function submitBookingAfterUpgrade() {
     if (data.isWechatCustomer) msgLines.push(isEn ? '💚 Note: WeChat Customer' : '💚 備注：微訊客戶');
     var customerMessage = msgLines.join('\n');
 
-    // ⭐ Discord / Telegram / Calendar 訊息
     var discordMsgLines = [];
     if (orderType === 'instant') { discordMsgLines.push('⚡ 即時訂單 ⚡'); discordMsgLines.push(''); }
 
-    // ⭐ 中途站行（只有1個唔寫編號，多於1個就寫 1. 2. 3.）
     if (data.stopoverTexts && data.stopoverTexts.length > 0) {
         var stopsArr = data.stopoverTexts.map(function(s) { return s.replace(/中途站\d+:\s*/, ''); });
         var stopsText;
@@ -1002,7 +1007,6 @@ function submitBookingAfterUpgrade() {
         discordMsgLines.push('🛑有中途站 （經 ' + stopsText + '）');
     }
 
-    // ⭐ 路線行（起點 → 終點 + 隧道）
     var routeLine = '🚕 ' + data.pickup + ' → ' + data.dropoff + tunnelText;
     discordMsgLines.push(routeLine);
 
@@ -1530,8 +1534,8 @@ window.addEventListener('DOMContentLoaded', function() {
         selectedFareMode = bookingData.selectedFareMode || '';
         currentBaseFare = bookingData.currentBaseFare || 0;
         currentTunnelFee = bookingData.currentTunnelFee || 0;
-        selectedForcedTunnels = bookingData.selectedForcedTunnels || [];   // ⭐
-        detectedTunnels = bookingData.detectedTunnels || [];                // ⭐
+        selectedForcedTunnels = bookingData.selectedForcedTunnels || [];
+        detectedTunnels = bookingData.detectedTunnels || [];
     }
 
     var routeData = loadRouteDataFromLocalStorage();
