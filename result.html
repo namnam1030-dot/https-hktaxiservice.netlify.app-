@@ -276,8 +276,9 @@
     let currentRouteResults = null;
     let routeOverlays = [];
 
-    // ⭐ 深圳灣強制途經點（龍鼓灘／屯赤隧道一帶）
-const SHENZHEN_BAY_FORCED_POINT = { lat: 22.416278, lng: 113.989528 };
+    // ⭐ 深圳灣強制途經點（按方向區分）
+    const SHENZHEN_BAY_FORCED_POINT_IN = { lat: 22.416278, lng: 113.989528 };   // 往深圳灣方向
+    const SHENZHEN_BAY_FORCED_POINT_OUT = { lat: 22.4155, lng: 113.987056 };    // 由深圳灣出市區方向
 
     const translations = {
         zh: {
@@ -664,6 +665,20 @@ const SHENZHEN_BAY_FORCED_POINT = { lat: 22.416278, lng: 113.989528 };
         return { matchedTunnels, totalTunnelFee };
     }
 
+    // ⭐ 判斷深圳灣方向並返回應該用嘅強制點（或 null）
+    function getShenzhenBayForcedPoint(pickupVal, dropoffVal, stopoverTexts) {
+        // 乘客揀咗大欖就唔強制
+        if (selectedForcedTunnels.indexOf("大欖") >= 0) return null;
+
+        const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
+        const isToSZ = dropoffVal.includes("深圳灣") || dropoffVal.includes("深圳湾");
+        const stopoverHasSZ = stopoverTexts.some(s => s.includes("深圳灣") || s.includes("深圳湾"));
+
+        if (isFromSZ) return SHENZHEN_BAY_FORCED_POINT_OUT;     // 由深圳灣出市區
+        if (isToSZ || stopoverHasSZ) return SHENZHEN_BAY_FORCED_POINT_IN; // 往深圳灣
+        return null;
+    }
+
     function calculateFareWithGoogle() {
         if (!routeData) {
             alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
@@ -709,14 +724,14 @@ const SHENZHEN_BAY_FORCED_POINT = { lat: 22.416278, lng: 113.989528 };
             waypoints.push({ location: normalizeLocation(s, false), stopover: true });
         });
 
-        // ⭐ 深圳灣強制途經點（除非乘客揀咗大欖）
-        const userChoseTaiLam = selectedForcedTunnels.indexOf("大欖") >= 0;
-        if (isShenzhenBayRoute && !userChoseTaiLam) {
+        // ⭐ 深圳灣強制途經點（按方向 + 有冇揀大欖）
+        const forcedPoint = getShenzhenBayForcedPoint(pickupVal, dropoffVal, stopoverTexts);
+        if (forcedPoint) {
             waypoints.push({
-                location: new google.maps.LatLng(SHENZHEN_BAY_FORCED_POINT.lat, SHENZHEN_BAY_FORCED_POINT.lng),
+                location: new google.maps.LatLng(forcedPoint.lat, forcedPoint.lng),
                 stopover: false
             });
-            console.log('[路線] 深圳灣行程：強制經過指定座標，優先走屯赤');
+            console.log('[路線] 深圳灣行程：強制經過指定座標', forcedPoint);
         }
 
         selectedForcedTunnels.forEach(tunnelName => {
@@ -767,8 +782,6 @@ const SHENZHEN_BAY_FORCED_POINT = { lat: 22.416278, lng: 113.989528 };
             { text: dropoffVal, isPickup: false }
         ];
 
-        const userChoseTaiLam = selectedForcedTunnels.indexOf("大欖") >= 0;
-
         const segments = [];
         for (let i = 0; i < allPoints.length - 1; i++) {
             const segStart = allPoints[i];
@@ -776,14 +789,18 @@ const SHENZHEN_BAY_FORCED_POINT = { lat: 22.416278, lng: 113.989528 };
 
             const segTunnelWaypoints = [];
 
-            // ⭐ 深圳灣強制途經點（除非乘客揀咗大欖）——只喺最後一段（去深圳灣）加
-            const segHasSZ = segStart.text.includes("深圳灣") || segEnd.text.includes("深圳灣");
-            if (isShenzhenBayRoute && !userChoseTaiLam && segHasSZ) {
-                segTunnelWaypoints.push({
-                    location: new google.maps.LatLng(SHENZHEN_BAY_FORCED_POINT.lat, SHENZHEN_BAY_FORCED_POINT.lng),
-                    stopover: false
-                });
-                console.log('[路線] 深圳灣分段：強制經過指定座標');
+            // ⭐ 深圳灣強制途經點：只有喺「涉及深圳灣嘅嗰一段」先加，並按方向判斷
+            const segInvolvesSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾")
+                               || segEnd.text.includes("深圳灣") || segEnd.text.includes("深圳湾");
+            if (segInvolvesSZ) {
+                const segForced = getShenzhenBayForcedPoint(segStart.text, segEnd.text, []);
+                if (segForced) {
+                    segTunnelWaypoints.push({
+                        location: new google.maps.LatLng(segForced.lat, segForced.lng),
+                        stopover: false
+                    });
+                    console.log('[路線] 深圳灣分段：強制經過指定座標', segForced);
+                }
             }
 
             selectedForcedTunnels.forEach(tunnelName => {
