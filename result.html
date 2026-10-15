@@ -273,10 +273,11 @@
     let isShenzhenBay = false;
     let selectedForcedTunnels = [];
 
-    // ⭐ 用來存當前路線結果（供選擇替代路線時用）
     let currentRouteResults = null;
-    // ⭐ 地圖上的疊加物件（Polyline + Marker），用嚟清除舊嘅
     let routeOverlays = [];
+
+    // ⭐ 深圳灣強制途經點（龍鼓灘／屯赤隧道一帶）
+    const SHENZHEN_BAY_FORCED_POINT = { lat: 22.419583, lng: 113.987194 };
 
     const translations = {
         zh: {
@@ -708,6 +709,16 @@
             waypoints.push({ location: normalizeLocation(s, false), stopover: true });
         });
 
+        // ⭐ 深圳灣強制途經點（除非乘客揀咗大欖）
+        const userChoseTaiLam = selectedForcedTunnels.indexOf("大欖") >= 0;
+        if (isShenzhenBayRoute && !userChoseTaiLam) {
+            waypoints.push({
+                location: new google.maps.LatLng(SHENZHEN_BAY_FORCED_POINT.lat, SHENZHEN_BAY_FORCED_POINT.lng),
+                stopover: false
+            });
+            console.log('[路線] 深圳灣行程：強制經過指定座標，優先走屯赤');
+        }
+
         selectedForcedTunnels.forEach(tunnelName => {
             const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
             if (tunnel) {
@@ -756,12 +767,25 @@
             { text: dropoffVal, isPickup: false }
         ];
 
+        const userChoseTaiLam = selectedForcedTunnels.indexOf("大欖") >= 0;
+
         const segments = [];
         for (let i = 0; i < allPoints.length - 1; i++) {
             const segStart = allPoints[i];
             const segEnd = allPoints[i + 1];
 
             const segTunnelWaypoints = [];
+
+            // ⭐ 深圳灣強制途經點（除非乘客揀咗大欖）——只喺最後一段（去深圳灣）加
+            const segHasSZ = segStart.text.includes("深圳灣") || segEnd.text.includes("深圳灣");
+            if (isShenzhenBayRoute && !userChoseTaiLam && segHasSZ) {
+                segTunnelWaypoints.push({
+                    location: new google.maps.LatLng(SHENZHEN_BAY_FORCED_POINT.lat, SHENZHEN_BAY_FORCED_POINT.lng),
+                    stopover: false
+                });
+                console.log('[路線] 深圳灣分段：強制經過指定座標');
+            }
+
             selectedForcedTunnels.forEach(tunnelName => {
                 const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
                 if (!tunnel) return;
@@ -789,9 +813,6 @@
         }
 
         console.log('[路線] 分段請求：共 ' + segments.length + ' 段');
-        segments.forEach((seg, i) => {
-            console.log('  段 ' + (i+1) + '：' + seg.originText + ' → ' + seg.destText + '，隧道 waypoints：' + seg.waypoints.length);
-        });
 
         let requestTimedOut = false;
         const timeoutId = setTimeout(() => {
@@ -855,22 +876,11 @@
         for (let i = 0; i < results.length; i++) {
             const segRoute = results[i].result.routes[0];
 
-            if (segRoute.legs) {
-                segRoute.legs.forEach(leg => allLegs.push(leg));
-            }
-            if (segRoute.overview_path) {
-                segRoute.overview_path.forEach(p => overviewPath.push(p));
-            }
+            if (segRoute.legs) segRoute.legs.forEach(leg => allLegs.push(leg));
+            if (segRoute.overview_path) segRoute.overview_path.forEach(p => overviewPath.push(p));
             if (segRoute.bounds) {
-                if (!bounds) {
-                    bounds = segRoute.bounds;
-                } else {
-                    try {
-                        bounds = bounds.union(segRoute.bounds);
-                    } catch(e) {
-                        console.warn('[路線] bounds union 失敗，保留原 bounds');
-                    }
-                }
+                if (!bounds) bounds = segRoute.bounds;
+                else { try { bounds = bounds.union(segRoute.bounds); } catch(e) {} }
             }
         }
 
@@ -883,7 +893,7 @@
     }
 
     function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-        console.warn('[路線] Fallback：改用單次請求（唔加隧道 waypoint）');
+        console.warn('[路線] Fallback：改用單次請求');
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
 
@@ -913,7 +923,7 @@
     function renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute) {
         routesData = processRoutes(result.routes, isShenzhenBayRoute);
         result.routes = routesData;
-        currentRouteResults = result; // ⭐ 存起供選擇路線用
+        currentRouteResults = result;
         document.getElementById('loading-indicator').classList.add('hidden');
         document.getElementById('result-content').classList.remove('hidden');
 
@@ -954,15 +964,11 @@
             if (i === index) btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-brand-yellow/20 border-brand-yellow text-white font-bold";
             else btn.className = "p-2.5 rounded-lg border text-xs text-left transition cursor-pointer bg-black/40 border-gray-700 text-gray-400 hover:text-white";
         });
-        // ⭐ 改用 currentRouteResults
         if (currentRouteResults) {
             displaySelectedRoute(currentRouteResults, index, isShenzhenBayRoute, isHuanggangRoute);
         }
     }
 
-    /* =========================================================
-       ⭐ 用 Polyline 畫路線（唔再用 DirectionsRenderer）
-       ========================================================= */
     function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute, isHuanggangRoute) {
         if (!map) {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -973,13 +979,11 @@
             });
         }
 
-        // ⭐ 清除舊嘅疊加物件
         routeOverlays.forEach(o => o.setMap(null));
         routeOverlays = [];
 
         const selectedRoute = directionsResult.routes[routeIndex];
 
-        // ⭐ 收集所有座標點（優先 overview_path）
         const pathPoints = [];
         if (selectedRoute.overview_path && selectedRoute.overview_path.length > 0) {
             selectedRoute.overview_path.forEach(p => pathPoints.push(p));
@@ -991,7 +995,6 @@
             });
         }
 
-        // ⭐ 用 Polyline 畫路線
         if (pathPoints.length > 0) {
             const polyline = new google.maps.Polyline({
                 path: pathPoints,
@@ -1002,25 +1005,18 @@
             });
             routeOverlays.push(polyline);
 
-            // ⭐ 調整視野
             const bounds = new google.maps.LatLngBounds();
             pathPoints.forEach(p => bounds.extend(p));
-            try {
-                map.fitBounds(bounds, { top: 30, right: 30, bottom: 30, left: 30 });
-            } catch(e) {
-                console.warn('[路線] fitBounds 失敗：', e);
-            }
+            try { map.fitBounds(bounds, { top: 30, right: 30, bottom: 30, left: 30 }); } catch(e) {}
         }
 
-        // ⭐ 起點 / 終點 Marker
         if (selectedRoute.legs && selectedRoute.legs.length > 0) {
             const startLoc = selectedRoute.legs[0].start_location;
             const endLoc = selectedRoute.legs[selectedRoute.legs.length - 1].end_location;
 
             if (startLoc) {
                 const markerA = new google.maps.Marker({
-                    position: startLoc,
-                    map: map,
+                    position: startLoc, map: map,
                     label: { text: 'A', color: '#000000', fontWeight: 'bold' },
                     title: '起點'
                 });
@@ -1028,8 +1024,7 @@
             }
             if (endLoc) {
                 const markerB = new google.maps.Marker({
-                    position: endLoc,
-                    map: map,
+                    position: endLoc, map: map,
                     label: { text: 'B', color: '#000000', fontWeight: 'bold' },
                     title: '終點'
                 });
@@ -1037,7 +1032,6 @@
             }
         }
 
-        // ⭐ 計算車費（保持不變）
         let totalMeters = 0;
         let totalSeconds = 0;
         selectedRoute.legs.forEach(leg => { totalMeters += leg.distance.value; totalSeconds += leg.duration.value; });
