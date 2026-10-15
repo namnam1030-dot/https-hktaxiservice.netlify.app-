@@ -330,6 +330,7 @@
             selectedFareMode: selectedFareMode,
             currentBaseFare: currentBaseFare,
             currentTunnelFee: currentTunnelFee,
+            selectedForcedTunnels: selectedForcedTunnels,
             pickup: routeData ? routeData.pickup : '',
             dropoff: routeData ? routeData.dropoff : '',
             stopovers: routeData ? routeData.stopovers : []
@@ -506,7 +507,6 @@
         const isHKIsland = /港島|港岛|中環|中环|灣仔|湾仔|銅鑼灣|铜锣湾|北角|鰂魚涌|鲗鱼涌|太古|西灣河|西湾河|筲箕灣|筲箕湾|柴灣|柴湾|薄扶林|堅尼地城|坚尼地城|西環|西环|上環|上环|金鐘|金钟|跑馬地|跑马地|天后|炮台山|山頂|山顶|石澳|赤柱|鴨脷洲|鸭脷洲|黃竹坑|黄竹坑|海洋公園|海洋公园|淺水灣|浅水湾|南區|南区|東區|东区|中西區|中西区|灣仔區|湾仔区|半山|數碼港|数码港|貝沙灣|贝沙湾/.test(pickupStr);
         const isKowloon = /九龍|九龙|尖沙咀|旺角|油麻地|佐敦|深水埗|長沙灣|长沙湾|荔枝角|美孚|觀塘|观塘|牛頭角|牛头角|九龍灣|九龙湾|彩虹|鑽石山|钻石山|黃大仙|黄大仙|樂富|乐富|九龍塘|九龙塘|何文田|紅磡|红磡|土瓜灣|土瓜湾|啟德|启德|油塘|藍田|蓝田|新蒲崗|新蒲岗|慈雲山|慈云山|九龍城|九龙城|大角咀|奧運|奥运/.test(pickupStr);
         const isNTE = /沙田|大圍|大围|火炭|馬鞍山|马鞍山|大埔|上水|粉嶺|粉岭|太和|北區|北区|白石角|科學園|科学园|沙頭角|沙头角|打鼓嶺|打鼓岭/.test(pickupStr);
-        // ⭐ 已加入「深圳灣」到 isNTW
         const isNTW = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸|荃灣|荃湾|葵涌|青衣|深圳灣|深圳湾/.test(pickupStr);
         const isLantau = /東涌|东涌|機場|机场|赤鱲角|赤鱲角|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(pickupStr);
         const isSouth = /香港仔|薄扶林|鴨脷洲|鸭脷洲|黃竹坑|黄竹坑|海洋公園|海洋公园|淺水灣|浅水湾|石澳|赤柱|南區|南区|數碼港|数码港|貝沙灣|贝沙湾/.test(pickupStr);
