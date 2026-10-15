@@ -659,9 +659,6 @@
         return { matchedTunnels, totalTunnelFee };
     }
 
-    /* =========================================================
-       ⭐ 主入口：判斷走單次請求定分段請求
-       ========================================================= */
     function calculateFareWithGoogle() {
         if (!routeData) {
             alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
@@ -691,7 +688,6 @@
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
         let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
 
-        // 有中途站 + 有選隧道 → 分段請求；否則單次請求
         if (stopoverTexts.length > 0 && selectedForcedTunnels.length > 0) {
             calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
         } else {
@@ -699,9 +695,6 @@
         }
     }
 
-    /* =========================================================
-       ⭐ 單次請求（冇中途站或冇選隧道）
-       ========================================================= */
     function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
@@ -752,19 +745,13 @@
         });
     }
 
-    /* =========================================================
-       ⭐ 分段請求（有中途站 + 有選隧道）
-       每段獨立請求，智能判斷隧道應該喺邊一段行
-       ========================================================= */
     function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-        // 構建點列表：起點 → 中途站1 → ... → 終點
         const allPoints = [
             { text: pickupVal, isPickup: true },
             ...stopoverTexts.map(s => ({ text: s, isPickup: false })),
             { text: dropoffVal, isPickup: false }
         ];
 
-        // 為每一段構建請求（智能判斷隧道應用喺邊段）
         const segments = [];
         for (let i = 0; i < allPoints.length - 1; i++) {
             const segStart = allPoints[i];
@@ -778,7 +765,6 @@
                 const entryFromStart = getTunnelEntryPoint(tunnel, segStart.text);
                 const entryFromEnd = getTunnelEntryPoint(tunnel, segEnd.text);
 
-                // 兩端入口唔同 → 隧道橫跨此段 → 應該喺呢段走
                 const sameEntry = (entryFromStart.lat === entryFromEnd.lat && entryFromStart.lng === entryFromEnd.lng);
                 if (!sameEntry) {
                     segTunnelWaypoints.push({
@@ -830,16 +816,18 @@
             const failed = results.filter(r => r.status !== 'OK');
             if (failed.length > 0) {
                 console.error('[路線] 分段請求失敗：', failed.map(r => r.status));
-                // Fallback：改用單次請求（唔加隧道 waypoint）
                 fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
                 return;
             }
 
-            // 合併所有段
-            const mergedRoute = mergeSegments(results);
-            const mergedResult = { routes: [mergedRoute] };
-
-            renderRouteResult(mergedResult, isShenzhenBayRoute, isHuanggangRoute);
+            try {
+                const mergedRoute = mergeSegments(results);
+                const mergedResult = { routes: [mergedRoute] };
+                renderRouteResult(mergedResult, isShenzhenBayRoute, isHuanggangRoute);
+            } catch(err) {
+                console.error('[路線] 合併分段路線失敗：', err);
+                fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
+            }
         }).catch(err => {
             clearTimeout(timeoutId);
             console.error('[路線] 分段請求拋錯：', err);
@@ -848,36 +836,47 @@
     }
 
     /* =========================================================
-       ⭐ 合併多段路線結果（legs 拼接、overview_path 拼接、bounds 合併）
+       ⭐ 合併多段路線（淺拷貝，保留 Google Maps 對象）
        ========================================================= */
     function mergeSegments(results) {
         const firstRoute = results[0].result.routes[0];
-        const merged = JSON.parse(JSON.stringify(firstRoute));
 
-        let overviewPath = firstRoute.overview_path ? firstRoute.overview_path.slice() : [];
-        let bounds = firstRoute.bounds;
-
-        for (let i = 1; i < results.length; i++) {
-            const segRoute = results[i].result.routes[0];
-
-            // 拼接 legs
-            segRoute.legs.forEach(leg => {
-                merged.legs.push(leg);
-            });
-
-            // 拼接 overview_path
-            if (segRoute.overview_path) {
-                overviewPath = overviewPath.concat(segRoute.overview_path);
-            }
-
-            // 合併 bounds
-            if (segRoute.bounds && bounds) {
-                try {
-                    bounds = bounds.union(segRoute.bounds);
-                } catch(e) {}
+        // ⭐ 淺拷貝：只複製屬性名，唔複製物件
+        const merged = {};
+        for (let key in firstRoute) {
+            if (Object.prototype.hasOwnProperty.call(firstRoute, key)) {
+                merged[key] = firstRoute[key];
             }
         }
 
+        // 重新拼 legs（保留原始 leg 物件）
+        const allLegs = [];
+        let overviewPath = [];
+        let bounds = null;
+
+        for (let i = 0; i < results.length; i++) {
+            const segRoute = results[i].result.routes[0];
+
+            if (segRoute.legs) {
+                segRoute.legs.forEach(leg => allLegs.push(leg));
+            }
+            if (segRoute.overview_path) {
+                segRoute.overview_path.forEach(p => overviewPath.push(p));
+            }
+            if (segRoute.bounds) {
+                if (!bounds) {
+                    bounds = segRoute.bounds;
+                } else {
+                    try {
+                        bounds = bounds.union(segRoute.bounds);
+                    } catch(e) {
+                        console.warn('[路線] bounds union 失敗，保留原 bounds');
+                    }
+                }
+            }
+        }
+
+        merged.legs = allLegs;
         merged.overview_path = overviewPath;
         if (bounds) merged.bounds = bounds;
         merged.summary = '分段路線';
@@ -885,9 +884,6 @@
         return merged;
     }
 
-    /* =========================================================
-       ⭐ Fallback：分段請求失敗，退回單次請求
-       ========================================================= */
     function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
         console.warn('[路線] Fallback：改用單次請求（唔加隧道 waypoint）');
         let targetPickup = normalizeLocation(pickupVal, true);
@@ -912,15 +908,10 @@
             } else {
                 console.error('[路線] Fallback 都失敗：', status);
                 alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
-                sessionStorage.setItem('returningFromResult', '1');
-                window.location.href = 'index.html';
             }
         });
     }
 
-    /* =========================================================
-       ⭐ 統一渲染路線結果
-       ========================================================= */
     function renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute) {
         routesData = processRoutes(result.routes, isShenzhenBayRoute);
         result.routes = routesData;
