@@ -142,115 +142,39 @@
         border-color: #dc2626 !important;
     }
 
-    .mifa-banner-text {
-        color: #fca5a5;
-    }
-    html.light-theme body .mifa-banner-text {
-        color: #b91c1c !important;
-    }
+    .mifa-banner-text { color: #fca5a5; }
+    html.light-theme body .mifa-banner-text { color: #b91c1c !important; }
 
     @keyframes mifaFleetBtnBlink {
-        0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-            box-shadow: 0 4px 12px rgba(255, 242, 0, 0.4);
-        }
-        50% {
-            opacity: 0.75;
-            transform: scale(1.03);
-            box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
-        }
+        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 4px 12px rgba(255, 242, 0, 0.4); }
+        50% { opacity: 0.75; transform: scale(1.03); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); }
     }
-    .mifa-fleet-btn-blink {
-        animation: mifaFleetBtnBlink 1.2s ease-in-out infinite !important;
-    }
-    .mifa-fleet-btn-blink:hover {
-        animation-play-state: paused;
-        opacity: 1;
-        transform: scale(1.05);
-        box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
-    }
+    .mifa-fleet-btn-blink { animation: mifaFleetBtnBlink 1.2s ease-in-out infinite !important; }
+    .mifa-fleet-btn-blink:hover { animation-play-state: paused; opacity: 1; transform: scale(1.05); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); }
 
-    #tunnel-btns {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin-top: 8px;
-    }
+    #tunnel-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
 
     .tunnel-btn {
-        width: 100%;
-        padding: 0.5rem 0.25rem;
-        border-radius: 0.5rem;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        border: 1px solid #374151;
-        background-color: rgba(0, 0, 0, 0.4);
-        color: #9CA3AF;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3rem;
-        white-space: nowrap;
-        text-align: center;
+        width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700;
+        cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151;
+        background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF;
+        display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+        white-space: nowrap; text-align: center;
     }
-    .tunnel-btn:hover {
-        color: #FFF200;
-        border-color: #FFF200;
-    }
-    .tunnel-btn.active {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
-        box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3);
-    }
+    .tunnel-btn:hover { color: #FFF200; border-color: #FFF200; }
+    .tunnel-btn.active { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3); }
     .tunnel-checkbox {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 15px;
-        height: 15px;
-        border: 1.5px solid currentColor;
-        border-radius: 3px;
-        font-size: 11px;
-        font-weight: 900;
-        line-height: 1;
-        flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 3px;
+        font-size: 11px; font-weight: 900; line-height: 1; flex-shrink: 0;
     }
-    .tunnel-btn.active .tunnel-checkbox {
-        background-color: #000000;
-        color: #FFF200;
-        border-color: #000000;
-    }
-    html.light-theme body .tunnel-btn {
-        background-color: #FFFFFF !important;
-        color: #374151 !important;
-        border-color: #D1D5DB !important;
-    }
-    html.light-theme body .tunnel-btn:hover {
-        color: #000000 !important;
-        border-color: #000000 !important;
-    }
-    html.light-theme body .tunnel-btn.active {
-        background-color: #FFF200 !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
-    }
-    html.light-theme body .tunnel-btn.active .tunnel-checkbox {
-        background-color: #000000 !important;
-        color: #FFF200 !important;
-        border-color: #000000 !important;
-    }
+    .tunnel-btn.active .tunnel-checkbox { background-color: #000000; color: #FFF200; border-color: #000000; }
+    html.light-theme body .tunnel-btn { background-color: #FFFFFF !important; color: #374151 !important; border-color: #D1D5DB !important; }
+    html.light-theme body .tunnel-btn:hover { color: #000000 !important; border-color: #000000 !important; }
+    html.light-theme body .tunnel-btn.active { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; }
+    html.light-theme body .tunnel-btn.active .tunnel-checkbox { background-color: #000000 !important; color: #FFF200 !important; border-color: #000000 !important; }
 
-    details > summary {
-        list-style: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
+    details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
     details > summary::-webkit-details-marker { display: none; }
     details[open] > summary .chevron { transform: rotate(180deg); }
     details > summary .chevron { transition: transform 0.2s ease; }
@@ -276,9 +200,8 @@
     let currentRouteResults = null;
     let routeOverlays = [];
 
-    // ⭐ 深圳灣強制途經點（按方向區分）
-    const SHENZHEN_BAY_FORCED_POINT_IN = { lat: 22.416278, lng: 113.989528 };   // 往深圳灣方向
-    const SHENZHEN_BAY_FORCED_POINT_OUT = { lat: 22.4155, lng: 113.987056 };    // 由深圳灣出市區方向
+    const SHENZHEN_BAY_FORCED_POINT_IN = { lat: 22.416278, lng: 113.989528 };
+    const SHENZHEN_BAY_FORCED_POINT_OUT = { lat: 22.4155, lng: 113.987056 };
 
     const translations = {
         zh: {
@@ -583,7 +506,8 @@
         const isHKIsland = /港島|港岛|中環|中环|灣仔|湾仔|銅鑼灣|铜锣湾|北角|鰂魚涌|鲗鱼涌|太古|西灣河|西湾河|筲箕灣|筲箕湾|柴灣|柴湾|薄扶林|堅尼地城|坚尼地城|西環|西环|上環|上环|金鐘|金钟|跑馬地|跑马地|天后|炮台山|山頂|山顶|石澳|赤柱|鴨脷洲|鸭脷洲|黃竹坑|黄竹坑|海洋公園|海洋公园|淺水灣|浅水湾|南區|南区|東區|东区|中西區|中西区|灣仔區|湾仔区|半山|數碼港|数码港|貝沙灣|贝沙湾/.test(pickupStr);
         const isKowloon = /九龍|九龙|尖沙咀|旺角|油麻地|佐敦|深水埗|長沙灣|长沙湾|荔枝角|美孚|觀塘|观塘|牛頭角|牛头角|九龍灣|九龙湾|彩虹|鑽石山|钻石山|黃大仙|黄大仙|樂富|乐富|九龍塘|九龙塘|何文田|紅磡|红磡|土瓜灣|土瓜湾|啟德|启德|油塘|藍田|蓝田|新蒲崗|新蒲岗|慈雲山|慈云山|九龍城|九龙城|大角咀|奧運|奥运/.test(pickupStr);
         const isNTE = /沙田|大圍|大围|火炭|馬鞍山|马鞍山|大埔|上水|粉嶺|粉岭|太和|北區|北区|白石角|科學園|科学园|沙頭角|沙头角|打鼓嶺|打鼓岭/.test(pickupStr);
-        const isNTW = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸|荃灣|荃湾|葵涌|青衣/.test(pickupStr);
+        // ⭐ 已加入「深圳灣」到 isNTW
+        const isNTW = /屯門|屯门|元朗|天水圍|天水围|洪水橋|洪水桥|流浮山|深井|黃金海岸|黄金海岸|荃灣|荃湾|葵涌|青衣|深圳灣|深圳湾/.test(pickupStr);
         const isLantau = /東涌|东涌|機場|机场|赤鱲角|赤鱲角|迪士尼|港珠澳|大橋口岸|大桥口岸|HZMB/.test(pickupStr);
         const isSouth = /香港仔|薄扶林|鴨脷洲|鸭脷洲|黃竹坑|黄竹坑|海洋公園|海洋公园|淺水灣|浅水湾|石澳|赤柱|南區|南区|數碼港|数码港|貝沙灣|贝沙湾/.test(pickupStr);
 
@@ -665,17 +589,15 @@
         return { matchedTunnels, totalTunnelFee };
     }
 
-    // ⭐ 判斷深圳灣方向並返回應該用嘅強制點（或 null）
     function getShenzhenBayForcedPoint(pickupVal, dropoffVal, stopoverTexts) {
-        // 乘客揀咗大欖就唔強制
         if (selectedForcedTunnels.indexOf("大欖") >= 0) return null;
 
         const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
         const isToSZ = dropoffVal.includes("深圳灣") || dropoffVal.includes("深圳湾");
         const stopoverHasSZ = stopoverTexts.some(s => s.includes("深圳灣") || s.includes("深圳湾"));
 
-        if (isFromSZ) return SHENZHEN_BAY_FORCED_POINT_OUT;     // 由深圳灣出市區
-        if (isToSZ || stopoverHasSZ) return SHENZHEN_BAY_FORCED_POINT_IN; // 往深圳灣
+        if (isFromSZ) return SHENZHEN_BAY_FORCED_POINT_OUT;
+        if (isToSZ || stopoverHasSZ) return SHENZHEN_BAY_FORCED_POINT_IN;
         return null;
     }
 
@@ -724,14 +646,12 @@
             waypoints.push({ location: normalizeLocation(s, false), stopover: true });
         });
 
-        // ⭐ 深圳灣強制途經點（按方向 + 有冇揀大欖）
         const forcedPoint = getShenzhenBayForcedPoint(pickupVal, dropoffVal, stopoverTexts);
         if (forcedPoint) {
             waypoints.push({
                 location: new google.maps.LatLng(forcedPoint.lat, forcedPoint.lng),
                 stopover: false
             });
-            console.log('[路線] 深圳灣行程：強制經過指定座標', forcedPoint);
         }
 
         selectedForcedTunnels.forEach(tunnelName => {
@@ -757,7 +677,6 @@
         let requestTimedOut = false;
         const timeoutId = setTimeout(() => {
             requestTimedOut = true;
-            console.warn('[路線] 請求超時');
             alert(currentLang === 'en' ? "Route calculation is taking too long." : "路線計算太耐，請稍後再試。");
         }, 15000);
 
@@ -767,7 +686,6 @@
             if (status === google.maps.DirectionsStatus.OK) {
                 renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute);
             } else {
-                console.error('[路線] 失敗，狀態：', status);
                 alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
                 sessionStorage.setItem('returningFromResult', '1');
                 window.location.href = 'index.html';
@@ -789,7 +707,6 @@
 
             const segTunnelWaypoints = [];
 
-            // ⭐ 深圳灣強制途經點：只有喺「涉及深圳灣嘅嗰一段」先加，並按方向判斷
             const segInvolvesSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾")
                                || segEnd.text.includes("深圳灣") || segEnd.text.includes("深圳湾");
             if (segInvolvesSZ) {
@@ -799,7 +716,6 @@
                         location: new google.maps.LatLng(segForced.lat, segForced.lng),
                         stopover: false
                     });
-                    console.log('[路線] 深圳灣分段：強制經過指定座標', segForced);
                 }
             }
 
@@ -829,12 +745,9 @@
             });
         }
 
-        console.log('[路線] 分段請求：共 ' + segments.length + ' 段');
-
         let requestTimedOut = false;
         const timeoutId = setTimeout(() => {
             requestTimedOut = true;
-            console.warn('[路線] 分段請求超時');
             alert(currentLang === 'en' ? "Route calculation is taking too long." : "路線計算太耐，請稍後再試。");
         }, 20000);
 
@@ -857,7 +770,6 @@
 
             const failed = results.filter(r => r.status !== 'OK');
             if (failed.length > 0) {
-                console.error('[路線] 分段請求失敗：', failed.map(r => r.status));
                 fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
                 return;
             }
@@ -867,12 +779,10 @@
                 const mergedResult = { routes: [mergedRoute] };
                 renderRouteResult(mergedResult, isShenzhenBayRoute, isHuanggangRoute);
             } catch(err) {
-                console.error('[路線] 合併分段路線失敗：', err);
                 fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
             }
         }).catch(err => {
             clearTimeout(timeoutId);
-            console.error('[路線] 分段請求拋錯：', err);
             fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
         });
     }
@@ -892,7 +802,6 @@
 
         for (let i = 0; i < results.length; i++) {
             const segRoute = results[i].result.routes[0];
-
             if (segRoute.legs) segRoute.legs.forEach(leg => allLegs.push(leg));
             if (segRoute.overview_path) segRoute.overview_path.forEach(p => overviewPath.push(p));
             if (segRoute.bounds) {
@@ -905,12 +814,10 @@
         merged.overview_path = overviewPath;
         if (bounds) merged.bounds = bounds;
         merged.summary = '分段路線';
-
         return merged;
     }
 
     function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-        console.warn('[路線] Fallback：改用單次請求');
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
 
@@ -931,7 +838,6 @@
             if (status === google.maps.DirectionsStatus.OK) {
                 renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute);
             } else {
-                console.error('[路線] Fallback 都失敗：', status);
                 alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
             }
         });
