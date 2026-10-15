@@ -487,11 +487,23 @@ var isShenzhenBay = false;
 var upgradeChoice = null;
 var pendingBookingData = null;
 var editingBookingId = null;
-var selectedForcedTunnels = [];   // ⭐ 新增
+var selectedForcedTunnels = [];   // ⭐ 乘客手動揀嘅隧道
+var detectedTunnels = [];         // ⭐ Google 自動偵測到嘅隧道
 
 function getDiscountRate() { return isShenzhenBay ? 0.9 : 0.85; }
 function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
+}
+
+// ⭐ 取得最終要顯示嘅隧道（優先顯示乘客手動揀嘅，冇就顯示自動偵測到嘅）
+function getFinalTunnels() {
+    if (selectedForcedTunnels && selectedForcedTunnels.length > 0) {
+        return selectedForcedTunnels;
+    }
+    if (detectedTunnels && detectedTunnels.length > 0) {
+        return detectedTunnels;
+    }
+    return [];
 }
 
 function calculateTotalFare() {
@@ -925,6 +937,10 @@ function submitBookingAfterUpgrade() {
     var isEn = (currentLang === 'en');
     var msgLines = [];
 
+    // ⭐ 取得最終要顯示嘅隧道
+    var finalTunnels = getFinalTunnels();
+    var tunnelText = finalTunnels.length > 0 ? ' （' + finalTunnels.join('+') + '）' : '';
+
     var hidePaxLine = (data.passengers === '1 人'
                     && (!data.luggages || data.luggages === '0 件')
                     && !data.hasPet
@@ -934,10 +950,7 @@ function submitBookingAfterUpgrade() {
     if (isEn) {
         msgLines.push('📍 Pickup: ' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
-        msgLines.push('🏁 Dropoff: ' + data.dropoff);
-        if (selectedForcedTunnels && selectedForcedTunnels.length > 0) {
-            msgLines.push('🛣️ Tunnels: ' + selectedForcedTunnels.join('+'));
-        }
+        msgLines.push('🏁 Dropoff: ' + data.dropoff + tunnelText);
         if (data.flightNo) msgLines.push('✈️ Flight: ' + data.flightNo);
         if (orderType === 'booking') { msgLines.push('📅 Date: ' + data.date); msgLines.push('⏰ Time: ' + data.timeStringFormatted); }
         if (!hidePaxLine) msgLines.push('👥 Passengers: ' + data.passengers);
@@ -951,10 +964,7 @@ function submitBookingAfterUpgrade() {
     } else {
         msgLines.push('📍 起點：' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s); });
-        msgLines.push('🏁 終點：' + data.dropoff);
-        if (selectedForcedTunnels && selectedForcedTunnels.length > 0) {
-            msgLines.push('🛣️隧道：' + selectedForcedTunnels.join('+'));
-        }
+        msgLines.push('🏁 終點：' + data.dropoff + tunnelText);
         if (data.flightNo) msgLines.push('✈️ 航班編號：' + data.flightNo);
         if (orderType === 'booking') { msgLines.push('📅 日期：' + data.date); msgLines.push('⏰ 時間：' + data.timeStringFormatted); }
         if (!hidePaxLine) msgLines.push('👥 人數：' + data.passengers);
@@ -993,10 +1003,7 @@ function submitBookingAfterUpgrade() {
     }
 
     // ⭐ 路線行（起點 → 終點 + 隧道）
-    var routeLine = '🚕 ' + data.pickup + ' → ' + data.dropoff;
-    if (selectedForcedTunnels && selectedForcedTunnels.length > 0) {
-        routeLine += ' （' + selectedForcedTunnels.join('+') + '）';
-    }
+    var routeLine = '🚕 ' + data.pickup + ' → ' + data.dropoff + tunnelText;
     discordMsgLines.push(routeLine);
 
     if (data.flightNo) discordMsgLines.push('✈️ 航班：' + data.flightNo);
@@ -1523,7 +1530,8 @@ window.addEventListener('DOMContentLoaded', function() {
         selectedFareMode = bookingData.selectedFareMode || '';
         currentBaseFare = bookingData.currentBaseFare || 0;
         currentTunnelFee = bookingData.currentTunnelFee || 0;
-        selectedForcedTunnels = bookingData.selectedForcedTunnels || [];   // ⭐ 新增呢行
+        selectedForcedTunnels = bookingData.selectedForcedTunnels || [];   // ⭐
+        detectedTunnels = bookingData.detectedTunnels || [];                // ⭐
     }
 
     var routeData = loadRouteDataFromLocalStorage();

@@ -196,6 +196,7 @@
     let routeData = null;
     let isShenzhenBay = false;
     let selectedForcedTunnels = [];
+    let detectedTunnels = [];   // ⭐ 自動偵測到嘅隧道
 
     let currentRouteResults = null;
     let routeOverlays = [];
@@ -331,6 +332,7 @@
             currentBaseFare: currentBaseFare,
             currentTunnelFee: currentTunnelFee,
             selectedForcedTunnels: selectedForcedTunnels,
+            detectedTunnels: detectedTunnels,   // ⭐ 新增
             pickup: routeData ? routeData.pickup : '',
             dropoff: routeData ? routeData.dropoff : '',
             stopovers: routeData ? routeData.stopovers : []
@@ -969,6 +971,9 @@
         let tunnelResult = checkTunnelsForRoute(selectedRoute, false);
         let tunnelFee = tunnelResult.totalTunnelFee;
 
+        // ⭐ 儲存實際經過嘅隧道
+        detectedTunnels = tunnelResult.matchedTunnels.map(function(t) { return t.shortName; });
+
         currentBaseFare = baseMeterFare;
         currentTunnelFee = tunnelFee;
 
@@ -1162,6 +1167,7 @@
 
     function initMap() {
         selectedForcedTunnels = [];
+        detectedTunnels = [];   // ⭐ 初始化
 
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
