@@ -332,11 +332,15 @@
             currentBaseFare: currentBaseFare,
             currentTunnelFee: currentTunnelFee,
             selectedForcedTunnels: selectedForcedTunnels,
-            detectedTunnels: detectedTunnels,   // ⭐ 新增
+            detectedTunnels: detectedTunnels,
             pickup: routeData ? routeData.pickup : '',
             dropoff: routeData ? routeData.dropoff : '',
             stopovers: routeData ? routeData.stopovers : []
         };
+        // ⭐ 新增呢兩句，防止被 fleet.html 覆蓋
+        sessionStorage.setItem('taxi_selectedForcedTunnels', JSON.stringify(selectedForcedTunnels));
+        sessionStorage.setItem('taxi_detectedTunnels', JSON.stringify(detectedTunnels));
+        // ⭐ 結束
         localStorage.setItem('taxiBookingData', JSON.stringify(data));
     }
 

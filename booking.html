@@ -495,23 +495,22 @@ function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
 }
 
-// ⭐ 取得最終要顯示嘅隧道（直接從 localStorage 讀取，避免全局變數丟失）
+// ⭐ 取得最終要顯示嘅隧道（優先從 sessionStorage 讀取，避免被 fleet.html 覆蓋）
 function getFinalTunnels() {
+    try {
+        var sForced = JSON.parse(sessionStorage.getItem('taxi_selectedForcedTunnels'));
+        if (sForced && sForced.length > 0) return sForced;
+        var sDetected = JSON.parse(sessionStorage.getItem('taxi_detectedTunnels'));
+        if (sDetected && sDetected.length > 0) return sDetected;
+    } catch(e) {}
+
     var bd = loadBookingDataFromLocalStorage();
     if (bd) {
-        if (bd.selectedForcedTunnels && bd.selectedForcedTunnels.length > 0) {
-            return bd.selectedForcedTunnels;
-        }
-        if (bd.detectedTunnels && bd.detectedTunnels.length > 0) {
-            return bd.detectedTunnels;
-        }
+        if (bd.selectedForcedTunnels && bd.selectedForcedTunnels.length > 0) return bd.selectedForcedTunnels;
+        if (bd.detectedTunnels && bd.detectedTunnels.length > 0) return bd.detectedTunnels;
     }
-    if (selectedForcedTunnels && selectedForcedTunnels.length > 0) {
-        return selectedForcedTunnels;
-    }
-    if (detectedTunnels && detectedTunnels.length > 0) {
-        return detectedTunnels;
-    }
+    if (selectedForcedTunnels && selectedForcedTunnels.length > 0) return selectedForcedTunnels;
+    if (detectedTunnels && detectedTunnels.length > 0) return detectedTunnels;
     return [];
 }
 
