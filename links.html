@@ -62,12 +62,43 @@
         padding: 40px 16px 24px;
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
+        position: relative; /* 用於定位語言切換按鈕 */
     }
 
     html.light-theme body,
     html[data-theme="light"] body {
         background-color: #FFFFFF;
         color: #000000;
+    }
+
+    /* 🔴 語言切換按鈕 */
+    #lang-toggle-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background-color: transparent;
+        border: 1.5px solid #FFF200;
+        color: #FFF200;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        z-index: 10;
+    }
+    #lang-toggle-btn:hover {
+        background-color: #FFF200;
+        color: #000000;
+    }
+    html.light-theme #lang-toggle-btn {
+        border-color: #000000;
+        color: #000000;
+    }
+    html.light-theme #lang-toggle-btn:hover {
+        background-color: #000000;
+        color: #FFFFFF;
     }
 
     .wrap {
@@ -100,7 +131,6 @@
         box-shadow: 0 8px 26px rgba(255, 242, 0, 0.55);
     }
 
-    /* 🔴 標題：唔再強制換行 */
     .brand-title {
         font-size: 30px;
         font-weight: 800;
@@ -242,17 +272,18 @@
 </head>
 <body>
 
+<!-- 🔴 語言切換按鈕 -->
+<button id="lang-toggle-btn" onclick="toggleLanguage()" aria-label="切換語言">EN</button>
+
 <main class="wrap">
 
     <!-- 品牌區 -->
     <div class="brand-header">
         <div class="logo-circle">🚕</div>
         
-        <!-- 🔴 標題已取消強制換行，變返做一行 -->
-        <h1 class="brand-title">24小時的士預約</h1>
+        <h1 class="brand-title" data-i18n="brand_title">24小時的士預約</h1>
         
-        <!-- 副標題 -->
-        <p class="brand-sub">長途跨區・機場口岸接送<br>八五折的士 | 六座豪華的士</p>
+        <p class="brand-sub" data-i18n="brand_sub">長途跨區・機場口岸接送<br>八五折的士 | 六座豪華的士</p>
         
         <!-- 電話號碼（撳落去直接撥號） -->
         <a href="tel:68815441" class="brand-hotline">
@@ -260,12 +291,12 @@
         </a>
     </div>
 
-    <!-- ① 加入電話簿 -->
-    <a class="btn btn-save" href="nam.vcf" download>
+    <!-- ① 加入電話簿（加入 id 方便 JS 抓取） -->
+    <a class="btn btn-save" id="vcf-link" href="nam.vcf" download>
         <span class="icon"><i class="fa-solid fa-address-book"></i></span>
         <span class="text">
-            加入電話簿
-            <small>一鍵儲存「24小時的士預約」</small>
+            <span data-i18n="btn1_title">加入電話簿</span>
+            <small data-i18n="btn1_sub">一鍵儲存「24小時的士預約」</small>
         </span>
         <i class="fa-solid fa-chevron-right arrow"></i>
     </a>
@@ -276,8 +307,8 @@
        target="_blank" rel="noopener">
         <span class="icon"><i class="fa-brands fa-whatsapp"></i></span>
         <span class="text">
-            WhatsApp 叫車
-            <small>即時對話・預約的士服務</small>
+            <span data-i18n="btn2_title">WhatsApp 叫車</span>
+            <small data-i18n="btn2_sub">即時對話・預約的士服務</small>
         </span>
         <i class="fa-solid fa-chevron-right arrow"></i>
     </a>
@@ -288,13 +319,71 @@
        target="_blank" rel="noopener">
         <span class="icon"><i class="fa-solid fa-globe"></i></span>
         <span class="text">
-            瀏覽網站
-            <small>智能路線規劃・預計車費</small>
+            <span data-i18n="btn3_title">瀏覽網站</span>
+            <small data-i18n="btn3_sub">智能路線規劃・預計車費</small>
         </span>
         <i class="fa-solid fa-chevron-right arrow"></i>
     </a>
 
 </main>
+
+<!-- 🔴 語言切換邏輯 + vcf 動態連結 -->
+<script>
+var currentLang = localStorage.getItem('taxiLang') || 'zh';
+
+var translations = {
+    zh: {
+        brand_title: "24小時的士預約",
+        brand_sub: "長途跨區・機場口岸接送<br>八五折的士 | 六座豪華的士",
+        btn1_title: "加入電話簿",
+        btn1_sub: "一鍵儲存「24小時的士預約」",
+        btn2_title: "WhatsApp 叫車",
+        btn2_sub: "即時對話・預約的士服務",
+        btn3_title: "瀏覽網站",
+        btn3_sub: "智能路線規劃・預計車費"
+    },
+    en: {
+        brand_title: "24-Hour Taxi Booking",
+        brand_sub: "Long Distance &amp; Cross-Border · Airport &amp; Border Transfers<br>15% Off Taxi | 6-Seater Luxury Taxi",
+        btn1_title: "Add to Contacts",
+        btn1_sub: 'Save "24-Hour Taxi Booking" with one tap',
+        btn2_title: "Book via WhatsApp",
+        btn2_sub: "Instant Chat · Taxi Booking Service",
+        btn3_title: "Visit Website",
+        btn3_sub: "Smart Route Planning · Fare Estimation"
+    }
+};
+
+function applyLanguage() {
+    var btn = document.getElementById('lang-toggle-btn');
+    if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
+
+    // 更新所有文字
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+            el.innerHTML = translations[currentLang][key];
+        }
+    });
+
+    // 🔴 動態切換加入電話簿嘅 vcf 連結
+    var vcfLink = document.getElementById('vcf-link');
+    if (vcfLink) {
+        vcfLink.href = currentLang === 'en' ? 'nam_en.vcf' : 'nam.vcf';
+    }
+}
+
+function toggleLanguage() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    localStorage.setItem('taxiLang', currentLang);
+    applyLanguage();
+}
+
+// 頁面載入時立即套用語言
+document.addEventListener('DOMContentLoaded', function() {
+    applyLanguage();
+});
+</script>
 
 </body>
 </html>
