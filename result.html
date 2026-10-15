@@ -171,7 +171,6 @@
         box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9);
     }
 
-    /* ⭐ 隧道選擇方格（4列 Grid 排版，可多選） */
     #tunnel-btns {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -207,7 +206,6 @@
         border-color: #000000 !important;
         box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3);
     }
-    /* ⭐ 剔選方格（Checkbox）樣式 */
     .tunnel-checkbox {
         display: inline-flex;
         align-items: center;
@@ -274,7 +272,7 @@
     let currentTunnelFee = 0;
     let routeData = null;
     let isShenzhenBay = false;
-    let selectedForcedTunnels = []; // ⭐ 改為可多選（陣列）
+    let selectedForcedTunnels = [];
 
     const translations = {
         zh: {
@@ -485,7 +483,6 @@
         if (!isPickup && airportDropoffKeywords.includes(cleaned)) return new google.maps.LatLng(22.315500, 113.936361);
         if (trimmed.includes("迪士尼")) return "迪士尼樂園度假區的士站";
         
-        // ⭐ 口岸：用你提供嘅精確座標
         if (trimmed.includes("香園圍") || trimmed.includes("香园围") || trimmed.includes("香園圍口岸") || trimmed.includes("香园围口岸") || trimmed.includes("蓮塘") || trimmed.includes("莲塘")) {
             return new google.maps.LatLng(22.551972, 114.153694);
         }
@@ -606,7 +603,6 @@
         return { lat: tunnel.lat, lng: tunnel.lng };
     }
 
-    // ⭐ 渲染隧道按鈕（剔選方格，可多選）
     function renderTunnelButtons() {
         const container = document.getElementById('tunnel-btns');
         if (!container) return;
@@ -624,7 +620,6 @@
         });
     }
 
-    // ⭐ 多選切換
     function toggleTunnel(name) {
         const idx = selectedForcedTunnels.indexOf(name);
         if (idx >= 0) {
@@ -664,6 +659,9 @@
         return { matchedTunnels, totalTunnelFee };
     }
 
+    /* =========================================================
+       ⭐ 主入口：判斷走單次請求定分段請求
+       ========================================================= */
     function calculateFareWithGoogle() {
         if (!routeData) {
             alert(currentLang === 'en' ? "No route data found. Please go back and enter your route." : "未找到路線資料，請返回輸入起點同目的地。");
@@ -692,16 +690,27 @@
         if (!directionsService) directionsService = new google.maps.DirectionsService();
         let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
         let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
+
+        // 有中途站 + 有選隧道 → 分段請求；否則單次請求
+        if (stopoverTexts.length > 0 && selectedForcedTunnels.length > 0) {
+            calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
+        } else {
+            calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
+        }
+    }
+
+    /* =========================================================
+       ⭐ 單次請求（冇中途站或冇選隧道）
+       ========================================================= */
+    function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
         let targetPickup = normalizeLocation(pickupVal, true);
         let targetDropoff = normalizeLocation(dropoffVal, false);
 
-        // ⭐ 中途站：還原基本，直接用 normalizeLocation（口岸就靠 Google 原裝規劃）
         let waypoints = [];
         stopoverTexts.forEach(s => {
             waypoints.push({ location: normalizeLocation(s, false), stopover: true });
         });
 
-        // ⭐ 用戶指定隧道（可多選，每個選中嘅隧道都加 waypoint）
         selectedForcedTunnels.forEach(tunnelName => {
             const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
             if (tunnel) {
@@ -732,73 +741,221 @@
         directionsService.route(request, (result, status) => {
             clearTimeout(timeoutId);
             if (requestTimedOut) return;
-
             if (status === google.maps.DirectionsStatus.OK) {
-                routesData = processRoutes(result.routes, isShenzhenBayRoute);
-                result.routes = routesData;
-                document.getElementById('loading-indicator').classList.add('hidden');
-                document.getElementById('result-content').classList.remove('hidden');
-
-                const routeListContainer = document.getElementById('route-options-list');
-                const routeOptionsBox = document.getElementById('route-options-container');
-
-                if (routesData.length > 1) {
-                    routeOptionsBox.classList.remove('hidden');
-                    routeListContainer.innerHTML = '';
-                    routesData.forEach((route, index) => {
-                        let legs = route.legs;
-                        let distMeters = 0;
-                        let durSeconds = 0;
-                        legs.forEach(leg => { distMeters += leg.distance.value; durSeconds += leg.duration.value; });
-                        let distKm = distMeters / 1000;
-                        if (isShenzhenBayRoute) distKm += 2.8;
-                        if (isHuanggangRoute) distKm += 2;
-                        let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
-
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
-                        btn.onclick = () => selectRouteOption(index, isShenzhenBayRoute, isHuanggangRoute);
-                        btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
-                                        <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
-                        routeListContainer.appendChild(btn);
-                    });
-                } else {
-                    routeOptionsBox.classList.add('hidden');
-                }
-
-                displaySelectedRoute(result, 0, isShenzhenBayRoute, isHuanggangRoute);
+                renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute);
             } else {
                 console.error('[路線] 失敗，狀態：', status);
-                if (waypoints.length > 0) {
-                    console.warn('[路線] Fallback：唔加 Waypoint 重新計算');
-                    const fallbackRequest = {
-                        origin: targetPickup,
-                        destination: targetDropoff,
-                        travelMode: google.maps.TravelMode.DRIVING,
-                        provideRouteAlternatives: true
-                    };
-                    directionsService.route(fallbackRequest, (result2, status2) => {
-                        if (status2 === google.maps.DirectionsStatus.OK) {
-                            routesData = processRoutes(result2.routes, isShenzhenBayRoute);
-                            result2.routes = routesData;
-                            document.getElementById('loading-indicator').classList.add('hidden');
-                            document.getElementById('result-content').classList.remove('hidden');
-                            document.getElementById('route-options-container').classList.add('hidden');
-                            displaySelectedRoute(result2, 0, isShenzhenBayRoute, isHuanggangRoute);
-                        } else {
-                            alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
-                            sessionStorage.setItem('returningFromResult', '1');
-                            window.location.href = 'index.html';
-                        }
-                    });
-                } else {
-                    alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
-                    sessionStorage.setItem('returningFromResult', '1');
-                    window.location.href = 'index.html';
-                }
+                alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+                sessionStorage.setItem('returningFromResult', '1');
+                window.location.href = 'index.html';
             }
         });
+    }
+
+    /* =========================================================
+       ⭐ 分段請求（有中途站 + 有選隧道）
+       每段獨立請求，智能判斷隧道應該喺邊一段行
+       ========================================================= */
+    function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
+        // 構建點列表：起點 → 中途站1 → ... → 終點
+        const allPoints = [
+            { text: pickupVal, isPickup: true },
+            ...stopoverTexts.map(s => ({ text: s, isPickup: false })),
+            { text: dropoffVal, isPickup: false }
+        ];
+
+        // 為每一段構建請求（智能判斷隧道應用喺邊段）
+        const segments = [];
+        for (let i = 0; i < allPoints.length - 1; i++) {
+            const segStart = allPoints[i];
+            const segEnd = allPoints[i + 1];
+
+            const segTunnelWaypoints = [];
+            selectedForcedTunnels.forEach(tunnelName => {
+                const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
+                if (!tunnel) return;
+
+                const entryFromStart = getTunnelEntryPoint(tunnel, segStart.text);
+                const entryFromEnd = getTunnelEntryPoint(tunnel, segEnd.text);
+
+                // 兩端入口唔同 → 隧道橫跨此段 → 應該喺呢段走
+                const sameEntry = (entryFromStart.lat === entryFromEnd.lat && entryFromStart.lng === entryFromEnd.lng);
+                if (!sameEntry) {
+                    segTunnelWaypoints.push({
+                        location: new google.maps.LatLng(entryFromStart.lat, entryFromStart.lng),
+                        stopover: false
+                    });
+                }
+            });
+
+            segments.push({
+                origin: normalizeLocation(segStart.text, segStart.isPickup),
+                destination: normalizeLocation(segEnd.text, false),
+                waypoints: segTunnelWaypoints,
+                segIndex: i,
+                originText: segStart.text,
+                destText: segEnd.text
+            });
+        }
+
+        console.log('[路線] 分段請求：共 ' + segments.length + ' 段');
+        segments.forEach((seg, i) => {
+            console.log('  段 ' + (i+1) + '：' + seg.originText + ' → ' + seg.destText + '，隧道 waypoints：' + seg.waypoints.length);
+        });
+
+        let requestTimedOut = false;
+        const timeoutId = setTimeout(() => {
+            requestTimedOut = true;
+            console.warn('[路線] 分段請求超時');
+            alert(currentLang === 'en' ? "Route calculation is taking too long." : "路線計算太耐，請稍後再試。");
+        }, 20000);
+
+        Promise.all(segments.map(seg => {
+            return new Promise(resolve => {
+                directionsService.route({
+                    origin: seg.origin,
+                    destination: seg.destination,
+                    waypoints: seg.waypoints,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    provideRouteAlternatives: false,
+                    optimizeWaypoints: false
+                }, (result, status) => {
+                    resolve({ result, status, seg });
+                });
+            });
+        })).then(results => {
+            clearTimeout(timeoutId);
+            if (requestTimedOut) return;
+
+            const failed = results.filter(r => r.status !== 'OK');
+            if (failed.length > 0) {
+                console.error('[路線] 分段請求失敗：', failed.map(r => r.status));
+                // Fallback：改用單次請求（唔加隧道 waypoint）
+                fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
+                return;
+            }
+
+            // 合併所有段
+            const mergedRoute = mergeSegments(results);
+            const mergedResult = { routes: [mergedRoute] };
+
+            renderRouteResult(mergedResult, isShenzhenBayRoute, isHuanggangRoute);
+        }).catch(err => {
+            clearTimeout(timeoutId);
+            console.error('[路線] 分段請求拋錯：', err);
+            fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
+        });
+    }
+
+    /* =========================================================
+       ⭐ 合併多段路線結果（legs 拼接、overview_path 拼接、bounds 合併）
+       ========================================================= */
+    function mergeSegments(results) {
+        const firstRoute = results[0].result.routes[0];
+        const merged = JSON.parse(JSON.stringify(firstRoute));
+
+        let overviewPath = firstRoute.overview_path ? firstRoute.overview_path.slice() : [];
+        let bounds = firstRoute.bounds;
+
+        for (let i = 1; i < results.length; i++) {
+            const segRoute = results[i].result.routes[0];
+
+            // 拼接 legs
+            segRoute.legs.forEach(leg => {
+                merged.legs.push(leg);
+            });
+
+            // 拼接 overview_path
+            if (segRoute.overview_path) {
+                overviewPath = overviewPath.concat(segRoute.overview_path);
+            }
+
+            // 合併 bounds
+            if (segRoute.bounds && bounds) {
+                try {
+                    bounds = bounds.union(segRoute.bounds);
+                } catch(e) {}
+            }
+        }
+
+        merged.overview_path = overviewPath;
+        if (bounds) merged.bounds = bounds;
+        merged.summary = '分段路線';
+
+        return merged;
+    }
+
+    /* =========================================================
+       ⭐ Fallback：分段請求失敗，退回單次請求
+       ========================================================= */
+    function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
+        console.warn('[路線] Fallback：改用單次請求（唔加隧道 waypoint）');
+        let targetPickup = normalizeLocation(pickupVal, true);
+        let targetDropoff = normalizeLocation(dropoffVal, false);
+
+        let waypoints = [];
+        stopoverTexts.forEach(s => {
+            waypoints.push({ location: normalizeLocation(s, false), stopover: true });
+        });
+
+        const request = {
+            origin: targetPickup,
+            destination: targetDropoff,
+            waypoints: waypoints,
+            travelMode: google.maps.TravelMode.DRIVING,
+            provideRouteAlternatives: waypoints.length === 0
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+                renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute);
+            } else {
+                console.error('[路線] Fallback 都失敗：', status);
+                alert(currentLang === 'en' ? "Failed to calculate route. Please check input addresses." : "無法計算路線，請檢查輸入的地點名稱是否正確。");
+                sessionStorage.setItem('returningFromResult', '1');
+                window.location.href = 'index.html';
+            }
+        });
+    }
+
+    /* =========================================================
+       ⭐ 統一渲染路線結果
+       ========================================================= */
+    function renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute) {
+        routesData = processRoutes(result.routes, isShenzhenBayRoute);
+        result.routes = routesData;
+        document.getElementById('loading-indicator').classList.add('hidden');
+        document.getElementById('result-content').classList.remove('hidden');
+
+        const routeListContainer = document.getElementById('route-options-list');
+        const routeOptionsBox = document.getElementById('route-options-container');
+
+        if (routesData.length > 1) {
+            routeOptionsBox.classList.remove('hidden');
+            routeListContainer.innerHTML = '';
+            routesData.forEach((route, index) => {
+                let legs = route.legs;
+                let distMeters = 0;
+                let durSeconds = 0;
+                legs.forEach(leg => { distMeters += leg.distance.value; durSeconds += leg.duration.value; });
+                let distKm = distMeters / 1000;
+                if (isShenzhenBayRoute) distKm += 2.8;
+                if (isHuanggangRoute) distKm += 2;
+                let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
+                btn.onclick = () => selectRouteOption(index, isShenzhenBayRoute, isHuanggangRoute);
+                btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
+                                <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
+                routeListContainer.appendChild(btn);
+            });
+        } else {
+            routeOptionsBox.classList.add('hidden');
+        }
+
+        displaySelectedRoute(result, 0, isShenzhenBayRoute, isHuanggangRoute);
     }
 
     function selectRouteOption(index, isShenzhenBayRoute, isHuanggangRoute) {
@@ -840,7 +997,7 @@
         let finalKm = routeKm;
         if (isShenzhenBayRoute) finalKm += 2.8;
         if (isHuanggangRoute) finalKm += 2;
-        
+
         let durationMinutes = Math.round(totalSeconds / 60);
         let baseMeterFare = calculateTaxiBaseFare(finalKm);
         let tunnelResult = checkTunnelsForRoute(selectedRoute, false);
@@ -1038,7 +1195,7 @@
     }
 
     function initMap() {
-        selectedForcedTunnels = []; // ⭐ 初始化為空陣列
+        selectedForcedTunnels = [];
 
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
