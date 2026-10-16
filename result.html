@@ -534,43 +534,43 @@ function processRoutes(routes, isShenzhenBay) {
 
 const tunnelDatabase = [
     { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
-      lat: 22.2896118, lng: 114.1823943, radius: 120,
+      lat: 22.2896118, lng: 114.1823943, radius: 300,
       entryA: { lat: 22.286083, lng: 114.182917 },
       entryB: { lat: 22.298722, lng: 114.180889 } },
     { name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
-      lat: 22.294889, lng: 114.22223, radius: 120,
+      lat: 22.294889, lng: 114.22223, radius: 300,
       entryA: { lat: 22.290806, lng: 114.214278 },
       entryB: { lat: 22.298417, lng: 114.229306 } },
     { name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
-      lat: 22.2940599, lng: 114.150204, radius: 120,
+      lat: 22.2940599, lng: 114.150204, radius: 300,
       entryA: { lat: 22.290528, lng: 114.146694 },
       entryB: { lat: 22.298694, lng: 114.154528 } },
     { name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
-      lat: 22.2614503, lng: 114.1799975, radius: 120,
+      lat: 22.2614503, lng: 114.1799975, radius: 300,
       entryA: { lat: 22.255417, lng: 114.179806 },
       entryB: { lat: 22.265306, lng: 114.180667 } },
     { name: "大老山隧道", shortName: "大老山", fee: 20, discountFee: 20,
-      lat: 22.368694, lng: 114.212944, radius: 250,
+      lat: 22.368694, lng: 114.212944, radius: 500,
       entryA: { lat: 22.342139, lng: 114.204556 },
       entryB: { lat: 22.375722, lng: 114.213500 } },
     { name: "獅子山隧道", shortName: "獅隧", fee: 8, discountFee: 8,
-      lat: 22.3527046, lng: 114.1764997, radius: 150,
+      lat: 22.3527046, lng: 114.1764997, radius: 300,
       entryA: { lat: 22.346278, lng: 114.180917 },
       entryB: { lat: 22.356778, lng: 114.173333 } },
     { name: "尖山隧道", shortName: "尖山", fee: 8, discountFee: 8,
-      lat: 22.3523498, lng: 114.159581, radius: 100,
+      lat: 22.3523498, lng: 114.159581, radius: 200,
       entryA: { lat: 22.347028, lng: 114.148139 },
       entryB: { lat: 22.357083, lng: 114.162389 } },
     { name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
-      lat: 22.3764988, lng: 114.1487468, radius: 100,
+      lat: 22.3764988, lng: 114.1487468, radius: 300,
       entryA: { lat: 22.381028, lng: 114.139167 },
       entryB: { lat: 22.380222, lng: 114.164917 } },
     { name: "屯赤隧道", shortName: "屯赤", fee: 0, discountFee: 0,
-      lat: 22.3545000, lng: 113.9500000, radius: 400,
+      lat: 22.3545000, lng: 113.9500000, radius: 800,
       entryA: { lat: 22.356278, lng: 113.953500 },
       entryB: { lat: 22.324056, lng: 113.961000 } },
     { name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
-      lat: 22.3953506, lng: 114.0615077, radius: 200,
+      lat: 22.3953506, lng: 114.0615077, radius: 500,
       entryA: { lat: 22.375583, lng: 114.066611 },
       entryB: { lat: 22.406667, lng: 114.059889 } }
 ];
@@ -579,19 +579,19 @@ function tunnelNameToShort(fullName) {
     return String(fullName || '').replace(/\s*\(連回程\)/, '');
 }
 
-function getTunnelEntryPoint(tunnel, originLatLng) {
+function getTunnelWaypoints(tunnel, originLatLng) {
     if (!tunnel) return null;
     if (!originLatLng || !tunnel.entryA || !tunnel.entryB) {
-        return new google.maps.LatLng(tunnel.lat, tunnel.lng);
+        return null;
     }
     try {
         var ptA = new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
         var ptB = new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
         var dA = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, ptA);
         var dB = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, ptB);
-        return (dA <= dB) ? ptA : ptB;
+        return (dA <= dB) ? [ptA, ptB] : [ptB, ptA];
     } catch (e) {
-        return new google.maps.LatLng(tunnel.lat, tunnel.lng);
+        return null;
     }
 }
 
@@ -638,24 +638,14 @@ function checkTunnelsForRoute(route, isDiscount = false) {
         });
     }
 
-    const CONSECUTIVE_THRESHOLD = 3;
-
     tunnelDatabase.forEach(tunnel => {
         let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
-        let consecutiveCount = 0;
-        let maxConsecutive = 0;
-
+        let triggered = false;
         for (let i = 0; i < allPoints.length; i++) {
             let distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], tunnelLatLng);
-            if (distance <= tunnel.radius) {
-                consecutiveCount++;
-                if (consecutiveCount > maxConsecutive) maxConsecutive = consecutiveCount;
-            } else {
-                consecutiveCount = 0;
-            }
+            if (distance <= tunnel.radius) { triggered = true; break; }
         }
-
-        if (maxConsecutive >= CONSECUTIVE_THRESHOLD) {
+        if (triggered) {
             matchedTunnels.push(tunnel);
             totalTunnelFee += isDiscount ? (tunnel.discountFee || tunnel.fee) : tunnel.fee;
         }
@@ -768,16 +758,18 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     }
 
     const startLatLng = _geocodedPoints[pickupVal] || null;
+    let lastPoint = startLatLng;
+
     selectedForcedTunnels.forEach(tunnelName => {
         const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
-        if (tunnel) {
-            const entryPoint = getTunnelEntryPoint(tunnel, startLatLng);
-            if (entryPoint) {
-                waypoints.push({
-                    location: entryPoint,
-                    stopover: false
-                });
-            }
+        if (!tunnel) return;
+
+        const waypointsForTunnel = getTunnelWaypoints(tunnel, lastPoint);
+        if (waypointsForTunnel) {
+            waypointsForTunnel.forEach(pt => {
+                waypoints.push({ location: pt, stopover: false });
+            });
+            lastPoint = waypointsForTunnel[1];
         }
     });
 
@@ -836,16 +828,18 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         }
 
         const segStartLatLng = _geocodedPoints[segStart.text] || null;
+        let lastPoint = segStartLatLng;
+
         selectedForcedTunnels.forEach(tunnelName => {
             const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
-            if (tunnel) {
-                const entryPoint = getTunnelEntryPoint(tunnel, segStartLatLng);
-                if (entryPoint) {
-                    segTunnelWaypoints.push({
-                        location: entryPoint,
-                        stopover: false
-                    });
-                }
+            if (!tunnel) return;
+
+            const waypointsForTunnel = getTunnelWaypoints(tunnel, lastPoint);
+            if (waypointsForTunnel) {
+                waypointsForTunnel.forEach(pt => {
+                    segTunnelWaypoints.push({ location: pt, stopover: false });
+                });
+                lastPoint = waypointsForTunnel[1];
             }
         });
 
