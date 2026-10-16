@@ -201,6 +201,9 @@
     let currentRouteResults = null;
     let routeOverlays = [];
 
+    // ⭐ 緩存起點座標，用於判斷隧道入口方向
+    let _originLatLngCache = null;
+
     const SHENZHEN_BAY_FORCED_POINT_IN = { lat: 22.416278, lng: 113.989528 };
     const SHENZHEN_BAY_FORCED_POINT_OUT = { lat: 22.4155, lng: 113.987056 };
 
@@ -460,32 +463,99 @@
         return [fastest.route, shortest.route];
     }
 
-    // ⭐ 隧道資料庫：只保留中心點，移除所有入口座標
+    /* =========================================================
+       ⭐ 隧道資料庫：每條隧道儲存「兩個方向入口」
+       - entryA / entryB：兩個方向入口座標
+       - 用起點座標自動判斷由邊個入口入（近嗰個）
+       - lat / lng / radius：保留做自動偵測用
+       ========================================================= */
     const tunnelDatabase = [
-        { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
-          lat: 22.2896118, lng: 114.1823943, radius: 300 },
-        { name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
-          lat: 22.294889, lng: 114.22223, radius: 300 },
-        { name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
-          lat: 22.2940599, lng: 114.150204, radius: 300 },
-        { name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
-          lat: 22.2614503, lng: 114.1799975, radius: 300 },
-        { name: "大老山隧道", shortName: "大老山", fee: 20, discountFee: 20,
-          lat: 22.368694, lng: 114.212944, radius: 500 },
-        { name: "獅子山隧道", shortName: "獅隧", fee: 8, discountFee: 8,
-          lat: 22.3527046, lng: 114.1764997, radius: 300 },
-        { name: "尖山隧道", shortName: "尖山", fee: 8, discountFee: 8,
-          lat: 22.3523498, lng: 114.159581, radius: 200 },
-        { name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
-          lat: 22.3764988, lng: 114.1487468, radius: 300 },
-        { name: "屯赤隧道", shortName: "屯赤", fee: 0, discountFee: 0,
-          lat: 22.3545000, lng: 113.9500000, radius: 800 },
-        { name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
-          lat: 22.3953506, lng: 114.0615077, radius: 500 }
+        {
+            name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
+            lat: 22.2896118, lng: 114.1823943, radius: 300,
+            entryA: { lat: 22.286083, lng: 114.182917 },  // 港島側入口
+            entryB: { lat: 22.298722, lng: 114.180889 }   // 九龍側入口
+        },
+        {
+            name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
+            lat: 22.294889, lng: 114.22223, radius: 300,
+            entryA: { lat: 22.290806, lng: 114.214278 },  // 港島側入口
+            entryB: { lat: 22.298417, lng: 114.229306 }   // 九龍側入口
+        },
+        {
+            name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
+            lat: 22.2940599, lng: 114.150204, radius: 300,
+            entryA: { lat: 22.290528, lng: 114.146694 },  // 港島側入口
+            entryB: { lat: 22.298694, lng: 114.154528 }   // 九龍側入口
+        },
+        {
+            name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
+            lat: 22.2614503, lng: 114.1799975, radius: 300,
+            entryA: { lat: 22.255417, lng: 114.179806 },  // 南區側入口
+            entryB: { lat: 22.265306, lng: 114.180667 }   // 跑馬地側入口
+        },
+        {
+            name: "大老山隧道", shortName: "大老山", fee: 20, discountFee: 20,
+            lat: 22.368694, lng: 114.212944, radius: 500,
+            entryA: { lat: 22.342139, lng: 114.204556 },  // 九龍側入口
+            entryB: { lat: 22.375722, lng: 114.213500 }   // 新界側入口
+        },
+        {
+            name: "獅子山隧道", shortName: "獅隧", fee: 8, discountFee: 8,
+            lat: 22.3527046, lng: 114.1764997, radius: 300,
+            entryA: { lat: 22.346278, lng: 114.180917 },  // 九龍側入口
+            entryB: { lat: 22.356778, lng: 114.173333 }   // 新界側入口
+        },
+        {
+            name: "尖山隧道", shortName: "尖山", fee: 8, discountFee: 8,
+            lat: 22.3523498, lng: 114.159581, radius: 200,
+            entryA: { lat: 22.347028, lng: 114.148139 },  // 九龍側入口
+            entryB: { lat: 22.357083, lng: 114.162389 }   // 新界側入口
+        },
+        {
+            name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
+            lat: 22.3764988, lng: 114.1487468, radius: 300,
+            entryA: { lat: 22.381028, lng: 114.139167 },  // 荃灣側入口
+            entryB: { lat: 22.380222, lng: 114.164917 }   // 沙田側入口
+        },
+        {
+            name: "屯赤隧道", shortName: "屯赤", fee: 0, discountFee: 0,
+            lat: 22.3545000, lng: 113.9500000, radius: 800,
+            entryA: { lat: 22.356278, lng: 113.953500 },  // 屯門側入口
+            entryB: { lat: 22.324056, lng: 113.961000 }   // 東涌側入口
+        },
+        {
+            name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
+            lat: 22.3953506, lng: 114.0615077, radius: 500,
+            entryA: { lat: 22.375583, lng: 114.066611 },  // 九龍側入口
+            entryB: { lat: 22.406667, lng: 114.059889 }   // 新界側入口
+        }
     ];
 
     function tunnelNameToShort(fullName) {
         return String(fullName || '').replace(/\s*\(連回程\)/, '');
+    }
+
+    /* =========================================================
+       ⭐ 核心：用起點座標判斷揀邊個隧道入口
+       近起點嘅入口 → 用嗰個做 Waypoint
+       唔靠任何文字關鍵字，Google 自己會規劃正確方向
+       ========================================================= */
+    function getTunnelEntryPoint(tunnel, originLatLng) {
+        if (!tunnel) return null;
+        // 冇起點座標（未取得）：退回中心點
+        if (!originLatLng || !tunnel.entryA || !tunnel.entryB) {
+            return new google.maps.LatLng(tunnel.lat, tunnel.lng);
+        }
+        try {
+            var ptA = new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
+            var ptB = new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
+            var dA = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, ptA);
+            var dB = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, ptB);
+            return (dA <= dB) ? ptA : ptB;
+        } catch (e) {
+            return new google.maps.LatLng(tunnel.lat, tunnel.lng);
+        }
     }
 
     function renderTunnelButtons() {
@@ -609,14 +679,17 @@
             });
         }
 
-        // ⭐ 用戶指定隧道：直接使用隧道中心點
+        // ⭐ 用戶指定隧道：用起點座標自動揀正確入口
         selectedForcedTunnels.forEach(tunnelName => {
             const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
             if (tunnel) {
-                waypoints.push({
-                    location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
-                    stopover: false
-                });
+                const entryPoint = getTunnelEntryPoint(tunnel, _originLatLngCache);
+                if (entryPoint) {
+                    waypoints.push({
+                        location: entryPoint,
+                        stopover: false
+                    });
+                }
             }
         });
 
@@ -674,14 +747,17 @@
                 }
             }
 
-            // ⭐ 用戶指定隧道：直接使用隧道中心點
+            // ⭐ 用戶指定隧道：用整體起點座標自動揀正確入口
             selectedForcedTunnels.forEach(tunnelName => {
                 const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
                 if (tunnel) {
-                    segTunnelWaypoints.push({
-                        location: new google.maps.LatLng(tunnel.lat, tunnel.lng),
-                        stopover: false
-                    });
+                    const entryPoint = getTunnelEntryPoint(tunnel, _originLatLngCache);
+                    if (entryPoint) {
+                        segTunnelWaypoints.push({
+                            location: entryPoint,
+                            stopover: false
+                        });
+                    }
                 }
             });
 
@@ -797,6 +873,13 @@
         routesData = processRoutes(result.routes, isShenzhenBayRoute);
         result.routes = routesData;
         currentRouteResults = result;
+
+        // ⭐ 緩存起點座標（給隧道入口判斷用）
+        if (routesData.length > 0 && routesData[0].legs && routesData[0].legs.length > 0) {
+            const startLoc = routesData[0].legs[0].start_location;
+            if (startLoc) _originLatLngCache = startLoc;
+        }
+
         document.getElementById('loading-indicator').classList.add('hidden');
         document.getElementById('result-content').classList.remove('hidden');
 
@@ -1115,6 +1198,7 @@
     function initMap() {
         selectedForcedTunnels = [];
         detectedTunnels = [];
+        _originLatLngCache = null;
 
         routeData = loadRouteDataFromLocalStorage();
         if (routeData && routeData.pickup) {
