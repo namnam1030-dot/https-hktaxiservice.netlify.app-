@@ -201,17 +201,10 @@ let detectedTunnels = [];
 let currentRouteResults = null;
 let routeOverlays = [];
 
-// ⭐ 緩存 geocode 座標 (text -> LatLng)
 let _geocodedPoints = {};
 
-/* =========================================================
-   ⭐ 青龍頭點（屯門公路中段）
-   ========================================================= */
 const TUEN_MUN_ROAD_POINT = { lat: 22.365444, lng: 114.050028 };
 
-/* =========================================================
-   ⭐ 新界西關鍵字
-   ========================================================= */
 const NTW_KEYWORDS = [
     '屯門', '屯门', '元朗', '天水圍', '天水围',
     '洪水橋', '洪水桥', '深井', '青龍頭', '青龙头',
@@ -219,9 +212,6 @@ const NTW_KEYWORDS = [
     '小欖', '小榄', '大欖涌', '大榄涌'
 ];
 
-/* =========================================================
-   ⭐ 大嶼山（離島區）關鍵字
-   ========================================================= */
 const LANTAU_KEYWORDS = [
     '東涌', '东涌', '大嶼山', '大屿山',
     '機場', '机场', '香港國際機場', '香港国际机场', '赤鱲角', '赤腊角',
@@ -461,9 +451,6 @@ function normalizeLocation(loc, isPickup = false) {
     return trimmed;
 }
 
-/* =========================================================
-   ⭐ 核心：文字轉座標 (Geocoding)
-   ========================================================= */
 function geocodeToLatLng(text, isPickup) {
     var normalized = normalizeLocation(text, isPickup);
     if (normalized instanceof google.maps.LatLng) {
@@ -545,48 +532,45 @@ function processRoutes(routes, isShenzhenBay) {
     return [fastest.route, shortest.route];
 }
 
-/* =========================================================
-   ⭐ 隧道資料庫（純座標幾何，兩個方向入口 entryA / entryB）
-   ========================================================= */
 const tunnelDatabase = [
     { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
-      lat: 22.2896118, lng: 114.1823943, radius: 300,
+      lat: 22.2896118, lng: 114.1823943, radius: 120,
       entryA: { lat: 22.286083, lng: 114.182917 },
       entryB: { lat: 22.298722, lng: 114.180889 } },
     { name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
-      lat: 22.294889, lng: 114.22223, radius: 300,
+      lat: 22.294889, lng: 114.22223, radius: 120,
       entryA: { lat: 22.290806, lng: 114.214278 },
       entryB: { lat: 22.298417, lng: 114.229306 } },
     { name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
-      lat: 22.2940599, lng: 114.150204, radius: 300,
+      lat: 22.2940599, lng: 114.150204, radius: 120,
       entryA: { lat: 22.290528, lng: 114.146694 },
       entryB: { lat: 22.298694, lng: 114.154528 } },
     { name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
-      lat: 22.2614503, lng: 114.1799975, radius: 300,
+      lat: 22.2614503, lng: 114.1799975, radius: 120,
       entryA: { lat: 22.255417, lng: 114.179806 },
       entryB: { lat: 22.265306, lng: 114.180667 } },
     { name: "大老山隧道", shortName: "大老山", fee: 20, discountFee: 20,
-      lat: 22.368694, lng: 114.212944, radius: 500,
+      lat: 22.368694, lng: 114.212944, radius: 250,
       entryA: { lat: 22.342139, lng: 114.204556 },
       entryB: { lat: 22.375722, lng: 114.213500 } },
     { name: "獅子山隧道", shortName: "獅隧", fee: 8, discountFee: 8,
-      lat: 22.3527046, lng: 114.1764997, radius: 300,
+      lat: 22.3527046, lng: 114.1764997, radius: 150,
       entryA: { lat: 22.346278, lng: 114.180917 },
       entryB: { lat: 22.356778, lng: 114.173333 } },
     { name: "尖山隧道", shortName: "尖山", fee: 8, discountFee: 8,
-      lat: 22.3523498, lng: 114.159581, radius: 200,
+      lat: 22.3523498, lng: 114.159581, radius: 100,
       entryA: { lat: 22.347028, lng: 114.148139 },
       entryB: { lat: 22.357083, lng: 114.162389 } },
     { name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
-      lat: 22.3764988, lng: 114.1487468, radius: 300,
+      lat: 22.3764988, lng: 114.1487468, radius: 100,
       entryA: { lat: 22.381028, lng: 114.139167 },
       entryB: { lat: 22.380222, lng: 114.164917 } },
     { name: "屯赤隧道", shortName: "屯赤", fee: 0, discountFee: 0,
-      lat: 22.3545000, lng: 113.9500000, radius: 800,
+      lat: 22.3545000, lng: 113.9500000, radius: 400,
       entryA: { lat: 22.356278, lng: 113.953500 },
       entryB: { lat: 22.324056, lng: 113.961000 } },
     { name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
-      lat: 22.3953506, lng: 114.0615077, radius: 500,
+      lat: 22.3953506, lng: 114.0615077, radius: 200,
       entryA: { lat: 22.375583, lng: 114.066611 },
       entryB: { lat: 22.406667, lng: 114.059889 } }
 ];
@@ -595,9 +579,6 @@ function tunnelNameToShort(fullName) {
     return String(fullName || '').replace(/\s*\(連回程\)/, '');
 }
 
-/* =========================================================
-   ⭐ 核心：用「分段起點」嘅真實座標，揀最近嘅隧道入口
-   ========================================================= */
 function getTunnelEntryPoint(tunnel, originLatLng) {
     if (!tunnel) return null;
     if (!originLatLng || !tunnel.entryA || !tunnel.entryB) {
@@ -646,6 +627,7 @@ function checkTunnelsForRoute(route, isDiscount = false) {
     let matchedTunnels = [];
     let totalTunnelFee = 0;
     if (!window.google || !google.maps.geometry) return { matchedTunnels, totalTunnelFee };
+
     let allPoints = [];
     if (route.overview_path) allPoints = allPoints.concat(route.overview_path);
     if (route.legs) {
@@ -655,18 +637,30 @@ function checkTunnelsForRoute(route, isDiscount = false) {
             if (leg.steps) leg.steps.forEach(step => { if (step.path) allPoints = allPoints.concat(step.path); });
         });
     }
+
+    const CONSECUTIVE_THRESHOLD = 3;
+
     tunnelDatabase.forEach(tunnel => {
         let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
-        let triggered = false;
+        let consecutiveCount = 0;
+        let maxConsecutive = 0;
+
         for (let i = 0; i < allPoints.length; i++) {
             let distance = google.maps.geometry.spherical.computeDistanceBetween(allPoints[i], tunnelLatLng);
-            if (distance <= tunnel.radius) { triggered = true; break; }
+            if (distance <= tunnel.radius) {
+                consecutiveCount++;
+                if (consecutiveCount > maxConsecutive) maxConsecutive = consecutiveCount;
+            } else {
+                consecutiveCount = 0;
+            }
         }
-        if (triggered) {
+
+        if (maxConsecutive >= CONSECUTIVE_THRESHOLD) {
             matchedTunnels.push(tunnel);
             totalTunnelFee += isDiscount ? (tunnel.discountFee || tunnel.fee) : tunnel.fee;
         }
     });
+
     return { matchedTunnels, totalTunnelFee };
 }
 
@@ -741,7 +735,6 @@ function calculateFareWithGoogle() {
     let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
     let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
 
-    // ⭐ 有選隧道時，必須先 Geocode 所有點以獲取準確座標
     var geocodePromise = Promise.resolve();
     if (selectedForcedTunnels.length > 0) {
         _geocodedPoints = {};
@@ -774,7 +767,6 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         });
     }
 
-    // ⭐ 用「起點座標」揀最近嘅入口
     const startLatLng = _geocodedPoints[pickupVal] || null;
     selectedForcedTunnels.forEach(tunnelName => {
         const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
@@ -843,7 +835,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
             }
         }
 
-        // ⭐ 重點：用「該段起點座標」嚟揀最近嘅入口，確保「入口近起點、出口近終點」
         const segStartLatLng = _geocodedPoints[segStart.text] || null;
         selectedForcedTunnels.forEach(tunnelName => {
             const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
