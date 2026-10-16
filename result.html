@@ -532,6 +532,9 @@ function processRoutes(routes, isShenzhenBay) {
     return [fastest.route, shortest.route];
 }
 
+/* =========================================================
+   ⭐ 隧道資料庫（半徑還原原本數值）
+   ========================================================= */
 const tunnelDatabase = [
     { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
       lat: 22.2896118, lng: 114.1823943, radius: 300,
@@ -579,7 +582,9 @@ function tunnelNameToShort(fullName) {
     return String(fullName || '').replace(/\s*\(連回程\)/, '');
 }
 
-// ⭐ 核心：用上一個位置判斷揀邊個入口（返回單一座標）
+/* =========================================================
+   ⭐ 用「上一個位置」判斷揀邊個方向入口（單點）
+   ========================================================= */
 function getTunnelEntryPoint(tunnel, lastLatLng) {
     if (!tunnel) return null;
     if (!lastLatLng || !tunnel.entryA || !tunnel.entryB) {
@@ -596,7 +601,9 @@ function getTunnelEntryPoint(tunnel, lastLatLng) {
     }
 }
 
-// ⭐ 按「距離起點最近入口」排序所選隧道
+/* =========================================================
+   ⭐ 按「距離起點最近入口」排序所選隧道
+   ========================================================= */
 function sortTunnelsByProximity(tunnelNames, originLatLng) {
     if (!originLatLng || !window.google || !google.maps.geometry) {
         return tunnelNames.slice();
@@ -646,7 +653,9 @@ function toggleTunnel(name) {
     calculateFareWithGoogle();
 }
 
-// ⭐ 自動偵測：如果用戶有揀隧道，只檢查用戶揀嘅；否則全部檢查
+/* =========================================================
+   ⭐ 自動偵測：用戶有揀隧道 → 只檢查用戶揀嘅
+   ========================================================= */
 function checkTunnelsForRoute(route, isDiscount = false) {
     let matchedTunnels = [];
     let totalTunnelFee = 0;
@@ -767,7 +776,9 @@ function calculateFareWithGoogle() {
     });
 }
 
-// ⭐ 單段：按距離排序，只加「入口」waypoint
+/* =========================================================
+   ⭐ 單段：按距離排序；每條隧道加「方向入口 + 隧道中心點」
+   ========================================================= */
 function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     let targetPickup = normalizeLocation(pickupVal, true);
     let targetDropoff = normalizeLocation(dropoffVal, false);
@@ -795,12 +806,16 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
         if (!tunnel) return;
 
-        // ⭐ 只加「入口」
+        // ⭐ 用「上一個位置」揀方向入口
         const entryPt = getTunnelEntryPoint(tunnel, lastPoint);
         if (entryPt) {
+            // 加「方向入口」
             waypoints.push({ location: entryPt, stopover: false });
-            // 用返揀嘅入口做下條隧道判斷起點
-            lastPoint = entryPt;
+            // 加「隧道中心點」（逼 Google 穿隧道）
+            var centerPt = new google.maps.LatLng(tunnel.lat, tunnel.lng);
+            waypoints.push({ location: centerPt, stopover: false });
+            // 更新 lastPoint 為隧道中心點
+            lastPoint = centerPt;
         }
     });
 
@@ -832,7 +847,9 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     });
 }
 
-// ⭐ 分段：每段按距離排序，只加「入口」
+/* =========================================================
+   ⭐ 分段：每段按距離排序；每條隧道加「方向入口 + 隧道中心點」
+   ========================================================= */
 function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
         { text: pickupVal, isPickup: true },
@@ -872,7 +889,9 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
             const entryPt = getTunnelEntryPoint(tunnel, lastPoint);
             if (entryPt) {
                 segTunnelWaypoints.push({ location: entryPt, stopover: false });
-                lastPoint = entryPt;
+                var centerPt = new google.maps.LatLng(tunnel.lat, tunnel.lng);
+                segTunnelWaypoints.push({ location: centerPt, stopover: false });
+                lastPoint = centerPt;
             }
         });
 
