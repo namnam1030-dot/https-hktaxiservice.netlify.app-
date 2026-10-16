@@ -470,7 +470,7 @@ function normalizeLocation(loc, isPickup = false) {
 function processRoutes(routes, isShenzhenBay) {
     if (!routes || routes.length === 0) return [];
     if (routes.length === 1) {
-        routes[0].customLabel = "最佳路線";
+        routes[0].customLabel = routes[0].customLabel || "最佳路線";
         return [routes[0]];
     }
     let routeMetrics = routes.map((r, idx) => {
@@ -626,11 +626,6 @@ function isLocationInLantau(locationText, latLng) {
 
 /* =========================================================
    ⭐ 深圳灣路線：強制走屯門公路（避開大欖隧道）
-   加點條件（全部符合）：
-     1. 涉及深圳灣（起/終/中途站）
-     2. 用戶冇主動選大欖
-     3. 起點、終點、中途站都唔喺新界西
-     4. 起點、終點、中途站都唔喺大嶼山
    ========================================================= */
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
     if (selectedForcedTunnels.indexOf("大欖") >= 0) return null;
@@ -741,7 +736,8 @@ function calculateFareWithGoogle() {
     let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
     let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
 
-    if (stopoverTexts.length > 0 && selectedForcedTunnels.length > 0) {
+    // ⭐ 只要有中途站就用分段計算（唔理有冇選隧道），咁先可以出 alternatives
+    if (stopoverTexts.length > 0) {
         calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
     } else {
         calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
@@ -806,6 +802,10 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     });
 }
 
+/* =========================================================
+   ⭐ 分段計算：每段獨立 request alternatives，再用笛卡兒積組合
+   即使有中途站，都可以得出多條完整路線俾乘客揀
+   ========================================================= */
 function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
         { text: pickupVal, isPickup: true },
@@ -868,7 +868,8 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
                 destination: seg.destination,
                 waypoints: seg.waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
-                provideRouteAlternatives: false,
+                // ⭐ 每段獨立判斷：冇 waypoint 就 request alternatives
+                provideRouteAlternatives: seg.waypoints.length === 0,
                 optimizeWaypoints: false
             }, (result, status) => {
                 resolve({ result, status, seg });
@@ -885,8 +886,59 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         }
 
         try {
-            const mergedRoute = mergeSegments(results);
-            const mergedResult = { routes: [mergedRoute] };
+            // ⭐ 每段最多取 2 條，避免組合爆炸（2 段 = 4 組合、3 段 = 8 組合）
+            const perSegRoutes = results.map(r => r.result.routes.slice(0, 2));
+
+            // ⭐ 笛卡兒積
+            const combos = cartesianProduct(perSegRoutes);
+
+            const scored = combos.map(routesArr => {
+                let dist = 0, dur = 0;
+                routesArr.forEach(rt => {
+                    rt.legs.forEach(leg => {
+                        dist += leg.distance.value;
+                        dur  += leg.duration.value;
+                    });
+                });
+                return { routes: routesArr, dist, dur };
+            });
+
+            // ⭐ 去重：用總距離 + 總時間粗略做 key（避免同一條路重複出現）
+            const seen = new Set();
+            const unique = [];
+            scored.forEach(s => {
+                const key = Math.round(s.dist / 200) + '_' + Math.round(s.dur / 60);
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(s);
+                }
+            });
+
+            // ⭐ 揀最快 + 最短
+            const byTime = [...unique].sort((a, b) => a.dur - b.dur);
+            const byDist = [...unique].sort((a, b) => a.dist - b.dist);
+
+            const picked = [];
+            if (byTime[0]) picked.push({ combo: byTime[0], label: '⚡ 最快路線' });
+
+            if (byDist[0] && byDist[0] !== byTime[0]) {
+                picked.push({ combo: byDist[0], label: '📏 最短路線' });
+            } else if (byTime[1]) {
+                picked.push({ combo: byTime[1], label: '📏 替代路線' });
+            }
+
+            // ⭐ 若最短路線 === 最快路線（得 1 條），標籤改為「最佳路線」
+            if (picked.length === 1) {
+                picked[0].label = '最佳路線';
+            }
+
+            const mergedRoutes = picked.map(p => {
+                const merged = mergeSegmentsFromRoutes(p.combo.routes);
+                merged.customLabel = p.label;
+                return merged;
+            });
+
+            const mergedResult = { routes: mergedRoutes };
             renderRouteResult(mergedResult, isShenzhenBayRoute, isHuanggangRoute);
         } catch(err) {
             fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
@@ -897,6 +949,49 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
     });
 }
 
+/* ⭐ 笛卡兒積：用於組合每段嘅 alternatives */
+function cartesianProduct(arrays) {
+    if (arrays.length === 0) return [];
+    if (arrays.length === 1) return arrays[0].map(x => [x]);
+    const result = [];
+    const rest = cartesianProduct(arrays.slice(1));
+    arrays[0].forEach(x => {
+        rest.forEach(r => result.push([x, ...r]));
+    });
+    return result;
+}
+
+/* ⭐ 合併多段 routes（陣列）做一條完整路線 */
+function mergeSegmentsFromRoutes(routesArr) {
+    const first = routesArr[0];
+    const merged = {};
+    for (let key in first) {
+        if (Object.prototype.hasOwnProperty.call(first, key)) {
+            merged[key] = first[key];
+        }
+    }
+
+    const allLegs = [];
+    let overviewPath = [];
+    let bounds = null;
+
+    routesArr.forEach(rt => {
+        if (rt.legs) rt.legs.forEach(leg => allLegs.push(leg));
+        if (rt.overview_path) rt.overview_path.forEach(p => overviewPath.push(p));
+        if (rt.bounds) {
+            if (!bounds) bounds = rt.bounds;
+            else { try { bounds = bounds.union(rt.bounds); } catch(e) {} }
+        }
+    });
+
+    merged.legs = allLegs;
+    merged.overview_path = overviewPath;
+    if (bounds) merged.bounds = bounds;
+    merged.summary = '分段路線';
+    return merged;
+}
+
+/* ⭐ 保留舊版 mergeSegments（用於 fallback 或相容） */
 function mergeSegments(results) {
     const firstRoute = results[0].result.routes[0];
     const merged = {};
@@ -1605,8 +1700,8 @@ if ('serviceWorker' in navigator) {
                     </button>
                 </div>
             </div>
-            <a href="https://wa.me/85268815441?text=%E4%BD%A0%Ei5%A5%BD%EF%BC%> <8C%E6span%88%91%E data-i6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
-                <i class="fa-brands fa-whatsapp text-lg"></18n="whatsapp_inquiry">WhatsApp</span>
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+                <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
