@@ -532,9 +532,6 @@ function processRoutes(routes, isShenzhenBay) {
     return [fastest.route, shortest.route];
 }
 
-/* =========================================================
-   ⭐ 隧道資料庫（半徑全部還原到原本數值）
-   ========================================================= */
 const tunnelDatabase = [
     { name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
       lat: 22.2896118, lng: 114.1823943, radius: 300,
@@ -582,27 +579,25 @@ function tunnelNameToShort(fullName) {
     return String(fullName || '').replace(/\s*\(連回程\)/, '');
 }
 
-/* =========================================================
-   ⭐ 取隧道入口 + 出口（近 originLatLng 嘅一端做入口）
-   ========================================================= */
-function getTunnelEntryAndExit(tunnel, originLatLng) {
+// ⭐ 核心：用上一個位置判斷揀邊個入口（返回單一座標）
+function getTunnelEntryPoint(tunnel, lastLatLng) {
     if (!tunnel) return null;
-    if (!originLatLng || !tunnel.entryA || !tunnel.entryB) return null;
+    if (!lastLatLng || !tunnel.entryA || !tunnel.entryB) {
+        return new google.maps.LatLng(tunnel.lat, tunnel.lng);
+    }
     try {
         var ptA = new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
         var ptB = new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
-        var dA = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, ptA);
-        var dB = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, ptB);
-        return (dA <= dB) ? { entry: ptA, exit: ptB } : { entry: ptB, exit: ptA };
+        var dA = google.maps.geometry.spherical.computeDistanceBetween(lastLatLng, ptA);
+        var dB = google.maps.geometry.spherical.computeDistanceBetween(lastLatLng, ptB);
+        return (dA <= dB) ? ptA : ptB;
     } catch (e) {
-        return null;
+        return new google.maps.LatLng(tunnel.lat, tunnel.lng);
     }
 }
 
-/* =========================================================
-   ⭐ 核心修正：按「距離起點最近入口」排序所選隧道
-   ========================================================= */
-function sortForcedTunnelsByProximity(tunnelNames, originLatLng) {
+// ⭐ 按「距離起點最近入口」排序所選隧道
+function sortTunnelsByProximity(tunnelNames, originLatLng) {
     if (!originLatLng || !window.google || !google.maps.geometry) {
         return tunnelNames.slice();
     }
@@ -651,9 +646,7 @@ function toggleTunnel(name) {
     calculateFareWithGoogle();
 }
 
-/* =========================================================
-   ⭐ 自動偵測：還原「1 個點就當行過」
-   ========================================================= */
+// ⭐ 自動偵測：如果用戶有揀隧道，只檢查用戶揀嘅；否則全部檢查
 function checkTunnelsForRoute(route, isDiscount = false) {
     let matchedTunnels = [];
     let totalTunnelFee = 0;
@@ -670,6 +663,9 @@ function checkTunnelsForRoute(route, isDiscount = false) {
     }
 
     tunnelDatabase.forEach(tunnel => {
+        if (selectedForcedTunnels.length > 0 && selectedForcedTunnels.indexOf(tunnel.shortName) < 0) {
+            return;
+        }
         let tunnelLatLng = new google.maps.LatLng(tunnel.lat, tunnel.lng);
         let triggered = false;
         for (let i = 0; i < allPoints.length; i++) {
@@ -771,9 +767,7 @@ function calculateFareWithGoogle() {
     });
 }
 
-/* =========================================================
-   ⭐ 單段計算：按距離排序，只加「入口」做 waypoint
-   ========================================================= */
+// ⭐ 單段：按距離排序，只加「入口」waypoint
 function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     let targetPickup = normalizeLocation(pickupVal, true);
     let targetDropoff = normalizeLocation(dropoffVal, false);
@@ -794,19 +788,19 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     const startLatLng = _geocodedPoints[pickupVal] || null;
 
     // ⭐ 按距離排序
-    const sortedTunnels = sortForcedTunnelsByProximity(selectedForcedTunnels, startLatLng);
+    const sortedTunnels = sortTunnelsByProximity(selectedForcedTunnels, startLatLng);
 
     let lastPoint = startLatLng;
     sortedTunnels.forEach(tunnelName => {
         const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
         if (!tunnel) return;
 
-        const entryExit = getTunnelEntryAndExit(tunnel, lastPoint);
-        if (entryExit) {
-            // ⭐ 只加「入口」
-            waypoints.push({ location: entryExit.entry, stopover: false });
-            // ⭐ 內部記住出口，用嚟判斷下一條隧道
-            lastPoint = entryExit.exit;
+        // ⭐ 只加「入口」
+        const entryPt = getTunnelEntryPoint(tunnel, lastPoint);
+        if (entryPt) {
+            waypoints.push({ location: entryPt, stopover: false });
+            // 用返揀嘅入口做下條隧道判斷起點
+            lastPoint = entryPt;
         }
     });
 
@@ -838,9 +832,7 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     });
 }
 
-/* =========================================================
-   ⭐ 分段計算：每段按距離排序，只加「入口」
-   ========================================================= */
+// ⭐ 分段：每段按距離排序，只加「入口」
 function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
         { text: pickupVal, isPickup: true },
@@ -870,17 +862,17 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         const segStartLatLng = _geocodedPoints[segStart.text] || null;
 
         // ⭐ 按距離排序
-        const sortedTunnels = sortForcedTunnelsByProximity(selectedForcedTunnels, segStartLatLng);
+        const sortedTunnels = sortTunnelsByProximity(selectedForcedTunnels, segStartLatLng);
 
         let lastPoint = segStartLatLng;
         sortedTunnels.forEach(tunnelName => {
             const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
             if (!tunnel) return;
 
-            const entryExit = getTunnelEntryAndExit(tunnel, lastPoint);
-            if (entryExit) {
-                segTunnelWaypoints.push({ location: entryExit.entry, stopover: false });
-                lastPoint = entryExit.exit;
+            const entryPt = getTunnelEntryPoint(tunnel, lastPoint);
+            if (entryPt) {
+                segTunnelWaypoints.push({ location: entryPt, stopover: false });
+                lastPoint = entryPt;
             }
         });
 
@@ -1402,7 +1394,6 @@ if ('serviceWorker' in navigator) {
                     <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
                 </a>
             </div>
-
             <div class="flex flex-col items-center justify-center">
                 <a href="index.html">
                     <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
@@ -1411,7 +1402,6 @@ if ('serviceWorker' in navigator) {
                     <i class="fa-solid fa-phone text-small"></i> 6881 5441
                 </a>
             </div>
-
             <div class="flex items-center pr-1">
                 <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
                     <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
