@@ -206,12 +206,11 @@ let _originLatLngCache = null;
 
 /* =========================================================
    ⭐ 青龍頭點（屯門公路中段）
-   用於：涉及深圳灣時，強制走屯門公路 → 自然避開大欖隧道
    ========================================================= */
 const TUEN_MUN_ROAD_POINT = { lat: 22.365444, lng: 114.050028 };
 
 /* =========================================================
-   ⭐ 新界西關鍵字（屯門/元朗/天水圍/深井一帶）
+   ⭐ 新界西關鍵字
    ========================================================= */
 const NTW_KEYWORDS = [
     '屯門', '屯门', '元朗', '天水圍', '天水围',
@@ -221,7 +220,7 @@ const NTW_KEYWORDS = [
 ];
 
 /* =========================================================
-   ⭐ 大嶼山（離島區）關鍵字
+   ⭐ 大嶼山關鍵字
    ========================================================= */
 const LANTAU_KEYWORDS = [
     '東涌', '东涌', '大嶼山', '大屿山',
@@ -238,6 +237,28 @@ const LANTAU_BOUNDS = {
     minLat: 22.15, maxLat: 22.37,
     minLng: 113.75, maxLng: 114.10
 };
+
+/* =========================================================
+   ⭐ 過海隧道（連接港島 ↔ 九龍）
+   ========================================================= */
+const HARBOUR_TUNNEL_NAMES = ['紅隧', '東隧', '西隧'];
+
+/* =========================================================
+   ⭐ 港島區關鍵字
+   ========================================================= */
+const HKI_KEYWORDS = [
+    '跑馬地', '銅鑼灣', '铜锣湾', '中環', '中环', '灣仔', '湾仔', '北角',
+    '鰂魚涌', '鲗鱼涌', '太古', '西灣河', '西湾河', '筲箕灣', '筲箕湾', '柴灣', '柴湾',
+    '香港仔', '薄扶林', '山頂', '山顶', '金鐘', '金钟', '堅尼地城', '坚尼地城',
+    '西營盤', '西营盘', '上環', '上环', '康怡', '小西灣', '小西湾',
+    '赤柱', '淺水灣', '浅水湾', '南區', '南区', '數碼港', '数码港',
+    '石澳', '大潭', '陽明山莊', '阳明山庄', '天后', '炮台山',
+    '西半山', '東半山', '东半山', '半山', '寶馬山', '宝马山',
+    '深水灣', '深水湾', '石排灣', '石排湾', '鴨脷洲', '鸭脷洲',
+    '利東', '利东', '海怡', '置富', '碧瑤灣', '碧瑶湾',
+    '域多利道', '摩星嶺', '摩星岭', '大坑', '渣甸山', '畢拉山', '毕拉山',
+    '藍塘道', '蓝塘道', '山道', '西邊街', '西边街'
+];
 
 const translations = {
     zh: {
@@ -496,26 +517,26 @@ function processRoutes(routes, isShenzhenBay) {
 }
 
 /* =========================================================
-   ⭐ 隧道資料庫：每條隧道儲存「兩個方向入口」
+   ⭐ 隧道資料庫
    ========================================================= */
 const tunnelDatabase = [
     {
         name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
         lat: 22.2896118, lng: 114.1823943, radius: 300,
-        entryA: { lat: 22.286083, lng: 114.182917 },
-        entryB: { lat: 22.298722, lng: 114.180889 }
+        entryA: { lat: 22.286083, lng: 114.182917 },  // 港島側
+        entryB: { lat: 22.298722, lng: 114.180889 }   // 九龍側
     },
     {
         name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
         lat: 22.294889, lng: 114.22223, radius: 300,
-        entryA: { lat: 22.290806, lng: 114.214278 },
-        entryB: { lat: 22.298417, lng: 114.229306 }
+        entryA: { lat: 22.290806, lng: 114.214278 },  // 港島側
+        entryB: { lat: 22.298417, lng: 114.229306 }   // 九龍側
     },
     {
         name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
         lat: 22.2940599, lng: 114.150204, radius: 300,
-        entryA: { lat: 22.290528, lng: 114.146694 },
-        entryB: { lat: 22.298694, lng: 114.154528 }
+        entryA: { lat: 22.290528, lng: 114.146694 },  // 港島側
+        entryB: { lat: 22.298694, lng: 114.154528 }   // 九龍側
     },
     {
         name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
@@ -582,7 +603,7 @@ function getTunnelEntryPoint(tunnel, originLatLng) {
 }
 
 /* =========================================================
-   ⭐ 判斷一個地點係咪「新界西」
+   ⭐ 判斷新界西
    ========================================================= */
 function isLocationInNTW(locationText, latLng) {
     if (latLng && typeof latLng.lat === 'function' && typeof latLng.lng === 'function') {
@@ -602,7 +623,7 @@ function isLocationInNTW(locationText, latLng) {
 }
 
 /* =========================================================
-   ⭐ 判斷一個地點係咪「大嶼山」
+   ⭐ 判斷大嶼山
    ========================================================= */
 function isLocationInLantau(locationText, latLng) {
     if (locationText) {
@@ -622,6 +643,33 @@ function isLocationInLantau(locationText, latLng) {
         } catch(e) {}
     }
     return false;
+}
+
+/* =========================================================
+   ⭐ 判斷港島
+   ========================================================= */
+function isHKIsland(locationText, latLng) {
+    if (locationText) {
+        const text = String(locationText);
+        for (let i = 0; i < HKI_KEYWORDS.length; i++) {
+            if (text.indexOf(HKI_KEYWORDS[i]) >= 0) return true;
+        }
+    }
+    if (latLng && typeof latLng.lat === 'function' && typeof latLng.lng === 'function') {
+        try {
+            const lat = latLng.lat();
+            const lng = latLng.lng();
+            if (lat >= 22.19 && lat <= 22.295 && lng >= 114.10 && lng <= 114.28) return true;
+        } catch(e) {}
+    }
+    return false;
+}
+
+/* =========================================================
+   ⭐ 判斷一段係咪「跨海」（港島 ↔ 非港島）
+   ========================================================= */
+function isCrossHarbourSegment(startText, endText) {
+    return isHKIsland(startText, null) !== isHKIsland(endText, null);
 }
 
 /* =========================================================
@@ -649,6 +697,33 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     }
 
     return TUEN_MUN_ROAD_POINT;
+}
+
+/* =========================================================
+   ⭐ 統一的「該段要唔要加呢條隧道」判斷 + 入口選擇
+   =========================================================
+   返回：
+     - null  → 唔加（例如過海隧道但唔跨海）
+     - LatLng → 加呢個入口點做 waypoint
+   ========================================================= */
+function resolveTunnelWaypoint(tunnelName, startText, endText) {
+    const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
+    if (!tunnel) return null;
+
+    if (HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0) {
+        // 過海隧道：只有跨海段才加
+        if (!isCrossHarbourSegment(startText, endText)) return null;
+        // 起點在港島 → 用港島側入口（entryA）
+        // 起點在九龍/新界 → 用九龍側入口（entryB）
+        if (isHKIsland(startText, null)) {
+            return new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
+        } else {
+            return new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
+        }
+    }
+
+    // 非過海隧道：照舊用「距離起點最近的入口」
+    return getTunnelEntryPoint(tunnel, _originLatLngCache);
 }
 
 function renderTunnelButtons() {
@@ -736,7 +811,6 @@ function calculateFareWithGoogle() {
     let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
     let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
 
-    // ⭐ 只要有中途站就用分段計算（唔理有冇選隧道），咁先可以出 alternatives
     if (stopoverTexts.length > 0) {
         calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
     } else {
@@ -761,16 +835,14 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         });
     }
 
+    // ⭐ 用統一判斷：過海隧道只有跨海段才加
     selectedForcedTunnels.forEach(tunnelName => {
-        const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
-        if (tunnel) {
-            const entryPoint = getTunnelEntryPoint(tunnel, _originLatLngCache);
-            if (entryPoint) {
-                waypoints.push({
-                    location: entryPoint,
-                    stopover: false
-                });
-            }
+        const entryPoint = resolveTunnelWaypoint(tunnelName, pickupVal, dropoffVal);
+        if (entryPoint) {
+            waypoints.push({
+                location: entryPoint,
+                stopover: false
+            });
         }
     });
 
@@ -802,10 +874,6 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     });
 }
 
-/* =========================================================
-   ⭐ 分段計算：每段獨立 request alternatives，再用笛卡兒積組合
-   即使有中途站，都可以得出多條完整路線俾乘客揀
-   ========================================================= */
 function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
         { text: pickupVal, isPickup: true },
@@ -832,16 +900,14 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
             }
         }
 
+        // ⭐ 用統一判斷：過海隧道只有跨海段才加 + 依該段起點側選入口
         selectedForcedTunnels.forEach(tunnelName => {
-            const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
-            if (tunnel) {
-                const entryPoint = getTunnelEntryPoint(tunnel, _originLatLngCache);
-                if (entryPoint) {
-                    segTunnelWaypoints.push({
-                        location: entryPoint,
-                        stopover: false
-                    });
-                }
+            const entryPoint = resolveTunnelWaypoint(tunnelName, segStart.text, segEnd.text);
+            if (entryPoint) {
+                segTunnelWaypoints.push({
+                    location: entryPoint,
+                    stopover: false
+                });
             }
         });
 
@@ -868,7 +934,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
                 destination: seg.destination,
                 waypoints: seg.waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
-                // ⭐ 每段獨立判斷：冇 waypoint 就 request alternatives
                 provideRouteAlternatives: seg.waypoints.length === 0,
                 optimizeWaypoints: false
             }, (result, status) => {
@@ -886,10 +951,7 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         }
 
         try {
-            // ⭐ 每段最多取 2 條，避免組合爆炸（2 段 = 4 組合、3 段 = 8 組合）
             const perSegRoutes = results.map(r => r.result.routes.slice(0, 2));
-
-            // ⭐ 笛卡兒積
             const combos = cartesianProduct(perSegRoutes);
 
             const scored = combos.map(routesArr => {
@@ -903,7 +965,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
                 return { routes: routesArr, dist, dur };
             });
 
-            // ⭐ 去重：用總距離 + 總時間粗略做 key（避免同一條路重複出現）
             const seen = new Set();
             const unique = [];
             scored.forEach(s => {
@@ -914,7 +975,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
                 }
             });
 
-            // ⭐ 揀最快 + 最短
             const byTime = [...unique].sort((a, b) => a.dur - b.dur);
             const byDist = [...unique].sort((a, b) => a.dist - b.dist);
 
@@ -927,7 +987,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
                 picked.push({ combo: byTime[1], label: '📏 替代路線' });
             }
 
-            // ⭐ 若最短路線 === 最快路線（得 1 條），標籤改為「最佳路線」
             if (picked.length === 1) {
                 picked[0].label = '最佳路線';
             }
@@ -949,7 +1008,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
     });
 }
 
-/* ⭐ 笛卡兒積：用於組合每段嘅 alternatives */
 function cartesianProduct(arrays) {
     if (arrays.length === 0) return [];
     if (arrays.length === 1) return arrays[0].map(x => [x]);
@@ -961,7 +1019,6 @@ function cartesianProduct(arrays) {
     return result;
 }
 
-/* ⭐ 合併多段 routes（陣列）做一條完整路線 */
 function mergeSegmentsFromRoutes(routesArr) {
     const first = routesArr[0];
     const merged = {};
@@ -991,7 +1048,6 @@ function mergeSegmentsFromRoutes(routesArr) {
     return merged;
 }
 
-/* ⭐ 保留舊版 mergeSegments（用於 fallback 或相容） */
 function mergeSegments(results) {
     const firstRoute = results[0].result.routes[0];
     const merged = {};
