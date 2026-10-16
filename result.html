@@ -211,7 +211,7 @@
     const TUEN_MUN_ROAD_POINT = { lat: 22.365444, lng: 114.050028 };
 
     /* =========================================================
-       ⭐ 新界西關鍵字（起點 / 終點 / 中途站判斷用）
+       ⭐ 新界西關鍵字（屯門/元朗/天水圍/深井一帶）
        ========================================================= */
     const NTW_KEYWORDS = [
         '屯門', '屯门', '元朗', '天水圍', '天水围',
@@ -219,6 +219,24 @@
         '流浮山', '龍鼓灘', '龙鼓滩', '掃管笏', '扫管笏',
         '小欖', '小榄', '大欖涌', '大榄涌'
     ];
+
+    /* =========================================================
+       ⭐ 大嶼山（離島區）關鍵字
+       - 呢啲地方去深圳灣自然走屯赤隧道，唔需要加青龍頭點
+       ========================================================= */
+    const LANTAU_KEYWORDS = [
+        '東涌', '东涌', '大嶼山', '大屿山',
+        '機場', '机场', '香港國際機場', '香港国际机场', '赤鱲角', '赤鱲角', '赤腊角',
+        '迪士尼', '昂坪', '大澳', '梅窩', '梅窝',
+        '長洲', '长洲', '坪洲', '南丫島', '南丫岛', '喜靈洲', '喜灵洲',
+        '汲水門', '汲水门', '青馬', '青马'
+    ];
+
+    // 大嶼山座標範圍（粗略框）
+    const LANTAU_BOUNDS = {
+        minLat: 22.18, maxLat: 22.34,
+        minLng: 113.80, maxLng: 114.06
+    };
 
     const translations = {
         zh: {
@@ -571,7 +589,6 @@
        - 冇座標（終點/中途站）→ 用文字關鍵字
        ========================================================= */
     function isLocationInNTW(locationText, latLng) {
-        // 方法 1：有座標 → 計距青龍頭 < 8km
         if (latLng && typeof latLng.lat === 'function' && typeof latLng.lng === 'function') {
             try {
                 const tmPoint = new google.maps.LatLng(TUEN_MUN_ROAD_POINT.lat, TUEN_MUN_ROAD_POINT.lng);
@@ -580,11 +597,34 @@
                 return false;
             } catch(e) {}
         }
-        // 方法 2：冇座標 → 用文字判斷
         if (!locationText) return false;
         const text = String(locationText);
         for (let i = 0; i < NTW_KEYWORDS.length; i++) {
             if (text.indexOf(NTW_KEYWORDS[i]) >= 0) return true;
+        }
+        return false;
+    }
+
+    /* =========================================================
+       ⭐ 判斷一個地點係咪「大嶼山」（離島區）
+       - 有座標 → 睇座標框
+       - 冇座標 → 用文字關鍵字
+       ========================================================= */
+    function isLocationInLantau(locationText, latLng) {
+        if (latLng && typeof latLng.lat === 'function' && typeof latLng.lng === 'function') {
+            try {
+                const lat = latLng.lat();
+                const lng = latLng.lng();
+                if (lat >= LANTAU_BOUNDS.minLat && lat <= LANTAU_BOUNDS.maxLat &&
+                    lng >= LANTAU_BOUNDS.minLng && lng <= LANTAU_BOUNDS.maxLng) {
+                    return true;
+                }
+            } catch(e) {}
+        }
+        if (!locationText) return false;
+        const text = String(locationText);
+        for (let i = 0; i < LANTAU_KEYWORDS.length; i++) {
+            if (text.indexOf(LANTAU_KEYWORDS[i]) >= 0) return true;
         }
         return false;
     }
@@ -595,6 +635,7 @@
          1. 涉及深圳灣（起/終/中途站）
          2. 用戶冇主動選大欖
          3. 起點、終點、中途站都唔喺新界西
+         4. 起點、終點、中途站都唔喺大嶼山（東涌/機場自然走屯赤）
        ========================================================= */
     function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
         // 條件 2：用戶主動選大欖 → 唔加點
@@ -610,12 +651,23 @@
         // 條件 3a：起點喺新界西 → 唔加點
         if (isLocationInNTW(pickupVal, originLatLng)) return null;
 
-        // 條件 3b：終點喺新界西 → 唔加點（避免由深圳灣返屯門/元朗時兜路）
+        // 條件 3b：終點喺新界西 → 唔加點
         if (isLocationInNTW(dropoffVal, null)) return null;
 
         // 條件 3c：任何中途站喺新界西 → 唔加點
         for (let i = 0; i < stopoverTexts.length; i++) {
             if (isLocationInNTW(stopoverTexts[i], null)) return null;
+        }
+
+        // ⭐ 條件 4a：起點喺大嶼山（東涌/機場/迪士尼…）→ 唔加點（自然走屯赤）
+        if (isLocationInLantau(pickupVal, originLatLng)) return null;
+
+        // 條件 4b：終點喺大嶼山 → 唔加點
+        if (isLocationInLantau(dropoffVal, null)) return null;
+
+        // 條件 4c：任何中途站喺大嶼山 → 唔加點
+        for (let i = 0; i < stopoverTexts.length; i++) {
+            if (isLocationInLantau(stopoverTexts[i], null)) return null;
         }
 
         return TUEN_MUN_ROAD_POINT;
