@@ -244,12 +244,11 @@ const HKI_KEYWORDS = [
     '藍塘道', '蓝塘道', '山道', '西邊街', '西边街'
 ];
 
-/* ⭐ 新增：統一區域分類 */
 const ZONE_KEYWORDS = {
     HKI: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','柴灣','柴湾','金鐘','金钟','堅尼地城','坚尼地城','西營盤','西营盘','上環','上环','山頂','山顶','半山','天后','炮台山','大坑','渣甸山','薄扶林','香港仔','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','數碼港','数码港','石澳','大潭'],
     HKI_N: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','金鐘','金钟','天后','炮台山','大坑','西半山','東半山','东半山','半山'],
     HKI_S: ['香港仔','薄扶林','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','南區','南区','數碼港','数码港','石澳','大潭','深水灣','深水湾','石排灣','石排湾','海怡','利東','利东','置富','碧瑤灣','碧瑶湾','西營盤','西营盘','堅尼地城','坚尼地城','上環','上环'],
-    KLN: ['佐敦','尖沙咀','旺角','油麻地','深水埗','九龍塘','九龙塘','九龍城','九龙城','黃大仙','黄大仙','觀塘','观塘','九龍灣','九龙湾','鑽石山','钻石山','牛池灣','牛池湾','土瓜灣','土瓜湾','何文田','紅磡','红磡','啟德','启德','長沙灣','长沙湾','荔枝角','美孚','石硤尾','石硖尾','大角咀','奧運','奥运','南昌','柯士甸','油塘','藍田','蓝田','秀茂坪','慈雲山','慈云山','樂富','乐富','橫頭磡','横头磡','啟業','启业','新蒲崗','新蒲岗','彩虹','鑽石山','九龙站','九龙站'],
+    KLN: ['佐敦','尖沙咀','旺角','油麻地','深水埗','九龍塘','九龙塘','九龍城','九龙城','黃大仙','黄大仙','觀塘','观塘','九龍灣','九龙湾','鑽石山','钻石山','牛池灣','牛池湾','土瓜灣','土瓜湾','何文田','紅磡','红磡','啟德','启德','長沙灣','长沙湾','荔枝角','美孚','石硤尾','石硖尾','大角咀','奧運','奥运','南昌','柯士甸','油塘','藍田','蓝田','秀茂坪','慈雲山','慈云山','樂富','乐富','橫頭磡','横头磡','啟業','启业','新蒲崗','新蒲岗','彩虹','九龙站'],
     NTE: ['沙田','大圍','大围','馬鞍山','马鞍山','大埔','上水','粉嶺','粉岭','火炭','小瀝源','小沥源','沙田圍','沙田围','科學園','科学园','太和','西貢','西贡','將軍澳','将军澳','大埔墟','大埔中心','大尾篤'],
     NTW: ['屯門','屯门','元朗','天水圍','天水围','荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','錦田','锦田','洪水橋','洪水桥','流浮山','掃管笏','扫管笏','小欖','小榄','大欖涌','大榄涌'],
     NTW_S: ['荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','美孚','荔枝角','長沙灣','长沙湾'],
@@ -258,7 +257,6 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
-/* ⭐ 新增：每條隧道嘅兩側區域規則 */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
@@ -665,7 +663,6 @@ function isHKIsland(locationText, latLng) {
     return false;
 }
 
-/* ⭐ 新增：取得文字對應嘅所有區域 */
 function getLocationZone(locationText) {
     if (!locationText) return [];
     const text = String(locationText);
@@ -679,7 +676,6 @@ function getLocationZone(locationText) {
     return zones;
 }
 
-/* ⭐ 新增：判斷該隧道是否適用於該段（起終點分別在隧道兩側） */
 function isTunnelRelevantForSegment(tunnelName, startText, endText) {
     const rule = TUNNEL_ZONE_RULES[tunnelName];
     if (!rule) return true;
@@ -695,10 +691,6 @@ function isTunnelRelevantForSegment(tunnelName, startText, endText) {
     const endInB = sideB.some(z => endZones.indexOf(z) >= 0);
 
     return (startInA && endInB) || (startInB && endInA);
-}
-
-function isCrossHarbourSegment(startText, endText) {
-    return isHKIsland(startText, null) !== isHKIsland(endText, null);
 }
 
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
@@ -725,7 +717,7 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     return TUEN_MUN_ROAD_POINT;
 }
 
-/* ⭐ 統一入口：先判斷隧道是否適用，再決定 entryA / entryB */
+/* ⭐ 同過海隧道修好版完全一致：單入口點 */
 function resolveTunnelWaypoint(tunnelName, startText, endText) {
     const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
     if (!tunnel) return null;
@@ -734,28 +726,13 @@ function resolveTunnelWaypoint(tunnelName, startText, endText) {
 
     const rule = TUNNEL_ZONE_RULES[tunnelName];
     const startZones = getLocationZone(startText);
-    const endZones = getLocationZone(endText);
     const sideA = rule.sides[0];
-    const sideB = rule.sides[1];
 
     const startInA = sideA.some(z => startZones.indexOf(z) >= 0);
-    const startInB = sideB.some(z => startZones.indexOf(z) >= 0);
-    const endInA = sideA.some(z => endZones.indexOf(z) >= 0);
-    const endInB = sideB.some(z => endZones.indexOf(z) >= 0);
 
-    const forward = startInA && endInB;
-    const backward = startInB && endInA;
-
-    let useEntryA = forward;
-
-    if (HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0) {
-        if (isHKIsland(startText, null)) useEntryA = true;
-        else useEntryA = false;
-    }
-
-    if (useEntryA && tunnel.entryA) {
+    if (startInA && tunnel.entryA) {
         return new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
-    } else if (!useEntryA && tunnel.entryB) {
+    } else if (!startInA && tunnel.entryB) {
         return new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
     }
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
@@ -870,13 +847,14 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         });
     }
 
+    /* ⭐ 每段只加第一條符合嘅隧道（單入口點） */
+    let tunnelAdded = false;
     selectedForcedTunnels.forEach(tunnelName => {
-        const entryPoint = resolveTunnelWaypoint(tunnelName, pickupVal, dropoffVal);
-        if (entryPoint) {
-            waypoints.push({
-                location: entryPoint,
-                stopover: false
-            });
+        if (tunnelAdded) return;
+        const pt = resolveTunnelWaypoint(tunnelName, pickupVal, dropoffVal);
+        if (pt) {
+            waypoints.push({ location: pt, stopover: false });
+            tunnelAdded = true;
         }
     });
 
@@ -934,13 +912,14 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
             }
         }
 
+        /* ⭐ 每段只加第一條符合嘅隧道（單入口點） */
+        let segTunnelAdded = false;
         selectedForcedTunnels.forEach(tunnelName => {
-            const entryPoint = resolveTunnelWaypoint(tunnelName, segStart.text, segEnd.text);
-            if (entryPoint) {
-                segTunnelWaypoints.push({
-                    location: entryPoint,
-                    stopover: false
-                });
+            if (segTunnelAdded) return;
+            const pt = resolveTunnelWaypoint(tunnelName, segStart.text, segEnd.text);
+            if (pt) {
+                segTunnelWaypoints.push({ location: pt, stopover: false });
+                segTunnelAdded = true;
             }
         });
 
