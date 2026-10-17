@@ -244,6 +244,34 @@ const HKI_KEYWORDS = [
     '藍塘道', '蓝塘道', '山道', '西邊街', '西边街'
 ];
 
+/* ⭐ 新增：區域分類 */
+const ZONE_KEYWORDS = {
+    HKI: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','柴灣','柴湾','金鐘','金钟','堅尼地城','坚尼地城','西營盤','西营盘','上環','上环','山頂','山顶','半山','天后','炮台山','大坑','渣甸山','薄扶林','香港仔','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','數碼港','数码港','石澳','大潭'],
+    HKI_N: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','金鐘','金钟','天后','炮台山','大坑','西半山','東半山','东半山','半山'],
+    HKI_S: ['香港仔','薄扶林','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','南區','南区','數碼港','数码港','石澳','大潭','深水灣','深水湾','石排灣','石排湾','海怡','利東','利东','置富','碧瑤灣','碧瑶湾','西營盤','西营盘','堅尼地城','坚尼地城','上環','上环'],
+    KLN: ['佐敦','尖沙咀','旺角','油麻地','深水埗','九龍塘','九龙塘','九龍城','九龙城','黃大仙','黄大仙','觀塘','观塘','九龍灣','九龙湾','鑽石山','钻石山','牛池灣','牛池湾','土瓜灣','土瓜湾','何文田','紅磡','红磡','啟德','启德','長沙灣','长沙湾','荔枝角','美孚','石硤尾','石硖尾','大角咀','奧運','奥运','南昌','柯士甸','油塘','藍田','蓝田','秀茂坪','慈雲山','慈云山','樂富','乐富','橫頭磡','横头磡','啟業','启业','新蒲崗','新蒲岗','彩虹','九龙站'],
+    NTE: ['沙田','大圍','大围','馬鞍山','马鞍山','大埔','上水','粉嶺','粉岭','火炭','小瀝源','小沥源','沙田圍','沙田围','科學園','科学园','太和','西貢','西贡','將軍澳','将军澳','大埔墟','大埔中心','大尾篤'],
+    NTW: ['屯門','屯门','元朗','天水圍','天水围','荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','錦田','锦田','洪水橋','洪水桥','流浮山','掃管笏','扫管笏','小欖','小榄','大欖涌','大榄涌'],
+    NTW_S: ['荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','美孚','荔枝角','長沙灣','长沙湾'],
+    NTW_N: ['元朗','天水圍','天水围','錦田','锦田','洪水橋','洪水桥','流浮山','屯門','屯门'],
+    LANTAU: ['東涌','东涌','機場','机场','赤鱲角','赤鱲角','迪士尼','大嶼山','大屿山','昂坪','大澳','梅窩','梅窝','愉景灣','愉景湾','逸東','逸东','富東','富东','迎東','迎东'],
+    SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
+};
+
+/* ⭐ 新增：每條隧道嘅兩側區域規則 */
+const TUNNEL_ZONE_RULES = {
+    '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
+    '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
+    '西隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
+    '獅隧':  { sides: [['KLN'], ['NTE']] },
+    '大老山': { sides: [['KLN'], ['NTE']] },
+    '尖山':  { sides: [['KLN','NTW_S'], ['NTE']] },
+    '城隧':  { sides: [['NTW_S'], ['NTE']] },
+    '大欖':  { sides: [['HKI','KLN','NTE','NTW_S'], ['NTW_N','SZ']] },
+    '屯赤':  { sides: [['NTW'], ['LANTAU']] },
+    '香港仔': { sides: [['HKI_N'], ['HKI_S']] }
+};
+
 const translations = {
     zh: {
         result_title: "路線規劃結果",
@@ -637,8 +665,36 @@ function isHKIsland(locationText, latLng) {
     return false;
 }
 
-function isCrossHarbourSegment(startText, endText) {
-    return isHKIsland(startText, null) !== isHKIsland(endText, null);
+/* ⭐ 新增：取得地點對應嘅所有 zone */
+function getLocationZone(locationText) {
+    if (!locationText) return [];
+    const text = String(locationText);
+    const zones = [];
+    for (const zone in ZONE_KEYWORDS) {
+        const kws = ZONE_KEYWORDS[zone];
+        for (let i = 0; i < kws.length; i++) {
+            if (text.indexOf(kws[i]) >= 0) { zones.push(zone); break; }
+        }
+    }
+    return zones;
+}
+
+/* ⭐ 新增：判斷該段起終點是否分別喺隧道兩側 */
+function isTunnelRelevantForSegment(tunnelName, startText, endText) {
+    const rule = TUNNEL_ZONE_RULES[tunnelName];
+    if (!rule) return true;
+
+    const startZones = getLocationZone(startText);
+    const endZones = getLocationZone(endText);
+    const sideA = rule.sides[0];
+    const sideB = rule.sides[1];
+
+    const startInA = sideA.some(z => startZones.indexOf(z) >= 0);
+    const startInB = sideB.some(z => startZones.indexOf(z) >= 0);
+    const endInA = sideA.some(z => endZones.indexOf(z) >= 0);
+    const endInB = sideB.some(z => endZones.indexOf(z) >= 0);
+
+    return (startInA && endInB) || (startInB && endInA);
 }
 
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
@@ -665,28 +721,33 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     return TUEN_MUN_ROAD_POINT;
 }
 
+/* =========================================================
+   ⭐ 修正：所有隧道都用 ZONE_RULES 判断；入口按起點側揀
+   ========================================================= */
 function resolveTunnelWaypoint(tunnelName, startText, endText) {
     const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
     if (!tunnel) return null;
 
-    if (HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0) {
-        if (!isCrossHarbourSegment(startText, endText)) return null;
-        if (isHKIsland(startText, null)) {
-            return new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
-        } else {
-            return new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
-        }
+    const rule = TUNNEL_ZONE_RULES[tunnelName];
+    if (!rule) {
+        return getTunnelEntryPoint(tunnel, _originLatLngCache);
     }
 
+    if (!isTunnelRelevantForSegment(tunnelName, startText, endText)) return null;
+
+    const startZones = getLocationZone(startText);
+    const sideA = rule.sides[0];
+    const startInA = sideA.some(z => startZones.indexOf(z) >= 0);
+
+    if (startInA && tunnel.entryA) {
+        return new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
+    } else if (tunnel.entryB) {
+        return new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
+    }
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
 }
 
-/* =========================================================
-   ⭐ 新增：收集所有匹配嘅隧道入口，按方向排好序
-   - 過海隧道最多 1 條
-   - 非過海隧道可以多條（按距離起點升序）
-   - 起點喺港島 → 過海先；否則 → 過海後
-   ========================================================= */
+/* ⭐ 收集所有匹配隧道入口，按方向排好序 */
 function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
     const harbour = [];
     const nonHarbour = [];
@@ -822,14 +883,11 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         waypoints.push({ location: normalizeLocation(s, false), stopover: true });
     });
 
-    /* ⭐ 收集所有匹配隧道入口（過海最多 1 條，其餘多條，按方向排序） */
     const tunnelWaypoints = collectTunnelWaypoints(pickupVal, dropoffVal, _originLatLngCache);
 
-    /* ⭐ 青龍頭點 */
     const tmRoadPoint = getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, _originLatLngCache);
     const tmLatLng = tmRoadPoint ? new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng) : null;
 
-    /* ⭐ 組合：起點深圳灣 → 青龍頭在前；否則 → 隧道在前 */
     const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
     if (isFromSZ) {
         if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
@@ -881,14 +939,11 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
 
         const segTunnelWaypoints = [];
 
-        /* ⭐ 收集該段所有匹配隧道入口 */
         const segTunnelWaypointsList = collectTunnelWaypoints(segStart.text, segEnd.text, _originLatLngCache);
 
-        /* ⭐ 青龍頭點 */
         const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
         const segTmLatLng = segTmRoadPoint ? new google.maps.LatLng(segTmRoadPoint.lat, segTmRoadPoint.lng) : null;
 
-        /* ⭐ 組合：該段起點深圳灣 → 青龍頭在前；否則 → 隧道在前 */
         const segStartIsSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾");
         if (segStartIsSZ) {
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
