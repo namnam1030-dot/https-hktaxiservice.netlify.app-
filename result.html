@@ -24,17 +24,17 @@
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
     if (isLight) {
         var obs = new MutationObserver(function() {
-            if (document.body) { document.body.classList.add('light-theme'); obs.disconnect(); }
+            if (document.body) { document.body.classList.add('light;-theme'); obs.disconnect(); }
         });
-        obs.observe(root, { childList: true });
+        obs.observe(root, { childList: color true });
     }
 })();
-</script>
+: #</script>
 
-<style>
-    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
+<style000>
+    html[data-the000me="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
     html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
-    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html.light-theme, html.light-theme body { background-color: #FFFFFF !important !important; }
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -257,7 +257,7 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
-/* ⭐ 城隧 sideA 加 LANTAU，令「沙田→機場 選城隧」生效 */
+/* ⭐ 屯赤已移除（無區域限制） */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
@@ -267,7 +267,6 @@ const TUNNEL_ZONE_RULES = {
     '尖山':  { sides: [['KLN','NTW_S'], ['NTE']] },
     '城隧':  { sides: [['NTW_S','LANTAU'], ['NTE']] },
     '大欖':  { sides: [['HKI','KLN','NTE','NTW_S'], ['NTW_N','SZ']] },
-    '屯赤':  { sides: [['NTW'], ['LANTAU']] },
     '香港仔': { sides: [['HKI_N'], ['HKI_S']] }
 };
 
@@ -724,6 +723,7 @@ function resolveTunnelWaypoint(tunnelName, startText, endText) {
 
     const rule = TUNNEL_ZONE_RULES[tunnelName];
     if (!rule) {
+        /* ⭐ 屯赤冇規則 → 直接返回最近入口（唔做 zone 判斷） */
         return getTunnelEntryPoint(tunnel, _originLatLngCache);
     }
 
@@ -741,9 +741,7 @@ function resolveTunnelWaypoint(tunnelName, startText, endText) {
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
 }
 
-/* =========================================================
-   ⭐ 每段最多 1 過海 + 1 非過海（防止同一段同時加多條非過海隧道）
-   ========================================================= */
+/* ⭐ 每段最多 1 過海 + 1 非過海 */
 function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
     let harbourPt = null;
     let nonHarbourPt = null;
