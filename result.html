@@ -244,7 +244,6 @@ const HKI_KEYWORDS = [
     '藍塘道', '蓝塘道', '山道', '西邊街', '西边街'
 ];
 
-/* ⭐ 新增：區域分類 */
 const ZONE_KEYWORDS = {
     HKI: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','柴灣','柴湾','金鐘','金钟','堅尼地城','坚尼地城','西營盤','西营盘','上環','上环','山頂','山顶','半山','天后','炮台山','大坑','渣甸山','薄扶林','香港仔','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','數碼港','数码港','石澳','大潭'],
     HKI_N: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','金鐘','金钟','天后','炮台山','大坑','西半山','東半山','东半山','半山'],
@@ -258,7 +257,7 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
-/* ⭐ 新增：每條隧道嘅兩側區域規則 */
+/* ⭐ 城隧 sideA 加 LANTAU，令「沙田→機場 選城隧」生效 */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
@@ -266,7 +265,7 @@ const TUNNEL_ZONE_RULES = {
     '獅隧':  { sides: [['KLN'], ['NTE']] },
     '大老山': { sides: [['KLN'], ['NTE']] },
     '尖山':  { sides: [['KLN','NTW_S'], ['NTE']] },
-    '城隧':  { sides: [['NTW_S'], ['NTE']] },
+    '城隧':  { sides: [['NTW_S','LANTAU'], ['NTE']] },
     '大欖':  { sides: [['HKI','KLN','NTE','NTW_S'], ['NTW_N','SZ']] },
     '屯赤':  { sides: [['NTW'], ['LANTAU']] },
     '香港仔': { sides: [['HKI_N'], ['HKI_S']] }
@@ -665,7 +664,6 @@ function isHKIsland(locationText, latLng) {
     return false;
 }
 
-/* ⭐ 新增：取得地點對應嘅所有 zone */
 function getLocationZone(locationText) {
     if (!locationText) return [];
     const text = String(locationText);
@@ -679,7 +677,6 @@ function getLocationZone(locationText) {
     return zones;
 }
 
-/* ⭐ 新增：判斷該段起終點是否分別喺隧道兩側 */
 function isTunnelRelevantForSegment(tunnelName, startText, endText) {
     const rule = TUNNEL_ZONE_RULES[tunnelName];
     if (!rule) return true;
@@ -721,9 +718,6 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     return TUEN_MUN_ROAD_POINT;
 }
 
-/* =========================================================
-   ⭐ 修正：所有隧道都用 ZONE_RULES 判断；入口按起點側揀
-   ========================================================= */
 function resolveTunnelWaypoint(tunnelName, startText, endText) {
     const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
     if (!tunnel) return null;
@@ -747,10 +741,12 @@ function resolveTunnelWaypoint(tunnelName, startText, endText) {
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
 }
 
-/* ⭐ 收集所有匹配隧道入口，按方向排好序 */
+/* =========================================================
+   ⭐ 每段最多 1 過海 + 1 非過海（防止同一段同時加多條非過海隧道）
+   ========================================================= */
 function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
-    const harbour = [];
-    const nonHarbour = [];
+    let harbourPt = null;
+    let nonHarbourPt = null;
 
     selectedForcedTunnels.forEach(tunnelName => {
         const isHarbour = HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0;
@@ -758,28 +754,22 @@ function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
         if (!pt) return;
 
         if (isHarbour) {
-            if (harbour.length === 0) harbour.push(pt);
+            if (!harbourPt) harbourPt = pt;
         } else {
-            nonHarbour.push(pt);
+            if (!nonHarbourPt) nonHarbourPt = pt;
         }
     });
 
-    if (originLatLng && nonHarbour.length > 1 && window.google && google.maps.geometry) {
-        try {
-            nonHarbour.sort((a, b) => {
-                const dA = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, a);
-                const dB = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, b);
-                return dA - dB;
-            });
-        } catch(e) {}
-    }
-
+    const result = [];
     const startIsHKI = isHKIsland(pickupText, originLatLng);
     if (startIsHKI) {
-        return [...harbour, ...nonHarbour];
+        if (harbourPt) result.push(harbourPt);
+        if (nonHarbourPt) result.push(nonHarbourPt);
     } else {
-        return [...nonHarbour, ...harbour];
+        if (nonHarbourPt) result.push(nonHarbourPt);
+        if (harbourPt) result.push(harbourPt);
     }
+    return result;
 }
 
 function renderTunnelButtons() {
