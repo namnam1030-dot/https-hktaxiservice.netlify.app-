@@ -1183,10 +1183,15 @@ function submitBooking(event) {
     var title = titleSelect ? titleSelect.value : '';
     var isWechatCustomer = document.getElementById('is_wechat_customer') && document.getElementById('is_wechat_customer').checked;
 
-    var payEls = document.getElementsByName('payment_method');
+var payEls = document.getElementsByName('payment_method');
     var payments = [];
     for (var i = 0; i < payEls.length; i++) { if (payEls[i].checked) payments.push(payEls[i].value); }
     var paymentStr = payments.join(' / ');
+    
+    // ⭐ 如果只揀咗現金，就當作冇填付款方式
+    if (paymentStr === '現金' || paymentStr.trim() === '') {
+        paymentStr = '';
+    }
 
     var timeStringFormatted = time;
     if (orderType === 'booking' && date && time) {
