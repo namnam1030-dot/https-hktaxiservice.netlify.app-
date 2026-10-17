@@ -681,6 +681,46 @@ function resolveTunnelWaypoint(tunnelName, startText, endText) {
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
 }
 
+/* =========================================================
+   ⭐ 新增：收集所有匹配嘅隧道入口，按方向排好序
+   - 過海隧道最多 1 條
+   - 非過海隧道可以多條（按距離起點升序）
+   - 起點喺港島 → 過海先；否則 → 過海後
+   ========================================================= */
+function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
+    const harbour = [];
+    const nonHarbour = [];
+
+    selectedForcedTunnels.forEach(tunnelName => {
+        const isHarbour = HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0;
+        const pt = resolveTunnelWaypoint(tunnelName, pickupText, dropoffText);
+        if (!pt) return;
+
+        if (isHarbour) {
+            if (harbour.length === 0) harbour.push(pt);
+        } else {
+            nonHarbour.push(pt);
+        }
+    });
+
+    if (originLatLng && nonHarbour.length > 1 && window.google && google.maps.geometry) {
+        try {
+            nonHarbour.sort((a, b) => {
+                const dA = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, a);
+                const dB = google.maps.geometry.spherical.computeDistanceBetween(originLatLng, b);
+                return dA - dB;
+            });
+        } catch(e) {}
+    }
+
+    const startIsHKI = isHKIsland(pickupText, originLatLng);
+    if (startIsHKI) {
+        return [...harbour, ...nonHarbour];
+    } else {
+        return [...nonHarbour, ...harbour];
+    }
+}
+
 function renderTunnelButtons() {
     const container = document.getElementById('tunnel-btns');
     if (!container) return;
@@ -773,9 +813,6 @@ function calculateFareWithGoogle() {
     }
 }
 
-/* =========================================================
-   ⭐ 修复：inline 排序，保证 directionsService.route 一定会 call
-   ========================================================= */
 function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     let targetPickup = normalizeLocation(pickupVal, true);
     let targetDropoff = normalizeLocation(dropoffVal, false);
@@ -785,26 +822,20 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         waypoints.push({ location: normalizeLocation(s, false), stopover: true });
     });
 
-    /* 收集隧道入口（每段只加第一条匹配） */
-    let tunnelLatLng = null;
-    let tunnelAdded = false;
-    selectedForcedTunnels.forEach(tunnelName => {
-        if (tunnelAdded) return;
-        const pt = resolveTunnelWaypoint(tunnelName, pickupVal, dropoffVal);
-        if (pt) { tunnelLatLng = pt; tunnelAdded = true; }
-    });
+    /* ⭐ 收集所有匹配隧道入口（過海最多 1 條，其餘多條，按方向排序） */
+    const tunnelWaypoints = collectTunnelWaypoints(pickupVal, dropoffVal, _originLatLngCache);
 
-    /* 收集青龙头点 */
+    /* ⭐ 青龍頭點 */
     const tmRoadPoint = getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, _originLatLngCache);
     const tmLatLng = tmRoadPoint ? new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng) : null;
 
-    /* 按起点方向排序：起点深圳湾 → 青龙头先；否则 → 隧道先 */
+    /* ⭐ 組合：起點深圳灣 → 青龍頭在前；否則 → 隧道在前 */
     const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
     if (isFromSZ) {
         if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
-        if (tunnelLatLng) waypoints.push({ location: tunnelLatLng, stopover: false });
+        tunnelWaypoints.forEach(pt => waypoints.push({ location: pt, stopover: false }));
     } else {
-        if (tunnelLatLng) waypoints.push({ location: tunnelLatLng, stopover: false });
+        tunnelWaypoints.forEach(pt => waypoints.push({ location: pt, stopover: false }));
         if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
     }
 
@@ -850,26 +881,20 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
 
         const segTunnelWaypoints = [];
 
-        /* 收集该段隧道入口 */
-        let segTunnelLatLng = null;
-        let segTunnelAdded = false;
-        selectedForcedTunnels.forEach(tunnelName => {
-            if (segTunnelAdded) return;
-            const pt = resolveTunnelWaypoint(tunnelName, segStart.text, segEnd.text);
-            if (pt) { segTunnelLatLng = pt; segTunnelAdded = true; }
-        });
+        /* ⭐ 收集該段所有匹配隧道入口 */
+        const segTunnelWaypointsList = collectTunnelWaypoints(segStart.text, segEnd.text, _originLatLngCache);
 
-        /* 收集该段青龙头点 */
+        /* ⭐ 青龍頭點 */
         const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
         const segTmLatLng = segTmRoadPoint ? new google.maps.LatLng(segTmRoadPoint.lat, segTmRoadPoint.lng) : null;
 
-        /* 按该段起点方向排序 */
+        /* ⭐ 組合：該段起點深圳灣 → 青龍頭在前；否則 → 隧道在前 */
         const segStartIsSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾");
         if (segStartIsSZ) {
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
-            if (segTunnelLatLng) segTunnelWaypoints.push({ location: segTunnelLatLng, stopover: false });
+            segTunnelWaypointsList.forEach(pt => segTunnelWaypoints.push({ location: pt, stopover: false }));
         } else {
-            if (segTunnelLatLng) segTunnelWaypoints.push({ location: segTunnelLatLng, stopover: false });
+            segTunnelWaypointsList.forEach(pt => segTunnelWaypoints.push({ location: pt, stopover: false }));
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
         }
 
