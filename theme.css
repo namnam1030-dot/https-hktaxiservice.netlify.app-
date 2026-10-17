@@ -356,3 +356,24 @@ html.light-theme body button[onclick*="calculateAndGoToResult"] {
 footer {
     margin-top: 0 !important;
 }
+
+/* =========================================================
+   ⭐ 社群按鈕主題專用設定
+   ========================================================= */
+/* 淺色主題：FB / IG 轉白色字，Threads 轉黑框白底黑字 */
+html.light-theme body .social-fb-btn,
+html.light-theme body .social-ig-btn {
+    color: #FFFFFF !important;
+}
+html.light-theme body .social-threads-btn {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+}
+
+/* 深色主題：Threads 轉白框黑底白字 */
+html:not(.light-theme) body .social-threads-btn {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #FFFFFF !important;
+}
