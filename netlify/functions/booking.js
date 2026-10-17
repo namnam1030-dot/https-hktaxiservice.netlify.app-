@@ -318,7 +318,7 @@ async function findExistingBooking(bookingId) {
 function buildCalendarEvent(data, bookingId, discordMessageId) {
   const startTime = new Date(data.date + 'T' + data.time + ':00+08:00');
   const endTime = new Date(startTime);
-  endTime.setMinutes(endTime.getMinutes() + 1);
+  endTime.setMinutes(endTime.getMinutes() + 60);
 
   const bookingSourceMark = data.isInternalBooking === true
     ? '\n\n[網站預約] 👤 工作人員落單'
@@ -394,7 +394,7 @@ async function addToGoogleCalendar(data, bookingId, discordMessageId) {
   const result = await calendar.events.insert({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     resource: resource,
-    sendUpdates: 'all'
+    sendUpdates: 'none'
   });
   console.log('成功加入日曆：', result.data.htmlLink);
   return result.data;
@@ -414,7 +414,7 @@ async function updateGoogleCalendar(existing, data) {
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     eventId: existing.eventId,
     resource: resource,
-    sendUpdates: 'all'
+    sendUpdates: 'none'
   });
   console.log('日曆已更新：', result.data.htmlLink);
   return result.data;
