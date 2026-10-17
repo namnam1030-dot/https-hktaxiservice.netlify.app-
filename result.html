@@ -270,8 +270,8 @@ const translations = {
         fee_mode_title: "收費模式",
         required_mark: "* (必須選擇)",
         min_fare_note: "所有行程最低消費$100",
- catch        fare_normal_label: "正價按錶收費(e",
-        fare_discount_label: "八五)折優惠",
+        fare_normal_label: "正價按錶收費",
+        fare_discount_label: "八五折優惠",
         fare_discount_note: "(只限豐田混能的士)",
         btn_reselect_route: "重新規劃路線",
         btn_view_fleet: "選擇車款類型",
@@ -350,7 +350,7 @@ function getDiscountLabel() {
 
 function loadRouteDataFromLocalStorage() {
     const saved = localStorage.getItem('taxiRouteData');
-    if (saved) { try { return JSON.parse(saved); } { return null; } }
+    if (saved) { try { return JSON.parse(saved); } catch(e) { return null; } }
     return null;
 }
 
@@ -681,37 +681,6 @@ function resolveTunnelWaypoint(tunnelName, startText, endText) {
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
 }
 
-/* =========================================================
-   ⭐ 新增：按起终点方向排序强制点（隧道入口 / 青龙头点）
-   - 如果起点是深圳湾 → 青龙头先
-   - 否则（去深圳湾）→ 隧道入口先
-   ========================================================= */
-function buildOrderedForcedPoints(pickupText, dropoffText, stopoverTexts, isSegOriginSZ) {
-    // 收集青龙头点
-    const tmRoadPoint = getTuenMunRoadAvoidancePoint(pickupText, dropoffText, stopoverTexts, _originLatLngCache);
-    const tmLatLng = tmRoadPoint ? new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng) : null;
-
-    // 收集隧道入口（每段只加第一条匹配）
-    let tunnelLatLng = null;
-    let tunnelAdded = false;
-    selectedForcedTunnels.forEach(tunnelName => {
-        if (tunnelAdded) return;
-        const pt = resolveTunnelWaypoint(tunnelName, pickupText, dropoffText);
-        if (pt) { tunnelLatLng = pt; tunnelAdded = true; }
-    });
-
-    // 排序
-    const ordered = [];
-    if (isSegOriginSZ) {
-        if (tmLatLng) ordered.push(tmLatLng);
-        if (tunnelLatLng) ordered.push(tunnelLatLng);
-    } else {
-        if (tunnelLatLng) ordered.push(tunnelLatLng);
-        if (tmLatLng) ordered.push(tmLatLng);
-    }
-    return ordered;
-}
-
 function renderTunnelButtons() {
     const container = document.getElementById('tunnel-btns');
     if (!container) return;
@@ -804,6 +773,9 @@ function calculateFareWithGoogle() {
     }
 }
 
+/* =========================================================
+   ⭐ 修复：inline 排序，保证 directionsService.route 一定会 call
+   ========================================================= */
 function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     let targetPickup = normalizeLocation(pickupVal, true);
     let targetDropoff = normalizeLocation(dropoffVal, false);
@@ -813,12 +785,28 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         waypoints.push({ location: normalizeLocation(s, false), stopover: true });
     });
 
-    /* ⭐ 用新函数一次性按方向排好隧道入口 + 青龙头点 */
-    const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
-    const orderedForced = buildOrderedForcedPoints(pickupVal, dropoffVal, stopoverTexts, isFromSZ);
-    orderedForced.forEach(pt => {
-        waypoints.push({ location: pt, stopover: false });
+    /* 收集隧道入口（每段只加第一条匹配） */
+    let tunnelLatLng = null;
+    let tunnelAdded = false;
+    selectedForcedTunnels.forEach(tunnelName => {
+        if (tunnelAdded) return;
+        const pt = resolveTunnelWaypoint(tunnelName, pickupVal, dropoffVal);
+        if (pt) { tunnelLatLng = pt; tunnelAdded = true; }
     });
+
+    /* 收集青龙头点 */
+    const tmRoadPoint = getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, _originLatLngCache);
+    const tmLatLng = tmRoadPoint ? new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng) : null;
+
+    /* 按起点方向排序：起点深圳湾 → 青龙头先；否则 → 隧道先 */
+    const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
+    if (isFromSZ) {
+        if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
+        if (tunnelLatLng) waypoints.push({ location: tunnelLatLng, stopover: false });
+    } else {
+        if (tunnelLatLng) waypoints.push({ location: tunnelLatLng, stopover: false });
+        if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
+    }
 
     const request = {
         origin: targetPickup,
@@ -862,12 +850,28 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
 
         const segTunnelWaypoints = [];
 
-        /* ⭐ 用新函数一次性按该段方向排好隧道入口 + 青龙头点 */
-        const segStartIsSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾");
-        const orderedForced = buildOrderedForcedPoints(segStart.text, segEnd.text, [], segStartIsSZ);
-        orderedForced.forEach(pt => {
-            segTunnelWaypoints.push({ location: pt, stopover: false });
+        /* 收集该段隧道入口 */
+        let segTunnelLatLng = null;
+        let segTunnelAdded = false;
+        selectedForcedTunnels.forEach(tunnelName => {
+            if (segTunnelAdded) return;
+            const pt = resolveTunnelWaypoint(tunnelName, segStart.text, segEnd.text);
+            if (pt) { segTunnelLatLng = pt; segTunnelAdded = true; }
         });
+
+        /* 收集该段青龙头点 */
+        const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
+        const segTmLatLng = segTmRoadPoint ? new google.maps.LatLng(segTmRoadPoint.lat, segTmRoadPoint.lng) : null;
+
+        /* 按该段起点方向排序 */
+        const segStartIsSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾");
+        if (segStartIsSZ) {
+            if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
+            if (segTunnelLatLng) segTunnelWaypoints.push({ location: segTunnelLatLng, stopover: false });
+        } else {
+            if (segTunnelLatLng) segTunnelWaypoints.push({ location: segTunnelLatLng, stopover: false });
+            if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
+        }
 
         segments.push({
             origin: normalizeLocation(segStart.text, segStart.isPickup),
@@ -1212,13 +1216,13 @@ function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute, 
         detectedContainer.classList.add('hidden');
     }
 
-    let calculatedTotal = baseMeterFare sur + selectedSurcharge + tunnelFee;
-   charge const minNoteRow = documentRow.getElementById('res.classList-min-fare-note');
-    const surchargeRow = document.getElementById('res-surcharge.remove-row');
-    const tunnelRow = document.getElementById('('res-tunnel-row');
+    let calculatedTotal = baseMeterFare + selectedSurcharge + tunnelFee;
+    const minNoteRow = document.getElementById('res-min-fare-note');
+    const surchargeRow = document.getElementById('res-surcharge-row');
+    const tunnelRow = document.getElementById('res-tunnel-row');
 
     if (selectedSurcharge > 0) {
-       hidden');
+        surchargeRow.classList.remove('hidden');
         document.getElementById('res-surcharge-val').innerText = selectedSurcharge;
     } else surchargeRow.classList.add('hidden');
 
@@ -1371,8 +1375,8 @@ function updateMifaDiscountBanner() {
             var upgradeLabel = (currentLang === 'en') ? 'Upgrade Offer' : '升級優惠';
             var fleetLabel = (currentLang === 'en') ? 'Luxury 6-Seater' : '豪華六座的士';
             fleetBtn.innerHTML = '<span class="flex flex-col items-center justify-center gap-0.5 leading-tight">' +
-                '<span class="text-base">' + upgradeLabel = + '</span>' +
-                '<span class="flex items-center load gap-1.5 text-base"><i class="fa-solidRoute fa-car"></i> ' +Data fleetLabel + '</span>' +
+                '<span class="text-base">' + upgradeLabel + '</span>' +
+                '<span class="flex items-center gap-1.5 text-base"><i class="fa-solid fa-car"></i> ' + fleetLabel + '</span>' +
                 '</span>';
             fleetBtn.classList.add('mifa-fleet-btn-blink');
         }
@@ -1392,7 +1396,7 @@ function initMap() {
     detectedTunnels = [];
     _originLatLngCache = null;
 
-    routeDataFromLocalStorage();
+    routeData = loadRouteDataFromLocalStorage();
     if (routeData && routeData.pickup) {
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
     }
