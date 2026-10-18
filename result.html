@@ -211,6 +211,7 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
+/* ⭐ 尖山已放宽到沙田↔天水围可用；其他保持不变；屯赤无区域限制 */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
@@ -479,17 +480,18 @@ function processRoutes(routes, isShenzhenBay) {
     return [fastest.route, shortest.route];
 }
 
+/* ⭐ 加入 shortNameEn */
 const tunnelDatabase = [
-    { name: "紅隧 (連回程)", nameEn: "Cross-Harbour Tunnel (Round Trip)", shortName: "紅隧", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300, entryA: { lat: 22.286083, lng: 114.182917 }, entryB: { lat: 22.298722, lng: 114.180889 } },
-    { name: "東隧 (連回程)", nameEn: "Eastern Harbour Crossing (Round Trip)", shortName: "東隧", fee: 50, discountFee: 25, lat: 22.294889, lng: 114.22223, radius: 300, entryA: { lat: 22.290806, lng: 114.214278 }, entryB: { lat: 22.298417, lng: 114.229306 } },
-    { name: "西隧 (連回程)", nameEn: "Western Harbour Crossing (Round Trip)", shortName: "西隧", fee: 50, discountFee: 25, lat: 22.2940599, lng: 114.150204, radius: 300, entryA: { lat: 22.290528, lng: 114.146694 }, entryB: { lat: 22.298694, lng: 114.154528 } },
-    { name: "香港仔隧道", nameEn: "Aberdeen Tunnel", shortName: "香港仔", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300, entryA: { lat: 22.255417, lng: 114.179806 }, entryB: { lat: 22.265306, lng: 114.180667 } },
-    { name: "大老山隧道", nameEn: "Tate's Cairn Tunnel", shortName: "大老山", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500, entryA: { lat: 22.342139, lng: 114.204556 }, entryB: { lat: 22.375722, lng: 114.213500 } },
-    { name: "獅子山隧道", nameEn: "Lion Rock Tunnel", shortName: "獅隧", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300, entryA: { lat: 22.346278, lng: 114.180917 }, entryB: { lat: 22.356778, lng: 114.173333 } },
-    { name: "尖山隧道", nameEn: "Eagle's Nest Tunnel", shortName: "尖山", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200, entryA: { lat: 22.347028, lng: 114.148139 }, entryB: { lat: 22.357083, lng: 114.162389 } },
-    { name: "城門隧道", nameEn: "Shing Mun Tunnels", shortName: "城隧", fee: 8, discountFee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300, entryA: { lat: 22.381028, lng: 114.139167 }, entryB: { lat: 22.380222, lng: 114.164917 } },
-    { name: "屯赤隧道", nameEn: "Tuen Mun-Chek Lap Kok Tunnel", shortName: "屯赤", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800, entryA: { lat: 22.356278, lng: 113.953500 }, entryB: { lat: 22.324056, lng: 113.961000 } },
-    { name: "大欖隧道", nameEn: "Tai Lam Tunnel", shortName: "大欖", fee: 28, discountFee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500, entryA: { lat: 22.375583, lng: 114.066611 }, entryB: { lat: 22.406667, lng: 114.059889 } }
+    { name: "紅隧 (連回程)", nameEn: "Cross-Harbour Tunnel (Round Trip)", shortName: "紅隧", shortNameEn: "Cross-Harbour", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300, entryA: { lat: 22.286083, lng: 114.182917 }, entryB: { lat: 22.298722, lng: 114.180889 } },
+    { name: "東隧 (連回程)", nameEn: "Eastern Harbour Crossing (Round Trip)", shortName: "東隧", shortNameEn: "Eastern Harbour", fee: 50, discountFee: 25, lat: 22.294889, lng: 114.22223, radius: 300, entryA: { lat: 22.290806, lng: 114.214278 }, entryB: { lat: 22.298417, lng: 114.229306 } },
+    { name: "西隧 (連回程)", nameEn: "Western Harbour Crossing (Round Trip)", shortName: "西隧", shortNameEn: "Western Harbour", fee: 50, discountFee: 25, lat: 22.2940599, lng: 114.150204, radius: 300, entryA: { lat: 22.290528, lng: 114.146694 }, entryB: { lat: 22.298694, lng: 114.154528 } },
+    { name: "香港仔隧道", nameEn: "Aberdeen Tunnel", shortName: "香港仔", shortNameEn: "Aberdeen", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300, entryA: { lat: 22.255417, lng: 114.179806 }, entryB: { lat: 22.265306, lng: 114.180667 } },
+    { name: "大老山隧道", nameEn: "Tate's Cairn Tunnel", shortName: "大老山", shortNameEn: "Tate's Cairn", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500, entryA: { lat: 22.342139, lng: 114.204556 }, entryB: { lat: 22.375722, lng: 114.213500 } },
+    { name: "獅子山隧道", nameEn: "Lion Rock Tunnel", shortName: "獅隧", shortNameEn: "Lion Rock", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300, entryA: { lat: 22.346278, lng: 114.180917 }, entryB: { lat: 22.356778, lng: 114.173333 } },
+    { name: "尖山隧道", nameEn: "Eagle's Nest Tunnel", shortName: "尖山", shortNameEn: "Eagle's Nest", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200, entryA: { lat: 22.347028, lng: 114.148139 }, entryB: { lat: 22.357083, lng: 114.162389 } },
+    { name: "城門隧道", nameEn: "Shing Mun Tunnels", shortName: "城隧", shortNameEn: "Shing Mun", fee: 8, discountFee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300, entryA: { lat: 22.381028, lng: 114.139167 }, entryB: { lat: 22.380222, lng: 114.164917 } },
+    { name: "屯赤隧道", nameEn: "Tuen Mun-Chek Lap Kok Tunnel", shortName: "屯赤", shortNameEn: "TM-CLKL", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800, entryA: { lat: 22.356278, lng: 113.953500 }, entryB: { lat: 22.324056, lng: 113.961000 } },
+    { name: "大欖隧道", nameEn: "Tai Lam Tunnel", shortName: "大欖", shortNameEn: "Tai Lam", fee: 28, discountFee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500, entryA: { lat: 22.375583, lng: 114.066611 }, entryB: { lat: 22.406667, lng: 114.059889 } }
 ];
 
 function tunnelNameToShort(fullName) {
@@ -671,6 +673,7 @@ function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
     return result;
 }
 
+/* ⭐ 根據當前語言顯示隧道按鈕 */
 function renderTunnelButtons() {
     const container = document.getElementById('tunnel-btns');
     if (!container) return;
@@ -682,7 +685,8 @@ function renderTunnelButtons() {
         btn.dataset.tunnel = tunnel.shortName;
         const isActive = selectedForcedTunnels.indexOf(tunnel.shortName) >= 0;
         btn.className = 'tunnel-btn' + (isActive ? ' active' : '');
-        btn.innerHTML = '<span class="tunnel-checkbox">' + (isActive ? '✓' : '') + '</span>' + tunnel.shortName;
+        const displayName = (currentLang === 'en' && tunnel.shortNameEn) ? tunnel.shortNameEn : tunnel.shortName;
+        btn.innerHTML = '<span class="tunnel-checkbox">' + (isActive ? '✓' : '') + '</span>' + displayName;
         btn.onclick = () => toggleTunnel(tunnel.shortName);
         container.appendChild(btn);
     });
@@ -1369,9 +1373,9 @@ function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     localStorage.setItem('taxiLang', currentLang);
     applyLanguage();
+    renderTunnelButtons(); // 重新繪製按鈕
     if (typeof updateMifaDiscountBanner === 'function') updateMifaDiscountBanner();
     
-    // 切換語言時重新渲染路線按鈕與隧道列表
     if (currentRouteResults && currentRouteResults.routes && currentRouteResults.routes.length > 0) {
         let pickupVal = routeData ? routeData.pickup || '' : '';
         let dropoffVal = routeData ? routeData.dropoff || '' : '';
