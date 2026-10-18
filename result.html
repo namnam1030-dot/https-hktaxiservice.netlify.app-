@@ -228,48 +228,6 @@ const LANTAU_BOUNDS = {
     minLng: 113.75, maxLng: 114.10
 };
 
-const HARBOUR_TUNNEL_NAMES = ['紅隧', '東隧', '西隧'];
-
-const HKI_KEYWORDS = [
-    '跑馬地', '銅鑼灣', '铜锣湾', '中環', '中环', '灣仔', '湾仔', '北角',
-    '鰂魚涌', '鲗鱼涌', '太古', '西灣河', '西湾河', '筲箕灣', '筲箕湾', '柴灣', '柴湾',
-    '香港仔', '薄扶林', '山頂', '山顶', '金鐘', '金钟', '堅尼地城', '坚尼地城',
-    '西營盤', '西营盘', '上環', '上环', '康怡', '小西灣', '小西湾',
-    '赤柱', '淺水灣', '浅水湾', '南區', '南区', '數碼港', '数码港',
-    '石澳', '大潭', '陽明山莊', '阳明山庄', '天后', '炮台山',
-    '西半山', '東半山', '东半山', '半山', '寶馬山', '宝马山',
-    '深水灣', '深水湾', '石排灣', '石排湾', '鴨脷洲', '鸭脷洲',
-    '利東', '利东', '海怡', '置富', '碧瑤灣', '碧瑶湾',
-    '域多利道', '摩星嶺', '摩星岭', '大坑', '渣甸山', '畢拉山', '毕拉山',
-    '藍塘道', '蓝塘道', '山道', '西邊街', '西边街'
-];
-
-const ZONE_KEYWORDS = {
-    HKI: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','柴灣','柴湾','金鐘','金钟','堅尼地城','坚尼地城','西營盤','西营盘','上環','上环','山頂','山顶','半山','天后','炮台山','大坑','渣甸山','薄扶林','香港仔','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','數碼港','数码港','石澳','大潭'],
-    HKI_N: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','金鐘','金钟','天后','炮台山','大坑','西半山','東半山','东半山','半山'],
-    HKI_S: ['香港仔','薄扶林','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','南區','南区','數碼港','数码港','石澳','大潭','深水灣','深水湾','石排灣','石排湾','海怡','利東','利东','置富','碧瑤灣','碧瑶湾','西營盤','西营盘','堅尼地城','坚尼地城','上環','上环'],
-    KLN: ['佐敦','尖沙咀','旺角','油麻地','深水埗','九龍塘','九龙塘','九龍城','九龙城','黃大仙','黄大仙','觀塘','观塘','九龍灣','九龙湾','鑽石山','钻石山','牛池灣','牛池湾','土瓜灣','土瓜湾','何文田','紅磡','红磡','啟德','启德','長沙灣','长沙湾','荔枝角','美孚','石硤尾','石硖尾','大角咀','奧運','奥运','南昌','柯士甸','油塘','藍田','蓝田','秀茂坪','慈雲山','慈云山','樂富','乐富','橫頭磡','横头磡','啟業','启业','新蒲崗','新蒲岗','彩虹','九龙站'],
-    NTE: ['沙田','大圍','大围','馬鞍山','马鞍山','大埔','上水','粉嶺','粉岭','火炭','小瀝源','小沥源','沙田圍','沙田围','科學園','科学园','太和','西貢','西贡','將軍澳','将军澳','大埔墟','大埔中心','大尾篤'],
-    NTW: ['屯門','屯门','元朗','天水圍','天水围','荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','錦田','锦田','洪水橋','洪水桥','流浮山','掃管笏','扫管笏','小欖','小榄','大欖涌','大榄涌'],
-    NTW_S: ['荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','美孚','荔枝角','長沙灣','长沙湾'],
-    NTW_N: ['元朗','天水圍','天水围','錦田','锦田','洪水橋','洪水桥','流浮山','屯門','屯门'],
-    LANTAU: ['東涌','东涌','機場','机场','赤鱲角','赤鱲角','迪士尼','大嶼山','大屿山','昂坪','大澳','梅窩','梅窝','愉景灣','愉景湾','逸東','逸东','富東','富东','迎東','迎东'],
-    SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
-};
-
-/* ⭐ 只放寬尖山（sideA 加 NTW），其他保持不變 */
-const TUNNEL_ZONE_RULES = {
-    '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
-    '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
-    '西隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
-    '獅隧':  { sides: [['KLN'], ['NTE']] },
-    '大老山': { sides: [['KLN'], ['NTE']] },
-    '尖山':  { sides: [['KLN','NTW','HKI','LANTAU','SZ'], ['NTE']] },
-    '城隧':  { sides: [['NTW_S','LANTAU'], ['NTE']] },
-    '大欖':  { sides: [['HKI','KLN','NTE','NTW_S'], ['NTW_N','SZ']] },
-    '香港仔': { sides: [['HKI_N'], ['HKI_S']] }
-};
-
 const translations = {
     zh: {
         result_title: "路線規劃結果",
@@ -501,7 +459,7 @@ function normalizeLocation(loc, isPickup = false) {
 function processRoutes(routes, isShenzhenBay) {
     if (!routes || routes.length === 0) return [];
     if (routes.length === 1) {
-        routes[0].customLabel = routes[0].customLabel || "最佳路線";
+        routes[0].customLabel = "最佳路線";
         return [routes[0]];
     }
     let routeMetrics = routes.map((r, idx) => {
@@ -646,53 +604,6 @@ function isLocationInLantau(locationText, latLng) {
     return false;
 }
 
-function isHKIsland(locationText, latLng) {
-    if (locationText) {
-        const text = String(locationText);
-        for (let i = 0; i < HKI_KEYWORDS.length; i++) {
-            if (text.indexOf(HKI_KEYWORDS[i]) >= 0) return true;
-        }
-    }
-    if (latLng && typeof latLng.lat === 'function' && typeof latLng.lng === 'function') {
-        try {
-            const lat = latLng.lat();
-            const lng = latLng.lng();
-            if (lat >= 22.19 && lat <= 22.295 && lng >= 114.10 && lng <= 114.28) return true;
-        } catch(e) {}
-    }
-    return false;
-}
-
-function getLocationZone(locationText) {
-    if (!locationText) return [];
-    const text = String(locationText);
-    const zones = [];
-    for (const zone in ZONE_KEYWORDS) {
-        const kws = ZONE_KEYWORDS[zone];
-        for (let i = 0; i < kws.length; i++) {
-            if (text.indexOf(kws[i]) >= 0) { zones.push(zone); break; }
-        }
-    }
-    return zones;
-}
-
-function isTunnelRelevantForSegment(tunnelName, startText, endText) {
-    const rule = TUNNEL_ZONE_RULES[tunnelName];
-    if (!rule) return true;
-
-    const startZones = getLocationZone(startText);
-    const endZones = getLocationZone(endText);
-    const sideA = rule.sides[0];
-    const sideB = rule.sides[1];
-
-    const startInA = sideA.some(z => startZones.indexOf(z) >= 0);
-    const startInB = sideB.some(z => startZones.indexOf(z) >= 0);
-    const endInA = sideA.some(z => endZones.indexOf(z) >= 0);
-    const endInB = sideB.some(z => endZones.indexOf(z) >= 0);
-
-    return (startInA && endInB) || (startInB && endInA);
-}
-
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
     if (selectedForcedTunnels.indexOf("大欖") >= 0) return null;
 
@@ -715,57 +626,6 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     }
 
     return TUEN_MUN_ROAD_POINT;
-}
-
-function resolveTunnelWaypoint(tunnelName, startText, endText) {
-    const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
-    if (!tunnel) return null;
-
-    const rule = TUNNEL_ZONE_RULES[tunnelName];
-    if (!rule) {
-        return getTunnelEntryPoint(tunnel, _originLatLngCache);
-    }
-
-    if (!isTunnelRelevantForSegment(tunnelName, startText, endText)) return null;
-
-    const startZones = getLocationZone(startText);
-    const sideA = rule.sides[0];
-    const startInA = sideA.some(z => startZones.indexOf(z) >= 0);
-
-    if (startInA && tunnel.entryA) {
-        return new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
-    } else if (tunnel.entryB) {
-        return new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
-    }
-    return getTunnelEntryPoint(tunnel, _originLatLngCache);
-}
-
-function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
-    let harbourPt = null;
-    let nonHarbourPt = null;
-
-    selectedForcedTunnels.forEach(tunnelName => {
-        const isHarbour = HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0;
-        const pt = resolveTunnelWaypoint(tunnelName, pickupText, dropoffText);
-        if (!pt) return;
-
-        if (isHarbour) {
-            if (!harbourPt) harbourPt = pt;
-        } else {
-            if (!nonHarbourPt) nonHarbourPt = pt;
-        }
-    });
-
-    const result = [];
-    const startIsHKI = isHKIsland(pickupText, originLatLng);
-    if (startIsHKI) {
-        if (harbourPt) result.push(harbourPt);
-        if (nonHarbourPt) result.push(nonHarbourPt);
-    } else {
-        if (nonHarbourPt) result.push(nonHarbourPt);
-        if (harbourPt) result.push(harbourPt);
-    }
-    return result;
 }
 
 function renderTunnelButtons() {
@@ -853,7 +713,7 @@ function calculateFareWithGoogle() {
     let isShenzhenBayRoute = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
     let isHuanggangRoute = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
 
-    if (stopoverTexts.length > 0) {
+    if (stopoverTexts.length > 0 && selectedForcedTunnels.length > 0) {
         calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
     } else {
         calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
@@ -869,19 +729,26 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
         waypoints.push({ location: normalizeLocation(s, false), stopover: true });
     });
 
-    const tunnelWaypoints = collectTunnelWaypoints(pickupVal, dropoffVal, _originLatLngCache);
-
     const tmRoadPoint = getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, _originLatLngCache);
-    const tmLatLng = tmRoadPoint ? new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng) : null;
-
-    const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
-    if (isFromSZ) {
-        if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
-        tunnelWaypoints.forEach(pt => waypoints.push({ location: pt, stopover: false }));
-    } else {
-        tunnelWaypoints.forEach(pt => waypoints.push({ location: pt, stopover: false }));
-        if (tmLatLng) waypoints.push({ location: tmLatLng, stopover: false });
+    if (tmRoadPoint) {
+        waypoints.push({
+            location: new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng),
+            stopover: false
+        });
     }
+
+    selectedForcedTunnels.forEach(tunnelName => {
+        const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
+        if (tunnel) {
+            const entryPoint = getTunnelEntryPoint(tunnel, _originLatLngCache);
+            if (entryPoint) {
+                waypoints.push({
+                    location: entryPoint,
+                    stopover: false
+                });
+            }
+        }
+    });
 
     const request = {
         origin: targetPickup,
@@ -925,19 +792,30 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
 
         const segTunnelWaypoints = [];
 
-        const segTunnelWaypointsList = collectTunnelWaypoints(segStart.text, segEnd.text, _originLatLngCache);
-
-        const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
-        const segTmLatLng = segTmRoadPoint ? new google.maps.LatLng(segTmRoadPoint.lat, segTmRoadPoint.lng) : null;
-
-        const segStartIsSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾");
-        if (segStartIsSZ) {
-            if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
-            segTunnelWaypointsList.forEach(pt => segTunnelWaypoints.push({ location: pt, stopover: false }));
-        } else {
-            segTunnelWaypointsList.forEach(pt => segTunnelWaypoints.push({ location: pt, stopover: false }));
-            if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
+        const segInvolvesSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾")
+                           || segEnd.text.includes("深圳灣") || segEnd.text.includes("深圳湾");
+        if (segInvolvesSZ) {
+            const tmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
+            if (tmRoadPoint) {
+                segTunnelWaypoints.push({
+                    location: new google.maps.LatLng(tmRoadPoint.lat, tmRoadPoint.lng),
+                    stopover: false
+                });
+            }
         }
+
+        selectedForcedTunnels.forEach(tunnelName => {
+            const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
+            if (tunnel) {
+                const entryPoint = getTunnelEntryPoint(tunnel, _originLatLngCache);
+                if (entryPoint) {
+                    segTunnelWaypoints.push({
+                        location: entryPoint,
+                        stopover: false
+                    });
+                }
+            }
+        });
 
         segments.push({
             origin: normalizeLocation(segStart.text, segStart.isPickup),
@@ -962,7 +840,7 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
                 destination: seg.destination,
                 waypoints: seg.waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
-                provideRouteAlternatives: seg.waypoints.length === 0,
+                provideRouteAlternatives: false,
                 optimizeWaypoints: false
             }, (result, status) => {
                 resolve({ result, status, seg });
@@ -979,53 +857,8 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         }
 
         try {
-            const perSegRoutes = results.map(r => r.result.routes.slice(0, 2));
-            const combos = cartesianProduct(perSegRoutes);
-
-            const scored = combos.map(routesArr => {
-                let dist = 0, dur = 0;
-                routesArr.forEach(rt => {
-                    rt.legs.forEach(leg => {
-                        dist += leg.distance.value;
-                        dur  += leg.duration.value;
-                    });
-                });
-                return { routes: routesArr, dist, dur };
-            });
-
-            const seen = new Set();
-            const unique = [];
-            scored.forEach(s => {
-                const key = Math.round(s.dist / 200) + '_' + Math.round(s.dur / 60);
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    unique.push(s);
-                }
-            });
-
-            const byTime = [...unique].sort((a, b) => a.dur - b.dur);
-            const byDist = [...unique].sort((a, b) => a.dist - b.dist);
-
-            const picked = [];
-            if (byTime[0]) picked.push({ combo: byTime[0], label: '⚡ 最快路線' });
-
-            if (byDist[0] && byDist[0] !== byTime[0]) {
-                picked.push({ combo: byDist[0], label: '📏 最短路線' });
-            } else if (byTime[1]) {
-                picked.push({ combo: byTime[1], label: '📏 替代路線' });
-            }
-
-            if (picked.length === 1) {
-                picked[0].label = '最佳路線';
-            }
-
-            const mergedRoutes = picked.map(p => {
-                const merged = mergeSegmentsFromRoutes(p.combo.routes);
-                merged.customLabel = p.label;
-                return merged;
-            });
-
-            const mergedResult = { routes: mergedRoutes };
+            const mergedRoute = mergeSegments(results);
+            const mergedResult = { routes: [mergedRoute] };
             renderRouteResult(mergedResult, isShenzhenBayRoute, isHuanggangRoute);
         } catch(err) {
             fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
@@ -1034,46 +867,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         clearTimeout(timeoutId);
         fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute);
     });
-}
-
-function cartesianProduct(arrays) {
-    if (arrays.length === 0) return [];
-    if (arrays.length === 1) return arrays[0].map(x => [x]);
-    const result = [];
-    const rest = cartesianProduct(arrays.slice(1));
-    arrays[0].forEach(x => {
-        rest.forEach(r => result.push([x, ...r]));
-    });
-    return result;
-}
-
-function mergeSegmentsFromRoutes(routesArr) {
-    const first = routesArr[0];
-    const merged = {};
-    for (let key in first) {
-        if (Object.prototype.hasOwnProperty.call(first, key)) {
-            merged[key] = first[key];
-        }
-    }
-
-    const allLegs = [];
-    let overviewPath = [];
-    let bounds = null;
-
-    routesArr.forEach(rt => {
-        if (rt.legs) rt.legs.forEach(leg => allLegs.push(leg));
-        if (rt.overview_path) rt.overview_path.forEach(p => overviewPath.push(p));
-        if (rt.bounds) {
-            if (!bounds) bounds = rt.bounds;
-            else { try { bounds = bounds.union(rt.bounds); } catch(e) {} }
-        }
-    });
-
-    merged.legs = allLegs;
-    merged.overview_path = overviewPath;
-    if (bounds) merged.bounds = bounds;
-    merged.summary = '分段路線';
-    return merged;
 }
 
 function mergeSegments(results) {
