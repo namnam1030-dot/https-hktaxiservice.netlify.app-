@@ -257,13 +257,14 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
+/* ⭐ 只放寬尖山（sideA 加 NTW），其他保持不變 */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '西隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '獅隧':  { sides: [['KLN'], ['NTE']] },
     '大老山': { sides: [['KLN'], ['NTE']] },
-    '尖山':  { sides: [['KLN','NTW_S'], ['NTE']] },
+    '尖山':  { sides: [['KLN','NTW','HKI','LANTAU','SZ'], ['NTE']] },
     '城隧':  { sides: [['NTW_S','LANTAU'], ['NTE']] },
     '大欖':  { sides: [['HKI','KLN','NTE','NTW_S'], ['NTW_N','SZ']] },
     '香港仔': { sides: [['HKI_N'], ['HKI_S']] }
