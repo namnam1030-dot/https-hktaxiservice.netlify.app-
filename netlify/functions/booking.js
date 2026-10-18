@@ -168,12 +168,24 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   // ⭐ 先處理「粗體 + 連結」：**[text](url)**
-  result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, '<a href="$2"><b>$1</b></a>');
-  result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a href="$2"><b>$1</b></a>');
+  result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>';
+    return '<a href="' + url + '"><b>' + text + '</b></a>';
+  });
+  result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>';
+    return '<a href="' + url + '"><b>' + text + '</b></a>';
+  });
 
   // 普通連結
-  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, '<a href="$2">$1</a>');
-  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
+    return '<a href="' + url + '">' + text + '</a>';
+  });
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
+    return '<a href="' + url + '">' + text + '</a>';
+  });
 
   // 普通粗體
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -318,7 +330,7 @@ async function findExistingBooking(bookingId) {
 function buildCalendarEvent(data, bookingId, discordMessageId) {
   const startTime = new Date(data.date + 'T' + data.time + ':00+08:00');
   const endTime = new Date(startTime);
-  endTime.setMinutes(endTime.getMinutes() + 1);
+  endTime.setMinutes(endTime.getMinutes() + 60);
 
   const bookingSourceMark = data.isInternalBooking === true
     ? '\n\n[網站預約] 👤 工作人員落單'
@@ -394,7 +406,7 @@ async function addToGoogleCalendar(data, bookingId, discordMessageId) {
   const result = await calendar.events.insert({
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     resource: resource,
-    sendUpdates: 'all'
+    sendUpdates: 'none'
   });
   console.log('成功加入日曆：', result.data.htmlLink);
   return result.data;
@@ -414,7 +426,7 @@ async function updateGoogleCalendar(existing, data) {
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     eventId: existing.eventId,
     resource: resource,
-    sendUpdates: 'all'
+    sendUpdates: 'none'
   });
   console.log('日曆已更新：', result.data.htmlLink);
   return result.data;
