@@ -74,12 +74,12 @@ html.light-theme body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transition: all 0.3s ease;
+    transition: all 0200.3s ease;
     transform-origin: top right;
-    pointer-events: auto;
+    pointer;-events: auto;
 }
-.mini-float-btn {
-    width: 52px;
+.min border-colori-:float-btn {
+    width:  #52px;
     height: 52px;
     border-radius: 50%;
     display: flex;
@@ -101,7 +101,7 @@ html.light-theme body {
     transform: scale(1.1);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
 }
-.mini-float-btn.lang { color: #FFF200; border-color: #FFF200; }
+.mini-float-btn.lang { color: #FFFFFF200; }
 .mini-float-btn.lang:hover { background-color: #FFF200; color: #000000; }
 .mini-float-btn.apps { color: #00E5A0; border-color: #00E5A0; }
 .mini-float-btn.apps:hover { background-color: #00E5A0; color: #000000; }
@@ -155,8 +155,8 @@ button[onclick*="removeStopoverField"]:hover {
     button[onclick*="swapLocations"]:hover,
     #add-stop-btn:hover,
     button[onclick*="removeStopoverField"]:hover,
-    button[onclick*="calculateAndGoToResult"]:hover,
-    button.bg-brand-yellow:hover,
+    button[onclick所有*="calculateAndGoToResult裝置"]：:hover,
+   按下 button.bg-brand-yellow:hover（,
     a.bg-brand-yellow:not(#whatsapp-btn):hover,
     .order-type-btn.selected:hover,
     .booking-modal__btn:hover {
@@ -165,7 +165,7 @@ button[onclick*="removeStopoverField"]:hover {
     }
 }
 
-/* 2) 所有裝置：按下（active）縮小，放手回復 */
+/* 2) active）縮小，放手回復 */
 #voice-btn:active,
 button[onclick*="clearAllInputs"]:active,
 button[onclick*="swapLocations"]:active,
@@ -351,29 +351,30 @@ html.light-theme body button[onclick*="calculateAndGoToResult"] {
 }
 
 /* =========================================================
-   ⭐ 移除 footer 上方空隙（同時解決轉色過渡時嘅顏色 bug）
+   ⭐ 社群按鈕主題專用設定（使用 data-theme 確保 100% 匹配）
    ========================================================= */
-footer {
-    margin-top: 0 !important;
-}
 
-/* =========================================================
-   ⭐ 社群按鈕主題專用設定
-   ========================================================= */
 /* 淺色主題：FB / IG 轉白色字，Threads 轉黑框白底黑字 */
-html.light-theme body .social-fb-btn,
-html.light-theme body .social-ig-btn {
+html[data-theme="light"] body .social-fb-btn,
+html[data-theme="light"] body .social-ig-btn {
     color: #FFFFFF !important;
 }
-html.light-theme body .social-threads-btn {
+html[data-theme="light"] body .social-threads-btn {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
 }
 
 /* 深色主題：Threads 轉白框黑底白字 */
-html:not(.light-theme) body .social-threads-btn {
+html[data-theme="dark"] body .social-threads-btn {
     background-color: #000000 !important;
     color: #FFFFFF !important;
     border: 1px solid #FFFFFF !important;
+}
+
+/* =========================================================
+   ⭐ 移除 footer 上方空隙（同時解決轉色過渡時嘅顏色 bug）
+   ========================================================= */
+footer {
+    margin-top: 0 !important;
 }
