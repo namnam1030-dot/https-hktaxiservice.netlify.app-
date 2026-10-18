@@ -82,7 +82,7 @@
 <meta name="theme-color" content="#FFF200">
 
 <link rel="stylesheet" href="tailwind-compiled.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="theme.css">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_96kRHBq2ydwohDfpmUhdDNIPOgZQSL0&libraries=places,geometry&language=zh-HK&callback=initMap" defer></script>
 
@@ -1761,8 +1761,9 @@ if ('serviceWorker' in navigator) {
     </section>
     </main>
 
-    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
-        <div class="flex justify-center items-center gap-3 mb-6">
+<footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
+        <!-- 第一行：WeChat / WhatsApp -->
+        <div class="flex justify-center items-center gap-3 mb-3">
             <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
             </button>
@@ -1785,10 +1786,29 @@ if ('serviceWorker' in navigator) {
                     </button>
                 </div>
             </div>
+            
             <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
         </div>
+
+        <!-- 第二行：Facebook / Instagram -->
+        <div class="flex justify-center items-center gap-3 mb-3">
+            <a href="https://www.facebook.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-fb-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-[#1877F2] hover:opacity-90">
+                <i class="fa-brands fa-facebook text-lg"></i> Facebook
+            </a>
+            <a href="https://www.instagram.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-ig-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90">
+                <i class="fa-brands fa-instagram text-lg"></i> Instagram
+            </a>
+        </div>
+
+        <!-- 第三行：Threads -->
+        <div class="flex justify-center items-center gap-3 mb-6">
+            <a href="https://www.threads.net/@hktaxi688" target="_blank" rel="noopener noreferrer" class="social-threads-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+                <i class="fa-brands fa-threads text-lg"></i> Threads
+            </a>
+        </div>
+
         <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
     </footer>
 
