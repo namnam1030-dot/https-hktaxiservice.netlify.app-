@@ -90,94 +90,48 @@
     html { font-size: 130%; }
     body { font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; }
     .text-xs, .text-\[11px\] { font-size: 18px !important; line-height: 1.5; }
-    .pac-container {
-        background-color: #1E1E1E; color: #ffffff; border: 1px solid #333;
-        border-radius: 0.5rem; font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); z-index: 9999;
-    }
+    .pac-container { background-color: #1E1E1E; color: #ffffff; border: 1px solid #333; border-radius: 0.5rem; font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); z-index: 9999; }
     .pac-item { color: #ccc; border-top: 1px solid #333; padding: 8px 12px; cursor: pointer; }
     .pac-item:hover { background-color: #333; }
     .pac-item-query { color: #FFF200; font-size: 17px; }
-    html.light-theme body .pac-container {
-        background-color: #FFFFFF; color: #000000; border-color: #D1D5DB;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-    }
+    html.light-theme body .pac-container { background-color: #FFFFFF; color: #000000; border-color: #D1D5DB; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15); }
     html.light-theme body .pac-item { color: #374151; border-top-color: #E5E7EB; }
     html.light-theme body .pac-item:hover { background-color: #F3F4F6; }
     html.light-theme body .pac-item-query { color: #000000; font-weight: 700; }
-    html.light-theme body #voice-btn,
-    html.light-theme body button[onclick*="clearAllInputs"],
-    html.light-theme body button[onclick*="swapLocations"],
-    html.light-theme body #add-stop-btn,
-    html.light-theme body button[onclick*="removeStopoverField"],
-    html.light-theme body button[onclick*="calculateAndGoToResult"] {
-        background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important;
-    }
+    html.light-theme body #voice-btn, html.light-theme body button[onclick*="clearAllInputs"], html.light-theme body button[onclick*="swapLocations"], html.light-theme body #add-stop-btn, html.light-theme body button[onclick*="removeStopoverField"], html.light-theme body button[onclick*="calculateAndGoToResult"] { background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important; }
     html.light-theme body #route-options-list button { background-color: #F3F4F6 !important; border-color: #D1D5DB !important; color: #374151 !important; }
     html.light-theme body #route-options-list button[class*="bg-brand-yellow"] { background-color: rgba(255, 242, 0, 0.5) !important; border-color: #000000 !important; color: #000000 !important; }
     html.light-theme body .bg-sky-900\/30 { background-color: rgba(14, 165, 233, 0.1) !important; }
     html.light-theme body .border-sky-500\/50 { border-color: #0EA5E9 !important; }
     html.light-theme body .text-sky-200, html.light-theme body .text-sky-300, html.light-theme body .text-sky-400 { color: #0369A1 !important; }
     html.light-theme body .hover\:border-brand-yellow:hover { border-color: #000000 !important; }
-    html.light-theme body #detected-tunnels-container,
-    html.light-theme body #detected-tunnels-container *,
-    html.light-theme body #detected-tunnels-container .text-sky-200,
-    html.light-theme body #detected-tunnels-container .text-sky-300,
-    html.light-theme body #detected-tunnels-container .text-sky-400,
-    html.light-theme body #detected-tunnels-container .text-white,
-    html.light-theme body #detected-tunnels-container #detected-tunnels-list { color: #0369A1 !important; }
-    html.light-theme body #res-tunnel-row,
-    html.light-theme body #res-tunnel-row *,
-    html.light-theme body #res-tunnel-row .text-sky-300 { color: #0369A1 !important; }
-    html.light-theme body #discount-option-container,
-    html.light-theme body .space-y-3 > label.bg-brand-dark,
-    html.light-theme body label.bg-brand-dark,
-    html.light-theme body .bg-brand-dark { background-color: #FFFFFF !important; background: #FFFFFF !important; border-color: #D1D5DB !important; }
+    html.light-theme body #detected-tunnels-container, html.light-theme body #detected-tunnels-container *, html.light-theme body #detected-tunnels-container .text-sky-200, html.light-theme body #detected-tunnels-container .text-sky-300, html.light-theme body #detected-tunnels-container .text-sky-400, html.light-theme body #detected-tunnels-container .text-white, html.light-theme body #detected-tunnels-container #detected-tunnels-list { color: #0369A1 !important; }
+    html.light-theme body #res-tunnel-row, html.light-theme body #res-tunnel-row *, html.light-theme body #res-tunnel-row .text-sky-300 { color: #0369A1 !important; }
+    html.light-theme body #discount-option-container, html.light-theme body .space-y-3 > label.bg-brand-dark, html.light-theme body label.bg-brand-dark, html.light-theme body .bg-brand-dark { background-color: #FFFFFF !important; background: #FFFFFF !important; border-color: #D1D5DB !important; }
     html.light-theme body input[type="checkbox"], html.light-theme body .fare-mode-checkbox { color-scheme: light !important; accent-color: #000000 !important; background-color: #FFFFFF !important; }
-    html.light-theme body .space-y-3 > label.bg-brand-dark:hover,
-    html.light-theme body #discount-option-container:hover { border-color: #000000 !important; }
-
-    html.light-theme body #mifa-discount-banner {
-        background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15)) !important;
-        border-color: #dc2626 !important;
-    }
-
+    html.light-theme body .space-y-3 > label.bg-brand-dark:hover, html.light-theme body #discount-option-container:hover { border-color: #000000 !important; }
+    html.light-theme body #mifa-discount-banner { background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(249, 115, 22, 0.15)) !important; border-color: #dc2626 !important; }
     .mifa-banner-text { color: #fca5a5; }
     html.light-theme body .mifa-banner-text { color: #b91c1c !important; }
-
-    @keyframes mifaFleetBtnBlink {
-        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 4px 12px rgba(255, 242, 0, 0.4); }
-        50% { opacity: 0.75; transform: scale(1.03); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); }
-    }
+    @keyframes mifaFleetBtnBlink { 0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 4px 12px rgba(255, 242, 0, 0.4); } 50% { opacity: 0.75; transform: scale(1.03); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); } }
     .mifa-fleet-btn-blink { animation: mifaFleetBtnBlink 1.2s ease-in-out infinite !important; }
     .mifa-fleet-btn-blink:hover { animation-play-state: paused; opacity: 1; transform: scale(1.05); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); }
-
     #tunnel-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
-
-    .tunnel-btn {
-        width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700;
-        cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151;
-        background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF;
-        display: flex; align-items: center; justify-content: center; gap: 0.3rem;
-        white-space: nowrap; text-align: center;
-    }
+    .tunnel-btn { width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151; background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF; display: flex; align-items: center; justify-content: center; gap: 0.3rem; white-space: nowrap; text-align: center; }
     .tunnel-btn:hover { color: #FFF200; border-color: #FFF200; }
     .tunnel-btn.active { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3); }
-    .tunnel-checkbox {
-        display: inline-flex; align-items: center; justify-content: center;
-        width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 3px;
-        font-size: 11px; font-weight: 900; line-height: 1; flex-shrink: 0;
-    }
+    .tunnel-checkbox { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 3px; font-size: 11px; font-weight: 900; line-height: 1; flex-shrink: 0; }
     .tunnel-btn.active .tunnel-checkbox { background-color: #000000; color: #FFF200; border-color: #000000; }
     html.light-theme body .tunnel-btn { background-color: #FFFFFF !important; color: #374151 !important; border-color: #D1D5DB !important; }
     html.light-theme body .tunnel-btn:hover { color: #000000 !important; border-color: #000000 !important; }
     html.light-theme body .tunnel-btn.active { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; }
     html.light-theme body .tunnel-btn.active .tunnel-checkbox { background-color: #000000 !important; color: #FFF200 !important; border-color: #000000 !important; }
-
     details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
     details > summary::-webkit-details-marker { display: none; }
     details[open] > summary .chevron { transform: rotate(180deg); }
     details > summary .chevron { transition: transform 0.2s ease; }
+    .social-threads-btn { background-color: #000000; color: #FFFFFF; }
+    html.light-theme body .social-threads-btn { background-color: #000000 !important; color: #FFFFFF !important; }
 </style>
 
 <script>
@@ -257,7 +211,6 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
-/* ⭐ 尖山已放宽到沙田↔天水围可用；其他保持不变；屯赤无区域限制 */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTW','LANTAU','SZ']] },
@@ -501,7 +454,7 @@ function normalizeLocation(loc, isPickup = false) {
 function processRoutes(routes, isShenzhenBay) {
     if (!routes || routes.length === 0) return [];
     if (routes.length === 1) {
-        routes[0].customLabel = routes[0].customLabel || "最佳路線";
+        routes[0].customLabel = routes[0].customLabel || (currentLang === 'en' ? "Best Route" : "最佳路線");
         return [routes[0]];
     }
     let routeMetrics = routes.map((r, idx) => {
@@ -512,81 +465,31 @@ function processRoutes(routes, isShenzhenBay) {
     let fastest = [...routeMetrics].sort((a, b) => a.dur - b.dur)[0];
     let shortest = [...routeMetrics].sort((a, b) => a.dist - b.dist)[0];
     if (fastest.index === shortest.index) {
-        fastest.route.customLabel = "⚡ 最快及最短路線";
+        fastest.route.customLabel = currentLang === 'en' ? "⚡ Fastest & Shortest" : "⚡ 最快及最短路線";
         let others = routeMetrics.filter(m => m.index !== fastest.index);
         if (others.length > 0) {
             let alternative = [...others].sort((a, b) => a.dur - b.dur)[0];
-            alternative.route.customLabel = "📏 替代路線";
+            alternative.route.customLabel = currentLang === 'en' ? "📏 Alternative Route" : "📏 替代路線";
             return [fastest.route, alternative.route];
         }
         return [fastest.route];
     }
-    fastest.route.customLabel = "⚡ 最快路線";
-    shortest.route.customLabel = "📏 最短路線";
+    fastest.route.customLabel = currentLang === 'en' ? "⚡ Fastest Route" : "⚡ 最快路線";
+    shortest.route.customLabel = currentLang === 'en' ? "📏 Shortest Route" : "📏 最短路線";
     return [fastest.route, shortest.route];
 }
 
 const tunnelDatabase = [
-    {
-        name: "紅隧 (連回程)", shortName: "紅隧", fee: 50, discountFee: 25,
-        lat: 22.2896118, lng: 114.1823943, radius: 300,
-        entryA: { lat: 22.286083, lng: 114.182917 },
-        entryB: { lat: 22.298722, lng: 114.180889 }
-    },
-    {
-        name: "東隧 (連回程)", shortName: "東隧", fee: 50, discountFee: 25,
-        lat: 22.294889, lng: 114.22223, radius: 300,
-        entryA: { lat: 22.290806, lng: 114.214278 },
-        entryB: { lat: 22.298417, lng: 114.229306 }
-    },
-    {
-        name: "西隧 (連回程)", shortName: "西隧", fee: 50, discountFee: 25,
-        lat: 22.2940599, lng: 114.150204, radius: 300,
-        entryA: { lat: 22.290528, lng: 114.146694 },
-        entryB: { lat: 22.298694, lng: 114.154528 }
-    },
-    {
-        name: "香港仔隧道", shortName: "香港仔", fee: 8, discountFee: 8,
-        lat: 22.2614503, lng: 114.1799975, radius: 300,
-        entryA: { lat: 22.255417, lng: 114.179806 },
-        entryB: { lat: 22.265306, lng: 114.180667 }
-    },
-    {
-        name: "大老山隧道", shortName: "大老山", fee: 20, discountFee: 20,
-        lat: 22.368694, lng: 114.212944, radius: 500,
-        entryA: { lat: 22.342139, lng: 114.204556 },
-        entryB: { lat: 22.375722, lng: 114.213500 }
-    },
-    {
-        name: "獅子山隧道", shortName: "獅隧", fee: 8, discountFee: 8,
-        lat: 22.3527046, lng: 114.1764997, radius: 300,
-        entryA: { lat: 22.346278, lng: 114.180917 },
-        entryB: { lat: 22.356778, lng: 114.173333 }
-    },
-    {
-        name: "尖山隧道", shortName: "尖山", fee: 8, discountFee: 8,
-        lat: 22.3523498, lng: 114.159581, radius: 200,
-        entryA: { lat: 22.347028, lng: 114.148139 },
-        entryB: { lat: 22.357083, lng: 114.162389 }
-    },
-    {
-        name: "城門隧道", shortName: "城隧", fee: 8, discountFee: 8,
-        lat: 22.3764988, lng: 114.1487468, radius: 300,
-        entryA: { lat: 22.381028, lng: 114.139167 },
-        entryB: { lat: 22.380222, lng: 114.164917 }
-    },
-    {
-        name: "屯赤隧道", shortName: "屯赤", fee: 0, discountFee: 0,
-        lat: 22.3545000, lng: 113.9500000, radius: 800,
-        entryA: { lat: 22.356278, lng: 113.953500 },
-        entryB: { lat: 22.324056, lng: 113.961000 }
-    },
-    {
-        name: "大欖隧道", shortName: "大欖", fee: 28, discountFee: 28,
-        lat: 22.3953506, lng: 114.0615077, radius: 500,
-        entryA: { lat: 22.375583, lng: 114.066611 },
-        entryB: { lat: 22.406667, lng: 114.059889 }
-    }
+    { name: "紅隧 (連回程)", nameEn: "Cross-Harbour Tunnel (Round Trip)", shortName: "紅隧", fee: 50, discountFee: 25, lat: 22.2896118, lng: 114.1823943, radius: 300, entryA: { lat: 22.286083, lng: 114.182917 }, entryB: { lat: 22.298722, lng: 114.180889 } },
+    { name: "東隧 (連回程)", nameEn: "Eastern Harbour Crossing (Round Trip)", shortName: "東隧", fee: 50, discountFee: 25, lat: 22.294889, lng: 114.22223, radius: 300, entryA: { lat: 22.290806, lng: 114.214278 }, entryB: { lat: 22.298417, lng: 114.229306 } },
+    { name: "西隧 (連回程)", nameEn: "Western Harbour Crossing (Round Trip)", shortName: "西隧", fee: 50, discountFee: 25, lat: 22.2940599, lng: 114.150204, radius: 300, entryA: { lat: 22.290528, lng: 114.146694 }, entryB: { lat: 22.298694, lng: 114.154528 } },
+    { name: "香港仔隧道", nameEn: "Aberdeen Tunnel", shortName: "香港仔", fee: 8, discountFee: 8, lat: 22.2614503, lng: 114.1799975, radius: 300, entryA: { lat: 22.255417, lng: 114.179806 }, entryB: { lat: 22.265306, lng: 114.180667 } },
+    { name: "大老山隧道", nameEn: "Tate's Cairn Tunnel", shortName: "大老山", fee: 20, discountFee: 20, lat: 22.368694, lng: 114.212944, radius: 500, entryA: { lat: 22.342139, lng: 114.204556 }, entryB: { lat: 22.375722, lng: 114.213500 } },
+    { name: "獅子山隧道", nameEn: "Lion Rock Tunnel", shortName: "獅隧", fee: 8, discountFee: 8, lat: 22.3527046, lng: 114.1764997, radius: 300, entryA: { lat: 22.346278, lng: 114.180917 }, entryB: { lat: 22.356778, lng: 114.173333 } },
+    { name: "尖山隧道", nameEn: "Eagle's Nest Tunnel", shortName: "尖山", fee: 8, discountFee: 8, lat: 22.3523498, lng: 114.159581, radius: 200, entryA: { lat: 22.347028, lng: 114.148139 }, entryB: { lat: 22.357083, lng: 114.162389 } },
+    { name: "城門隧道", nameEn: "Shing Mun Tunnels", shortName: "城隧", fee: 8, discountFee: 8, lat: 22.3764988, lng: 114.1487468, radius: 300, entryA: { lat: 22.381028, lng: 114.139167 }, entryB: { lat: 22.380222, lng: 114.164917 } },
+    { name: "屯赤隧道", nameEn: "Tuen Mun-Chek Lap Kok Tunnel", shortName: "屯赤", fee: 0, discountFee: 0, lat: 22.3545000, lng: 113.9500000, radius: 800, entryA: { lat: 22.356278, lng: 113.953500 }, entryB: { lat: 22.324056, lng: 113.961000 } },
+    { name: "大欖隧道", nameEn: "Tai Lam Tunnel", shortName: "大欖", fee: 28, discountFee: 28, lat: 22.3953506, lng: 114.0615077, radius: 500, entryA: { lat: 22.375583, lng: 114.066611 }, entryB: { lat: 22.406667, lng: 114.059889 } }
 ];
 
 function tunnelNameToShort(fullName) {
@@ -911,7 +814,6 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     });
 }
 
-/* ⭐ 有中途站：分段独立规划，每段先跟 Google 预设，选隧道后才加 waypoint */
 function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
         { text: pickupVal, isPickup: true },
@@ -1008,16 +910,16 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
             const byDist = [...unique].sort((a, b) => a.dist - b.dist);
 
             const picked = [];
-            if (byTime[0]) picked.push({ combo: byTime[0], label: '⚡ 最快路線' });
+            if (byTime[0]) picked.push({ combo: byTime[0], label: currentLang === 'en' ? '⚡ Fastest Route' : '⚡ 最快路線' });
 
             if (byDist[0] && byDist[0] !== byTime[0]) {
-                picked.push({ combo: byDist[0], label: '📏 最短路線' });
+                picked.push({ combo: byDist[0], label: currentLang === 'en' ? '📏 Shortest Route' : '📏 最短路線' });
             } else if (byTime[1]) {
-                picked.push({ combo: byTime[1], label: '📏 替代路線' });
+                picked.push({ combo: byTime[1], label: currentLang === 'en' ? '📏 Alternative Route' : '📏 替代路線' });
             }
 
             if (picked.length === 1) {
-                picked[0].label = '最佳路線';
+                picked[0].label = currentLang === 'en' ? 'Best Route' : '最佳路線';
             }
 
             const mergedRoutes = picked.map(p => {
@@ -1073,37 +975,7 @@ function mergeSegmentsFromRoutes(routesArr) {
     merged.legs = allLegs;
     merged.overview_path = overviewPath;
     if (bounds) merged.bounds = bounds;
-    merged.summary = '分段路線';
-    return merged;
-}
-
-function mergeSegments(results) {
-    const firstRoute = results[0].result.routes[0];
-    const merged = {};
-    for (let key in firstRoute) {
-        if (Object.prototype.hasOwnProperty.call(firstRoute, key)) {
-            merged[key] = firstRoute[key];
-        }
-    }
-
-    const allLegs = [];
-    let overviewPath = [];
-    let bounds = null;
-
-    for (let i = 0; i < results.length; i++) {
-        const segRoute = results[i].result.routes[0];
-        if (segRoute.legs) segRoute.legs.forEach(leg => allLegs.push(leg));
-        if (segRoute.overview_path) segRoute.overview_path.forEach(p => overviewPath.push(p));
-        if (segRoute.bounds) {
-            if (!bounds) bounds = segRoute.bounds;
-            else { try { bounds = bounds.union(segRoute.bounds); } catch(e) {} }
-        }
-    }
-
-    merged.legs = allLegs;
-    merged.overview_path = overviewPath;
-    if (bounds) merged.bounds = bounds;
-    merged.summary = '分段路線';
+    merged.summary = currentLang === 'en' ? 'Segmented Route' : '分段路線';
     return merged;
 }
 
@@ -1160,14 +1032,14 @@ function renderRouteResult(result, isShenzhenBayRoute, isHuanggangRoute) {
             let distKm = distMeters / 1000;
             if (isShenzhenBayRoute) distKm += 2.8;
             if (isHuanggangRoute) distKm += 2;
-            let routeLabel = route.customLabel || (index === 0 ? "最快路線" : "最短路線");
+            let routeLabel = route.customLabel || (index === 0 ? (currentLang === 'en' ? "Fastest Route" : "最快路線") : (currentLang === 'en' ? "Shortest Route" : "最短路線"));
 
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `p-2.5 rounded-lg border text-xs text-left transition cursor-pointer ${index === 0 ? 'bg-brand-yellow/20 border-brand-yellow text-white font-bold' : 'bg-black/40 border-gray-700 text-gray-400 hover:text-white'}`;
             btn.onclick = () => selectRouteOption(index, isShenzhenBayRoute, isHuanggangRoute);
-            btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || '主要路線'}</div>
-                            <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} 分鐘</div>`;
+            btn.innerHTML = `<div><i class="fa-solid fa-route text-brand-yellow mr-1"></i> ${routeLabel}: ${route.summary || (currentLang === 'en' ? 'Main Route' : '主要路線')}</div>
+                            <div class="text-[11px] opacity-80 mt-0.5">${distKm.toFixed(1)} km · ${Math.round(durSeconds / 60)} ${currentLang === 'en' ? 'mins' : '分鐘'}</div>`;
             routeListContainer.appendChild(btn);
         });
     } else {
@@ -1237,7 +1109,7 @@ function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute, 
             const markerA = new google.maps.Marker({
                 position: startLoc, map: map,
                 label: { text: 'A', color: '#000000', fontWeight: 'bold' },
-                title: '起點'
+                title: currentLang === 'en' ? 'Start' : '起點'
             });
             routeOverlays.push(markerA);
         }
@@ -1245,7 +1117,7 @@ function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute, 
             const markerB = new google.maps.Marker({
                 position: endLoc, map: map,
                 label: { text: 'B', color: '#000000', fontWeight: 'bold' },
-                title: '終點'
+                title: currentLang === 'en' ? 'End' : '終點'
             });
             routeOverlays.push(markerB);
         }
@@ -1275,9 +1147,11 @@ function displaySelectedRoute(directionsResult, routeIndex, isShenzhenBayRoute, 
     if (tunnelResult.matchedTunnels.length > 0) {
         detectedContainer.classList.remove('hidden');
         let tunnelNames = tunnelResult.matchedTunnels.map(t => {
-            if (t.fee === 0) return `${t.name} (免費)`;
-            return `${t.name} ($${t.fee})`;
-        }).join('、');
+            let tName = (currentLang === 'en' && t.nameEn) ? t.nameEn : t.name;
+            if (currentLang === 'en') tName = tName.replace(' (Round Trip)', '');
+            if (t.fee === 0) return currentLang === 'en' ? `${tName} (Free)` : `${tName} (免費)`;
+            return `${tName} ($${t.fee})`;
+        }).join(currentLang === 'en' ? ', ' : '、');
         detectedList.innerText = tunnelNames;
     } else {
         detectedContainer.classList.add('hidden');
@@ -1496,6 +1370,16 @@ function toggleLanguage() {
     localStorage.setItem('taxiLang', currentLang);
     applyLanguage();
     if (typeof updateMifaDiscountBanner === 'function') updateMifaDiscountBanner();
+    
+    // 切換語言時重新渲染路線按鈕與隧道列表
+    if (currentRouteResults && currentRouteResults.routes && currentRouteResults.routes.length > 0) {
+        let pickupVal = routeData ? routeData.pickup || '' : '';
+        let dropoffVal = routeData ? routeData.dropoff || '' : '';
+        let stopoverTexts = routeData ? routeData.stopovers || [] : [];
+        let isSZB = pickupVal.includes("深圳灣") || dropoffVal.includes("深圳灣") || stopoverTexts.some(s => s.includes("深圳灣"));
+        let isHGB = pickupVal.includes("皇崗") || pickupVal.includes("皇岗") || dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗") || stopoverTexts.some(s => s.includes("皇崗") || s.includes("皇岗"));
+        renderRouteResult(currentRouteResults, isSZB, isHGB);
+    }
 }
 
 function applyLanguage() {
@@ -1761,7 +1645,7 @@ if ('serviceWorker' in navigator) {
     </section>
     </main>
 
-<footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
+    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
         <!-- 第一行：WeChat / WhatsApp -->
         <div class="flex justify-center items-center gap-3 mb-3">
             <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
@@ -1794,17 +1678,17 @@ if ('serviceWorker' in navigator) {
 
         <!-- 第二行：Facebook / Instagram -->
         <div class="flex justify-center items-center gap-3 mb-3">
-            <a href="https://www.facebook.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-fb-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-[#1877F2] hover:opacity-90">
+            <a href="https://www.facebook.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-fb-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-[#1877F2] hover:opacity-90 text-white">
                 <i class="fa-brands fa-facebook text-lg"></i> Facebook
             </a>
-            <a href="https://www.instagram.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-ig-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90">
+            <a href="https://www.instagram.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-ig-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90 text-white">
                 <i class="fa-brands fa-instagram text-lg"></i> Instagram
             </a>
         </div>
 
         <!-- 第三行：Threads -->
         <div class="flex justify-center items-center gap-3 mb-6">
-            <a href="https://www.threads.net/@hktaxi688" target="_blank" rel="noopener noreferrer" class="social-threads-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+            <a href="https://www.threads.net/@hktaxi688" target="_blank" rel="noopener noreferrer" class="social-threads-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-black text-white hover:opacity-90">
                 <i class="fa-brands fa-threads text-lg"></i> Threads
             </a>
         </div>
