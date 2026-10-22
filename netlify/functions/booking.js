@@ -36,17 +36,31 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
+// ⭐ 修改：優先將 ID 插在備注（📝）下面
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   if (text.indexOf('🆔') >= 0) return text;
   const lines = text.split('\n');
   let insertIndex = -1;
+  
+  // ⭐ 優先搵「備注」，將 ID 插喺備注下一行
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (lines[i].indexOf('💰') >= 0) {
+    if (lines[i].indexOf('📝 備注：') >= 0 || lines[i].indexOf('📝 Remarks:') >= 0) {
       insertIndex = i + 1;
       break;
     }
   }
+  
+  // 如果冇備注，先搵「金額」
+  if (insertIndex === -1) {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i].indexOf('💰') >= 0) {
+        insertIndex = i + 1;
+        break;
+      }
+    }
+  }
+
   const idLine = '🆔 `' + bookingId + '`';
   if (insertIndex >= 0) {
     lines.splice(insertIndex, 0, idLine);
@@ -374,6 +388,7 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     luggages: data.luggages || '',
     hasPet: data.hasPet ? 'true' : 'false',
     hasWheelchair: data.hasWheelchair ? 'true' : 'false',
+    remarks: data.remarks || '', // ⭐ 存入 Calendar
     payments: data.paymentMethod || '',
     contactTitle: data.title || '',
     contactSurname: data.surname || '',
