@@ -139,7 +139,8 @@
     html.light-theme body select, html.light-theme body #flight_no,
     html.light-theme body #date, html.light-theme body #time,
     html.light-theme body #passengers, html.light-theme body #luggages,
-    html.light-theme body #contact_title, html.light-theme body #contact_surname {
+    html.light-theme body #contact_title, html.light-theme body #contact_surname,
+    html.light-theme body #remarks {
         background-color: #FFFFFF !important; border-color: #D1D5DB !important; color: #000000 !important;
     }
     html.light-theme body input:focus, html.light-theme body select:focus {
@@ -333,6 +334,15 @@
                     </label>
                 </div>
 
+                <!-- ⭐ 新增：備注輸入框 -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">
+                        <i class="fa-solid fa-pen text-brand-yellow mr-1.5"></i>
+                        <span data-i18n="label_remarks">備注（選填，最多30字）</span>
+                    </label>
+                    <input type="text" id="remarks" maxlength="30" data-i18n-placeholder="ph_remarks" placeholder="例：無煙車箱 / 2大2小行李" class="w-full bg-brand-dark border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-gray-300 mb-1.5">
                         <i class="fa-solid fa-credit-card text-brand-yellow mr-1.5"></i>
@@ -422,7 +432,6 @@
     </div>
 
 <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark">
-        <!-- 第一行：WeChat / WhatsApp -->
         <div class="flex justify-center items-center gap-3 mb-3">
             <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-weixin text-lg"></i> WeChat
@@ -452,7 +461,6 @@
             </a>
         </div>
 
-        <!-- 第二行：Facebook / Instagram -->
         <div class="flex justify-center items-center gap-3 mb-3">
             <a href="https://www.facebook.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-fb-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-[#1877F2] hover:opacity-90">
                 <i class="fa-brands fa-facebook text-lg"></i> Facebook
@@ -462,7 +470,6 @@
             </a>
         </div>
 
-        <!-- 第三行：Threads -->
         <div class="flex justify-center items-center gap-3 mb-6">
             <a href="https://www.threads.net/@hktaxi688" target="_blank" rel="noopener noreferrer" class="social-threads-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
                 <i class="fa-brands fa-threads text-lg"></i> Threads
@@ -518,7 +525,6 @@ function getDiscountLabel() {
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount' : '九折優惠') : (currentLang === 'en' ? '15% Discount' : '八五折優惠');
 }
 
-// ⭐ 取得最終要顯示嘅隧道（優先從 sessionStorage 讀取，避免被 fleet.html 覆蓋）
 function getFinalTunnels() {
     try {
         var sForced = JSON.parse(sessionStorage.getItem('taxi_selectedForcedTunnels'));
@@ -591,6 +597,7 @@ var translations = {
         instant_order: "即時訂單", instant_note: "15分鐘內用車", booking_order: "預約訂單", booking_note: "接受最多3日內",
         label_flight: "航班編號 (選填，如適用)", ph_flight: "例：CX250", label_date: "用車日期", label_time: "用車時間",
         label_passengers: "乘客人數（選填）", label_luggages: "行李件數（選填）", label_has_pet: "有寵物", label_has_wheelchair: "輪椅放尾箱",
+        label_remarks: "備注（選填，最多30字）", ph_remarks: "例：無煙車箱 / 2大2小行李",
         label_contact_title: "稱謂（選填）", title_mr: "先生", title_ms: "小姐", label_contact_surname: "聯絡人（選填）",
         ph_contact_surname: "例：陳", label_payment_method: "選擇付款方式（選填）", pay_cash: "現金",
         pay_credit: "信用卡<br>(需另加手續費)", pay_wechat: "微信", pay_alipay: "支付寶", pay_octopus: "八達通",
@@ -613,6 +620,7 @@ var translations = {
         instant_order: "Instant Order", instant_note: "Within 15 mins", booking_order: "Booking Order", booking_note: "Up to 3 days",
         label_flight: "Flight Number (Optional)", ph_flight: "e.g., CX250", label_date: "Service Date", label_time: "Service Time",
         label_passengers: "Passengers (Optional)", label_luggages: "Luggages (Optional)", label_has_pet: "Pets?", label_has_wheelchair: "Wheelchair?",
+        label_remarks: "Remarks (Optional, Max 30 chars)", ph_remarks: "e.g., Non-smoking / 2 large 2 small luggages",
         label_contact_title: "Title (Optional)", title_mr: "Mr.", title_ms: "Ms.", label_contact_surname: "Contact (Optional)",
         ph_contact_surname: "e.g., Chan", label_payment_method: "Payment Method (Optional)", pay_cash: "Cash",
         pay_credit: "Credit Card", pay_wechat: "WeChat Pay", pay_alipay: "Alipay", pay_octopus: "Octopus",
@@ -654,6 +662,7 @@ function saveFormSnapshot(carDisplayText) {
             luggages: document.getElementById('luggages') ? document.getElementById('luggages').value : '',
             hasPet: document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false,
             hasWheelchair: document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false,
+            remarks: document.getElementById('remarks') ? document.getElementById('remarks').value : '',
             payments: payments.join(' / '),
             contactTitle: document.getElementById('contact_title') ? document.getElementById('contact_title').value : '',
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
@@ -677,6 +686,7 @@ function restoreFormSnapshot() {
         if (s.flightNo) { var elFn = document.getElementById('flight_no'); if (elFn) elFn.value = s.flightNo; }
         if (s.passengers) { var elP = document.getElementById('passengers'); if (elP) elP.value = s.passengers; }
         if (s.luggages) { var elL = document.getElementById('luggages'); if (elL) elL.value = s.luggages; }
+        if (s.remarks) { var elRm = document.getElementById('remarks'); if (elRm) elRm.value = s.remarks; }
         var petEl = document.getElementById('has_pet'); if (petEl) petEl.checked = !!s.hasPet;
         var wheelEl = document.getElementById('has_wheelchair'); if (wheelEl) wheelEl.checked = !!s.hasWheelchair;
         var paymentArr = [];
@@ -715,6 +725,7 @@ function computeChangedFields(carDisplayText) {
             luggages: document.getElementById('luggages') ? document.getElementById('luggages').value : '',
             hasPet: document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false,
             hasWheelchair: document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false,
+            remarks: document.getElementById('remarks') ? document.getElementById('remarks').value.trim() : '',
             payments: payments.join(' / '),
             contactTitle: document.getElementById('contact_title') ? document.getElementById('contact_title').value : '',
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
@@ -722,7 +733,7 @@ function computeChangedFields(carDisplayText) {
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
             carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
         };
-        var labels = { pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', hasWheelchair: '輪椅', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式' };
+        var labels = { pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式' };
         function fmt(val, key) {
             if (typeof val === 'boolean') return val ? '✅' : '❌';
             if (key === 'selectedFareMode') {
@@ -762,6 +773,7 @@ function saveAllFormData() {
             luggages: document.getElementById('luggages') ? document.getElementById('luggages').value : '0 件',
             hasPet: document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false,
             hasWheelchair: document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false,
+            remarks: document.getElementById('remarks') ? document.getElementById('remarks').value : '',
             payments: payments,
             contactTitle: document.getElementById('contact_title') ? document.getElementById('contact_title').value : '',
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
@@ -788,6 +800,7 @@ function restoreAllFormData() {
         if (formData.flightNo) { var el = document.getElementById('flight_no'); if (el) el.value = formData.flightNo; }
         if (formData.passengers) { var el = document.getElementById('passengers'); if (el) el.value = formData.passengers; }
         if (formData.luggages) { var el = document.getElementById('luggages'); if (el) el.value = formData.luggages; }
+        if (formData.remarks) { var elRm = document.getElementById('remarks'); if (elRm) elRm.value = formData.remarks; }
         var petEl = document.getElementById('has_pet'); if (petEl) petEl.checked = !!formData.hasPet;
         var wheelEl = document.getElementById('has_wheelchair'); if (wheelEl) wheelEl.checked = !!formData.hasWheelchair;
 
@@ -1012,6 +1025,9 @@ function submitBookingAfterUpgrade() {
         else msgLines.push(isEn ? '💎 Pricing: Standard Metered Fare' : '💎 收費模式：💯 正價按錶收費');
         msgLines.push(isEn ? '💰 Estimated Total: HK$' + data.totalFareForWhatsApp : '💰 預計車費總額：HK$' + data.totalFareForWhatsApp);
     }
+    // ⭐ 加入備注至客戶訊息
+    if (data.remarks) msgLines.push(isEn ? '📝 Remarks: ' + data.remarks : '📝 備注：' + data.remarks);
+
     if (data.isWechatCustomer) msgLines.push(isEn ? '💚 Note: WeChat Customer' : '💚 備注：微訊客戶');
     var customerMessage = msgLines.join('\n');
 
@@ -1071,6 +1087,9 @@ function submitBookingAfterUpgrade() {
         }
         discordMsgLines.push('💎 ' + feeModeText + ' | 💰預計參考車費 HK$' + data.totalFareForWhatsApp);
     }
+    // ⭐ 加入備注至 Discord 訊息
+    if (data.remarks) discordMsgLines.push('📝 備注：' + data.remarks);
+
     if (data.isWechatCustomer) discordMsgLines.push('💚 備注：微訊客戶');
     discordMsgLines.push('');
     discordMsgLines.push('🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸');
@@ -1083,7 +1102,8 @@ function submitBookingAfterUpgrade() {
         pickup: data.pickup, stopover: data.stopoverTexts.join(' / '), stopoverTexts: data.stopoverTexts,
         dropoff: data.dropoff, date: data.date || '', time: data.time || '',
         timeFormatted: data.timeStringFormatted || '', passengers: data.passengers, luggages: data.luggages,
-        hasPet: data.hasPet, hasWheelchair: data.hasWheelchair, surname: data.surname, title: data.title,
+        hasPet: data.hasPet, hasWheelchair: data.hasWheelchair, remarks: data.remarks || '',
+        surname: data.surname, title: data.title,
         phone: data.phone, paymentMethod: data.paymentStr, carType: carDisplayText,
         totalFare: data.totalFareForWhatsApp, flightNo: data.flightNo, upgradeOption: carDisplayText,
         feeMode: minCharge ? '最低消費' : (selectedFareMode === 'discount' ? getDiscountLabel() : '正價按錶收費'),
@@ -1181,6 +1201,7 @@ function submitBooking(event) {
     if (routeData.stopovers) routeData.stopovers.forEach(function(s, i) { stopoverTexts.push('中途站' + (i+1) + ': ' + s); });
 
     var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
+    var remarks = document.getElementById('remarks') ? document.getElementById('remarks').value.trim() : '';
     var date = document.getElementById('date') ? document.getElementById('date').value : '';
     var time = document.getElementById('time') ? document.getElementById('time').value : '';
 
@@ -1211,7 +1232,6 @@ var payEls = document.getElementsByName('payment_method');
     for (var i = 0; i < payEls.length; i++) { if (payEls[i].checked) payments.push(payEls[i].value); }
     var paymentStr = payments.join(' / ');
     
-    // ⭐ 如果只揀咗現金，就當作冇填付款方式
     if (paymentStr === '現金' || paymentStr.trim() === '') {
         paymentStr = '';
     }
@@ -1232,7 +1252,7 @@ var payEls = document.getElementsByName('payment_method');
         pickup: routeData.pickup, dropoff: routeData.dropoff, stopoverTexts: stopoverTexts,
         flightNo: flightNo, date: date, time: time, timeStringFormatted: timeStringFormatted,
         passengers: passengers, passengerCount: passengerCount, luggages: luggages,
-        hasPet: hasPet, hasWheelchair: hasWheelchair, surname: surname, title: title,
+        hasPet: hasPet, hasWheelchair: hasWheelchair, remarks: remarks, surname: surname, title: title,
         phone: phone, paymentStr: paymentStr, totalFareForWhatsApp: totalFareForWhatsApp,
         selectedCarName: selectedCarName, isWechatCustomer: isWechatCustomer
     };
@@ -1488,6 +1508,7 @@ function applyLookupResultIfAny() {
         if (o.flightNo) { var elF = document.getElementById('flight_no'); if (elF) elF.value = o.flightNo; }
         if (o.passengers) { var elP = document.getElementById('passengers'); if (elP) elP.value = o.passengers; }
         if (o.luggages) { var elL = document.getElementById('luggages'); if (elL) elL.value = o.luggages; }
+        if (o.remarks) { var elRm = document.getElementById('remarks'); if (elRm) elRm.value = o.remarks; }
 
         var petEl = document.getElementById('has_pet'); if (petEl) petEl.checked = !!o.hasPet;
         var wheelEl = document.getElementById('has_wheelchair'); if (wheelEl) wheelEl.checked = !!o.hasWheelchair;
