@@ -144,6 +144,7 @@ exports.handler = async (event) => {
         luggages: ext.luggages || '',
         hasPet: ext.hasPet === 'true',
         hasWheelchair: ext.hasWheelchair === 'true',
+        remarks: ext.remarks || '', // ⭐ 讀取備注
         payments: ext.payments || '',
         contactTitle: ext.contactTitle || '',
         contactSurname: ext.contactSurname || '',
@@ -181,6 +182,7 @@ exports.handler = async (event) => {
         luggages: '',
         hasPet: false,
         hasWheelchair: false,
+        remarks: '', // ⭐ Legacy 舊訂單無備注
         payments: paymentMatch ? paymentMatch[1].trim() : '',
         contactTitle: '',
         contactSurname: surnameMatch ? surnameMatch[1].trim() : '',
