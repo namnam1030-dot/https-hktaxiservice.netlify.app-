@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#FFF200">
 
-<!-- ✅ 反黑閃：第一時間搶 paint（同主站一致） -->
+<!-- ✅✅✅ 反黑閃：第一時間搶 paint ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -21,6 +20,7 @@
     } catch(e) {}
 
     var root = document.documentElement;
+
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
@@ -39,318 +39,320 @@
 })();
 </script>
 
+<style>
+    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
+    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
+</style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>24小時的士預約 | 加入電話簿・WhatsApp叫車・瀏覽網站</title>
 <meta name="description" content="24小時的士預約 — 一鍵加入電話簿、WhatsApp叫車或瀏覽網站。電話 6881 5441。">
 <meta name="robots" content="noindex, follow">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.jpeg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FFF200">
+
+<!-- ⭐ 引入官網依賴 -->
+<link rel="stylesheet" href="tailwind-compiled.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="theme.css">
 
 <style>
     html { font-size: 130%; }
     
-    /* ⭐ 由頂部開始排列 */
     body {
         font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
         margin: 0;
         min-height: 100vh;
-        background-color: #0B0B0B;
-        color: #FFFFFF;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
-        padding: 40px 16px 24px;
+        padding: 120px 16px 24px; /* 留位俾 fixed header */
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
-        position: relative; /* 用於定位語言切換按鈕 */
-    }
-
-    html.light-theme body,
-    html[data-theme="light"] body {
-        background-color: #FFFFFF;
-        color: #000000;
-    }
-
-    /* 🔴 語言切換按鈕 */
-    #lang-toggle-btn {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        background-color: transparent;
-        border: 1.5px solid #FFF200;
-        color: #FFF200;
-        font-size: 16px;
-        font-weight: 700;
-        padding: 6px 14px;
-        border-radius: 999px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-family: inherit;
-        z-index: 10;
-    }
-    #lang-toggle-btn:hover {
-        background-color: #FFF200;
-        color: #000000;
-    }
-    html.light-theme #lang-toggle-btn {
-        border-color: #000000;
-        color: #000000;
-    }
-    html.light-theme #lang-toggle-btn:hover {
-        background-color: #000000;
-        color: #FFFFFF;
     }
 
     .wrap {
         width: 100%;
         max-width: 420px;
-    }
-
-    /* ── 頂部品牌區 ── */
-    .brand-header {
-        text-align: center;
-        margin-bottom: 28px;
-    }
-
-    .logo-circle {
-        width: 88px;
-        height: 88px;
-        margin: 0 auto 14px;
-        border-radius: 50%;
-        background-color: #FFF200;
-        border: 3px solid #000000;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 44px;
-        box-shadow: 0 8px 26px rgba(255, 242, 0, 0.35);
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 10px;
     }
 
-    html.light-theme .logo-circle {
-        border-color: #000000;
-        box-shadow: 0 8px 26px rgba(255, 242, 0, 0.55);
-    }
-
-    .brand-title {
-        font-size: 30px;
-        font-weight: 800;
-        margin: 0 0 10px;
-        letter-spacing: 0.5px;
-        line-height: 1.3;
-    }
-
-    html.light-theme .brand-title { color: #000000; }
-
-    .brand-sub {
-        font-size: 19px;
-        font-weight: 600;
-        color: #9CA3AF;
-        margin: 0 0 14px;
-        line-height: 1.6;
-    }
-
-    html.light-theme .brand-sub { color: #4B5563; }
-
-    /* 電話號碼按鈕 */
-    .brand-hotline {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 8px;
-        background-color: #FFF200;
-        border: 2px solid #000000;
-        color: #000000;
-        font-weight: 800;
-        font-size: 24px;
-        padding: 12px 28px;
-        border-radius: 999px;
-        text-decoration: none;
-        box-shadow: 0 6px 20px rgba(255, 242, 0, 0.45);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .brand-hotline:active { transform: scale(0.95); }
-    .brand-hotline:hover { box-shadow: 0 8px 28px rgba(255, 242, 0, 0.65); }
-
-    html.light-theme .brand-hotline {
-        background-color: #FFF200;
-        border-color: #000000;
-        color: #000000;
-    }
-
-    /* ── 按鈕卡片 ── */
+    /* ── 三大按鈕區 ── */
     .btn {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 16px;
         width: 100%;
-        padding: 20px 22px;
-        margin-bottom: 16px;
+        padding: 16px 20px;
         border-radius: 16px;
         text-decoration: none;
-        font-size: 21px;
-        font-weight: 700;
-        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        font-size: 22px;
+        font-weight: 800;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
         box-sizing: border-box;
         cursor: pointer;
+        border: 2px solid transparent;
     }
 
     .btn:active { transform: scale(0.97); }
 
     .btn .icon {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 26px;
         flex-shrink: 0;
     }
 
-    .btn .text { display: flex; flex-direction: column; line-height: 1.35; }
+    .btn .text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.3;
+        text-align: left;
+    }
 
     .btn .text small {
         font-size: 16px;
         font-weight: 600;
-        opacity: 0.85;
+        opacity: 0.8;
         margin-top: 4px;
     }
 
     .btn .arrow {
         margin-left: auto;
-        font-size: 20px;
-        opacity: 0.55;
+        font-size: 24px;
+        opacity: 0.5;
     }
 
-    /* 加入電話簿 */
+    /* 1. 加入電話簿 (白底黑字) */
     .btn-save {
-        background-color: #1E1E1E;
-        color: #FFFFFF;
-        border: 1px solid #333333;
-    }
-    .btn-save .icon { background-color: #FFF200; color: #000000; }
-    .btn-save:hover { background-color: #262626; border-color: #FFF200; }
-
-    html.light-theme .btn-save {
         background-color: #FFFFFF;
         color: #000000;
-        border: 1.5px solid #000000;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        border-color: #000000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
-    html.light-theme .btn-save:hover { background-color: #FFFDE6; }
+    .btn-save .icon { background-color: #FFF200; color: #000000; border: 1px solid #000000; }
+    .btn-save:hover { background-color: #FFFDE6; }
 
-    /* WhatsApp */
+    /* 2. WhatsApp 叫車 (黃底黑字) */
     .btn-wa {
         background-color: #FFF200;
         color: #000000;
-        border: 1px solid #000000;
-        box-shadow: 0 6px 22px rgba(255, 242, 0, 0.35);
+        border-color: #000000;
+        box-shadow: 0 4px 12px rgba(255, 242, 0, 0.3);
     }
     .btn-wa .icon { background-color: #000000; color: #FFF200; }
-    .btn-wa .text small { opacity: 0.75; }
-    .btn-wa:hover { box-shadow: 0 8px 28px rgba(255, 242, 0, 0.55); }
+    .btn-wa:hover { box-shadow: 0 6px 16px rgba(255, 242, 0, 0.5); }
 
-    /* 瀏覽網站 */
+    /* 3. 瀏覽網站 (黑底黃字) */
     .btn-web {
-        background-color: #161616;
-        color: #FFFFFF;
-        border: 1px solid #FFF200;
-    }
-    .btn-web .icon { background-color: rgba(255, 242, 0, 0.15); color: #FFF200; }
-    .btn-web:hover { background-color: #1F1F1F; box-shadow: 0 6px 22px rgba(255, 242, 0, 0.25); }
-
-    html.light-theme .btn-web {
         background-color: #000000;
         color: #FFF200;
-        border: 1px solid #000000;
+        border-color: #000000;
     }
-    html.light-theme .btn-web .icon { background-color: #FFF200; color: #000000; }
-    html.light-theme .btn-web .text small { color: #FFF200; opacity: 0.75; }
-    html.light-theme .btn-web:hover { background-color: #1A1A1A; }
+    .btn-web .icon { background-color: #FFF200; color: #000000; }
+    .btn-web:hover { opacity: 0.9; }
+
+    /* 深色主題下的按鈕微調 */
+    html:not(.light-theme) .btn-save { background-color: #1E1E1E; color: #FFF; border-color: #333; }
+    html:not(.light-theme) .btn-save .icon { border: none; }
+    html:not(.light-theme) .btn-web { border-color: #FFF200; }
 </style>
 </head>
-<body>
+<body class="antialiased">
 
-<!-- 🔴 語言切換按鈕 -->
-<button id="lang-toggle-btn" onclick="toggleLanguage()" aria-label="切換語言">EN</button>
+    <!-- 🔴 官網 Header -->
+    <header class="bg-brand-yellow text-black px-0 py-[1mm] fixed top-0 left-0 w-full z-50 shadow-md" style="min-height: 92px;">
+        <div class="w-full px-1 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="index.html">
+                    <img src="logo.jpeg" alt="網約車及的士預約服務 TAXI SERVICE" class="h-[90px] object-contain" onerror="this.style.display='none'">
+                </a>
+            </div>
 
-<main class="wrap">
+            <div class="flex flex-col items-center justify-center">
+                <a href="index.html">
+                    <img src="hotline.jpeg" alt="24小時網約車及的士熱線" class="h-[30px] object-contain" onerror="this.style.display='none'">
+                </a>
+                <a href="tel:68815441" class="text-black font-extrabold text-[22px] hover:underline mt-0.5 tracking-wide flex items-center gap-1">
+                    <i class="fa-solid fa-phone text-small"></i> 6881 5441
+                </a>
+            </div>
 
-    <!-- 品牌區 -->
-    <div class="brand-header">
-        <div class="logo-circle">🚕</div>
-        
-        <h1 class="brand-title" data-i18n="brand_title">24小時的士預約</h1>
-        
-        <p class="brand-sub" data-i18n="brand_sub">長途跨區・機場口岸接送<br>八五折的士 | 六座豪華的士</p>
-        
-        <!-- 電話號碼（撳落去直接撥號） -->
-        <a href="tel:68815441" class="brand-hotline">
-            <i class="fa-solid fa-phone"></i> 6881 5441
-        </a>
+            <div class="flex items-center pr-1">
+                <button id="mini-float-toggle-btn" class="mini-float-toggle" title="展開/收起功能鍵" aria-label="展開或收起功能鍵">
+                    <i class="fa-solid fa-sliders" id="mini-float-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 🔴 官網 Mini-float 懸浮按鈕 -->
+    <div id="mini-float" class="minimized">
+        <div class="mini-float-btns">
+            <button onclick="toggleLanguage()" id="lang-toggle-btn" class="mini-float-btn lang theme-blink" title="切換語言" aria-label="切換語言">EN</button>
+            <button onclick="showInstallGuide()" class="mini-float-btn apps animate-pulse" title="加到主畫面" aria-label="加到主畫面">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </button>
+            <button onclick="toggleTheme()" class="mini-float-btn theme theme-blink" title="切換主題色" aria-label="切換主題色">
+                <i class="fa-solid fa-circle-half-stroke"></i>
+            </button>
+        </div>
     </div>
 
-    <!-- ① 加入電話簿（加入 id 方便 JS 抓取） -->
-    <a class="btn btn-save" id="vcf-link" href="nam.vcf" download>
-        <span class="icon"><i class="fa-solid fa-address-book"></i></span>
-        <span class="text">
-            <span data-i18n="btn1_title">加入電話簿</span>
-            <small data-i18n="btn1_sub">一鍵儲存「24小時的士預約」</small>
-        </span>
-        <i class="fa-solid fa-chevron-right arrow"></i>
-    </a>
+    <!-- 🔴 官網 Install Modal -->
+    <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-brand-yellow text-3xl mb-3">
+                <i class="fa-solid fa-circle-down animate-bounce"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">
+                為了方便下次叫車，您可以將本服務加到手機主畫面：
+            </p>
+            <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800">
+            </div>
+            <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
+                了解，關閉
+            </button>
+        </div>
+    </div>
 
-    <!-- ② WhatsApp 叫車 -->
-    <a class="btn btn-wa"
-       href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E5%8F%AB%E8%BB%8A"
-       target="_blank" rel="noopener">
-        <span class="icon"><i class="fa-brands fa-whatsapp"></i></span>
-        <span class="text">
-            <span data-i18n="btn2_title">WhatsApp 叫車</span>
-            <small data-i18n="btn2_sub">即時對話・預約的士服務</small>
-        </span>
-        <i class="fa-solid fa-chevron-right arrow"></i>
-    </a>
+    <!-- 中間主要內容區 -->
+    <main class="wrap">
+        <!-- ① 加入電話簿 -->
+        <a class="btn btn-save" id="vcf-link" href="nam.vcf" download>
+            <span class="icon"><i class="fa-solid fa-address-book"></i></span>
+            <span class="text">
+                <span data-i18n="btn1_title">加入電話簿</span>
+                <small data-i18n="btn1_sub">一鍵儲存「24小時的士預約」</small>
+            </span>
+            <i class="fa-solid fa-chevron-right arrow"></i>
+        </a>
 
-    <!-- ③ 瀏覽網站 -->
-    <a class="btn btn-web"
-       href="https://hktaxiservice.netlify.app/"
-       target="_blank" rel="noopener">
-        <span class="icon"><i class="fa-solid fa-globe"></i></span>
-        <span class="text">
-            <span data-i18n="btn3_title">瀏覽網站</span>
-            <small data-i18n="btn3_sub">智能路線規劃・預計車費</small>
-        </span>
-        <i class="fa-solid fa-chevron-right arrow"></i>
-    </a>
+        <!-- ② WhatsApp 叫車 -->
+        <a class="btn btn-wa"
+           href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E5%8F%AB%E8%BB%8A"
+           target="_blank" rel="noopener">
+            <span class="icon"><i class="fa-brands fa-whatsapp"></i></span>
+            <span class="text">
+                <span data-i18n="btn2_title">WhatsApp 叫車</span>
+                <small data-i18n="btn2_sub">即時對話・預約的士服務</small>
+            </span>
+            <i class="fa-solid fa-chevron-right arrow"></i>
+        </a>
 
-</main>
+        <!-- ③ 瀏覽網站 -->
+        <a class="btn btn-web"
+           href="https://hktaxiservice.netlify.app/"
+           target="_blank" rel="noopener">
+            <span class="icon"><i class="fa-solid fa-globe"></i></span>
+            <span class="text">
+                <span data-i18n="btn3_title">瀏覽網站</span>
+                <small data-i18n="btn3_sub">智能路線規劃・預計車費</small>
+            </span>
+            <i class="fa-solid fa-chevron-right arrow"></i>
+        </a>
+    </main>
 
-<!-- 🔴 語言切換邏輯 + vcf 動態連結 -->
+    <!-- 🔴 官網 Footer -->
+    <footer class="border-t border-gray-800/80 mt-6 py-3 text-center px-4 bg-brand-dark w-full" style="max-width: 100%;">
+        <!-- 第一行：WeChat / WhatsApp -->
+        <div class="flex justify-center items-center gap-3 mb-3">
+            <button onclick="showWeComQR()" id="wechat-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+                <i class="fa-brands fa-weixin text-lg"></i> WeChat
+            </button>
+
+            <!-- WeCom Modal -->
+            <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+                <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
+                    <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="text-green-500 text-3xl mb-3">
+                        <i class="fa-brands fa-weixin"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
+                    <p class="text-xs text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
+                    <div class="bg-white p-3 rounded-xl mb-4 inline-block">
+                        <img src="wecomcode.jpeg" alt="WeCom QR Code" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
+                    </div>
+                    <button onclick="closeWeComQR()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer">
+                        關閉
+                    </button>
+                </div>
+            </div>
+            
+            <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
+                <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
+            </a>
+        </div>
+
+        <!-- 第二行：Facebook / Instagram -->
+        <div class="flex justify-center items-center gap-3 mb-3">
+            <a href="https://www.facebook.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-fb-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-[#1877F2] hover:opacity-90">
+                <i class="fa-brands fa-facebook text-lg"></i> Facebook
+            </a>
+            <a href="https://www.instagram.com/hktaxi688" target="_blank" rel="noopener noreferrer" class="social-ig-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] hover:opacity-90">
+                <i class="fa-brands fa-instagram text-lg"></i> Instagram
+            </a>
+        </div>
+
+        <!-- 第三行：Threads -->
+        <div class="flex justify-center items-center gap-3 mb-6">
+            <a href="https://www.threads.net/@hktaxi688" target="_blank" rel="noopener noreferrer" class="social-threads-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md">
+                <i class="fa-brands fa-threads text-lg"></i> Threads
+            </a>
+        </div>
+
+        <p class="text-xs text-gray-600" data-i18n="footer_copy">© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士</p>
+    </footer>
+
 <script>
 var currentLang = localStorage.getItem('taxiLang') || 'zh';
 
 var translations = {
     zh: {
-        brand_title: "24小時的士預約",
-        brand_sub: "長途跨區・機場口岸接送<br>八五折的士 | 六座豪華的士",
+        modal_title: "一鍵加入主畫面",
+        modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
         btn1_title: "加入電話簿",
         btn1_sub: "一鍵儲存「24小時的士預約」",
         btn2_title: "WhatsApp 叫車",
         btn2_sub: "即時對話・預約的士服務",
         btn3_title: "瀏覽網站",
-        btn3_sub: "智能路線規劃・預計車費"
+        btn3_sub: "智能路線規劃・預計車費",
+        wecom_modal_title: "掃描二維碼添加企業微信",
+        wecom_modal_desc: "請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
     },
     en: {
-        brand_title: "24-Hour Taxi Booking",
-        brand_sub: "Long Distance &amp; Cross-Border · Airport &amp; Border Transfers<br>15% Off Taxi | 6-Seater Luxury Taxi",
+        modal_title: "Add to Home Screen",
+        modal_desc: "For quick booking next time, add this service to your phone's home screen:",
         btn1_title: "Add to Contacts",
         btn1_sub: 'Save "24-Hour Taxi Booking" with one tap',
         btn2_title: "Book via WhatsApp",
         btn2_sub: "Instant Chat · Taxi Booking Service",
         btn3_title: "Visit Website",
-        btn3_sub: "Smart Route Planning · Fare Estimation"
+        btn3_sub: "Smart Route & Fare Estimation",
+        wecom_modal_title: "Scan QR Code to Add WeCom",
+        wecom_modal_desc: "Scan the QR code below with WeChat to add our WeCom for inquiries",
+        whatsapp_inquiry: "WhatsApp",
+        footer_copy: "© 2026 All Rights Reserved. Online Taxi Booking | Fleet Taxi | Star Taxi | Lok Hang Taxi | Joie Taxi | Big Boss | Bumblebee | Big Bee | 15% Discount Taxi"
     }
 };
 
@@ -358,7 +360,6 @@ function applyLanguage() {
     var btn = document.getElementById('lang-toggle-btn');
     if (btn) btn.innerText = currentLang === 'zh' ? 'EN' : '繁';
 
-    // 更新所有文字
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
@@ -366,7 +367,7 @@ function applyLanguage() {
         }
     });
 
-    // 🔴 動態切換加入電話簿嘅 vcf 連結
+    // 動態切換加入電話簿嘅 vcf 連結
     var vcfLink = document.getElementById('vcf-link');
     if (vcfLink) {
         vcfLink.href = currentLang === 'en' ? 'nam_en.vcf' : 'nam.vcf';
@@ -379,11 +380,23 @@ function toggleLanguage() {
     applyLanguage();
 }
 
+// WeCom 彈窗控制
+function showWeComQR() {
+    var el = document.getElementById('wecom-modal');
+    if (el) el.classList.remove('hidden');
+}
+
+function closeWeComQR() {
+    var el = document.getElementById('wecom-modal');
+    if (el) el.classList.add('hidden');
+}
+
 // 頁面載入時立即套用語言
 document.addEventListener('DOMContentLoaded', function() {
     applyLanguage();
 });
 </script>
-
+<!-- ⭐ 引入官網的 theme.js，用於 Header 懸浮按鈕與主題切換 -->
+<script src="theme.js"></script>
 </body>
 </html>
