@@ -71,8 +71,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        /* ⭐ 92px (Header高度) + 16px (間距) = 108px */
-        padding: 108px 16px 24px; 
+        padding: 100px 16px 24px; /* 預設值，theme.js 會自動改為 Header 真實高度 */
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
     }
@@ -83,7 +82,7 @@
         display: flex;
         flex-direction: column;
         gap: 16px; /* 按鈕之間嘅距離 */
-        margin-top: 0; /* ⭐ 唔再加額外 margin */
+        margin-top: 16px; /* ⭐ 關鍵：喺 Header 同第一粒掣之間加 16px，同 gap 一致 */
     }
 
     /* ── 三大按鈕區 ── */
