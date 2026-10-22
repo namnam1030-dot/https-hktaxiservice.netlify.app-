@@ -81,9 +81,50 @@
         max-width: 420px;
         display: flex;
         flex-direction: column;
-        gap: 16px; /* 按鈕之間嘅距離 */
-        margin-top: 16px; /* ⭐ 關鍵：喺 Header 同第一粒掣之間加 16px，同 gap 一致 */
+        gap: 16px; /* 所有元素之間的距離 */
+        margin-top: 16px; /* Header 同第一件物件之間嘅距離 */
     }
+
+    /* ── 介紹文字區塊 ── */
+    .hero-text-box {
+        background-color: #161616;
+        border: 1px solid #333333;
+        border-radius: 16px;
+        padding: 20px 16px;
+        text-align: center;
+        line-height: 1.6;
+    }
+    
+    .hero-text-box h2 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #FFFFFF;
+        margin: 0 0 4px 0;
+        line-height: 1.4;
+    }
+    
+    .hero-text-box .highlight {
+        color: #FFF200;
+        font-size: 22px;
+    }
+    
+    .hero-text-box p {
+        font-size: 15px;
+        font-weight: 700;
+        color: #D1D5DB;
+        margin: 8px 0 0 0;
+        line-height: 1.7;
+    }
+
+    /* 淺色主題 */
+    html.light-theme .hero-text-box {
+        background-color: #FFFFFF;
+        border-color: #000000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    html.light-theme .hero-text-box h2 { color: #000000; }
+    html.light-theme .hero-text-box .highlight { color: #000000; }
+    html.light-theme .hero-text-box p { color: #4B5563; }
 
     /* ── 三大按鈕區 ── */
     .btn {
@@ -234,6 +275,21 @@
 
     <!-- 中間主要內容區 -->
     <main class="wrap">
+        
+        <!-- ⭐ 加入文字介紹區塊 -->
+        <div class="hero-text-box">
+            <h2 data-i18n-html="hero_title">
+                長途跨區・機場口岸接送<br>
+                <span class="highlight">八五折(85折)的士 | 六座豪華的士</span>
+            </h2>
+            <p data-i18n-html="hero_desc">
+                機場及各大口岸・新界往返香港・九龍<br>
+                機場・港珠澳・深圳灣・落馬洲・香園圍<br>
+                屯門・元朗・天水圍・上水・粉嶺<br>
+                豪華6座位・混能的士・輪椅的士
+            </p>
+        </div>
+
         <!-- ① 加入電話簿 -->
         <a class="btn btn-save" id="vcf-link" href="nam.vcf" download>
             <span class="icon"><i class="fa-solid fa-address-book"></i></span>
@@ -327,6 +383,8 @@ var currentLang = localStorage.getItem('taxiLang') || 'zh';
 
 var translations = {
     zh: {
+        hero_title: '長途跨區・機場口岸接送<br><span class="highlight">八五折(85折)的士 | 六座豪華的士</span>',
+        hero_desc: '機場及各大口岸・新界往返香港・九龍<br>機場・港珠澳・深圳灣・落馬洲・香園圍<br>屯門・元朗・天水圍・上水・粉嶺<br>豪華6座位・混能的士・輪椅的士',
         modal_title: "一鍵加入主畫面",
         modal_desc: "為了方便下次叫車，您可以將本服務加到手機主畫面：",
         btn1_title: "加入電話簿",
@@ -341,6 +399,8 @@ var translations = {
         footer_copy: "© 2026 版權所有。網約車平台 | 車隊的士 | 星群的士 | 樂行的士 | Joie Taxi | Big Boss | 大黃鋒 | Big Bee | 八五折的士"
     },
     en: {
+        hero_title: 'Long Distance &amp; Cross-District<br><span class="highlight">15% Off Taxi | 6-Seater Luxury Taxi</span>',
+        hero_desc: 'Airport &amp; Major Border Crossings · N.T. to HK Island &amp; Kowloon<br>Airport · HZMB · Shenzhen Bay · Lok Ma Chau · Heung Yuen Wai<br>Tuen Mun · Yuen Long · Tin Shui Wai · Sheung Shui · Fanling<br>Luxury 6-Seater · Hybrid Taxi · Wheelchair Taxi',
         modal_title: "Add to Home Screen",
         modal_desc: "For quick booking next time, add this service to your phone's home screen:",
         btn1_title: "Add to Contacts",
@@ -362,6 +422,14 @@ function applyLanguage() {
 
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key] !== undefined) {
+            el.innerHTML = translations[currentLang][key];
+        }
+    });
+
+    // 處理含有 HTML 標籤的翻譯
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-html');
         if (translations[currentLang] && translations[currentLang][key] !== undefined) {
             el.innerHTML = translations[currentLang][key];
         }
