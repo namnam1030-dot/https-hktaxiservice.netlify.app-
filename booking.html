@@ -187,6 +187,12 @@
     html.light-theme body .flight-option-btn:hover {
         border-color: #000000 !important; background-color: rgba(255, 242, 0, 0.3) !important;
     }
+
+    /* ⭐ 自定義彈窗樣式 */
+    html.light-theme body #custom-alert-modal > div { background-color: #FFFFFF !important; border-color: #000000 !important; }
+    html.light-theme body #custom-alert-title { color: #000000 !important; }
+    html.light-theme body #custom-alert-msg { color: #374151 !important; }
+    html.light-theme body #custom-alert-cancel { background-color: #E5E7EB !important; color: #000000 !important; }
 </style>
 </head>
 <body class="antialiased">
@@ -442,6 +448,19 @@
     </section>
     </main>
 
+    <!-- ⭐ 自定義提示彈窗 -->
+    <div id="custom-alert-modal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center relative shadow-2xl">
+            <div id="custom-alert-icon" class="text-brand-yellow text-4xl mb-3"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h3 id="custom-alert-title" class="text-xl font-extrabold text-white mb-2">提示</h3>
+            <p id="custom-alert-msg" class="text-sm text-gray-300 mb-6 leading-relaxed"></p>
+            <div class="flex gap-3">
+                <button id="custom-alert-cancel" type="button" class="w-1/2 bg-gray-600 text-white font-bold py-2.5 rounded-xl hidden">取消</button>
+                <button id="custom-alert-ok" type="button" class="w-1/2 bg-brand-yellow text-black font-bold py-2.5 rounded-xl ml-auto">確定</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 航班選擇彈窗 -->
     <div id="flight-select-modal" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full relative shadow-2xl">
@@ -694,6 +713,57 @@ var translations = {
         flight_status_delayed: "Delayed"
     }
 };
+
+// ⭐ 自定義彈窗邏輯
+function showAppAlert(msg, callback) {
+    var modal = document.getElementById('custom-alert-modal');
+    document.getElementById('custom-alert-msg').innerText = msg;
+    document.getElementById('custom-alert-title').innerText = currentLang === 'en' ? 'Notice' : '提示';
+    document.getElementById('custom-alert-cancel').classList.add('hidden');
+    
+    var okBtn = document.getElementById('custom-alert-ok');
+    okBtn.classList.remove('w-1/2');
+    okBtn.classList.add('w-full');
+    
+    modal.classList.remove('hidden');
+    
+    var newOkBtn = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+    newOkBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        if (callback) callback();
+    });
+}
+
+function showAppConfirm(msg, onConfirm, onCancel) {
+    var modal = document.getElementById('custom-alert-modal');
+    document.getElementById('custom-alert-msg').innerText = msg;
+    document.getElementById('custom-alert-title').innerText = currentLang === 'en' ? 'Confirm' : '請確認';
+    
+    var cancelBtn = document.getElementById('custom-alert-cancel');
+    var okBtn = document.getElementById('custom-alert-ok');
+    cancelBtn.classList.remove('hidden');
+    
+    cancelBtn.classList.add('w-1/2');
+    okBtn.classList.add('w-1/2');
+    okBtn.classList.remove('w-full');
+    
+    modal.classList.remove('hidden');
+    
+    var newOkBtn = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+    newOkBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        if (onConfirm) onConfirm();
+    });
+
+    var newCancelBtn = cancelBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+    newCancelBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        if (onCancel) onCancel();
+    });
+}
 
 function updateTimeLabel() {
     var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
@@ -1154,7 +1224,7 @@ function checkPassengerLimit() {
             selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
             if (selectedFareMode === 'discount') selectedFareMode = 'normal';
             updateCarDisplay();
-            alert(currentLang === 'en' ? "5+ passengers: auto-switched to MAXUS MIFA 7." : "乘客人數為 5 人或以上，已自動為你切換至 MAXUS MIFA 7。");
+            showAppAlert(currentLang === 'en' ? "5+ passengers: auto-switched to MAXUS MIFA 7." : "乘客人數為 5 人或以上，已自動為你切換至 MAXUS MIFA 7。");
         }
     }
 }
@@ -1394,7 +1464,7 @@ function submitBookingAfterUpgrade() {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fa-solid fa-calendar-check text-lg"></i> ' + translations[currentLang].btn_confirm_booking;
             }
-            alert(currentLang === 'en' ? 'Booking failed. Please try again.' : '預約送出失敗，請重試。');
+            showAppAlert(currentLang === 'en' ? 'Booking failed. Please try again.' : '預約送出失敗，請重試。');
         }
     })
     .catch(function(error) {
@@ -1404,21 +1474,41 @@ function submitBookingAfterUpgrade() {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fa-solid fa-calendar-check text-lg"></i> ' + translations[currentLang].btn_confirm_booking;
         }
-        alert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
+        showAppAlert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
     });
 }
 
 function submitBooking(event) {
-    event.preventDefault();
-    if (sessionStorage.getItem('taxiSubmitting') === '1') { alert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...'); return; }
+    if (event) event.preventDefault();
+    
+    // 防止重複提交
+    if (sessionStorage.getItem('taxiSubmitting') === '1') { 
+        showAppAlert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...'); 
+        return; 
+    }
+    
     checkPassengerLimit();
-    if (!selectedFareMode) { alert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！"); return; }
 
+    // 1. 檢查收費模式
+    if (!selectedFareMode) { 
+        showAppAlert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！"); 
+        return; 
+    }
+
+    // 2. 檢查路線
     var routeData = loadRouteDataFromLocalStorage();
-    if (!routeData || !routeData.pickup || !routeData.dropoff) { alert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！"); return; }
+    if (!routeData || !routeData.pickup || !routeData.dropoff) { 
+        showAppAlert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！"); 
+        return; 
+    }
+
+    // 3. 檢查電話
     var phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
     var cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 8) { alert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！"); return; }
+    if (cleanPhone.length < 8) { 
+        showAppAlert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！"); 
+        return; 
+    }
 
     var stopoverTexts = [];
     if (routeData.stopovers) routeData.stopovers.forEach(function(s, i) { stopoverTexts.push('中途站' + (i+1) + ': ' + s); });
@@ -1426,32 +1516,28 @@ function submitBooking(event) {
     // ⭐ 處理「即時訂單」但輸入了「航班編號」的情況
     var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
     if (orderType === 'instant' && flightNo) {
-        var confirmSwitch = confirm(
+        showAppConfirm(
             currentLang === 'en'
                 ? 'You have entered a flight number, but you selected "Instant Order".\n\nClick OK to switch to "Booking Order" (use flight arrival time).\nClick Cancel to continue as "Instant Order" (flight number will be ignored).'
-                : '你輸入了航班編號，但目前選擇的是「即時訂單」。\n\n按「確定」會轉為「預約訂單」（使用航班降落時間）。\n按「取消」將繼續「即時訂單」（系統會自動忽略航班編號）。'
-        );
-        if (confirmSwitch) {
-            // 自動切換為預約訂單，並引導客人填寫/選擇時間
-            switchOrderType('booking');
-            
-            // 如果客人未選擇時間，彈出提示
-            var timeInput = document.getElementById('time');
-            if (timeInput && !timeInput.value) {
-                alert(currentLang === 'en' 
-                    ? 'Please select a date and time for your booking.' 
-                    : '請選擇用車日期及時間。');
+                : '你輸入了航班編號，但目前選擇的是「即時訂單」。\n\n按「確定」會轉為「預約訂單」（使用航班降落時間）。\n按「取消」將繼續「即時訂單」（系統會自動忽略航班編號）。',
+            function() { // 確定：轉預約
+                switchOrderType('booking');
+                var timeInput = document.getElementById('time');
+                if (timeInput && !timeInput.value) {
+                    showAppAlert(currentLang === 'en' ? 'Please select a date and time for your booking.' : '請選擇用車日期及時間。');
+                }
+            },
+            function() { // 取消：繼續即時，清空航班
+                var flightInput = document.getElementById('flight_no');
+                if (flightInput) flightInput.value = '';
+                updateTimeLabel();
+                var msgEl = document.getElementById('flight-lookup-msg');
+                if (msgEl) msgEl.classList.add('hidden');
+                // 重新觸發提交
+                setTimeout(function() { submitBooking(); }, 100);
             }
-            return; // 停止提交，讓客人繼續填寫
-        } else {
-            // 客人選擇繼續即時訂單，清空航班編號
-            flightNo = '';
-            var flightInput = document.getElementById('flight_no');
-            if (flightInput) flightInput.value = '';
-            updateTimeLabel();
-            var msgEl = document.getElementById('flight-lookup-msg');
-            if (msgEl) msgEl.classList.add('hidden');
-        }
+        );
+        return; // 等待用戶選擇
     }
 
     var remarks = document.getElementById('remarks') ? document.getElementById('remarks').value.trim() : '';
@@ -1459,15 +1545,28 @@ function submitBooking(event) {
     var time = document.getElementById('time') ? document.getElementById('time').value : '';
 
     if (orderType === 'booking') {
-        if (!date) { alert(currentLang === 'en' ? "Please select a date!" : "請選擇預約日期！"); return; }
+        if (!date) { showAppAlert(currentLang === 'en' ? "Please select a date!" : "請選擇預約日期！"); return; }
+        if (!time) { showAppAlert(currentLang === 'en' ? "Please select a time!" : "請選擇預約時間！"); return; }
+        
         var selectedDate = new Date(date);
         var today = new Date(); today.setHours(0, 0, 0, 0);
         var maxAllowedDate = new Date(today); maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
-        if (selectedDate < today || selectedDate > maxAllowedDate) { alert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！"); return; }
-        if (!time) { alert(currentLang === 'en' ? "Please select a time!" : "請選擇預約時間！"); return; }
-        var targetDateTime = new Date(date + 'T' + time);
+        if (selectedDate < today || selectedDate > maxAllowedDate) { 
+            showAppAlert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！"); 
+            return; 
+        }
+        
+        // 兼容性更好的時間解析：YYYY-MM-DDTHH:MM:00
+        var targetDateTime = new Date(date + 'T' + time + ':00');
+        if (isNaN(targetDateTime.getTime())) {
+            showAppAlert(currentLang === 'en' ? "Invalid date or time format." : "日期或時間格式錯誤。");
+            return;
+        }
         var diffMinutes = (targetDateTime.getTime() - Date.now()) / (1000 * 60);
-        if (diffMinutes < 15) { alert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！"); return; }
+        if (diffMinutes < 15) { 
+            showAppAlert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！"); 
+            return; 
+        }
     }
 
     var passengers = document.getElementById('passengers') ? document.getElementById('passengers').value : '';
@@ -1634,7 +1733,7 @@ function initEditMode() {
         );
 
         if (!userInput || userInput.trim() === '') {
-            alert(currentLang === 'en' ? 'Input is required.' : '必須輸入資料。');
+            showAppAlert(currentLang === 'en' ? 'Input is required.' : '必須輸入資料。');
             window.location.href = 'index.html';
             return;
         }
@@ -1670,13 +1769,15 @@ function initEditMode() {
                     showEditTooLateModal();
                 }
             } else {
-                alert(data.error || (currentLang === 'en' ? 'Booking ID or phone number is incorrect.' : '預約編號或電話唔正確。'));
-                window.location.href = 'index.html';
+                showAppAlert(data.error || (currentLang === 'en' ? 'Booking ID or phone number is incorrect.' : '預約編號或電話唔正確。'), function() {
+                    window.location.href = 'index.html';
+                });
             }
         })
         .catch(function(error) {
-            alert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。');
-            window.location.href = 'index.html';
+            showAppAlert(currentLang === 'en' ? 'Network error. Please try again.' : '網絡錯誤，請重試。', function() {
+                window.location.href = 'index.html';
+            });
         });
 
         return;
@@ -1892,10 +1993,10 @@ window.addEventListener('DOMContentLoaded', function() {
             var today = new Date(); today.setHours(0, 0, 0, 0);
             var maxAllowedDate = new Date(today); maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
             if (selDate < today) {
-                alert(currentLang === 'en' ? "⚠️ Booking date cannot be in the past!" : "⚠️ 預約日期不能係過去！");
+                showAppAlert(currentLang === 'en' ? "⚠️ Booking date cannot be in the past!" : "⚠️ 預約日期不能係過去！");
                 this.value = ''; this.focus();
             } else if (selDate > maxAllowedDate) {
-                alert(currentLang === 'en' ? "⚠️ Booking date cannot exceed 3 days!" : "⚠️ 預約日期不能超過三日！");
+                showAppAlert(currentLang === 'en' ? "⚠️ Booking date cannot exceed 3 days!" : "⚠️ 預約日期不能超過三日！");
                 this.value = ''; this.focus();
             }
         });
@@ -1906,16 +2007,16 @@ window.addEventListener('DOMContentLoaded', function() {
         if (recent) {
             setTimeout(function() {
                 var msg = currentLang === 'en' ? "You recently submitted a booking.\n\nOK = view success page\nCancel = back to home" : "你啱啱先提交過一張訂單。\n\n「確定」= 返去成功頁\n「取消」= 返回主頁";
-                if (confirm(msg)) {
+                showAppConfirm(msg, function() {
                     var encoded = encodeURIComponent(recent.customerMessage || '');
                     window.location.replace('booking-success.html?data=' + encoded);
-                } else {
+                }, function() {
                     localStorage.removeItem('taxiRouteData');
                     localStorage.removeItem('taxiBookingData');
                     localStorage.removeItem('taxiEditPrefillData');
                     sessionStorage.removeItem('taxiLastSubmission');
                     window.location.replace('index.html');
-                }
+                });
             }, 200);
         }
     }
