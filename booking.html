@@ -224,7 +224,7 @@
 
     <div id="install-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
-            <button onclick="closeInstallGuide()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="closeInstallGuide()" aria-label="關閉" title="關閉" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             <div class="text-brand-yellow text-3xl mb-3"><i class="fa-solid fa-circle-down animate-bounce"></i></div>
             <h3 class="text-lg font-bold text-white mb-2" data-i18n="modal_title">一鍵加入主畫面</h3>
             <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">為了方便下次叫車，您可以將本服務加到手機主畫面：</p>
@@ -445,7 +445,7 @@
     <!-- 航班選擇彈窗 -->
     <div id="flight-select-modal" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full relative shadow-2xl">
-            <button type="button" onclick="closeFlightSelectModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-xl">
+            <button type="button" onclick="closeFlightSelectModal()" aria-label="關閉" title="關閉" class="absolute top-3 right-3 text-gray-400 hover:text-white text-xl">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-plane-arrival text-brand-yellow mr-2"></i><span data-i18n="flight_select_title">選擇航班降落時間</span></h3>
@@ -477,7 +477,7 @@
 
             <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
                 <div class="bg-brand-gray border border-green-500 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl relative">
-                    <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
+                    <button onclick="closeWeComQR()" aria-label="關閉" title="關閉" class="absolute top-3 right-3 text-gray-400 hover:text-white text-lg">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                     <div class="text-green-500 text-3xl mb-3">
@@ -922,15 +922,28 @@ function switchOrderType(type) {
     var instantBtn = document.getElementById('btn-instant-order');
     var bookingBtn = document.getElementById('btn-booking-order');
     var datetimeContainer = document.getElementById('datetime-container');
+    
     if (type === 'instant') {
         instantBtn.classList.add('selected');
         bookingBtn.classList.remove('selected');
         datetimeContainer.classList.add('hidden');
+        
+        // ⭐ 切換到即時訂單時，清空航班欄位
+        var flightInput = document.getElementById('flight_no');
+        if (flightInput) {
+            flightInput.value = '';
+            updateTimeLabel();
+        }
+        var msgEl = document.getElementById('flight-lookup-msg');
+        if (msgEl) msgEl.classList.add('hidden');
+
     } else {
         bookingBtn.classList.add('selected');
         instantBtn.classList.remove('selected');
         datetimeContainer.classList.remove('hidden');
     }
+    
+    checkShowFlightField();
 }
 
 function loadBookingDataFromLocalStorage() {
@@ -997,12 +1010,17 @@ function applyLanguage() {
 function checkShowFlightField() {
     var routeData = loadRouteDataFromLocalStorage();
     var flightContainer = document.getElementById('field-flight-container');
+    
+    // ⭐ 只要起點係機場就顯示，唔再限制只係預約單
     if (routeData && routeData.pickup && flightContainer) {
         var pickupValue = routeData.pickup.toLowerCase();
         var airportKeywords = ['機場', 'airport', '香港國際機場', 'hkg', 'hong kong international'];
         var isAirport = airportKeywords.some(function(kw) { return pickupValue.indexOf(kw) >= 0; });
+        
         if (isAirport) flightContainer.classList.remove('hidden');
         else flightContainer.classList.add('hidden');
+    } else {
+        if (flightContainer) flightContainer.classList.add('hidden');
     }
 }
 
@@ -1027,11 +1045,22 @@ function closeFlightSelectModal() {
 function applyFlightSelection(date, time) {
     var dateInput = document.getElementById('date');
     var timeInput = document.getElementById('time');
+    
     if (dateInput) dateInput.value = date;
     if (timeInput) timeInput.value = time;
+    
+    // ⭐ 如果當前係即時訂單，自動切換去預約訂單
+    if (orderType === 'instant') {
+        switchOrderType('booking');
+    }
+    
     updateTimeLabel();
     closeFlightSelectModal();
-    showFlightMsg(currentLang === 'en' ? 'Flight time applied: ' + date + ' ' + time : '已套用航班時間：' + date + ' ' + time, 'ok');
+    
+    var successMsg = currentLang === 'en' 
+        ? 'Flight time applied: ' + date + ' ' + time + ' (Switched to Booking Order)' 
+        : '已套用航班時間：' + date + ' ' + time + '（已自動切換為預約訂單）';
+    showFlightMsg(successMsg, 'ok');
 }
 
 function lookupFlightArrival() {
@@ -1394,7 +1423,37 @@ function submitBooking(event) {
     var stopoverTexts = [];
     if (routeData.stopovers) routeData.stopovers.forEach(function(s, i) { stopoverTexts.push('中途站' + (i+1) + ': ' + s); });
 
+    // ⭐ 處理「即時訂單」但輸入了「航班編號」的情況
     var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
+    if (orderType === 'instant' && flightNo) {
+        var confirmSwitch = confirm(
+            currentLang === 'en'
+                ? 'You have entered a flight number, but you selected "Instant Order".\n\nClick OK to switch to "Booking Order" (use flight arrival time).\nClick Cancel to continue as "Instant Order" (flight number will be ignored).'
+                : '你輸入了航班編號，但目前選擇的是「即時訂單」。\n\n按「確定」會轉為「預約訂單」（使用航班降落時間）。\n按「取消」將繼續「即時訂單」（系統會自動忽略航班編號）。'
+        );
+        if (confirmSwitch) {
+            // 自動切換為預約訂單，並引導客人填寫/選擇時間
+            switchOrderType('booking');
+            
+            // 如果客人未選擇時間，彈出提示
+            var timeInput = document.getElementById('time');
+            if (timeInput && !timeInput.value) {
+                alert(currentLang === 'en' 
+                    ? 'Please select a date and time for your booking.' 
+                    : '請選擇用車日期及時間。');
+            }
+            return; // 停止提交，讓客人繼續填寫
+        } else {
+            // 客人選擇繼續即時訂單，清空航班編號
+            flightNo = '';
+            var flightInput = document.getElementById('flight_no');
+            if (flightInput) flightInput.value = '';
+            updateTimeLabel();
+            var msgEl = document.getElementById('flight-lookup-msg');
+            if (msgEl) msgEl.classList.add('hidden');
+        }
+    }
+
     var remarks = document.getElementById('remarks') ? document.getElementById('remarks').value.trim() : '';
     var date = document.getElementById('date') ? document.getElementById('date').value : '';
     var time = document.getElementById('time') ? document.getElementById('time').value : '';
