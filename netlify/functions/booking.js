@@ -7,7 +7,6 @@ const CORS_HEADERS = {
 };
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-// ⭐ 區分兩個群組的環境變數
 const TELEGRAM_CHAT_ID_INSTANT = process.env.TELEGRAM_CHAT_ID_INSTANT;
 const TELEGRAM_CHAT_ID_BOOKING = process.env.TELEGRAM_CHAT_ID_BOOKING;
 
@@ -170,7 +169,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：移除 tel: 剝離，保留點擊連結
+// ⭐ 修改這裡：保留粗體，但剝走 tel: 連結，讓 Telegram 自動識別
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -182,16 +181,20 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
 
