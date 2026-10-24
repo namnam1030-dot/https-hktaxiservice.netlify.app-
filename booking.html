@@ -765,6 +765,11 @@ function showAppConfirm(msg, onConfirm, onCancel) {
     });
 }
 
+// ⭐ 劫持原生 alert，確保所有原生彈窗都變成自定義彈窗
+window.alert = function(msg) {
+    showAppAlert(msg);
+};
+
 function updateTimeLabel() {
     var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
     var labelEl = document.getElementById('label-time-text');
@@ -1081,7 +1086,6 @@ function checkShowFlightField() {
     var routeData = loadRouteDataFromLocalStorage();
     var flightContainer = document.getElementById('field-flight-container');
     
-    // ⭐ 只要起點係機場就顯示，唔再限制只係預約單
     if (routeData && routeData.pickup && flightContainer) {
         var pickupValue = routeData.pickup.toLowerCase();
         var airportKeywords = ['機場', 'airport', '香港國際機場', 'hkg', 'hong kong international'];
@@ -1119,7 +1123,6 @@ function applyFlightSelection(date, time) {
     if (dateInput) dateInput.value = date;
     if (timeInput) timeInput.value = time;
     
-    // ⭐ 如果當前係即時訂單，自動切換去預約訂單
     if (orderType === 'instant') {
         switchOrderType('booking');
     }
@@ -1155,7 +1158,6 @@ function lookupFlightArrival() {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
     }
 
-    // 唔傳 date，讓後端自動查最近幾日
     fetch('/.netlify/functions/get-flight-arrival', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1733,8 +1735,9 @@ function initEditMode() {
         );
 
         if (!userInput || userInput.trim() === '') {
-            showAppAlert(currentLang === 'en' ? 'Input is required.' : '必須輸入資料。');
-            window.location.href = 'index.html';
+            showAppAlert(currentLang === 'en' ? 'Input is required.' : '必須輸入資料。', function() {
+                window.location.href = 'index.html';
+            });
             return;
         }
 
