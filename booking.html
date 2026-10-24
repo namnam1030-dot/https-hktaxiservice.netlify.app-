@@ -170,6 +170,23 @@
     html.light-theme body #edit-too-late-back-btn:hover { background-color: #D1D5DB !important; }
     #edit-too-late-modal a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; border: none !important; }
     #edit-too-late-modal a[href^="tel:"]:hover { background-color: #2563EB !important; }
+
+    /* 航班選擇彈窗專用樣式 */
+    .flight-option-btn {
+        background-color: #1E1E1E; border: 1px solid #374151; color: #FFFFFF;
+        padding: 12px 16px; border-radius: 12px; margin-bottom: 8px;
+        display: flex; justify-content: space-between; align-items: center;
+        cursor: pointer; transition: all 0.2s ease; width: 100%;
+    }
+    .flight-option-btn:hover {
+        border-color: #FFF200; background-color: rgba(255, 242, 0, 0.1);
+    }
+    html.light-theme body .flight-option-btn {
+        background-color: #F9FAFB !important; border-color: #D1D5DB !important; color: #000000 !important;
+    }
+    html.light-theme body .flight-option-btn:hover {
+        border-color: #000000 !important; background-color: rgba(255, 242, 0, 0.3) !important;
+    }
 </style>
 </head>
 <body class="antialiased">
@@ -425,6 +442,21 @@
     </section>
     </main>
 
+    <!-- 航班選擇彈窗 -->
+    <div id="flight-select-modal" class="hidden fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full relative shadow-2xl">
+            <button type="button" onclick="closeFlightSelectModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-plane-arrival text-brand-yellow mr-2"></i><span data-i18n="flight_select_title">選擇航班降落時間</span></h3>
+            <p class="text-sm text-gray-400 mb-4" data-i18n="flight_select_desc">系統搵到以下航班資料，請點擊選擇：</p>
+            
+            <div id="flight-options-list" class="max-h-[60vh] overflow-y-auto pr-1">
+                <!-- 列表由 JS 生成 -->
+            </div>
+        </div>
+    </div>
+
     <div id="upgrade-modal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
         <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-md w-full text-center relative">
             <div class="text-brand-yellow text-3xl mb-3"><i class="fa-solid fa-gift"></i></div>
@@ -617,11 +649,14 @@ var translations = {
         edit_mode_text: "修改模式：正在修改預約", btn_cancel_edit: "取消修改",
         btn_flight_lookup: "查詢",
         flight_msg_enter_no: "請先輸入航班編號。",
-        flight_msg_enter_date: "請先選擇日期。",
-        flight_msg_found: "已找到抵達時間：{time}，已自動填入用車時間。",
+        flight_msg_found: "已找到 {count} 個航班資料。",
         flight_msg_not_found: "搵唔到航班資料。",
         flight_msg_fail: "航班查詢失敗，請檢查網絡或手動輸入時間。",
-        flight_msg_loading: "查詢中..."
+        flight_select_title: "選擇航班降落時間",
+        flight_select_desc: "系統搵到以下航班資料，請點擊選擇：",
+        flight_status_scheduled: "計劃中",
+        flight_status_arrived: "已抵達",
+        flight_status_delayed: "延誤"
     },
     en: {
         btn_accept_upgrade: "✅ Accept Free Upgrade", btn_decline_upgrade: "❌ No, Thanks",
@@ -649,11 +684,14 @@ var translations = {
         edit_mode_text: "Edit Mode: Editing booking", btn_cancel_edit: "Cancel Edit",
         btn_flight_lookup: "Lookup",
         flight_msg_enter_no: "Please enter a flight number first.",
-        flight_msg_enter_date: "Please select a date first.",
-        flight_msg_found: "Arrival time found: {time}. Applied to service time.",
+        flight_msg_found: "Found {count} flight record(s).",
         flight_msg_not_found: "Flight not found.",
         flight_msg_fail: "Lookup failed. Please check connection or enter time manually.",
-        flight_msg_loading: "Looking up..."
+        flight_select_title: "Select Arrival Time",
+        flight_select_desc: "Found the following flights, please select:",
+        flight_status_scheduled: "Scheduled",
+        flight_status_arrived: "Arrived",
+        flight_status_delayed: "Delayed"
     }
 };
 
@@ -969,7 +1007,7 @@ function checkShowFlightField() {
 }
 
 /* ============================================
-   ⭐ 航班抵達時間查詢（選填功能）
+   ⭐ 航班抵達時間查詢與選擇
    ============================================ */
 function showFlightMsg(text, type) {
     var el = document.getElementById('flight-lookup-msg');
@@ -981,13 +1019,26 @@ function showFlightMsg(text, type) {
     else el.classList.add('text-gray-400');
 }
 
+function closeFlightSelectModal() {
+    var modal = document.getElementById('flight-select-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function applyFlightSelection(date, time) {
+    var dateInput = document.getElementById('date');
+    var timeInput = document.getElementById('time');
+    if (dateInput) dateInput.value = date;
+    if (timeInput) timeInput.value = time;
+    updateTimeLabel();
+    closeFlightSelectModal();
+    showFlightMsg(currentLang === 'en' ? 'Flight time applied: ' + date + ' ' + time : '已套用航班時間：' + date + ' ' + time, 'ok');
+}
+
 function lookupFlightArrival() {
     var flightInput = document.getElementById('flight_no');
-    var dateInput = document.getElementById('date');
     var btn = document.getElementById('flight-lookup-btn');
 
     var flightNo = flightInput ? flightInput.value.trim().toUpperCase() : '';
-    var date = dateInput ? dateInput.value : '';
 
     var msgEl = document.getElementById('flight-lookup-msg');
     if (msgEl) {
@@ -999,24 +1050,17 @@ function lookupFlightArrival() {
         showFlightMsg(translations[currentLang].flight_msg_enter_no, 'warn');
         return;
     }
-    if (!date) {
-        showFlightMsg(translations[currentLang].flight_msg_enter_date, 'warn');
-        return;
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        showFlightMsg(currentLang === 'en' ? 'Invalid date format. Please select a valid date.' : '日期格式不正確，請重新選擇日期。', 'warn');
-        return;
-    }
 
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
     }
 
+    // 唔傳 date，讓後端自動查最近幾日
     fetch('/.netlify/functions/get-flight-arrival', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ flightNo: flightNo, date: date })
+        body: JSON.stringify({ flightNo: flightNo }) 
     })
     .then(function(r) {
         return r.text().then(function(text) {
@@ -1024,12 +1068,32 @@ function lookupFlightArrival() {
         });
     })
     .then(function(data) {
-        if (data.success && data.arrivalTimeHHMM) {
-            var timeInput = document.getElementById('time');
-            if (timeInput) timeInput.value = data.arrivalTimeHHMM;
-            var msg = translations[currentLang].flight_msg_found.replace('{time}', data.arrivalTimeHHMM);
-            showFlightMsg(msg, 'ok');
-            updateTimeLabel();
+        if (data.success && data.flights && data.flights.length > 0) {
+            var listEl = document.getElementById('flight-options-list');
+            if (!listEl) return;
+            
+            listEl.innerHTML = '';
+            data.flights.forEach(function(f) {
+                var btnItem = document.createElement('button');
+                btnItem.type = 'button';
+                btnItem.className = 'flight-option-btn';
+                btnItem.onclick = function() { applyFlightSelection(f.date, f.timeHHMM); };
+                
+                var statusText = f.status;
+                if (statusText === 'Scheduled') statusText = translations[currentLang].flight_status_scheduled;
+                else if (statusText === 'Arrived') statusText = translations[currentLang].flight_status_arrived;
+                else if (statusText === 'Delayed') statusText = translations[currentLang].flight_status_delayed;
+
+                btnItem.innerHTML = '<div class="flex flex-col text-left">' +
+                    '<span class="font-bold text-lg">' + f.date + '</span>' +
+                    '<span class="text-sm text-gray-400 mt-0.5">' + statusText + '</span>' +
+                    '</div>' +
+                    '<div class="text-xl font-extrabold text-brand-yellow">' + f.timeHHMM + '</div>';
+                listEl.appendChild(btnItem);
+            });
+            
+            document.getElementById('flight-select-modal').classList.remove('hidden');
+            showFlightMsg(translations[currentLang].flight_msg_found.replace('{count}', data.flights.length), 'ok');
         } else {
             var errMsg = data.error || translations[currentLang].flight_msg_not_found;
             showFlightMsg(errMsg, 'warn');
