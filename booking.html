@@ -279,7 +279,7 @@
                 <div id="field-flight-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-0.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
                     <div class="flex items-center gap-2">
-                        <input type="text" id="flight_no" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-lg py-1 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
+                        <input type="text" id="flight_no" oninput="updateTimeLabel()" data-i18n-placeholder="ph_flight" placeholder="例：CX250 (司機會自動監察航班時間)" class="w-full bg-brand-dark border border-gray-800 rounded-lg py-1 px-3 text-white text-sm focus:outline-none focus:border-brand-yellow transition">
                         <button type="button" id="flight-lookup-btn" onclick="lookupFlightArrival()" class="shrink-0 bg-brand-yellow/10 border border-brand-yellow/40 hover:bg-brand-yellow hover:text-black text-brand-yellow px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <span data-i18n="btn_flight_lookup">查詢</span>
@@ -298,7 +298,7 @@
                         </div>
                         <div class="bg-brand-dark border border-gray-800 rounded-lg py-1 px-2 transition hover:border-brand-yellow/50">
                             <label class="block text-xs font-bold text-gray-400 mb-0 flex items-center">
-                                <i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time">用車時間</span>
+                                <i class="fa-regular fa-clock text-brand-yellow mr-1.5"></i><span data-i18n="label_time" id="label-time-text">用車時間</span>
                             </label>
                             <input type="time" id="time" class="w-full bg-transparent text-white text-sm font-medium focus:outline-none cursor-pointer [color-scheme:dark]">
                         </div>
@@ -601,7 +601,8 @@ var translations = {
         summary_route_label: "路線摘要", summary_car_label: "目前選定車型", estimated_fare_label: "預計車費",
         fee_mode_label: "收費模式", pickup_label: "起點：", stopover_label: "中途站：", dropoff_label: "目的地：",
         instant_order: "即時訂單", instant_note: "15分鐘內用車", booking_order: "預約訂單", booking_note: "接受最多3日內",
-        label_flight: "航班編號 (選填，如適用)", ph_flight: "例：CX250", label_date: "用車日期", label_time: "用車時間",
+        label_flight: "航班編號 (選填，如適用)", ph_flight: "例：CX250", label_date: "用車日期", 
+        label_time: "用車時間", label_arrival_time: "航班降落時間",
         label_passengers: "乘客人數（選填）", label_luggages: "行李件數（選填）", label_has_pet: "有寵物", label_has_wheelchair: "輪椅放尾箱",
         label_remarks: "備注（選填，最多30字）", ph_remarks: "例：無煙車箱 / 2大2小行李",
         label_contact_title: "稱謂（選填）", title_mr: "先生", title_ms: "小姐", label_contact_surname: "聯絡人（選填）",
@@ -631,7 +632,8 @@ var translations = {
         summary_route_label: "Route Summary", summary_car_label: "Selected Vehicle", estimated_fare_label: "Estimated Fare",
         fee_mode_label: "Pricing Mode", pickup_label: "Pickup: ", stopover_label: "Stopover: ", dropoff_label: "Destination: ",
         instant_order: "Instant Order", instant_note: "Within 15 mins", booking_order: "Booking Order", booking_note: "Up to 3 days",
-        label_flight: "Flight Number (Optional)", ph_flight: "e.g., CX250", label_date: "Service Date", label_time: "Service Time",
+        label_flight: "Flight Number (Optional)", ph_flight: "e.g., CX250", label_date: "Service Date", 
+        label_time: "Service Time", label_arrival_time: "Arrival Time",
         label_passengers: "Passengers (Optional)", label_luggages: "Luggages (Optional)", label_has_pet: "Pets?", label_has_wheelchair: "Wheelchair?",
         label_remarks: "Remarks (Optional, Max 30 chars)", ph_remarks: "e.g., Non-smoking / 2 large 2 small luggages",
         label_contact_title: "Title (Optional)", title_mr: "Mr.", title_ms: "Ms.", label_contact_surname: "Contact (Optional)",
@@ -654,6 +656,23 @@ var translations = {
         flight_msg_loading: "Looking up..."
     }
 };
+
+function updateTimeLabel() {
+    var flightNo = document.getElementById('flight_no') ? document.getElementById('flight_no').value.trim() : '';
+    var labelEl = document.getElementById('label-time-text');
+    if (!labelEl) return;
+
+    if (flightNo) {
+        labelEl.setAttribute('data-i18n', 'label_arrival_time');
+    } else {
+        labelEl.setAttribute('data-i18n', 'label_time');
+    }
+    
+    var key = labelEl.getAttribute('data-i18n');
+    if (translations[currentLang] && translations[currentLang][key]) {
+        labelEl.textContent = translations[currentLang][key];
+    }
+}
 
 function getRecentSubmission() {
     try {
@@ -724,6 +743,8 @@ function restoreFormSnapshot() {
         if (s.contactSurname) { var elCs = document.getElementById('contact_surname'); if (elCs) elCs.value = s.contactSurname; }
         if (s.phone) { var elPh = document.getElementById('phone'); if (elPh) elPh.value = s.phone; }
         var wxEl = document.getElementById('is_wechat_customer'); if (wxEl) wxEl.checked = !!s.isWechatCustomer;
+        
+        updateTimeLabel();
     } catch(e) { console.error('[Snapshot] 預填失敗：', e); }
 }
 
@@ -844,6 +865,7 @@ function restoreAllFormData() {
         if (formData.phone) { var el = document.getElementById('phone'); if (el) el.value = formData.phone; }
         var wxEl = document.getElementById('is_wechat_customer'); if (wxEl) wxEl.checked = !!formData.isWechatCustomer;
 
+        updateTimeLabel();
         return true;
     } catch(e) { console.error('[restoreAllFormData] 失敗：', e); return false; }
 }
@@ -931,6 +953,7 @@ function applyLanguage() {
         if (translations[currentLang] && translations[currentLang][key]) el.placeholder = translations[currentLang][key];
     });
     updateCarDisplay();
+    updateTimeLabel();
 }
 
 function checkShowFlightField() {
@@ -1006,6 +1029,7 @@ function lookupFlightArrival() {
             if (timeInput) timeInput.value = data.arrivalTimeHHMM;
             var msg = translations[currentLang].flight_msg_found.replace('{time}', data.arrivalTimeHHMM);
             showFlightMsg(msg, 'ok');
+            updateTimeLabel();
         } else {
             var errMsg = data.error || translations[currentLang].flight_msg_not_found;
             showFlightMsg(errMsg, 'warn');
@@ -1088,12 +1112,16 @@ function submitBookingAfterUpgrade() {
                     && !data.hasPet
                     && !data.hasWheelchair);
 
+    // ⭐ 動態時間標籤：如果有航班編號，顯示「降落時間」，否則顯示「時間」
+    var timeLabel = data.flightNo ? (isEn ? 'Arrival Time' : '降落時間') : (isEn ? 'Time' : '時間');
+    var timeLabelDiscord = data.flightNo ? (isEn ? 'Arrival' : '降落時間') : (isEn ? 'Time' : '時間');
+
     if (isEn) {
         msgLines.push('📍 Pickup: ' + data.pickup);
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s.replace(/中途站\d+:\s*/, '')); });
         msgLines.push('🏁 Dropoff: ' + data.dropoff + tunnelText);
         if (data.flightNo) msgLines.push('✈️ Flight: ' + data.flightNo);
-        if (orderType === 'booking') { msgLines.push('📅 Date: ' + data.date); msgLines.push('⏰ Time: ' + data.timeStringFormatted); }
+        if (orderType === 'booking') { msgLines.push('📅 Date: ' + data.date); msgLines.push('⏰ ' + timeLabel + ': ' + data.timeStringFormatted); }
         if (!hidePaxLine) msgLines.push('👥 Passengers: ' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 Luggages: ' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 Pet: ✅');
@@ -1107,7 +1135,7 @@ function submitBookingAfterUpgrade() {
         data.stopoverTexts.forEach(function(s) { msgLines.push('🛑 ' + s); });
         msgLines.push('🏁 終點：' + data.dropoff + tunnelText);
         if (data.flightNo) msgLines.push('✈️ 航班編號：' + data.flightNo);
-        if (orderType === 'booking') { msgLines.push('📅 日期：' + data.date); msgLines.push('⏰ 時間：' + data.timeStringFormatted); }
+        if (orderType === 'booking') { msgLines.push('📅 日期：' + data.date); msgLines.push('⏰ ' + timeLabel + '：' + data.timeStringFormatted); }
         if (!hidePaxLine) msgLines.push('👥 人數：' + data.passengers);
         if (data.luggages && data.luggages !== '0 件') msgLines.push('🧳 行李件數：' + data.luggages);
         if (data.hasPet) msgLines.push('🐶 寵物：✅');
@@ -1150,7 +1178,8 @@ function submitBookingAfterUpgrade() {
     if (orderType === 'booking') {
         var dateObj = new Date(data.date);
         var weekdays = currentLang === 'zh' ? ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        discordMsgLines.push('📅 ' + data.date + '（' + weekdays[dateObj.getDay()] + '）⏰ ' + data.timeStringFormatted);
+        // ⭐ Discord 訊息都用動態時間標籤
+        discordMsgLines.push('📅 ' + data.date + '（' + weekdays[dateObj.getDay()] + '）⏰ ' + timeLabelDiscord + ' ' + data.timeStringFormatted);
     }
 
     if (!hidePaxLine) {
@@ -1656,6 +1685,7 @@ function applyLookupResultIfAny() {
         localStorage.removeItem('taxiEditPrefillData');
         saveFormSnapshot(o.carDisplayText || '');
         sessionStorage.removeItem('taxiLookupResult');
+        updateTimeLabel();
         return true;
     } catch(e) { console.error('[Lookup] 預填失敗：', e); return false; }
 }
@@ -1729,6 +1759,8 @@ window.addEventListener('DOMContentLoaded', function() {
     if (restoreAllFormData()) {
         console.log('[DOMContentLoaded] 已恢復所有表單資料');
     }
+
+    updateTimeLabel();
 
     if (dateInput) {
         dateInput.addEventListener('change', function() {
