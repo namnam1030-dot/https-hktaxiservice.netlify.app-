@@ -104,7 +104,6 @@ function ensureDateTime(data) {
   return data;
 }
 
-// ⭐ 確保這一行存在！
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: CORS_HEADERS, body: '' };
@@ -171,6 +170,7 @@ exports.handler = async (event) => {
   }
 };
 
+// ⭐ 修改這裡：移除 tel: 剝離，保留點擊連結
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -182,20 +182,16 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>';
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>';
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
 
