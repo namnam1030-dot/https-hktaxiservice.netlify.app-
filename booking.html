@@ -1104,44 +1104,88 @@ function applyLanguage() {
     updateTimeLabel();
 }
 
+/* ============================================
+   ⭐ 機場起點判斷：多邊形座標優先，關鍵詞後備
+   ============================================ */
+
+// 香港國際機場（赤鱲角）簡化多邊形，覆蓋機場島，排除青衣、東涌、機場快線各站
+// 座標格式：[緯度, 經度]
+var AIRPORT_POLYGON = [
+    [22.307, 113.906],  // 西南
+    [22.307, 113.943],  // 東南
+    [22.321, 113.943],  // 東北
+    [22.321, 113.906]   // 西北
+];
+
+// Ray-casting 算法：判斷點是否在多邊形內
+function isPointInPolygon(lat, lng, polygon) {
+    var inside = false;
+    for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        var lati = polygon[i][0], lngi = polygon[i][1];
+        var latj = polygon[j][0], lngj = polygon[j][1];
+        if (((lngi > lng) !== (lngj > lng)) &&
+            (lat < (latj - lati) * (lng - lngi) / (lngj - lngi) + lati)) {
+            inside = !inside;
+        }
+    }
+    return inside;
+}
+
 function checkShowFlightField() {
     var routeData = loadRouteDataFromLocalStorage();
     var flightContainer = document.getElementById('field-flight-container');
-    
-    if (routeData && routeData.pickup && flightContainer) {
-        var pickupValue = routeData.pickup.toLowerCase();
-        
-        // ⭐ 1. 排除清單：避免將「機場快綫」車站誤判為客運大樓
-        var excludeKeywords = [
-            '機場快綫', '机场快线', 'airport express', 
-            '香港站', 'hong kong station', 
-            '九龍站', '九龙站', 'kowloon station', 
-            '青衣站', 'tsing yi station', 
-            '博覽館站', '博览馆站', 'asiaworld-expo',
-            '亞洲國際博覽館', '亚洲国际博览馆'
-        ];
-        var isExcluded = excludeKeywords.some(function(kw) { return pickupValue.indexOf(kw) >= 0; });
-        
-        if (isExcluded) {
-            flightContainer.classList.add('hidden');
-            return; // 如果係機場快綫車站，直接隱藏，唔使再查
-        }
+    if (!flightContainer) return;
 
-        // ⭐ 2. 包含清單：精準匹配真正嘅機場客運大樓
-        var airportKeywords = [
-            '香港國際機場', '香港国际机场', '赤鱲角', '赤腊角', 
-            '客運大樓', '客运大楼', 'terminal', 't1', 't2',
-            'hkg', 'hong kong international', 'airport',
-            '機場', '机场'
-        ];
-        
-        var isAirport = airportKeywords.some(function(kw) { return pickupValue.indexOf(kw) >= 0; });
-        
-        if (isAirport) flightContainer.classList.remove('hidden');
-        else flightContainer.classList.add('hidden');
-    } else {
-        if (flightContainer) flightContainer.classList.add('hidden');
+    if (!routeData || !routeData.pickup) {
+        flightContainer.classList.add('hidden');
+        return;
     }
+
+    // ⭐ 方案 A：如果有座標，用多邊形精確判斷（最可靠）
+    var pickupLat = parseFloat(routeData.pickupLat);
+    var pickupLng = parseFloat(routeData.pickupLng);
+    if (!isNaN(pickupLat) && !isNaN(pickupLng)) {
+        if (isPointInPolygon(pickupLat, pickupLng, AIRPORT_POLYGON)) {
+            flightContainer.classList.remove('hidden');
+        } else {
+            flightContainer.classList.add('hidden');
+        }
+        return;
+    }
+
+    // ⭐ 方案 B：冇座標時，用增強版關鍵詞（後備）
+    var pickupValue = routeData.pickup.toLowerCase();
+
+    // 1. 排除清單（先排除，避免「機場快線」被「機場」誤匹配）
+    var excludeKeywords = [
+        '機場快線', '機場快綫', '机场快线', 'airport express',
+        '香港站', 'hong kong station',
+        '九龍站', '九龙站', 'kowloon station',
+        '青衣', 'tsing yi', '青敬路',
+        '博覽館', '博览馆', 'asiaworld-expo',
+        '亞洲國際博覽館', '亚洲国际博览馆'
+    ];
+    var isExcluded = excludeKeywords.some(function(kw) {
+        return pickupValue.indexOf(kw.toLowerCase()) >= 0;
+    });
+    if (isExcluded) {
+        flightContainer.classList.add('hidden');
+        return;
+    }
+
+    // 2. 包含清單（精準匹配真正嘅機場客運大樓）
+    var airportKeywords = [
+        '香港國際機場', '香港国际机场', 'hong kong international airport',
+        '赤鱲角', '赤腊角', 'chek lap kok',
+        '客運大樓', '客运大楼', 'terminal',
+        't1', 't2', 'hkg',
+        '機場', '机场', 'airport'
+    ];
+    var isAirport = airportKeywords.some(function(kw) {
+        return pickupValue.indexOf(kw.toLowerCase()) >= 0;
+    });
+    if (isAirport) flightContainer.classList.remove('hidden');
+    else flightContainer.classList.add('hidden');
 }
 
 /* ============================================

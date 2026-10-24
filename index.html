@@ -728,11 +728,16 @@ function saveRouteDataToLocalStorage() {
     var pickupEl = document.getElementById('calc-pickup');
     var dropoffEl = document.getElementById('calc-dropoff');
 
+    // ⭐ 新增 pickupLat / pickupLng / dropoffLat / dropoffLng
     var data = {
         pickup: pickupEl ? pickupEl.value.trim() : '',
         pickupPlaceId: pickupEl ? (pickupEl.dataset.placeId || '') : '',
+        pickupLat: pickupEl && pickupEl.dataset.lat ? parseFloat(pickupEl.dataset.lat) : null,
+        pickupLng: pickupEl && pickupEl.dataset.lng ? parseFloat(pickupEl.dataset.lng) : null,
         dropoff: dropoffEl ? dropoffEl.value.trim() : '',
         dropoffPlaceId: dropoffEl ? (dropoffEl.dataset.placeId || '') : '',
+        dropoffLat: dropoffEl && dropoffEl.dataset.lat ? parseFloat(dropoffEl.dataset.lat) : null,
+        dropoffLng: dropoffEl && dropoffEl.dataset.lng ? parseFloat(dropoffEl.dataset.lng) : null,
         stopovers: [],
         stopoverPlaceIds: []
     };
@@ -760,6 +765,11 @@ function loadRouteDataFromLocalStorage() {
         if (pickupEl && data.pickup) {
             pickupEl.value = data.pickup;
             if (data.pickupPlaceId) pickupEl.dataset.placeId = data.pickupPlaceId;
+            // ⭐ 還原經緯度
+            if (data.pickupLat != null && data.pickupLng != null) {
+                pickupEl.dataset.lat = data.pickupLat;
+                pickupEl.dataset.lng = data.pickupLng;
+            }
             toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         }
 
@@ -767,6 +777,11 @@ function loadRouteDataFromLocalStorage() {
         if (dropoffEl && data.dropoff) {
             dropoffEl.value = data.dropoff;
             if (data.dropoffPlaceId) dropoffEl.dataset.placeId = data.dropoffPlaceId;
+            // ⭐ 還原經緯度
+            if (data.dropoffLat != null && data.dropoffLng != null) {
+                dropoffEl.dataset.lat = data.dropoffLat;
+                dropoffEl.dataset.lng = data.dropoffLng;
+            }
             toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
         }
 
@@ -800,6 +815,9 @@ function clearAllInputs() {
         if (el) {
             el.value = '';
             delete el.dataset.placeId;
+            // ⭐ 同步清除經緯度
+            delete el.dataset.lat;
+            delete el.dataset.lng;
         }
     });
 
@@ -844,12 +862,17 @@ function calculateAndGoToResult() {
         if (v) fields.push({ el: el, val: v });
     }
 
+    // ⭐ 只對「冇 placeId」嘅欄位做 geocode；pickup/dropoff 同時補上經緯度
     var tasks = [];
     fields.forEach(function(f) {
         if (!f.el.dataset.placeId) {
             tasks.push(
-                geocodeSilently(f.val).then(function(pid) {
-                    if (pid) f.el.dataset.placeId = pid;
+                geocodeSilently(f.val).then(function(result) {
+                    if (result) {
+                        if (result.placeId) f.el.dataset.placeId = result.placeId;
+                        if (result.lat != null) f.el.dataset.lat = result.lat;
+                        if (result.lng != null) f.el.dataset.lng = result.lng;
+                    }
                 })
             );
         }
@@ -874,14 +897,15 @@ function calculateAndGoToResult() {
     });
 }
 
+// ⭐ 改為返回 { placeId, lat, lng }，方便一次過取得座標
 function geocodeSilently(text) {
     return new Promise(function(resolve) {
-        if (!text || !window.google || !google.maps.Geocoder) return resolve('');
+        if (!text || !window.google || !google.maps.Geocoder) return resolve(null);
 
         var settled = false;
         var done = function(v) { if (!settled) { settled = true; resolve(v); } };
 
-        var timeout = setTimeout(function() { done(''); }, 4000);
+        var timeout = setTimeout(function() { done(null); }, 4000);
 
         try {
             var geocoder = new google.maps.Geocoder();
@@ -894,16 +918,20 @@ function geocodeSilently(text) {
                 },
                 function(results, status) {
                     clearTimeout(timeout);
-                    if (status === 'OK' && results && results[0] && results[0].place_id) {
-                        done(results[0].place_id);
+                    if (status === 'OK' && results && results[0]) {
+                        var r = results[0];
+                        var pid = r.place_id || '';
+                        var lat = (r.geometry && r.geometry.location) ? r.geometry.location.lat() : null;
+                        var lng = (r.geometry && r.geometry.location) ? r.geometry.location.lng() : null;
+                        done({ placeId: pid, lat: lat, lng: lng });
                     } else {
-                        done('');
+                        done(null);
                     }
                 }
             );
         } catch (e) {
             clearTimeout(timeout);
-            done('');
+            done(null);
         }
     });
 }
@@ -1078,6 +1106,8 @@ function startVoiceRecognition() {
             if (el) {
                 el.value = pickup;
                 delete el.dataset.placeId;
+                delete el.dataset.lat;
+                delete el.dataset.lng;
                 toggleClearBtn('calc-pickup', 'clear-pickup-btn');
             }
         }
@@ -1097,6 +1127,8 @@ function startVoiceRecognition() {
             if (el3) {
                 el3.value = dropoff;
                 delete el3.dataset.placeId;
+                delete el3.dataset.lat;
+                delete el3.dataset.lng;
                 toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
             }
         }
@@ -1441,6 +1473,14 @@ function _attachAutocompletes() {
             var place = ac.getPlace();
             suppressInput = true;
             if (place && place.place_id) el.dataset.placeId = place.place_id;
+            // ⭐ 儲存經緯度（如果 Google 有返回 geometry）
+            if (place && place.geometry && place.geometry.location) {
+                el.dataset.lat = place.geometry.location.lat();
+                el.dataset.lng = place.geometry.location.lng();
+            } else {
+                delete el.dataset.lat;
+                delete el.dataset.lng;
+            }
             toggleClearBtn(inputId, btnId);
             setTimeout(function() { suppressInput = false; }, 400);
         });
@@ -1448,6 +1488,9 @@ function _attachAutocompletes() {
         el.addEventListener('input', function() {
             if (suppressInput) return;
             delete el.dataset.placeId;
+            // ⭐ 手動改字時同步清除經緯度
+            delete el.dataset.lat;
+            delete el.dataset.lng;
         });
 
         el.addEventListener('focus', function() {
@@ -1538,6 +1581,9 @@ function clearInput(inputId, btnId) {
     if (input) {
         input.value = '';
         delete input.dataset.placeId;
+        // ⭐ 同步清除經緯度
+        delete input.dataset.lat;
+        delete input.dataset.lng;
         toggleClearBtn(inputId, btnId);
         input.focus();
     }
@@ -1549,6 +1595,9 @@ function swapLocations() {
     if (pickupEl && dropoffEl) {
         var tempVal = pickupEl.value;
         var tempId = pickupEl.dataset.placeId || '';
+        // ⭐ 同步交換經緯度
+        var tempLat = pickupEl.dataset.lat || '';
+        var tempLng = pickupEl.dataset.lng || '';
 
         pickupEl.value = dropoffEl.value;
         dropoffEl.value = tempVal;
@@ -1558,6 +1607,19 @@ function swapLocations() {
 
         if (tempId) dropoffEl.dataset.placeId = tempId;
         else delete dropoffEl.dataset.placeId;
+
+        // ⭐ 交換 pickup 與 dropoff 嘅經緯度
+        if (dropoffEl.dataset.lat) pickupEl.dataset.lat = dropoffEl.dataset.lat;
+        else delete pickupEl.dataset.lat;
+
+        if (dropoffEl.dataset.lng) pickupEl.dataset.lng = dropoffEl.dataset.lng;
+        else delete pickupEl.dataset.lng;
+
+        if (tempLat) dropoffEl.dataset.lat = tempLat;
+        else delete dropoffEl.dataset.lat;
+
+        if (tempLng) dropoffEl.dataset.lng = tempLng;
+        else delete dropoffEl.dataset.lng;
 
         toggleClearBtn('calc-pickup', 'clear-pickup-btn');
         toggleClearBtn('calc-dropoff', 'clear-dropoff-btn');
