@@ -619,7 +619,7 @@ var translations = {
         flight_msg_enter_date: "請先選擇日期。",
         flight_msg_found: "已找到抵達時間：{time}，已自動填入用車時間。",
         flight_msg_not_found: "搵唔到航班資料。",
-        flight_msg_fail: "查詢失敗，請手動輸入時間。",
+        flight_msg_fail: "航班查詢失敗，請檢查網絡或手動輸入時間。",
         flight_msg_loading: "查詢中..."
     },
     en: {
@@ -650,7 +650,7 @@ var translations = {
         flight_msg_enter_date: "Please select a date first.",
         flight_msg_found: "Arrival time found: {time}. Applied to service time.",
         flight_msg_not_found: "Flight not found.",
-        flight_msg_fail: "Lookup failed. Please enter time manually.",
+        flight_msg_fail: "Lookup failed. Please check connection or enter time manually.",
         flight_msg_loading: "Looking up..."
     }
 };
@@ -972,19 +972,14 @@ function lookupFlightArrival() {
         msgEl.textContent = '';
     }
 
-    // 1. 驗證航班編號
     if (!flightNo) {
         showFlightMsg(translations[currentLang].flight_msg_enter_no, 'warn');
         return;
     }
-    
-    // 2. 驗證有冇填日期
     if (!date) {
         showFlightMsg(translations[currentLang].flight_msg_enter_date, 'warn');
         return;
     }
-    
-    // 3. 驗證日期格式是否正確 (YYYY-MM-DD)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         showFlightMsg(currentLang === 'en' ? 'Invalid date format. Please select a valid date.' : '日期格式不正確，請重新選擇日期。', 'warn');
         return;
@@ -1001,13 +996,8 @@ function lookupFlightArrival() {
         body: JSON.stringify({ flightNo: flightNo, date: date })
     })
     .then(function(r) {
-        // 4. 安全防護：用 text() 接收，再用 try-catch 轉 JSON，防止 Unexpected end of JSON input
         return r.text().then(function(text) {
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                throw new Error('INVALID_RESPONSE');
-            }
+            try { return JSON.parse(text); } catch (e) { throw new Error('INVALID_RESPONSE'); }
         });
     })
     .then(function(data) {
@@ -1023,13 +1013,7 @@ function lookupFlightArrival() {
     })
     .catch(function(err) {
         console.error('[FlightLookup] 錯誤：', err);
-        // 5. 只要有任何網絡/解析錯誤，一律顯示友善提示
-        showFlightMsg(
-            currentLang === 'en' 
-            ? 'Lookup failed. Please check connection or enter time manually.' 
-            : '航班查詢失敗，請檢查網絡或手動輸入時間。', 
-            'warn'
-        );
+        showFlightMsg(translations[currentLang].flight_msg_fail, 'warn');
     })
     .finally(function() {
         if (btn) {
@@ -1240,7 +1224,11 @@ function submitBookingAfterUpgrade() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookingData)
     })
-    .then(function(response) { return response.json(); })
+    .then(function(response) {
+        return response.text().then(function(text) {
+            try { return JSON.parse(text); } catch (e) { throw new Error('INVALID_RESPONSE'); }
+        });
+    })
     .then(function(data) {
         if (data.success) {
             saveFormSnapshot(carDisplayText);
@@ -1507,7 +1495,11 @@ function initEditMode() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(reqBody)
         })
-        .then(function(response) { return response.json(); })
+        .then(function(response) {
+            return response.text().then(function(text) {
+                try { return JSON.parse(text); } catch (e) { throw new Error('INVALID_RESPONSE'); }
+            });
+        })
         .then(function(data) {
             if (data.success && data.orderData) {
                 var orderData = data.orderData;
