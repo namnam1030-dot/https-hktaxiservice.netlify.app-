@@ -307,7 +307,6 @@
                 </button>
             </div>
 
-            <!-- ⭐ 加入 novalidate 禁止瀏覽器原生驗證 -->
             <form id="booking-form" onsubmit="submitBooking(event)" novalidate class="space-y-3 text-sm">
 
                 <div id="field-flight-container" class="hidden">
@@ -725,11 +724,10 @@ var translations = {
     }
 };
 
-// ⭐ 自定義彈窗邏輯 (終極防錯版)
+// ⭐ 自定義彈窗邏輯
 function showAppAlert(msg, callback) {
     var modal = document.getElementById('custom-alert-modal');
     if (!modal) {
-        // 若然 HTML 沒有加載成功，強制用原生 alert 作後備
         window.alert(msg);
         if (callback) callback();
         return;
@@ -1112,7 +1110,31 @@ function checkShowFlightField() {
     
     if (routeData && routeData.pickup && flightContainer) {
         var pickupValue = routeData.pickup.toLowerCase();
-        var airportKeywords = ['機場', 'airport', '香港國際機場', 'hkg', 'hong kong international'];
+        
+        // ⭐ 1. 排除清單：避免將「機場快綫」車站誤判為客運大樓
+        var excludeKeywords = [
+            '機場快綫', '机场快线', 'airport express', 
+            '香港站', 'hong kong station', 
+            '九龍站', '九龙站', 'kowloon station', 
+            '青衣站', 'tsing yi station', 
+            '博覽館站', '博览馆站', 'asiaworld-expo',
+            '亞洲國際博覽館', '亚洲国际博览馆'
+        ];
+        var isExcluded = excludeKeywords.some(function(kw) { return pickupValue.indexOf(kw) >= 0; });
+        
+        if (isExcluded) {
+            flightContainer.classList.add('hidden');
+            return; // 如果係機場快綫車站，直接隱藏，唔使再查
+        }
+
+        // ⭐ 2. 包含清單：精準匹配真正嘅機場客運大樓
+        var airportKeywords = [
+            '香港國際機場', '香港国际机场', '赤鱲角', '赤腊角', 
+            '客運大樓', '客运大楼', 'terminal', 't1', 't2',
+            'hkg', 'hong kong international', 'airport',
+            '機場', '机场'
+        ];
+        
         var isAirport = airportKeywords.some(function(kw) { return pickupValue.indexOf(kw) >= 0; });
         
         if (isAirport) flightContainer.classList.remove('hidden');
