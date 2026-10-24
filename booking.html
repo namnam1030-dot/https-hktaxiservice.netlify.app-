@@ -189,10 +189,20 @@
     }
 
     /* ⭐ 自定義彈窗樣式 */
-    html.light-theme body #custom-alert-modal > div { background-color: #FFFFFF !important; border-color: #000000 !important; }
+    #custom-alert-modal {
+        position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.8);
+        display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    #custom-alert-modal.show { display: flex !important; }
+    #custom-alert-box {
+        background: #161616; border: 2px solid #FFF200; border-radius: 1rem;
+        padding: 1.5rem; max-width: 24rem; width: 100%; text-align: center;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+    }
+    html.light-theme body #custom-alert-box { background: #FFFFFF !important; border-color: #000000 !important; }
     html.light-theme body #custom-alert-title { color: #000000 !important; }
     html.light-theme body #custom-alert-msg { color: #374151 !important; }
-    html.light-theme body #custom-alert-cancel { background-color: #E5E7EB !important; color: #000000 !important; }
+    html.light-theme body #custom-alert-cancel { background: #E5E7EB !important; color: #000000 !important; }
 </style>
 </head>
 <body class="antialiased">
@@ -297,7 +307,8 @@
                 </button>
             </div>
 
-            <form id="booking-form" onsubmit="submitBooking(event)" class="space-y-3 text-sm">
+            <!-- ⭐ 加入 novalidate 禁止瀏覽器原生驗證 -->
+            <form id="booking-form" onsubmit="submitBooking(event)" novalidate class="space-y-3 text-sm">
 
                 <div id="field-flight-container" class="hidden">
                     <label class="block text-xs font-bold text-gray-300 mb-0.5"><i class="fa-solid fa-plane text-brand-yellow mr-1.5"></i><span data-i18n="label_flight">航班編號 (選填，如適用)</span></label>
@@ -449,8 +460,8 @@
     </main>
 
     <!-- ⭐ 自定義提示彈窗 -->
-    <div id="custom-alert-modal" class="hidden fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border-2 border-brand-yellow rounded-2xl p-6 max-w-sm w-full text-center relative shadow-2xl">
+    <div id="custom-alert-modal">
+        <div id="custom-alert-box">
             <div id="custom-alert-icon" class="text-brand-yellow text-4xl mb-3"><i class="fa-solid fa-circle-exclamation"></i></div>
             <h3 id="custom-alert-title" class="text-xl font-extrabold text-white mb-2">提示</h3>
             <p id="custom-alert-msg" class="text-sm text-gray-300 mb-6 leading-relaxed"></p>
@@ -714,29 +725,42 @@ var translations = {
     }
 };
 
-// ⭐ 自定義彈窗邏輯
+// ⭐ 自定義彈窗邏輯 (終極防錯版)
 function showAppAlert(msg, callback) {
     var modal = document.getElementById('custom-alert-modal');
+    if (!modal) {
+        // 若然 HTML 沒有加載成功，強制用原生 alert 作後備
+        window.alert(msg);
+        if (callback) callback();
+        return;
+    }
+    
     document.getElementById('custom-alert-msg').innerText = msg;
     document.getElementById('custom-alert-title').innerText = currentLang === 'en' ? 'Notice' : '提示';
     document.getElementById('custom-alert-cancel').classList.add('hidden');
     
     var okBtn = document.getElementById('custom-alert-ok');
     okBtn.classList.remove('w-1/2');
-    okBtn.classList.add('w-full');
+    okBtn.classList.add('w-full', 'ml-auto');
     
-    modal.classList.remove('hidden');
+    modal.classList.add('show');
     
     var newOkBtn = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOkBtn, okBtn);
     newOkBtn.addEventListener('click', function() {
-        modal.classList.add('hidden');
+        modal.classList.remove('show');
         if (callback) callback();
     });
 }
 
 function showAppConfirm(msg, onConfirm, onCancel) {
     var modal = document.getElementById('custom-alert-modal');
+    if (!modal) {
+        if (window.confirm(msg)) { if (onConfirm) onConfirm(); }
+        else { if (onCancel) onCancel(); }
+        return;
+    }
+    
     document.getElementById('custom-alert-msg').innerText = msg;
     document.getElementById('custom-alert-title').innerText = currentLang === 'en' ? 'Confirm' : '請確認';
     
@@ -748,19 +772,19 @@ function showAppConfirm(msg, onConfirm, onCancel) {
     okBtn.classList.add('w-1/2');
     okBtn.classList.remove('w-full');
     
-    modal.classList.remove('hidden');
+    modal.classList.add('show');
     
     var newOkBtn = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOkBtn, okBtn);
     newOkBtn.addEventListener('click', function() {
-        modal.classList.add('hidden');
+        modal.classList.remove('show');
         if (onConfirm) onConfirm();
     });
 
     var newCancelBtn = cancelBtn.cloneNode(true);
     cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
     newCancelBtn.addEventListener('click', function() {
-        modal.classList.add('hidden');
+        modal.classList.remove('show');
         if (onCancel) onCancel();
     });
 }
@@ -1559,7 +1583,8 @@ function submitBooking(event) {
         }
         
         // 兼容性更好的時間解析：YYYY-MM-DDTHH:MM:00
-        var targetDateTime = new Date(date + 'T' + time + ':00');
+        // 解決 iOS 解析問題：將 - 替換為 /
+        var targetDateTime = new Date((date + 'T' + time + ':00').replace(/-/g, '/').replace('T', ' '));
         if (isNaN(targetDateTime.getTime())) {
             showAppAlert(currentLang === 'en' ? "Invalid date or time format." : "日期或時間格式錯誤。");
             return;
