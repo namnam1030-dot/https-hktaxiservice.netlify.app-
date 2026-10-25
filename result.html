@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
+<!-- ✅ charset 一定要最前 -->
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark light">
 
+<!-- ✅✅✅ 反黑閃終極版：第一時間搶 paint ✅✅✅ -->
 <script>
 (function() {
     var isLight = false;
@@ -16,15 +18,21 @@
             isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         }
     } catch(e) {}
+
     var root = document.documentElement;
+
     root.classList.toggle('light-theme', isLight);
     root.style.backgroundColor = isLight ? '#FFFFFF' : '#0B0B0B';
     root.style.color           = isLight ? '#000000' : '#FFFFFF';
     root.style.colorScheme     = isLight ? 'light' : 'dark';
     root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+
     if (isLight) {
         var obs = new MutationObserver(function() {
-            if (document.body) { document.body.classList.add('light-theme'); obs.disconnect(); }
+            if (document.body) {
+                document.body.classList.add('light-theme');
+                obs.disconnect();
+            }
         });
         obs.observe(root, { childList: true });
     }
@@ -32,12 +40,26 @@
 </script>
 
 <style>
-    html[data-theme="light"], html[data-theme="light"] body { background-color: #FFFFFF !important; color: #000000 !important; }
-    html[data-theme="dark"], html[data-theme="dark"] body { background-color: #0B0B0B !important; color: #FFFFFF !important; }
-    html.light-theme, html.light-theme body { background-color: #FFFFFF !important; color: #000000 !important; }
+    html[data-theme="light"],
+    html[data-theme="light"] body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
+    html[data-theme="dark"],
+    html[data-theme="dark"] body {
+        background-color: #0B0B0B !important;
+        color: #FFFFFF !important;
+    }
+
+    html.light-theme,
+    html.light-theme body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+    }
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 
@@ -201,7 +223,7 @@ const ZONE_KEYWORDS = {
     HKI_N: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','金鐘','金钟','天后','炮台山','大坑','西半山','東半山','东半山','半山'],
     HKI_S: ['香港仔','薄扶林','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','南區','南区','數碼港','数码港','石澳','大潭','深水灣','深水湾','石排灣','石排湾','海怡','利東','利东','置富','碧瑤灣','碧瑶湾','西營盤','西营盘','堅尼地城','坚尼地城','上環','上环'],
     KLN: ['佐敦','尖沙咀','旺角','油麻地','深水埗','九龍塘','九龙塘','九龍城','九龙城','黃大仙','黄大仙','觀塘','观塘','九龍灣','九龙湾','鑽石山','钻石山','牛池灣','牛池湾','土瓜灣','土瓜湾','何文田','紅磡','红磡','啟德','启德','長沙灣','长沙湾','荔枝角','美孚','石硤尾','石硖尾','大角咀','奧運','奥运','南昌','柯士甸','油塘','藍田','蓝田','秀茂坪','慈雲山','慈云山','樂富','乐富','橫頭磡','横头磡','啟業','启业','新蒲崗','新蒲岗','彩虹','九龙站'],
-    NTE: ['沙田','大圍','大围','馬鞍山','马鞍山','大埔','上水','粉嶺','粉岭','火炭','小瀝源','小沥源','沙田圍','沙田围','科學園','科学园','太和','西貢','西贡','將軍澳','将军澳','大埔墟','大埔中心','大尾篤'],
+    NTE: ['沙田','大圍','大围','馬鞍山','马鞍山','大埔','上水','粉嶺','粉岭','火炭','小瀝源','小沥源','沙田圍','沙田围','科學園','科学园','太和','西貢','西贡','將軍澳','将军澳','大埔墟','大埔中心','大尾篤', '新翠', '新翠邨', '隆亨', '隆亨邨', '顯徑', '显径', '顯徑邨', '显径邨', '美林', '美林邨', '美田', '美田邨', '車公廟', '车公庙', '田心', '大圍站', '大围站'],
     NTW: ['屯門','屯门','元朗','天水圍','天水围','荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','錦田','锦田','洪水橋','洪水桥','流浮山','掃管笏','扫管笏','小欖','小榄','大欖涌','大榄涌'],
     NTW_S: ['荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','美孚','荔枝角','長沙灣','长沙湾'],
     NTW_N: ['元朗','天水圍','天水围','錦田','锦田','洪水橋','洪水桥','流浮山','屯門','屯门'],
@@ -217,7 +239,7 @@ const TUNNEL_ZONE_RULES = {
     '獅隧':  { sides: [['KLN'], ['NTE']] },
     '大老山': { sides: [['KLN'], ['NTE']] },
     '尖山':  { sides: [['KLN','NTW','HKI','LANTAU','SZ'], ['NTE']] },
-    '城隧':  { sides: [['NTW_S','LANTAU'], ['NTE']] },
+    '城隧':  { sides: [['NTW_S','LANTAU','SZ'], ['NTE']] }, // ⭐ 這裡加入了 'SZ'
     '大欖':  { sides: [['HKI','KLN','NTE','NTW_S'], ['NTW_N','SZ']] },
     '香港仔': { sides: [['HKI_N'], ['HKI_S']] }
 };
@@ -585,6 +607,12 @@ function isTunnelRelevantForSegment(tunnelName, startText, endText) {
 
     const startZones = getLocationZone(startText);
     const endZones = getLocationZone(endText);
+    
+    // ⭐ 容錯機制：如果起點或終點完全認唔出係邊區，但客人手動揀咗，放行俾 Google Maps 算
+    if (startZones.length === 0 || endZones.length === 0) {
+        return true;
+    }
+
     const sideA = rule.sides[0];
     const sideB = rule.sides[1];
 
@@ -1327,7 +1355,7 @@ function updateMifaDiscountBanner() {
         banner.classList.add('hidden');
 
         if (fleetBtn) {
-            var fleetLabel2 = (currentLang === 'en') ? 'Luxury 6-Seater' : '豪華六座的士';
+            var fleetLabel2 = (currentLang === 'en') ? 'Luxury 6-Seater' : '豪華六座位的士';
             fleetBtn.innerHTML = '<i class="fa-solid fa-car"></i> ' + fleetLabel2;
             fleetBtn.classList.remove('mifa-fleet-btn-blink');
         }
