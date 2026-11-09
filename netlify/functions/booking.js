@@ -169,44 +169,41 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改：保留超連結，確保電話可點擊
+// ⭐ 將 Markdown 轉換為 Telegram 支持的 HTML（完美處理所有連結）
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
 
+  // 1. 去除程式碼區塊
   result = result.replace(/```(\w*)\n?([\s\S]*?)```/g, function(m, lang, code) {
     return String(code).trim();
   });
-
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
-    return '<a href="' + url + '"><b>' + text + '</b></a>';
-  });
-  result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
-    return '<a href="' + url + '"><b>' + text + '</b></a>';
-  });
-
-  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>';
-    return '<a href="' + url + '">' + text + '</a>';
-  });
-  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>';
-    return '<a href="' + url + '">' + text + '</a>';
-  });
-
+  // 2. 處理加粗及斜體
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  result = result.replace(/_(.+?)_/g, '<i>$1</i>');
 
+  // 3. 處理一般連結及電話連結
+  result = result.replace(/\[([^\]]+)\]\(<?([^>)]+)>?\)/g, function(m, text, url) {
+    // 強制將電話號碼變成 HTML 連結
+    if (url.startsWith('tel:')) {
+      return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
+    }
+    return '<a href="' + url + '">' + text + '</a>';
+  });
+
+  // 4. 佔位符保護（確保生成的 HTML 標籤不會被系統轉義成 &lt;）
   const placeholders = [];
-  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
+  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[^<]+<\/b>|<i>[^<]+<\/i>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
     return '\u0000' + (placeholders.length - 1) + '\u0000';
   });
 
+  // 5. 轉義剩餘符號
   result = result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // 6. 還原佔位符
   result = result.replace(/\u0000(\d+)\u0000/g, function(_, idx) {
     return placeholders[parseInt(idx, 10)];
   });
@@ -470,6 +467,7 @@ async function patchCalendarMessageIds(eventId, discordMessageId, telegramMessag
   }
 }
 
+// ⭐ 恢復純 Markdown，絕不包含 HTML 標籤
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
 
@@ -493,23 +491,21 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-    let header = '🔄 <b>【訂單已修改】</b> <i>(' + now + ')</i>\n';
+    // ⭐ 用返標準 Markdown
+    let header = '🔄 **【訂單已修改】** _(' + now + ')_\n';
 
     const diffText = buildChangedFieldsText(changedFields);
     if (diffText) {
-      header += '\n<b>修改內容：</b>\n' + diffText + '\n\n';
+      header += '\n**修改內容：**\n' + diffText + '\n\n';
     } else {
-      header += '\n<i>（未能偵測具體修改欄位）</i>\n\n';
+      header += '\n_（未能偵測具體修改欄位）_\n\n';
     }
-    header += '<b>最新訂單內容：</b>\n';
+    header += '**最新訂單內容：**\n';
     body = header + body;
   }
 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
-  
-  // ⭐ 強制將電話轉為 HTML 標籤，不依賴 Telegram 自動識別
-  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, '📞 <a href="tel:$2"><b>$1</b></a>');
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
@@ -571,7 +567,11 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
   const randomDelay = Math.floor(Math.random() * 800);
   await new Promise(function(r) { setTimeout(r, randomDelay); });
 
-  const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
+  let message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
+  
+  // ⭐ 喺 Discord 入面，將 tel: 連結轉做純粗體數字，避免佢當成 HTTP 連結處理而出錯
+  message = message.replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '**$1**');
+
   const reqBody = JSON.stringify({ content: message, flags: 4 });
 
   if (waitForId) {
