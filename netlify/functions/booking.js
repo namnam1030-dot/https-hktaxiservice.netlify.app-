@@ -169,7 +169,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：保留 tel: 超連結標籤，確保 Telegram 電話可點擊（絕不加 +852）
+// ⭐ 修改這裡：只加一個「+」號，確保 Telegram 不會報錯（能發出），同時必定變藍色（可點擊）
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -181,20 +181,32 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
+    if (url.startsWith('tel:')) {
+      let num = url.replace('tel:', '').replace(/\D/g, '');
+      return '<a href="tel:+' + num + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
+    }
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
+    if (url.startsWith('tel:')) {
+      let num = url.replace('tel:', '').replace(/\D/g, '');
+      return '<a href="tel:+' + num + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
+    }
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>';
+    if (url.startsWith('tel:')) {
+      let num = url.replace('tel:', '').replace(/\D/g, '');
+      return '<a href="tel:+' + num + '">' + text.replace(/\s/g, '') + '</a>';
+    }
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>';
+    if (url.startsWith('tel:')) {
+      let num = url.replace('tel:', '').replace(/\D/g, '');
+      return '<a href="tel:+' + num + '">' + text.replace(/\s/g, '') + '</a>';
+    }
     return '<a href="' + url + '">' + text + '</a>';
   });
 
