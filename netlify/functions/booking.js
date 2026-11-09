@@ -169,7 +169,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改：強制保留 <a> 超連結標籤，確保電話號碼可以點擊撥打
+// ⭐ 修改：保留超連結，確保電話可點擊
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -493,21 +493,23 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-    let header = '🔄 **【訂單已修改】** _(' + now + ')_\n';
+    let header = '🔄 <b>【訂單已修改】</b> <i>(' + now + ')</i>\n';
 
     const diffText = buildChangedFieldsText(changedFields);
     if (diffText) {
-      header += '\n**修改內容：**\n' + diffText + '\n\n';
+      header += '\n<b>修改內容：</b>\n' + diffText + '\n\n';
     } else {
-      header += '\n_（未能偵測具體修改欄位）_\n\n';
+      header += '\n<i>（未能偵測具體修改欄位）</i>\n\n';
     }
-    header += '**最新訂單內容：**\n';
+    header += '<b>最新訂單內容：</b>\n';
     body = header + body;
   }
 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
-  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, '📞 **[$1](tel:$2)**');
+  
+  // ⭐ 強制將電話轉為 HTML 標籤，不依賴 Telegram 自動識別
+  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, '📞 <a href="tel:$2"><b>$1</b></a>');
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
