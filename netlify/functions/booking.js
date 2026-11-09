@@ -169,7 +169,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：保留原本的 tel: 網址，不強加 +852，確保全球號碼通用及 100% 可點擊
+// ⭐ 修改這裡：保留 tel: 超連結標籤，確保 Telegram 電話可點擊（絕不加 +852）
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -180,7 +180,6 @@ function convertToTelegramHtml(text) {
 
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  // 這裡是唯一改動的地方：將原本的 `<b>...</b>` 改為 `<a href="url"><b>...</b></a>`
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
     if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
     return '<a href="' + url + '"><b>' + text + '</b></a>';
