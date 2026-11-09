@@ -169,7 +169,6 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：保留粗體，但剝走 tel: 連結，讓 Telegram 自動識別
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -180,24 +179,27 @@ function convertToTelegramHtml(text) {
 
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
+  // ⭐ 粗體 + 連結：**[text](url)**
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
+    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>'; // ⭐ 保留 a 標籤
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
+    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>'; // ⭐ 保留 a 標籤
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
+  // 普通連結
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
+    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>'; // ⭐ 保留 a 標籤
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
+    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>'; // ⭐ 保留 a 標籤
     return '<a href="' + url + '">' + text + '</a>';
   });
 
+  // 普通粗體
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
   const placeholders = [];
