@@ -910,10 +910,19 @@ function computeChangedFields(carDisplayText) {
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
-            carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
+            carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || '',
+            baseFare: currentBaseFare || 0,
+            tunnelFee: currentTunnelFee || 0
         };
         
-        var labels = { pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式' };
+        var labels = { 
+            pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', 
+            flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', 
+            hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂', 
+            contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', 
+            carDisplayText: '預約車款', selectedFareMode: '收費模式',
+            baseFare: '基本車費', tunnelFee: '隧道費'
+        };
         
         function fmt(val, key) {
             if (typeof val === 'boolean') return val ? '✅' : '❌';
@@ -921,6 +930,9 @@ function computeChangedFields(carDisplayText) {
                 if (val === 'discount') return getDiscountLabel();
                 if (val === 'normal') return '正價';
                 return val || '-';
+            }
+            if (key === 'baseFare' || key === 'tunnelFee') {
+                return 'HK$ ' + (val || 0);
             }
             return String(val || '').trim() || '（空）';
         }
@@ -1549,6 +1561,7 @@ function submitBookingAfterUpgrade() {
             sessionStorage.removeItem('taxiEditingBookingId');
             sessionStorage.removeItem('taxiInternalAccess');
             sessionStorage.removeItem('taxiEditVerified');
+            sessionStorage.removeItem('taxiOriginalOrderData'); // ⭐ 清除原始快照
             clearAllFormData();
 
             var idParam = newBookingId ? '&id=' + encodeURIComponent(newBookingId) : '';
