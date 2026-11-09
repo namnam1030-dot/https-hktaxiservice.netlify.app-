@@ -169,7 +169,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：只加一個「+」號，確保 Telegram 不會報錯（能發出），同時必定變藍色（可點擊）
+// ⭐ 修改這裡：保留粗體，但剝走 tel: 連結，讓 Telegram 自動識別
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -181,32 +181,20 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) {
-      let num = url.replace('tel:', '').replace(/\D/g, '');
-      return '<a href="tel:+' + num + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
-    }
+    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) {
-      let num = url.replace('tel:', '').replace(/\D/g, '');
-      return '<a href="tel:+' + num + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
-    }
+    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) {
-      let num = url.replace('tel:', '').replace(/\D/g, '');
-      return '<a href="tel:+' + num + '">' + text.replace(/\s/g, '') + '</a>';
-    }
+    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) {
-      let num = url.replace('tel:', '').replace(/\D/g, '');
-      return '<a href="tel:+' + num + '">' + text.replace(/\s/g, '') + '</a>';
-    }
+    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
 
