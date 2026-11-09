@@ -885,15 +885,18 @@ function restoreFormSnapshot() {
 
 function computeChangedFields(carDisplayText) {
     try {
-        var raw = localStorage.getItem('taxiEditPrefillData');
+        // ⭐ 修正：優先使用最原始的資料進行對比，避免中途被覆蓋
+        var raw = sessionStorage.getItem('taxiOriginalOrderData') || localStorage.getItem('taxiEditPrefillData');
         if (!raw) return null;
+        
         var old = JSON.parse(raw);
         var routeData = loadRouteDataFromLocalStorage() || {};
         var payments = [];
         document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
+        
         var cur = {
             pickup: routeData.pickup || '', dropoff: routeData.dropoff || '',
-            stopovers: (routeData.stopovers || []).join('、'),
+            stopovers: Array.isArray(routeData.stopovers) ? routeData.stopovers.join('、') : (routeData.stopovers || ''),
             date: document.getElementById('date') ? document.getElementById('date').value : '',
             time: document.getElementById('time') ? document.getElementById('time').value : '',
             flightNo: document.getElementById('flight_no') ? document.getElementById('flight_no').value : '',
@@ -909,7 +912,9 @@ function computeChangedFields(carDisplayText) {
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
             carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
         };
+        
         var labels = { pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂', contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', carDisplayText: '預約車款', selectedFareMode: '收費模式' };
+        
         function fmt(val, key) {
             if (typeof val === 'boolean') return val ? '✅' : '❌';
             if (key === 'selectedFareMode') {
@@ -919,12 +924,14 @@ function computeChangedFields(carDisplayText) {
             }
             return String(val || '').trim() || '（空）';
         }
+        
         var changed = {};
         Object.keys(labels).forEach(function(key) {
             var oldStr = fmt(old[key], key);
             var newStr = fmt(cur[key], key);
             if (oldStr !== newStr) changed[key] = { label: labels[key], old: oldStr, new: newStr };
         });
+        
         if (changed.contactTitle || changed.contactSurname) {
             var oldTitle = old.contactTitle || '', oldSur = old.contactSurname || '';
             var newTitle = cur.contactTitle || '', newSur = cur.contactSurname || '';
@@ -932,8 +939,12 @@ function computeChangedFields(carDisplayText) {
             delete changed.contactTitle;
             delete changed.contactSurname;
         }
+        
         return Object.keys(changed).length > 0 ? changed : null;
-    } catch(e) { console.error('[ChangedFields] 計算失敗：', e); return null; }
+    } catch(e) { 
+        console.error('[ChangedFields] 計算失敗：', e); 
+        return null; 
+    }
 }
 
 function saveAllFormData() {
@@ -1849,6 +1860,7 @@ function initEditMode() {
             if (data.success && data.orderData) {
                 var orderData = data.orderData;
                 sessionStorage.setItem('taxiLookupResult', JSON.stringify(orderData));
+                sessionStorage.setItem('taxiOriginalOrderData', JSON.stringify(orderData)); // ⭐ 儲存原始快照
                 sessionStorage.setItem('taxiEditVerified', editingBookingId);
 
                 if (data.isInternalAccess === true) {
@@ -1930,6 +1942,7 @@ function applyLookupResultIfAny() {
         var raw = sessionStorage.getItem('taxiLookupResult');
         if (!raw) return false;
         var o = JSON.parse(raw);
+        sessionStorage.setItem('taxiOriginalOrderData', raw); // ⭐ 儲存最原始的資料用來對比
         var stopoversArr = [];
         if (o.stopovers) stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) { return s.trim(); }).filter(Boolean);
         var routeData = { pickup: o.pickup || '', pickupPlaceId: '', dropoff: o.dropoff || '', dropoffPlaceId: '', stopovers: stopoversArr, stopoverPlaceIds: stopoversArr.map(function() { return ''; }) };
@@ -2020,6 +2033,7 @@ function cancelEditMode() {
     sessionStorage.removeItem('taxiEditingBookingId');
     sessionStorage.removeItem('taxiInternalAccess');
     sessionStorage.removeItem('taxiEditVerified');
+    sessionStorage.removeItem('taxiOriginalOrderData'); // ⭐ 清除原始快照
     clearAllFormData();
     var lastSuccessUrl = sessionStorage.getItem('taxiLastSuccessUrl');
     if (lastSuccessUrl) window.location.href = lastSuccessUrl;
