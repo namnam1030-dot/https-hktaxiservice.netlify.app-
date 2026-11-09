@@ -169,7 +169,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：保留 <a> 標籤，讓 Telegram 識別為可點擊連結
+// ⭐ 修改：強制保留 <a> 超連結標籤，確保電話號碼可以點擊撥打
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -181,20 +181,20 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>'; // 保留 a 標籤
+    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>'; // 保留 a 標籤
+    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>'; // 保留 a 標籤
+    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>';
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>'; // 保留 a 標籤
+    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>';
     return '<a href="' + url + '">' + text + '</a>';
   });
 
