@@ -169,41 +169,44 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 將 Markdown 轉換為 Telegram 支持的 HTML（完美處理所有連結）
+// ⭐ 修改這裡：保留 tel: 連結，確保 Telegram 電話可點擊
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
 
-  // 1. 去除程式碼區塊
   result = result.replace(/```(\w*)\n?([\s\S]*?)```/g, function(m, lang, code) {
     return String(code).trim();
   });
+
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  // 2. 處理加粗及斜體
-  result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  result = result.replace(/_(.+?)_/g, '<i>$1</i>');
+  result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>'; // 強制保留連結
+    return '<a href="' + url + '"><b>' + text + '</b></a>';
+  });
+  result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>'; // 強制保留連結
+    return '<a href="' + url + '"><b>' + text + '</b></a>';
+  });
 
-  // 3. 處理一般連結及電話連結
-  result = result.replace(/\[([^\]]+)\]\(<?([^>)]+)>?\)/g, function(m, text, url) {
-    // 強制將電話號碼變成 HTML 連結
-    if (url.startsWith('tel:')) {
-      return '<a href="' + url + '"><b>' + text.replace(/\s/g, '') + '</b></a>';
-    }
+  result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>'; // 強制保留連結
+    return '<a href="' + url + '">' + text + '</a>';
+  });
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
+    if (url.startsWith('tel:')) return '<a href="' + url + '">' + text.replace(/\s/g, '') + '</a>'; // 強制保留連結
     return '<a href="' + url + '">' + text + '</a>';
   });
 
-  // 4. 佔位符保護（確保生成的 HTML 標籤不會被系統轉義成 &lt;）
+  result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+
   const placeholders = [];
-  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[^<]+<\/b>|<i>[^<]+<\/i>|<code>[^<]+<\/code>/g, function(m) {
+  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
     return '\u0000' + (placeholders.length - 1) + '\u0000';
   });
 
-  // 5. 轉義剩餘符號
   result = result.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  // 6. 還原佔位符
   result = result.replace(/\u0000(\d+)\u0000/g, function(_, idx) {
     return placeholders[parseInt(idx, 10)];
   });
@@ -467,7 +470,6 @@ async function patchCalendarMessageIds(eventId, discordMessageId, telegramMessag
   }
 }
 
-// ⭐ 恢復純 Markdown，絕不包含 HTML 標籤
 function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   let body = data.fullMessage || data.description || '收到新訂單';
 
@@ -491,7 +493,6 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-    // ⭐ 用返標準 Markdown
     let header = '🔄 **【訂單已修改】** _(' + now + ')_\n';
 
     const diffText = buildChangedFieldsText(changedFields);
@@ -506,6 +507,7 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
+  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, '📞 **[$1](tel:$2)**');
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
@@ -567,11 +569,7 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
   const randomDelay = Math.floor(Math.random() * 800);
   await new Promise(function(r) { setTimeout(r, randomDelay); });
 
-  let message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
-  
-  // ⭐ 喺 Discord 入面，將 tel: 連結轉做純粗體數字，避免佢當成 HTTP 連結處理而出錯
-  message = message.replace(/\[([^\]]+)\]\(tel:[^)]+\)/g, '**$1**');
-
+  const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
   const reqBody = JSON.stringify({ content: message, flags: 4 });
 
   if (waitForId) {
