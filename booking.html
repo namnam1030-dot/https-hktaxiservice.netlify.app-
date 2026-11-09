@@ -842,7 +842,8 @@ function saveFormSnapshot(carDisplayText) {
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
-            selectedCarName: selectedCarName || '', carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || ''
+            selectedCarName: selectedCarName || '', carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || '',
+            totalFare: calculateTotalFare() // ⭐ 新增：保存總車費
         };
         localStorage.setItem('taxiEditPrefillData', JSON.stringify(snapshot));
     } catch(e) { console.error('[Snapshot] 保存失敗：', e); }
@@ -885,7 +886,7 @@ function restoreFormSnapshot() {
 
 function computeChangedFields(carDisplayText) {
     try {
-        // ⭐ 修正：優先使用最原始的資料進行對比，避免中途被覆蓋
+        // ⭐ 優先使用最原始的資料進行對比，避免中途被覆蓋
         var raw = sessionStorage.getItem('taxiOriginalOrderData') || localStorage.getItem('taxiEditPrefillData');
         if (!raw) return null;
         
@@ -911,8 +912,7 @@ function computeChangedFields(carDisplayText) {
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
             isWechatCustomer: document.getElementById('is_wechat_customer') ? document.getElementById('is_wechat_customer').checked : false,
             carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || '',
-            baseFare: currentBaseFare || 0,
-            tunnelFee: currentTunnelFee || 0
+            totalFare: calculateTotalFare() // ⭐ 改為對比總車費
         };
         
         var labels = { 
@@ -921,7 +921,7 @@ function computeChangedFields(carDisplayText) {
             hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂', 
             contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', 
             carDisplayText: '預約車款', selectedFareMode: '收費模式',
-            baseFare: '基本車費', tunnelFee: '隧道費'
+            totalFare: '預計參考車費' // ⭐ 移除基本車費及隧道費，改為顯示總價
         };
         
         function fmt(val, key) {
@@ -931,7 +931,7 @@ function computeChangedFields(carDisplayText) {
                 if (val === 'normal') return '正價';
                 return val || '-';
             }
-            if (key === 'baseFare' || key === 'tunnelFee') {
+            if (key === 'totalFare') {
                 return 'HK$ ' + (val || 0);
             }
             return String(val || '').trim() || '（空）';
