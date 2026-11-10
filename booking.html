@@ -1960,7 +1960,9 @@ function applyLookupResultIfAny() {
         if (o.stopovers) stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) { return s.trim(); }).filter(Boolean);
         var routeData = { pickup: o.pickup || '', pickupPlaceId: '', dropoff: o.dropoff || '', dropoffPlaceId: '', stopovers: stopoversArr, stopoverPlaceIds: stopoversArr.map(function() { return ''; }) };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
-        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+        
+        // ⭐ 修改：加入皇崗判斷，令佢變九折
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0 || routeData.pickup.indexOf('皇崗') >= 0 || routeData.pickup.indexOf('皇岗') >= 0);
 
         var pickupEl = document.getElementById('booking-pickup-display');
         var dropoffEl = document.getElementById('booking-dropoff-display');
@@ -2071,7 +2073,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
     var routeData = loadRouteDataFromLocalStorage();
     if (routeData) {
-        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+        // ⭐ 修改：加入皇崗判斷，令佢變九折
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0 || routeData.pickup.indexOf('皇崗') >= 0 || routeData.pickup.indexOf('皇岗') >= 0);
+        
         if (routeData.pickup) document.getElementById('booking-pickup-display').innerText = routeData.pickup;
         if (routeData.dropoff) document.getElementById('booking-dropoff-display').innerText = routeData.dropoff;
         if (routeData.stopovers && routeData.stopovers.length > 0) {

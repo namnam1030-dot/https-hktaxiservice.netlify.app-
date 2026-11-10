@@ -853,7 +853,8 @@ window.addEventListener('DOMContentLoaded', () => {
     
     const routeData = loadRouteDataFromLocalStorage();
     if (routeData && routeData.pickup) {
-        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+        // ⭐ 修改：加入皇崗判斷，令佢變九折
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0 || routeData.pickup.indexOf('皇崗') >= 0 || routeData.pickup.indexOf('皇岗') >= 0);
     }
 
     previewFareMode = selectedFareMode;
