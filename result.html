@@ -341,10 +341,12 @@ const translations = {
 function getDiscountRate() {
     if (!routeData || !routeData.pickup) return 0.85;
     var p = routeData.pickup;
-    return (p.indexOf('深圳灣') >= 0 || p.indexOf('深圳湾') >= 0) ? 0.9 : 0.85;
+    // ⭐ 修改：起點係深圳灣或皇崗，都當作九折
+    return (p.indexOf('深圳灣') >= 0 || p.indexOf('深圳湾') >= 0 || p.indexOf('皇崗') >= 0 || p.indexOf('皇岗') >= 0) ? 0.9 : 0.85;
 }
 
 function getDiscountLabel() {
+    // ⭐ 修改：isShenzhenBay 變數已經包含咗皇崗，所以標籤會自動變九折
     return isShenzhenBay ? (currentLang === 'en' ? '10% Discount Offer' : '九折優惠') : (currentLang === 'en' ? '15% Discount Offer' : '八五折優惠');
 }
 
@@ -771,7 +773,9 @@ function calculateFareWithGoogle() {
     let pickupVal = routeData.pickup || '';
     let dropoffVal = routeData.dropoff || '';
     let stopoverTexts = routeData.stopovers || [];
-    isShenzhenBay = (pickupVal.indexOf('深圳灣') >= 0 || pickupVal.indexOf('深圳湾') >= 0);
+    // ⭐ 修改：起點係深圳灣或皇崗，都視為 9 折 (isShenzhenBay = true)
+    isShenzhenBay = (pickupVal.indexOf('深圳灣') >= 0 || pickupVal.indexOf('深圳湾') >= 0 || pickupVal.indexOf('皇崗') >= 0 || pickupVal.indexOf('皇岗') >= 0);
+    
     if (!pickupVal || !dropoffVal) {
         alert(currentLang === 'en' ? "Please enter both Pickup and Destination locations." : "請先輸入起點及目的地！");
         window.location.href = 'index.html';
@@ -1374,7 +1378,7 @@ function initMap() {
 
     routeData = loadRouteDataFromLocalStorage();
     if (routeData && routeData.pickup) {
-        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0);
+        isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0 || routeData.pickup.indexOf('皇崗') >= 0 || routeData.pickup.indexOf('皇岗') >= 0);
     }
     const bookingData = loadBookingDataFromLocalStorage();
     if (bookingData) {
