@@ -460,10 +460,12 @@ function normalizeLocation(loc, isPickup = false) {
     if (trimmed.includes("香園圍") || trimmed.includes("香园围") || trimmed.includes("香園圍口岸") || trimmed.includes("香园围口岸") || trimmed.includes("蓮塘") || trimmed.includes("莲塘")) {
         return new google.maps.LatLng(22.551972, 114.153694);
     }
+    
+    // ⭐ 聽從指示：無論起點定終點，只要見到皇崗，一律直接用呢個自訂座標
     if (trimmed.includes("皇崗口岸") || trimmed.includes("皇岗口岸") || trimmed.includes("新皇崗口岸") || trimmed.includes("新皇岗口岸") || trimmed.includes("皇崗") || trimmed.includes("皇岗")) {
-        // ⭐ 統一起點與終點都用相同嘅皇崗座標，並在規劃時加入隱形引導點
         return new google.maps.LatLng(22.518611, 114.070361);
     }
+    
     if (trimmed.includes("深圳灣") || trimmed.includes("深圳湾")) {
         return new google.maps.LatLng(22.475889, 113.955944);
     }
@@ -609,7 +611,6 @@ function isTunnelRelevantForSegment(tunnelName, startText, endText) {
     const startZones = getLocationZone(startText);
     const endZones = getLocationZone(endText);
     
-    // ⭐ 容錯機制：如果起點或終點完全認唔出係邊區，但客人手動揀咗，放行俾 Google Maps 算
     if (startZones.length === 0 || endZones.length === 0) {
         return true;
     }
@@ -799,12 +800,6 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
     let targetDropoff = normalizeLocation(dropoffVal, false);
 
     let waypoints = [];
-    
-    // ⭐ 如果起點係皇崗，強制加一個隱形途經點（新田交匯處附近），引導 Google Maps 駛出禁區
-    if (pickupVal.includes("皇崗") || pickupVal.includes("皇岗")) {
-        waypoints.push({ location: new google.maps.LatLng(22.503889, 114.077500), stopover: true });
-    }
-
     stopoverTexts.forEach(s => {
         waypoints.push({ location: normalizeLocation(s, false), stopover: true });
     });
@@ -877,11 +872,6 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
         } else {
             segTunnelWaypointsList.forEach(pt => segTunnelWaypoints.push({ location: pt, stopover: false }));
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
-        }
-
-        // ⭐ 如果分段起點係皇崗，加隱形途經點
-        if (segStart.text.includes("皇崗") || segStart.text.includes("皇岗")) {
-            segTunnelWaypoints.push({ location: new google.maps.LatLng(22.503889, 114.077500), stopover: true });
         }
 
         segments.push({
@@ -1026,11 +1016,6 @@ function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhe
     let targetDropoff = normalizeLocation(dropoffVal, false);
 
     let waypoints = [];
-    
-    if (pickupVal.includes("皇崗") || pickupVal.includes("皇岗")) {
-        waypoints.push({ location: new google.maps.LatLng(22.503889, 114.077500), stopover: true });
-    }
-
     stopoverTexts.forEach(s => {
         waypoints.push({ location: normalizeLocation(s, false), stopover: true });
     });
