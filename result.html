@@ -461,9 +461,12 @@ function normalizeLocation(loc, isPickup = false) {
         return new google.maps.LatLng(22.551972, 114.153694);
     }
     
-    // ⭐ 聽從指示：無論起點定終點，只要見到皇崗，一律直接用呢個自訂座標
+    // ⭐ 聽從指示：起點用新座標，目的地用舊座標
     if (trimmed.includes("皇崗口岸") || trimmed.includes("皇岗口岸") || trimmed.includes("新皇崗口岸") || trimmed.includes("新皇岗口岸") || trimmed.includes("皇崗") || trimmed.includes("皇岗")) {
-        return new google.maps.LatLng(22.518611, 114.070361);
+        if (isPickup) {
+            return new google.maps.LatLng(22.518139, 114.070583); // 起點用呢個
+        }
+        return new google.maps.LatLng(22.518611, 114.070361); // 目的地用返舊嗰個
     }
     
     if (trimmed.includes("深圳灣") || trimmed.includes("深圳湾")) {
