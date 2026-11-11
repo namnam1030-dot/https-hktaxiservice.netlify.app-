@@ -645,6 +645,12 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
 
     if (!isFromSZ && !isToSZ && !stopoverHasSZ) return null;
 
+    // ⭐ 新增：如果用戶揀咗城隧，強制使用屯門公路
+    //（避免從城隧入口到新田點之間，Google 揀大欖隧道兜路）
+    if (selectedForcedTunnels.indexOf('城隧') >= 0) {
+        return TUEN_MUN_ROAD_POINT;
+    }
+
     // ⭐ 指定座標 22°24'15.1"N 以北嘅判斷 (22.404194)
     const NORTH_BOUNDARY_LAT = 22.404194;
     let pLat = (originLatLng && typeof originLatLng.lat === 'function') ? originLatLng.lat() : (routeData && routeData.pickupLat ? parseFloat(routeData.pickupLat) : 0);
