@@ -631,6 +631,8 @@ function isTunnelRelevantForSegment(tunnelName, startText, endText) {
     return (startInA && endInB) || (startInB && endInA);
 }
 
+const NORTH_NTW_WAYPOINT = { lat: 22.482000, lng: 114.060000 }; // ⭐ 新田/元朗公路附近，強制引導路線
+
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
     if (selectedForcedTunnels.indexOf("大欖") >= 0) return null;
 
@@ -645,9 +647,9 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     let pLat = (originLatLng && typeof originLatLng.lat === 'function') ? originLatLng.lat() : (routeData && routeData.pickupLat ? parseFloat(routeData.pickupLat) : 0);
     let dLat = (routeData && routeData.dropoffLat) ? parseFloat(routeData.dropoffLat) : 0;
 
-    // 如果起點在界限以北去深圳灣，或者由深圳灣去界限以北，取消屯門公路
+    // 如果起點在界限以北去深圳灣，或者由深圳灣去界限以北，強制行經新田公路，避免兜出九龍
     if ((isToSZ && pLat > NORTH_BOUNDARY_LAT) || (isFromSZ && dLat > NORTH_BOUNDARY_LAT)) {
-        return null;
+        return NORTH_NTW_WAYPOINT;
     }
 
     // ⭐ 原有的皇崗互通邏輯
