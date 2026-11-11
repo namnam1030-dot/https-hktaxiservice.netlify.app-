@@ -183,7 +183,7 @@ let routeOverlays = [];
 
 let _originLatLngCache = null;
 
-const TUEN_MUN_ROAD_POINT = { lat: 22.365444, lng: 114.050028 };
+const TUEN_MUN_ROAD_POINT = { lat: 22.385000, lng: 113.970000 };
 
 const NTW_KEYWORDS = [
     '屯門', '屯门', '元朗', '天水圍', '天水围',
@@ -240,7 +240,7 @@ const ZONE_KEYWORDS = {
     NTW: ['屯門','屯门','元朗','天水圍','天水围','荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','錦田','锦田','洪水橋','洪水桥','流浮山','掃管笏','扫管笏','小欖','小榄','大欖涌','大榄涌'],
     NTW_S: ['荃灣','荃湾','葵涌','葵芳','青衣','汀九','深井','青龍頭','青龙头','美孚','荔枝角','長沙灣','长沙湾'],
     NTW_N: ['元朗','天水圍','天水围','錦田','锦田','洪水橋','洪水桥','流浮山','屯門','屯门'],
-    LANTAU: ['東涌','东涌','機場','机场','赤鱲角','赤鱲角','迪士尼','大嶼山','大屿山','昂坪','大澳','梅窩','梅窝','愉景灣','愉景湾','逸東','逸东','富東','富东','迎東','迎东'],
+    LANTAU: ['東涌','东涌','機場','机场','赤鱲角','赤鱲角','迪士尼','大嶼山','大屿山','昂坪','大澳','梅窩','梅窝','映灣園','映湾园','愉景灣','愉景湾','逸東','逸东','富東','富东','迎東','迎东'],
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
@@ -604,7 +604,36 @@ function isHKIsland(locationText, latLng) {
     return false;
 }
 
-function getLocationZone(locationText) {
+// ⭐ 核心修改：優先使用座標判斷地區，若無座標才用文字匹配
+function getLocationZone(locationText, latLng) {
+    // 1. 優先使用座標判斷（最準確，不受錯別字影響）
+    if (latLng && typeof latLng.lat === 'function') {
+        const lat = latLng.lat();
+        const lng = latLng.lng();
+        
+        // 深圳灣/皇崗 (SZ)
+        if (lat > 22.45 && lng < 114.10) return ['SZ'];
+        
+        // 大嶼山 (LANTAU) - 包含東涌、機場、迪士尼等
+        if (lat >= 22.15 && lat <= 22.38 && lng >= 113.75 && lng <= 114.10) return ['LANTAU'];
+        
+        // 港島 (HKI)
+        if (lat >= 22.19 && lat <= 22.30 && lng >= 114.10 && lng <= 114.30) return ['HKI'];
+        
+        // 將軍澳/西貢 (NTE_S)
+        if (lat >= 22.25 && lat <= 22.45 && lng >= 114.20 && lng <= 114.45) return ['NTE_S'];
+        
+        // 九龍 (KLN)
+        if (lat > 22.295 && lat <= 22.36 && lng > 114.14 && lng < 114.25) return ['KLN'];
+        
+        // 新界東 (NTE) - 沙田、大埔、上水等
+        if (lat > 22.33 && lat <= 22.55 && lng > 114.14 && lng < 114.45) return ['NTE'];
+        
+        // 新界西 (NTW) - 屯門、元朗、荃灣等
+        if (lat > 22.33 && lat <= 22.55 && lng > 113.90 && lng <= 114.15) return ['NTW'];
+    }
+    
+    // 2. 如果無座標或判斷失敗，退回文字匹配
     if (!locationText) return [];
     const text = String(locationText);
     const zones = [];
@@ -617,12 +646,12 @@ function getLocationZone(locationText) {
     return zones;
 }
 
-function isTunnelRelevantForSegment(tunnelName, startText, endText) {
+function isTunnelRelevantForSegment(tunnelName, startText, endText, startLatLng, endLatLng) {
     const rule = TUNNEL_ZONE_RULES[tunnelName];
     if (!rule) return true;
 
-    const startZones = getLocationZone(startText);
-    const endZones = getLocationZone(endText);
+    const startZones = getLocationZone(startText, startLatLng);
+    const endZones = getLocationZone(endText, endLatLng);
     
     if (startZones.length === 0 || endZones.length === 0) {
         return true;
@@ -644,10 +673,12 @@ const NORTH_NTW_WAYPOINT = { lat: 22.482000, lng: 114.060000 };
 const UNIVERSITY_STATION_LAT = 22.4135;
 
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
+    const pLatLng = originLatLng || (routeData && routeData.pickupLat ? new google.maps.LatLng(routeData.pickupLat, routeData.pickupLng) : null);
+    const dLatLng = (routeData && routeData.dropoffLat ? new google.maps.LatLng(routeData.dropoffLat, routeData.dropoffLng) : null);
+
     if (selectedForcedTunnels.indexOf('屯門公路') >= 0) {
-        // ⭐ 避免分段時兩端都在東邊(如將軍澳去大圍)時強行繞去屯門
-        const startZones = getLocationZone(pickupVal);
-        const endZones = getLocationZone(dropoffVal);
+        const startZones = getLocationZone(pickupVal, pLatLng);
+        const endZones = getLocationZone(dropoffVal, dLatLng);
         const isStartEast = startZones.includes('NTE') || startZones.includes('NTE_S') || startZones.includes('KLN');
         const isEndEast = endZones.includes('NTE') || endZones.includes('NTE_S') || endZones.includes('KLN');
         
@@ -660,7 +691,6 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
         return TUEN_MUN_ROAD_POINT;
     }
 
-    // ⭐ 如果用戶自選了「大欖」或「屯赤」，就不要強制加屯門公路點，避免折返兜路
     if (selectedForcedTunnels.indexOf("大欖") >= 0 || selectedForcedTunnels.indexOf("屯赤") >= 0) return null;
 
     const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
@@ -706,24 +736,32 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
     return TUEN_MUN_ROAD_POINT;
 }
 
-function resolveTunnelWaypoint(tunnelName, startText, endText) {
+function resolveTunnelWaypoint(tunnelName, startText, endText, startLatLng) {
     const tunnel = tunnelDatabase.find(t => t.shortName === tunnelName);
     if (!tunnel) return null;
 
     const rule = TUNNEL_ZONE_RULES[tunnelName];
+    const dLatLng = (routeData && routeData.dropoffLat ? new google.maps.LatLng(routeData.dropoffLat, routeData.dropoffLng) : null);
+
     if (!rule) {
         return getTunnelEntryPoint(tunnel, _originLatLngCache);
     }
 
-    if (!isTunnelRelevantForSegment(tunnelName, startText, endText)) return null;
+    if (!isTunnelRelevantForSegment(tunnelName, startText, endText, startLatLng, dLatLng)) return null;
 
-    const startZones = getLocationZone(startText);
+    const startZones = getLocationZone(startText, startLatLng);
     const sideA = rule.sides[0];
     const startInA = sideA.some(z => startZones.indexOf(z) >= 0);
 
     if (startInA && tunnel.entryA) {
         return new google.maps.LatLng(tunnel.entryA.lat, tunnel.entryA.lng);
-    } else if (tunnel.entryB) {
+    }
+    
+    if (startZones.length === 0) {
+        return getTunnelEntryPoint(tunnel, _originLatLngCache);
+    }
+
+    if (tunnel.entryB) {
         return new google.maps.LatLng(tunnel.entryB.lat, tunnel.entryB.lng);
     }
     return getTunnelEntryPoint(tunnel, _originLatLngCache);
@@ -737,7 +775,7 @@ function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
         if (tunnelName === '屯門公路') return;
 
         const isHarbour = HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0;
-        const pt = resolveTunnelWaypoint(tunnelName, pickupText, dropoffText);
+        const pt = resolveTunnelWaypoint(tunnelName, pickupText, dropoffText, originLatLng);
         if (!pt) return;
 
         if (isHarbour) {
@@ -763,7 +801,6 @@ function renderTunnelButtons() {
     const container = document.getElementById('tunnel-btns');
     if (!container) return;
 
-    // ⭐ 中文維持原本 4 欄，英文切換 2 欄
     if (currentLang === 'en') {
         container.classList.add('en-layout');
     } else {
@@ -840,7 +877,6 @@ function calculateFareWithGoogle() {
         return;
     }
 
-    // ⭐ 新增：自動將英文關鍵字轉換為中文，確保後續所有自訂點、折扣及隧道邏輯正常運作
     if (routeData) {
         const replaceEnToZh = (str) => {
             if (!str) return str;
@@ -1065,9 +1101,9 @@ async function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShe
         }
 
         const segTunnelWaypoints = [];
-        const segTunnelWaypointsList = collectTunnelWaypoints(segStart.text, segEnd.text, _originLatLngCache);
+        const segTunnelWaypointsList = collectTunnelWaypoints(segStart.text, segEnd.text, segOrigin);
 
-        const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
+        const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], segOrigin);
         const segTmLatLng = segTmRoadPoint ? new google.maps.LatLng(segTmRoadPoint.lat, segTmRoadPoint.lng) : null;
 
         const segStartIsSZ = segStart.text.includes("深圳灣") || segStart.text.includes("深圳湾");
