@@ -839,6 +839,22 @@ function calculateFareWithGoogle() {
         window.location.href = 'index.html';
         return;
     }
+
+    // ⭐ 新增：自動將英文關鍵字轉換為中文，確保後續所有自訂點、折扣及隧道邏輯正常運作
+    if (routeData) {
+        const replaceEnToZh = (str) => {
+            if (!str) return str;
+            return str.replace(/shenzhen\s*bay/ig, '深圳灣')
+                      .replace(/huanggang/ig, '皇崗')
+                      .replace(/heung\s*yuen\s*wai/ig, '香園圍');
+        };
+        if (routeData.pickup) routeData.pickup = replaceEnToZh(routeData.pickup);
+        if (routeData.dropoff) routeData.dropoff = replaceEnToZh(routeData.dropoff);
+        if (routeData.stopovers && routeData.stopovers.length > 0) {
+            routeData.stopovers = routeData.stopovers.map(replaceEnToZh);
+        }
+    }
+
     let pickupVal = routeData.pickup || '';
     let dropoffVal = routeData.dropoff || '';
     let stopoverTexts = routeData.stopovers || [];
