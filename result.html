@@ -138,8 +138,14 @@
     @keyframes mifaFleetBtnBlink { 0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 4px 12px rgba(255, 242, 0, 0.4); } 50% { opacity: 0.75; transform: scale(1.03); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); } }
     .mifa-fleet-btn-blink { animation: mifaFleetBtnBlink 1.2s ease-in-out infinite !important; }
     .mifa-fleet-btn-blink:hover { animation-play-state: paused; opacity: 1; transform: scale(1.05); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); }
-    #tunnel-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
-    .tunnel-btn { width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151; background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF; display: flex; align-items: center; justify-content: center; gap: 0.3rem; white-space: nowrap; text-align: center; }
+    
+    /* ⭐ 修改：解決英文模式下隧道按鈕出界嘅問題 */
+    #tunnel-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+    @media (min-width: 600px) {
+        #tunnel-btns { grid-template-columns: repeat(4, 1fr); }
+    }
+    .tunnel-btn { width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151; background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF; display: flex; align-items: center; justify-content: center; gap: 0.3rem; text-align: center; word-break: break-word; line-height: 1.2; }
+
     .tunnel-btn:hover { color: #FFF200; border-color: #FFF200; }
     .tunnel-btn.active { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3); }
     .tunnel-checkbox { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 3px; font-size: 11px; font-weight: 900; line-height: 1; flex-shrink: 0; }
@@ -632,7 +638,6 @@ const NORTH_NTW_WAYPOINT = { lat: 22.482000, lng: 114.060000 };
 const UNIVERSITY_STATION_LAT = 22.4135;
 
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
-    // ⭐ 用戶主動選「屯門公路」：強制經過屯門公路點（優先級最高）
     if (selectedForcedTunnels.indexOf('屯門公路') >= 0) {
         return TUEN_MUN_ROAD_POINT;
     }
@@ -645,7 +650,6 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
 
     if (!isFromSZ && !isToSZ && !stopoverHasSZ) return null;
 
-    // ⭐ 如果用戶揀咗城隧，強制使用屯門公路
     if (selectedForcedTunnels.indexOf('城隧') >= 0) {
         return TUEN_MUN_ROAD_POINT;
     }
@@ -711,7 +715,6 @@ function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
     let nonHarbourPt = null;
 
     selectedForcedTunnels.forEach(tunnelName => {
-        // ⭐ 屯門公路唔係隧道，跳過（由 getTuenMunRoadAvoidancePoint 處理）
         if (tunnelName === '屯門公路') return;
 
         const isHarbour = HARBOUR_TUNNEL_NAMES.indexOf(tunnelName) >= 0;
@@ -754,7 +757,6 @@ function renderTunnelButtons() {
         container.appendChild(btn);
     });
 
-    // ⭐ 屯門公路自選按鈕
     const tmBtn = document.createElement('button');
     tmBtn.type = 'button';
     tmBtn.dataset.tunnel = '屯門公路';
