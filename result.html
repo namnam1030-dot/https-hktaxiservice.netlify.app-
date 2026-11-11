@@ -183,7 +183,7 @@ let routeOverlays = [];
 
 let _originLatLngCache = null;
 
-const TUEN_MUN_ROAD_POINT = { lat: 22.365444, lng: 114.050028 };
+const TUEN_MUN_ROAD_POINT = { lat: 22.385000, lng: 113.970000 };
 
 const NTW_KEYWORDS = [
     '屯門', '屯门', '元朗', '天水圍', '天水围',
@@ -224,7 +224,6 @@ const HKI_KEYWORDS = [
     '藍塘道', '蓝塘道', '山道', '西邊街', '西边街'
 ];
 
-/* ⭐ 修改：將西貢同將軍澳由 NTE 抽出嚟，放去新嘅 NTE_S (新界東南) */
 const ZONE_KEYWORDS = {
     HKI: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','柴灣','柴湾','金鐘','金钟','堅尼地城','坚尼地城','西營盤','西营盘','上環','上环','山頂','山顶','半山','天后','炮台山','大坑','渣甸山','薄扶林','香港仔','鴨脷洲','鸭脷洲','赤柱','淺水灣','浅水湾','數碼港','数码港','石澳','大潭'],
     HKI_N: ['跑馬地','跑马地','铜锣湾','銅鑼灣','中環','中环','灣仔','湾仔','北角','鰂魚涌','鲗鱼涌','太古','西灣河','西湾河','筲箕灣','筲箕湾','金鐘','金钟','天后','炮台山','大坑','西半山','東半山','东半山','半山'],
@@ -245,7 +244,6 @@ const ZONE_KEYWORDS = {
     SZ: ['深圳灣','深圳湾','皇崗','皇岗','落馬洲','落马洲','蓮塘','莲塘','香園圍','香园围','羅湖','罗湖','文錦渡','文锦渡']
 };
 
-/* ⭐ 修改：加入 NTE_S 嘅對應規則，並放寬香港仔隧道限制 */
 const TUNNEL_ZONE_RULES = {
     '紅隧':  { sides: [['HKI'], ['KLN','NTE','NTE_S','NTW','LANTAU','SZ']] },
     '東隧':  { sides: [['HKI'], ['KLN','NTE','NTE_S','NTW','LANTAU','SZ']] },
@@ -647,6 +645,18 @@ const UNIVERSITY_STATION_LAT = 22.4135;
 
 function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, originLatLng) {
     if (selectedForcedTunnels.indexOf('屯門公路') >= 0) {
+        // ⭐ 避免分段時兩端都在東邊(如將軍澳去大圍)時強行繞去屯門
+        const startZones = getLocationZone(pickupVal);
+        const endZones = getLocationZone(dropoffVal);
+        const isStartEast = startZones.includes('NTE') || startZones.includes('NTE_S') || startZones.includes('KLN');
+        const isEndEast = endZones.includes('NTE') || endZones.includes('NTE_S') || endZones.includes('KLN');
+        
+        const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
+        const isToSZ = dropoffVal.includes("深圳灣") || dropoffVal.includes("深圳湾");
+        
+        if (isStartEast && isEndEast && !isFromSZ && !isToSZ) {
+            return null;
+        }
         return TUEN_MUN_ROAD_POINT;
     }
 
