@@ -139,12 +139,12 @@
     .mifa-fleet-btn-blink { animation: mifaFleetBtnBlink 1.2s ease-in-out infinite !important; }
     .mifa-fleet-btn-blink:hover { animation-play-state: paused; opacity: 1; transform: scale(1.05); box-shadow: 0 8px 22px rgba(255, 242, 0, 0.9); }
     
-    /* ⭐ 修改：解決英文模式下隧道按鈕出界嘅問題 */
-    #tunnel-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
-    @media (min-width: 600px) {
-        #tunnel-btns { grid-template-columns: repeat(4, 1fr); }
-    }
-    .tunnel-btn { width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151; background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF; display: flex; align-items: center; justify-content: center; gap: 0.3rem; text-align: center; word-break: break-word; line-height: 1.2; }
+    /* ⭐ 恢復中文 4 欄，英文動態切換 2 欄 */
+    #tunnel-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    #tunnel-btns.en-layout { grid-template-columns: repeat(2, 1fr); }
+    
+    .tunnel-btn { width: 100%; padding: 0.5rem 0.25rem; border-radius: 0.5rem; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; border: 1px solid #374151; background-color: rgba(0, 0, 0, 0.4); color: #9CA3AF; display: flex; align-items: center; justify-content: center; gap: 0.3rem; white-space: nowrap; text-align: center; }
+    #tunnel-btns.en-layout .tunnel-btn { white-space: normal; word-break: break-word; line-height: 1.2; }
 
     .tunnel-btn:hover { color: #FFF200; border-color: #FFF200; }
     .tunnel-btn.active { background-color: #FFF200 !important; color: #000000 !important; border-color: #000000 !important; box-shadow: 0 4px 10px rgba(255, 242, 0, 0.3); }
@@ -743,6 +743,13 @@ function collectTunnelWaypoints(pickupText, dropoffText, originLatLng) {
 function renderTunnelButtons() {
     const container = document.getElementById('tunnel-btns');
     if (!container) return;
+
+    // ⭐ 中文維持原本 4 欄，英文切換 2 欄
+    if (currentLang === 'en') {
+        container.classList.add('en-layout');
+    } else {
+        container.classList.remove('en-layout');
+    }
 
     container.innerHTML = '';
     tunnelDatabase.forEach(tunnel => {
