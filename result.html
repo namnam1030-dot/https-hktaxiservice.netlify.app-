@@ -177,7 +177,7 @@ let routeOverlays = [];
 
 let _originLatLngCache = null;
 
-const TUEN_MUN_ROAD_POINT = { lat: 22.385000, lng: 113.970000 };
+const TUEN_MUN_ROAD_POINT = { lat: 22.365444, lng: 114.050028 };
 
 const NTW_KEYWORDS = [
     '屯門', '屯门', '元朗', '天水圍', '天水围',
@@ -461,7 +461,6 @@ function normalizeLocation(loc, isPickup = false) {
         return new google.maps.LatLng(22.551972, 114.153694);
     }
     
-    // ⭐ 聽從指示：起點用新座標，目的地用舊座標
     if (trimmed.includes("皇崗口岸") || trimmed.includes("皇岗口岸") || trimmed.includes("新皇崗口岸") || trimmed.includes("新皇岗口岸") || trimmed.includes("皇崗") || trimmed.includes("皇岗")) {
         if (isPickup) {
             return new google.maps.LatLng(22.518139, 114.070583);
@@ -471,41 +470,6 @@ function normalizeLocation(loc, isPickup = false) {
     
     if (trimmed.includes("深圳灣") || trimmed.includes("深圳湾")) {
         return new google.maps.LatLng(22.475889, 113.955944);
-    }
-
-    // ⭐ 新增：黃石碼頭（西貢東郊野公園禁區）強制使用精確座標，避免 Google 無法規劃路線
-    if (trimmed.includes("黃石碼頭") || trimmed.includes("黄石码头") || trimmed.includes("黃石") || trimmed.includes("黄石")) {
-        return new google.maps.LatLng(22.4356362, 114.3373492);
-    }
-// ⭐ 新增：熱門郊遊地點強制使用精確座標
-    // 沙下
-    if (trimmed.includes("沙下")) {
-        return new google.maps.LatLng(22.388988, 114.275549);
-    }
-    // 西灣亭
-    if (trimmed.includes("西灣亭") || trimmed.includes("西湾亭")) {
-        return new google.maps.LatLng(22.39475, 114.36012);
-    }
-    // 東壩 (萬宜水庫)
-    if (trimmed.includes("東壩") || trimmed.includes("东坝") || 
-        trimmed.includes("萬宜水庫東壩") || trimmed.includes("万宜水库东坝")) {
-        return new google.maps.LatLng(22.36389, 114.37222);
-    }
-    // 白腊
-    if (trimmed.includes("白腊") || trimmed.includes("白蠟")) {
-        return new google.maps.LatLng(22.358933, 114.362144);
-    }
-// 鹹田灣
-    if (trimmed.includes("鹹田灣") || trimmed.includes("咸田湾") || trimmed.includes("鹹田") || trimmed.includes("咸田")) {
-        return new google.maps.LatLng(22.40962285, 114.37429643);
-    }
-    // 赤徑
-    if (trimmed.includes("赤徑") || trimmed.includes("赤径")) {
-        return new google.maps.LatLng(22.42134, 114.3502);
-    }
-    // 浪茄
-    if (trimmed.includes("浪茄")) {
-        return new google.maps.LatLng(22.37405, 114.37506);
     }
 
     if (trimmed.includes("愉景灣")) return "愉景灣的士站";
