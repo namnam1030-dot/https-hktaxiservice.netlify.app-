@@ -901,6 +901,28 @@ async function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isSh
     let targetPickup = await getLocationObjectAsync(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
     let targetDropoff = await getLocationObjectAsync(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
 
+    // ⭐ 修復：確保第一次計算時 _originLatLngCache 同 routeData 有座標，
+    // 避免 getTuenMunRoadAvoidancePoint 因為 pLat/dLat = 0 而錯誤強制加屯門公路 waypoint（兜路）
+    if (targetPickup && typeof targetPickup.lat === 'function') {
+        _originLatLngCache = targetPickup;
+        if (routeData) {
+            if (!routeData.pickupLat || isNaN(parseFloat(routeData.pickupLat))) {
+                routeData.pickupLat = targetPickup.lat();
+            }
+            if (!routeData.pickupLng || isNaN(parseFloat(routeData.pickupLng))) {
+                routeData.pickupLng = targetPickup.lng();
+            }
+        }
+    }
+    if (targetDropoff && typeof targetDropoff.lat === 'function' && routeData) {
+        if (!routeData.dropoffLat || isNaN(parseFloat(routeData.dropoffLat))) {
+            routeData.dropoffLat = targetDropoff.lat();
+        }
+        if (!routeData.dropoffLng || isNaN(parseFloat(routeData.dropoffLng))) {
+            routeData.dropoffLng = targetDropoff.lng();
+        }
+    }
+
     let waypoints = [];
     for (let i = 0; i < stopoverTexts.length; i++) {
         let s = stopoverTexts[i];
@@ -968,8 +990,35 @@ async function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShe
         const segStart = allPoints[i];
         const segEnd = allPoints[i + 1];
 
-        const segTunnelWaypoints = [];
+        // ⭐ 先非同步獲取精確座標
+        let segOrigin = await getLocationObjectAsync(segStart.text, segStart.isPickup, segStart.pId, segStart.lat, segStart.lng);
+        let segDest = await getLocationObjectAsync(segEnd.text, segEnd.isPickup, segEnd.pId, segEnd.lat, segEnd.lng);
 
+        // ⭐ 修復：第一次循環時確保 _originLatLngCache 同 routeData.pickupLat/Lng 有值；
+        // 最後一次循環時確保 routeData.dropoffLat/Lng 有值。
+        // 咁樣 getTuenMunRoadAvoidancePoint 第一次就有正確座標判斷，唔會兜路。
+        if (i === 0 && segOrigin && typeof segOrigin.lat === 'function') {
+            _originLatLngCache = segOrigin;
+            if (routeData) {
+                if (!routeData.pickupLat || isNaN(parseFloat(routeData.pickupLat))) {
+                    routeData.pickupLat = segOrigin.lat();
+                }
+                if (!routeData.pickupLng || isNaN(parseFloat(routeData.pickupLng))) {
+                    routeData.pickupLng = segOrigin.lng();
+                }
+            }
+        }
+        if (i === allPoints.length - 2 && segDest && typeof segDest.lat === 'function' && routeData) {
+            if (!routeData.dropoffLat || isNaN(parseFloat(routeData.dropoffLat))) {
+                routeData.dropoffLat = segDest.lat();
+            }
+            if (!routeData.dropoffLng || isNaN(parseFloat(routeData.dropoffLng))) {
+                routeData.dropoffLng = segDest.lng();
+            }
+        }
+
+        // 之後才計算隧道 waypoints 同屯門公路 avoidance
+        const segTunnelWaypoints = [];
         const segTunnelWaypointsList = collectTunnelWaypoints(segStart.text, segEnd.text, _originLatLngCache);
 
         const segTmRoadPoint = getTuenMunRoadAvoidancePoint(segStart.text, segEnd.text, [], _originLatLngCache);
@@ -983,10 +1032,6 @@ async function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShe
             segTunnelWaypointsList.forEach(pt => segTunnelWaypoints.push({ location: pt, stopover: false }));
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
         }
-
-        // ⭐ 非同步獲取精確座標
-        let segOrigin = await getLocationObjectAsync(segStart.text, segStart.isPickup, segStart.pId, segStart.lat, segStart.lng);
-        let segDest = await getLocationObjectAsync(segEnd.text, segEnd.isPickup, segEnd.pId, segEnd.lat, segEnd.lng);
 
         segments.push({
             origin: segOrigin,
@@ -1128,6 +1173,23 @@ function mergeSegmentsFromRoutes(routesArr) {
 async function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     let targetPickup = await getLocationObjectAsync(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
     let targetDropoff = await getLocationObjectAsync(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
+
+    // ⭐ 同樣修復座標
+    if (targetPickup && typeof targetPickup.lat === 'function') {
+        _originLatLngCache = targetPickup;
+        if (routeData) {
+            if (!routeData.pickupLat || isNaN(parseFloat(routeData.pickupLat))) {
+                routeData.pickupLat = targetPickup.lat();
+                routeData.pickupLng = targetPickup.lng();
+            }
+        }
+    }
+    if (targetDropoff && typeof targetDropoff.lat === 'function' && routeData) {
+        if (!routeData.dropoffLat || isNaN(parseFloat(routeData.dropoffLat))) {
+            routeData.dropoffLat = targetDropoff.lat();
+            routeData.dropoffLng = targetDropoff.lng();
+        }
+    }
 
     let waypoints = [];
     for (let i = 0; i < stopoverTexts.length; i++) {
