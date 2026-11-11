@@ -809,12 +809,13 @@ function getLocationObject(textVal, isPickup, placeIdKey, latKey, lngKey) {
     if (typeof norm !== 'string') {
         return norm;
     }
-    // 否則，如果有存低 placeId 或經緯度，優先用佢
-    if (routeData && routeData[placeIdKey]) {
-        return { placeId: routeData[placeIdKey] };
-    }
+    // ⭐ 修正：優先使用經緯度，因為 Directions API 對座標嘅容錯率最高
     if (routeData && routeData[latKey] != null && routeData[lngKey] != null) {
         return new google.maps.LatLng(routeData[latKey], routeData[lngKey]);
+    }
+    // 其次用 placeId
+    if (routeData && routeData[placeIdKey]) {
+        return { placeId: routeData[placeIdKey] };
     }
     return norm; // 最後 fallback 用文字
 }
