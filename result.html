@@ -803,25 +803,50 @@ function calculateFareWithGoogle() {
     }
 }
 
+// ⭐ 用 Places API 取代 Geocoder 進行後備搜尋 (因為 Places 對屋苑/地標更準確)
 function geocodeAddressToLatLng(address) {
     return new Promise((resolve) => {
-        if (!window.google || !google.maps.Geocoder) return resolve(address);
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode(
-            {
-                address: address,
-                region: 'HK',
-                language: 'zh-HK',
+        if (!window.google) return resolve(address);
+        
+        if (google.maps.places && google.maps.places.PlacesService) {
+            var dummyDiv = document.createElement('div');
+            var service = new google.maps.places.PlacesService(dummyDiv);
+            service.textSearch({
+                query: address,
+                location: new google.maps.LatLng(22.3193, 114.1694), // 香港中心
+                radius: 50000,
                 componentRestrictions: { country: 'HK' }
-            },
-            function(results, status) {
-                if (status === 'OK' && results && results[0] && results[0].geometry) {
+            }, function(results, status) {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0] && results[0].geometry) {
                     resolve(results[0].geometry.location);
                 } else {
-                    resolve(address);
+                    // 如果 Places 搵唔到，先試 Geocoder
+                    if (google.maps.Geocoder) {
+                        var geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ address: address, region: 'HK', language: 'zh-HK', componentRestrictions: { country: 'HK' } }, function(gResults, gStatus) {
+                            if (gStatus === 'OK' && gResults && gResults[0] && gResults[0].geometry) {
+                                resolve(gResults[0].geometry.location);
+                            } else {
+                                resolve(address);
+                            }
+                        });
+                    } else {
+                        resolve(address);
+                    }
                 }
-            }
-        );
+            });
+        } else if (google.maps.Geocoder) {
+             var geocoder = new google.maps.Geocoder();
+             geocoder.geocode({ address: address, region: 'HK', language: 'zh-HK', componentRestrictions: { country: 'HK' } }, function(results, status) {
+                 if (status === 'OK' && results && results[0] && results[0].geometry) {
+                     resolve(results[0].geometry.location);
+                 } else {
+                     resolve(address);
+                 }
+             });
+        } else {
+            resolve(address);
+        }
     });
 }
 
@@ -834,14 +859,14 @@ async function getLocationObjectAsync(textVal, isPickup, placeIdKey, latKey, lng
     }
     
     if (routeData && routeData[placeIdKey]) {
-        // 如果係起點，Directions API 對 Place ID 有時會報無法規劃，所以用 Geocoder 轉座標
+        // 如果係起點，Directions API 對 Place ID 有時會報無法規劃，所以用 Places Service / Geocoder 轉座標
         if (isPickup) {
             return await geocodeAddressToLatLng(textVal);
         }
         return { placeId: routeData[placeIdKey] };
     }
     
-    // 如果連 Place ID 都冇，強制 Geocode
+    // 如果連 Place ID 都冇，強制用 Places / Geocoder 查
     return await geocodeAddressToLatLng(textVal);
 }
 
