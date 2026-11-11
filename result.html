@@ -773,6 +773,7 @@ function calculateFareWithGoogle() {
     let pickupVal = routeData.pickup || '';
     let dropoffVal = routeData.dropoff || '';
     let stopoverTexts = routeData.stopovers || [];
+    
     // ⭐ 修改：起點係深圳灣或皇崗，都視為 9 折 (isShenzhenBay = true)
     isShenzhenBay = (pickupVal.indexOf('深圳灣') >= 0 || pickupVal.indexOf('深圳湾') >= 0 || pickupVal.indexOf('皇崗') >= 0 || pickupVal.indexOf('皇岗') >= 0);
     
@@ -802,13 +803,35 @@ function calculateFareWithGoogle() {
     }
 }
 
+function getLocationObject(textVal, isPickup, placeIdKey, latKey, lngKey) {
+    var norm = normalizeLocation(textVal, isPickup);
+    // 如果 normalizeLocation 返回咗一個 LatLng object (即係命中咗特殊 keyword 如機場/皇崗)，直接用
+    if (typeof norm !== 'string') {
+        return norm;
+    }
+    // 否則，如果有存低 placeId 或經緯度，優先用佢
+    if (routeData && routeData[placeIdKey]) {
+        return { placeId: routeData[placeIdKey] };
+    }
+    if (routeData && routeData[latKey] != null && routeData[lngKey] != null) {
+        return new google.maps.LatLng(routeData[latKey], routeData[lngKey]);
+    }
+    return norm; // 最後 fallback 用文字
+}
+
 function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-    let targetPickup = normalizeLocation(pickupVal, true);
-    let targetDropoff = normalizeLocation(dropoffVal, false);
+    // ⭐ 改用 getLocationObject 優先攞座標
+    let targetPickup = getLocationObject(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
+    let targetDropoff = getLocationObject(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
 
     let waypoints = [];
-    stopoverTexts.forEach(s => {
-        waypoints.push({ location: normalizeLocation(s, false), stopover: true });
+    stopoverTexts.forEach((s, i) => {
+        let stopObj = normalizeLocation(s, false);
+        let stopPlaceId = routeData.stopoverPlaceIds ? routeData.stopoverPlaceIds[i] : '';
+        if (typeof stopObj === 'string' && stopPlaceId) {
+            stopObj = { placeId: stopPlaceId };
+        }
+        waypoints.push({ location: stopObj, stopover: true });
     });
 
     const tunnelWaypoints = collectTunnelWaypoints(pickupVal, dropoffVal, _originLatLngCache);
@@ -855,9 +878,9 @@ function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhen
 
 function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
-        { text: pickupVal, isPickup: true },
-        ...stopoverTexts.map(s => ({ text: s, isPickup: false })),
-        { text: dropoffVal, isPickup: false }
+        { text: pickupVal, isPickup: true, pId: 'pickupPlaceId', lat: 'pickupLat', lng: 'pickupLng' },
+        ...stopoverTexts.map((s, i) => ({ text: s, isPickup: false, pId: 'stopoverPlaceIds_' + i, lat: '', lng: '' })),
+        { text: dropoffVal, isPickup: false, pId: 'dropoffPlaceId', lat: 'dropoffLat', lng: 'dropoffLng' }
     ];
 
     const segments = [];
@@ -881,9 +904,13 @@ function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenB
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
         }
 
+        // ⭐ 優先使用 placeId 或 座標
+        let segOrigin = getLocationObject(segStart.text, segStart.isPickup, segStart.pId, segStart.lat, segStart.lng);
+        let segDest = getLocationObject(segEnd.text, segEnd.isPickup, segEnd.pId, segEnd.lat, segEnd.lng);
+
         segments.push({
-            origin: normalizeLocation(segStart.text, segStart.isPickup),
-            destination: normalizeLocation(segEnd.text, false),
+            origin: segOrigin,
+            destination: segDest,
             waypoints: segTunnelWaypoints,
             segIndex: i,
             originText: segStart.text,
@@ -1019,12 +1046,17 @@ function mergeSegmentsFromRoutes(routesArr) {
 }
 
 function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-    let targetPickup = normalizeLocation(pickupVal, true);
-    let targetDropoff = normalizeLocation(dropoffVal, false);
+    let targetPickup = getLocationObject(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
+    let targetDropoff = getLocationObject(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
 
     let waypoints = [];
-    stopoverTexts.forEach(s => {
-        waypoints.push({ location: normalizeLocation(s, false), stopover: true });
+    stopoverTexts.forEach((s, i) => {
+        let stopObj = normalizeLocation(s, false);
+        let stopPlaceId = routeData.stopoverPlaceIds ? routeData.stopoverPlaceIds[i] : '';
+        if (typeof stopObj === 'string' && stopPlaceId) {
+            stopObj = { placeId: stopPlaceId };
+        }
+        waypoints.push({ location: stopObj, stopover: true });
     });
 
     const request = {
