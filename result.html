@@ -660,7 +660,8 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
         return TUEN_MUN_ROAD_POINT;
     }
 
-    if (selectedForcedTunnels.indexOf("大欖") >= 0) return null;
+    // ⭐ 如果用戶自選了「大欖」或「屯赤」，就不要強制加屯門公路點，避免折返兜路
+    if (selectedForcedTunnels.indexOf("大欖") >= 0 || selectedForcedTunnels.indexOf("屯赤") >= 0) return null;
 
     const isFromSZ = pickupVal.includes("深圳灣") || pickupVal.includes("深圳湾");
     const isToSZ = dropoffVal.includes("深圳灣") || dropoffVal.includes("深圳湾");
