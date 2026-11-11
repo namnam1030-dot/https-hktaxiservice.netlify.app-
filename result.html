@@ -640,6 +640,13 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
 
     if (!isFromSZ && !isToSZ && !stopoverHasSZ) return null;
 
+    // ⭐ 修正：如果行程只係喺兩個口岸（皇崗 <-> 深圳灣）之間穿梭，直接行元朗公路，唔好兜去屯門公路，避免出現 U 形路線
+    const isFromHG = pickupVal.includes("皇崗") || pickupVal.includes("皇岗");
+    const isToHG = dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗");
+    if ((isFromHG && isToSZ) || (isToHG && isFromSZ)) {
+        return null;
+    }
+
     if (isLocationInNTW(pickupVal, originLatLng)) return null;
     if (isLocationInNTW(dropoffVal, null)) return null;
     for (let i = 0; i < stopoverTexts.length; i++) {
@@ -803,89 +810,33 @@ function calculateFareWithGoogle() {
     }
 }
 
-// ⭐ 用 Places API 取代 Geocoder 進行後備搜尋 (因為 Places 對屋苑/地標更準確)
-function geocodeAddressToLatLng(address) {
-    return new Promise((resolve) => {
-        if (!window.google) return resolve(address);
-        
-        if (google.maps.places && google.maps.places.PlacesService) {
-            var dummyDiv = document.createElement('div');
-            var service = new google.maps.places.PlacesService(dummyDiv);
-            service.textSearch({
-                query: address,
-                location: new google.maps.LatLng(22.3193, 114.1694), // 香港中心
-                radius: 50000,
-                componentRestrictions: { country: 'HK' }
-            }, function(results, status) {
-                if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0] && results[0].geometry) {
-                    resolve(results[0].geometry.location);
-                } else {
-                    // 如果 Places 搵唔到，先試 Geocoder
-                    if (google.maps.Geocoder) {
-                        var geocoder = new google.maps.Geocoder();
-                        geocoder.geocode({ address: address, region: 'HK', language: 'zh-HK', componentRestrictions: { country: 'HK' } }, function(gResults, gStatus) {
-                            if (gStatus === 'OK' && gResults && gResults[0] && gResults[0].geometry) {
-                                resolve(gResults[0].geometry.location);
-                            } else {
-                                resolve(address);
-                            }
-                        });
-                    } else {
-                        resolve(address);
-                    }
-                }
-            });
-        } else if (google.maps.Geocoder) {
-             var geocoder = new google.maps.Geocoder();
-             geocoder.geocode({ address: address, region: 'HK', language: 'zh-HK', componentRestrictions: { country: 'HK' } }, function(results, status) {
-                 if (status === 'OK' && results && results[0] && results[0].geometry) {
-                     resolve(results[0].geometry.location);
-                 } else {
-                     resolve(address);
-                 }
-             });
-        } else {
-            resolve(address);
-        }
-    });
-}
-
-async function getLocationObjectAsync(textVal, isPickup, placeIdKey, latKey, lngKey) {
+function getLocationObject(textVal, isPickup, placeIdKey, latKey, lngKey) {
     var norm = normalizeLocation(textVal, isPickup);
-    if (typeof norm !== 'string') return norm;
-    
+    if (typeof norm !== 'string') {
+        return norm;
+    }
     if (routeData && routeData[latKey] != null && routeData[lngKey] != null) {
         return new google.maps.LatLng(routeData[latKey], routeData[lngKey]);
     }
-    
     if (routeData && routeData[placeIdKey]) {
-        // 如果係起點，Directions API 對 Place ID 有時會報無法規劃，所以用 Places Service / Geocoder 轉座標
-        if (isPickup) {
-            return await geocodeAddressToLatLng(textVal);
-        }
         return { placeId: routeData[placeIdKey] };
     }
-    
-    // 如果連 Place ID 都冇，強制用 Places / Geocoder 查
-    return await geocodeAddressToLatLng(textVal);
+    return norm;
 }
 
-async function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-    let targetPickup = await getLocationObjectAsync(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
-    let targetDropoff = await getLocationObjectAsync(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
+function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
+    let targetPickup = getLocationObject(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
+    let targetDropoff = getLocationObject(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
 
     let waypoints = [];
-    for (let i = 0; i < stopoverTexts.length; i++) {
-        let s = stopoverTexts[i];
+    stopoverTexts.forEach((s, i) => {
         let stopObj = normalizeLocation(s, false);
         let stopPlaceId = routeData.stopoverPlaceIds ? routeData.stopoverPlaceIds[i] : '';
         if (typeof stopObj === 'string' && stopPlaceId) {
             stopObj = { placeId: stopPlaceId };
-        } else if (typeof stopObj === 'string') {
-            stopObj = await geocodeAddressToLatLng(s);
         }
         waypoints.push({ location: stopObj, stopover: true });
-    }
+    });
 
     const tunnelWaypoints = collectTunnelWaypoints(pickupVal, dropoffVal, _originLatLngCache);
 
@@ -929,7 +880,7 @@ async function calculateSingleRequest(pickupVal, dropoffVal, stopoverTexts, isSh
     });
 }
 
-async function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
+function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
     const allPoints = [
         { text: pickupVal, isPickup: true, pId: 'pickupPlaceId', lat: 'pickupLat', lng: 'pickupLng' },
         ...stopoverTexts.map((s, i) => ({ text: s, isPickup: false, pId: 'stopoverPlaceIds_' + i, lat: '', lng: '' })),
@@ -957,9 +908,8 @@ async function calculateWithSegments(pickupVal, dropoffVal, stopoverTexts, isShe
             if (segTmLatLng) segTunnelWaypoints.push({ location: segTmLatLng, stopover: false });
         }
 
-        // ⭐ 非同步獲取精確座標
-        let segOrigin = await getLocationObjectAsync(segStart.text, segStart.isPickup, segStart.pId, segStart.lat, segStart.lng);
-        let segDest = await getLocationObjectAsync(segEnd.text, segEnd.isPickup, segEnd.pId, segEnd.lat, segEnd.lng);
+        let segOrigin = getLocationObject(segStart.text, segStart.isPickup, segStart.pId, segStart.lat, segStart.lng);
+        let segDest = getLocationObject(segEnd.text, segEnd.isPickup, segEnd.pId, segEnd.lat, segEnd.lng);
 
         segments.push({
             origin: segOrigin,
@@ -1098,22 +1048,19 @@ function mergeSegmentsFromRoutes(routesArr) {
     return merged;
 }
 
-async function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
-    let targetPickup = await getLocationObjectAsync(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
-    let targetDropoff = await getLocationObjectAsync(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
+function fallbackToSingleRequest(pickupVal, dropoffVal, stopoverTexts, isShenzhenBayRoute, isHuanggangRoute) {
+    let targetPickup = getLocationObject(pickupVal, true, 'pickupPlaceId', 'pickupLat', 'pickupLng');
+    let targetDropoff = getLocationObject(dropoffVal, false, 'dropoffPlaceId', 'dropoffLat', 'dropoffLng');
 
     let waypoints = [];
-    for (let i = 0; i < stopoverTexts.length; i++) {
-        let s = stopoverTexts[i];
+    stopoverTexts.forEach((s, i) => {
         let stopObj = normalizeLocation(s, false);
         let stopPlaceId = routeData.stopoverPlaceIds ? routeData.stopoverPlaceIds[i] : '';
         if (typeof stopObj === 'string' && stopPlaceId) {
             stopObj = { placeId: stopPlaceId };
-        } else if (typeof stopObj === 'string') {
-            stopObj = await geocodeAddressToLatLng(s);
         }
         waypoints.push({ location: stopObj, stopover: true });
-    }
+    });
 
     const request = {
         origin: targetPickup,
