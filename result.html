@@ -640,7 +640,17 @@ function getTuenMunRoadAvoidancePoint(pickupVal, dropoffVal, stopoverTexts, orig
 
     if (!isFromSZ && !isToSZ && !stopoverHasSZ) return null;
 
-    // ⭐ 修正：如果行程只係喺兩個口岸（皇崗 <-> 深圳灣）之間穿梭，直接行元朗公路，唔好兜去屯門公路，避免出現 U 形路線
+    // ⭐ 指定座標 22°24'15.1"N 以北嘅判斷 (22.404194)
+    const NORTH_BOUNDARY_LAT = 22.404194;
+    let pLat = (originLatLng && typeof originLatLng.lat === 'function') ? originLatLng.lat() : (routeData && routeData.pickupLat ? parseFloat(routeData.pickupLat) : 0);
+    let dLat = (routeData && routeData.dropoffLat) ? parseFloat(routeData.dropoffLat) : 0;
+
+    // 如果起點在界限以北去深圳灣，或者由深圳灣去界限以北，取消屯門公路
+    if ((isToSZ && pLat > NORTH_BOUNDARY_LAT) || (isFromSZ && dLat > NORTH_BOUNDARY_LAT)) {
+        return null;
+    }
+
+    // ⭐ 原有的皇崗互通邏輯
     const isFromHG = pickupVal.includes("皇崗") || pickupVal.includes("皇岗");
     const isToHG = dropoffVal.includes("皇崗") || dropoffVal.includes("皇岗");
     if ((isFromHG && isToSZ) || (isToHG && isFromSZ)) {
