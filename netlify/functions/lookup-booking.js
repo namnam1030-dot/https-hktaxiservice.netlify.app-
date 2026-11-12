@@ -47,6 +47,45 @@ function extractStopoversFromDescription(description) {
   return '';
 }
 
+// ⭐ 新增：根據 extendedProperties 計算總車費（與前端 calculateTotalFare 邏輯一致）
+function calcTotalFareFromExt(ext) {
+  const baseFare = parseInt(ext.baseFare || '0', 10) || 0;
+  const tunnelFee = parseInt(ext.tunnelFee || '0', 10) || 0;
+  const surcharge = parseInt(ext.surcharge || '0', 10) || 0;
+  const carName = ext.selectedCarName || '';
+  const fareMode = ext.selectedFareMode || 'normal';
+  const pickup = ext.pickup || '';
+
+  if (baseFare <= 0) return 0;
+
+  // ⭐ 用 pickup 判斷九折定八五折
+  const isSZ = pickup.indexOf('深圳灣') >= 0 || pickup.indexOf('深圳湾') >= 0 ||
+               pickup.indexOf('皇崗') >= 0 || pickup.indexOf('皇岗') >= 0;
+  const rate = isSZ ? 0.9 : 0.85;
+
+  if (carName === '豐田混能的士') {
+    if (fareMode === 'discount') {
+      const discountedBase = Math.max(Math.round(baseFare * rate), 100);
+      let discountTunnelFee = 0;
+      if (tunnelFee > 0) {
+        const harborCount = Math.floor(tunnelFee / 50);
+        discountTunnelFee = harborCount * 25 + (tunnelFee % 50);
+      }
+      return discountedBase + discountTunnelFee;
+    }
+    return Math.max(baseFare, 100) + tunnelFee;
+  }
+
+  if (carName === 'MAXUS MIFA 7') {
+    const adjustedBase = Math.max(baseFare, 80);
+    const basePlusSurcharge = adjustedBase + 50;
+    if (basePlusSurcharge >= 250) return basePlusSurcharge - 50 + tunnelFee;
+    return basePlusSurcharge + tunnelFee;
+  }
+
+  return Math.max(baseFare, 80) + surcharge + tunnelFee;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: CORS_HEADERS, body: '' };
@@ -156,7 +195,8 @@ exports.handler = async (event) => {
         tunnelFee: parseInt(ext.tunnelFee || '0', 10) || 0,
         surcharge: parseInt(ext.surcharge || '0', 10) || 0,
         selectedFareMode: ext.selectedFareMode || 'normal',
-        selectedCarName: ext.selectedCarName || ''
+        selectedCarName: ext.selectedCarName || '',
+        totalFare: calcTotalFareFromExt(ext)   // ⭐ 新增：供前端對比車費變化
       };
     } else {
       const desc = ev.description || '';
@@ -195,6 +235,7 @@ exports.handler = async (event) => {
         surcharge: 0,
         selectedFareMode: 'normal',
         selectedCarName: '',
+        totalFare: 0,   // ⭐ 舊訂單冇車費資料
         isLegacy: true
       };
     }
