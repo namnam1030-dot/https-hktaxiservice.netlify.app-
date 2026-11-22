@@ -112,9 +112,6 @@
     html.light-theme body button[onclick="goBackToHome()"]:hover { background-color: #D1D5DB !important; }
     html.light-theme body a[href^="tel:"] { background-color: #3B82F6 !important; color: #FFFFFF !important; }
     html.light-theme body a[href*="wa.me"] { background-color: #FFF200 !important; color: #000000 !important; border: 1px solid #000000 !important; }
-    html.light-theme body #wecom-modal > div { background-color: #FFFFFF !important; }
-    html.light-theme body #wecom-modal h3 { color: #000000 !important; }
-    html.light-theme body #wecom-modal p { color: #4B5563 !important; }
     html.light-theme body .booking-modal__box { background: #FFFFFF !important; border-color: #16A34A !important; }
     html.light-theme body .booking-modal__title { color: #15803D !important; }
     html.light-theme body .booking-modal__text { color: #374151 !important; }
@@ -155,19 +152,6 @@
             <p class="text-xs text-gray-300 mb-4 leading-relaxed" data-i18n="modal_desc">為了方便下次叫車，您可以將本服務加到手機主畫面：</p>
             <div id="install-guide-content" class="text-left bg-black/60 p-3 rounded-xl text-xs text-gray-300 space-y-2 mb-4 border border-gray-800"></div>
             <button onclick="closeInstallGuide()" class="w-full bg-brand-yellow text-black font-bold py-2.5 rounded-xl text-xs cursor-pointer" data-i18n="btn_close_guide">了解，關閉</button>
-        </div>
-    </div>
-
-    <div id="wecom-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-brand-gray border-2 border-green-500 rounded-2xl p-6 max-w-sm w-full text-center relative">
-            <button onclick="closeWeComQR()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
-            <div class="text-green-500 text-4xl mb-3"><i class="fa-brands fa-weixin"></i></div>
-            <h3 class="text-2xl font-bold text-white mb-2" data-i18n="wecom_modal_title">掃描二維碼添加企業微信</h3>
-            <p class="text-xl text-gray-300 mb-4" data-i18n="wecom_modal_desc">請使用微信掃描以下二維碼，添加我們的企業微信後即可查詢預約</p>
-            <div class="bg-white p-3 rounded-xl mb-4 inline-block">
-                <img src="wecomcode.jpeg" alt="WeCom QR Code" width="192" height="192" style="aspect-ratio: 1/1;" class="w-48 h-48 object-contain" onerror="this.src='https://via.placeholder.com/200x200/fff/000?text=WeCom+QR'">
-            </div>
-            <button onclick="closeWeComQR()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl text-xl" data-i18n="btn_close">關閉</button>
         </div>
     </div>
 
@@ -221,9 +205,6 @@
                     <a href="https://wa.me/85268815441" target="_blank" class="w-full bg-brand-yellow text-black font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                         <i class="fa-brands fa-whatsapp text-xl"></i> <span data-i18n="btn_whatsapp_inquiry">WhatsApp 查詢</span>
                     </a>
-                    <button onclick="showWeComQR()" class="wechat-query-btn w-full font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
-                        <i class="fa-brands fa-weixin text-xl"></i> <span data-i18n="btn_wechat_inquiry">WeChat 查詢</span>
-                    </button>
                     <a href="tel:68815441" class="w-full bg-blue-500 text-white font-bold py-3 rounded-xl text-xl flex items-center justify-center gap-2 transition shadow-md">
                         <i class="fa-solid fa-phone text-xl"></i> <span data-i18n="btn_call_now">致電 6881 5441</span>
                     </a>
@@ -444,9 +425,6 @@ if (customerMessage) renderBookingDetails(customerMessage, changedFields);
 else document.getElementById('booking-details').textContent = translations[currentLang].no_booking_data;
 
 applyLanguage();
-
-function showWeComQR() { document.getElementById('wecom-modal').classList.remove('hidden'); }
-function closeWeComQR() { document.getElementById('wecom-modal').classList.add('hidden'); }
 
 function goBackToHome() {
     localStorage.removeItem('taxiRouteData');
