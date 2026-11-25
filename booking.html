@@ -475,7 +475,7 @@
             </button>
             <h3 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-plane-arrival text-brand-yellow mr-2"></i><span data-i18n="flight_select_title">選擇航班降落時間</span></h3>
             <p class="text-sm text-gray-400 mb-4" data-i18n="flight_select_desc">系統搵到以下航班資料，請點擊選擇：</p>
-            
+
             <div id="flight-options-list" class="max-h-[60vh] overflow-y-auto pr-1">
                 <!-- 列表由 JS 生成 -->
             </div>
@@ -500,7 +500,7 @@
             <a href="https://www.threads.net/@hktaxi688" target="_blank" rel="noopener noreferrer" class="social-threads-btn w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition shadow-md bg-black text-white hover:opacity-90">
                 <i class="fa-brands fa-threads text-lg"></i> Threads
             </a>
-            
+
             <a href="https://wa.me/85268815441?text=%E4%BD%A0%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E6%9F%A5%E8%A9%A2%E9%A0%90%E7%B4%84%E7%9A%84%E5%A3%AB%E6%9C%8D%E5%8B%99%EF%BC%81" target="_blank" id="whatsapp-btn" class="w-44 py-2 rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md">
                 <i class="fa-brands fa-whatsapp text-lg"></i> <span data-i18n="whatsapp_inquiry">WhatsApp</span>
             </a>
@@ -539,6 +539,46 @@
     </div>
 
 <script>
+// ============================================
+// ⭐ 電話號碼統一處理 - 必須與 netlify/functions/booking.js 一字不差
+// 輸入：任何格式（91234567 / +852... / +86... / 00852...）
+// 輸出：{ display: 顯示用, tel: tel: 用（帶 + 國碼）, wa: wa.me 用（唔帶 +） }
+// ============================================
+function normalizePhone(input) {
+  const raw = String(input || '').trim();
+  if (!raw) return { display: '', tel: '', wa: '' };
+
+  const hasPlus = raw.charAt(0) === '+';
+  let clean = raw.replace(/[^\d]/g, '');
+  if (!clean) return { display: raw, tel: '', wa: '' };
+
+  // 00 國際前綴（00852... → 852...）
+  if (clean.indexOf('00') === 0) clean = clean.substring(2);
+
+  let intl = '';
+  if (hasPlus) {
+    intl = '+' + clean;
+  } else if (clean.length === 8) {
+    intl = '+852' + clean;                                  // 香港 8 位
+  } else if (clean.length === 11 && clean.indexOf('852') === 0) {
+    intl = '+' + clean;                                     // 香港 852 開頭
+  } else if (clean.length === 13 && clean.indexOf('86') === 0) {
+    intl = '+' + clean;                                     // 中國 86 + 11 位
+  } else if (clean.length === 12 && clean.indexOf('86') === 0) {
+    intl = '+' + clean;                                     // 中國 86 + 10 位
+  } else if (clean.length === 11 && clean.charAt(0) === '1') {
+    intl = '+86' + clean;                                   // 中國大陸手機冇國碼
+  } else {
+    intl = clean;                                           // 其他：原樣（冇 +）
+  }
+
+  return {
+    display: raw,
+    tel: intl,
+    wa: intl.replace(/^\+/, '')
+  };
+}
+
 var currentLang = localStorage.getItem('taxiLang') || 'zh';
 var selectedCarName = '';
 var selectedCarNameEn = '';
@@ -632,7 +672,7 @@ var translations = {
         summary_route_label: "路線摘要", summary_car_label: "目前選定車型", estimated_fare_label: "預計車費",
         fee_mode_label: "收費模式", pickup_label: "起點：", stopover_label: "中途站：", dropoff_label: "目的地：",
         instant_order: "即時訂單", instant_note: "15分鐘內用車", booking_order: "預約訂單", booking_note: "接受最多3日內",
-        label_flight: "航班編號 (選填，如適用)", ph_flight: "例：CX250", label_date: "用車日期", 
+        label_flight: "航班編號 (選填，如適用)", ph_flight: "例：CX250", label_date: "用車日期",
         label_time: "用車時間", label_arrival_time: "航班降落時間",
         label_passengers: "乘客人數（選填）", label_luggages: "行李件數（選填）", label_has_pet: "有寵物", label_has_wheelchair: "輪椅放尾箱",
         label_remarks: "備注（選填，最多30字）", ph_remarks: "例：無煙車箱 / 2大2小行李",
@@ -666,7 +706,7 @@ var translations = {
         summary_route_label: "Route Summary", summary_car_label: "Selected Vehicle", estimated_fare_label: "Estimated Fare",
         fee_mode_label: "Pricing Mode", pickup_label: "Pickup: ", stopover_label: "Stopover: ", dropoff_label: "Destination: ",
         instant_order: "Instant Order", instant_note: "Within 15 mins", booking_order: "Booking Order", booking_note: "Up to 3 days",
-        label_flight: "Flight Number (Optional)", ph_flight: "e.g., CX250", label_date: "Service Date", 
+        label_flight: "Flight Number (Optional)", ph_flight: "e.g., CX250", label_date: "Service Date",
         label_time: "Service Time", label_arrival_time: "Arrival Time",
         label_passengers: "Passengers (Optional)", label_luggages: "Luggages (Optional)", label_has_pet: "Pets?", label_has_wheelchair: "Wheelchair?",
         label_remarks: "Remarks (Optional, Max 30 chars)", ph_remarks: "e.g., Non-smoking / 2 large 2 small luggages",
@@ -702,17 +742,17 @@ function showAppAlert(msg, callback) {
         if (callback) callback();
         return;
     }
-    
+
     document.getElementById('custom-alert-msg').innerText = msg;
     document.getElementById('custom-alert-title').innerText = currentLang === 'en' ? 'Notice' : '提示';
     document.getElementById('custom-alert-cancel').classList.add('hidden');
-    
+
     var okBtn = document.getElementById('custom-alert-ok');
     okBtn.classList.remove('w-1/2');
     okBtn.classList.add('w-full', 'ml-auto');
-    
+
     modal.classList.add('show');
-    
+
     var newOkBtn = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOkBtn, okBtn);
     newOkBtn.addEventListener('click', function() {
@@ -728,20 +768,20 @@ function showAppConfirm(msg, onConfirm, onCancel) {
         else { if (onCancel) onCancel(); }
         return;
     }
-    
+
     document.getElementById('custom-alert-msg').innerText = msg;
     document.getElementById('custom-alert-title').innerText = currentLang === 'en' ? 'Confirm' : '請確認';
-    
+
     var cancelBtn = document.getElementById('custom-alert-cancel');
     var okBtn = document.getElementById('custom-alert-ok');
     cancelBtn.classList.remove('hidden');
-    
+
     cancelBtn.classList.add('w-1/2');
     okBtn.classList.add('w-1/2');
     okBtn.classList.remove('w-full');
-    
+
     modal.classList.add('show');
-    
+
     var newOkBtn = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOkBtn, okBtn);
     newOkBtn.addEventListener('click', function() {
@@ -772,7 +812,7 @@ function updateTimeLabel() {
     } else {
         labelEl.setAttribute('data-i18n', 'label_time');
     }
-    
+
     var key = labelEl.getAttribute('data-i18n');
     if (translations[currentLang] && translations[currentLang][key]) {
         labelEl.textContent = translations[currentLang][key];
@@ -849,7 +889,7 @@ function restoreFormSnapshot() {
         if (s.contactSurname) { var elCs = document.getElementById('contact_surname'); if (elCs) elCs.value = s.contactSurname; }
         if (s.phone) { var elPh = document.getElementById('phone'); if (elPh) elPh.value = s.phone; }
         var wxEl = document.getElementById('is_wechat_customer'); if (wxEl) wxEl.checked = !!s.isWechatCustomer;
-        
+
         updateTimeLabel();
     } catch(e) { console.error('[Snapshot] 預填失敗：', e); }
 }
@@ -859,12 +899,12 @@ function computeChangedFields(carDisplayText) {
         // ⭐ 優先使用最原始的資料進行對比，避免中途被覆蓋
         var raw = sessionStorage.getItem('taxiOriginalOrderData') || localStorage.getItem('taxiEditPrefillData');
         if (!raw) return null;
-        
+
         var old = JSON.parse(raw);
         var routeData = loadRouteDataFromLocalStorage() || {};
         var payments = [];
         document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
-        
+
         var cur = {
             pickup: routeData.pickup || '', dropoff: routeData.dropoff || '',
             stopovers: Array.isArray(routeData.stopovers) ? routeData.stopovers.join('、') : (routeData.stopovers || ''),
@@ -884,16 +924,16 @@ function computeChangedFields(carDisplayText) {
             carDisplayText: carDisplayText || '', selectedFareMode: selectedFareMode || '',
             totalFare: calculateTotalFare() // ⭐ 改為對比總車費
         };
-        
-        var labels = { 
-            pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間', 
-            flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物', 
-            hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂', 
-            contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶', 
+
+        var labels = {
+            pickup: '起點', dropoff: '終點', stopovers: '中途站', date: '日期', time: '時間',
+            flightNo: '航班編號', passengers: '人數', luggages: '行李件數', hasPet: '寵物',
+            hasWheelchair: '輪椅', remarks: '備注', payments: '付款方式', contactTitle: '稱謂',
+            contactSurname: '聯絡人', phone: '電話', isWechatCustomer: '微信客戶',
             carDisplayText: '預約車款', selectedFareMode: '收費模式',
             totalFare: '預計參考車費' // ⭐ 移除基本車費及隧道費，改為顯示總價
         };
-        
+
         function fmt(val, key) {
             if (typeof val === 'boolean') return val ? '✅' : '❌';
             if (key === 'selectedFareMode') {
@@ -906,14 +946,14 @@ function computeChangedFields(carDisplayText) {
             }
             return String(val || '').trim() || '（空）';
         }
-        
+
         var changed = {};
         Object.keys(labels).forEach(function(key) {
             var oldStr = fmt(old[key], key);
             var newStr = fmt(cur[key], key);
             if (oldStr !== newStr) changed[key] = { label: labels[key], old: oldStr, new: newStr };
         });
-        
+
         if (changed.contactTitle || changed.contactSurname) {
             var oldTitle = old.contactTitle || '', oldSur = old.contactSurname || '';
             var newTitle = cur.contactTitle || '', newSur = cur.contactSurname || '';
@@ -921,11 +961,11 @@ function computeChangedFields(carDisplayText) {
             delete changed.contactTitle;
             delete changed.contactSurname;
         }
-        
+
         return Object.keys(changed).length > 0 ? changed : null;
-    } catch(e) { 
-        console.error('[ChangedFields] 計算失敗：', e); 
-        return null; 
+    } catch(e) {
+        console.error('[ChangedFields] 計算失敗：', e);
+        return null;
     }
 }
 
@@ -1012,12 +1052,12 @@ function switchOrderType(type) {
     var instantBtn = document.getElementById('btn-instant-order');
     var bookingBtn = document.getElementById('btn-booking-order');
     var datetimeContainer = document.getElementById('datetime-container');
-    
+
     if (type === 'instant') {
         instantBtn.classList.add('selected');
         bookingBtn.classList.remove('selected');
         datetimeContainer.classList.add('hidden');
-        
+
         // ⭐ 切換到即時訂單時，清空航班欄位
         var flightInput = document.getElementById('flight_no');
         if (flightInput) {
@@ -1032,7 +1072,7 @@ function switchOrderType(type) {
         instantBtn.classList.remove('selected');
         datetimeContainer.classList.remove('hidden');
     }
-    
+
     checkShowFlightField();
 }
 
@@ -1200,19 +1240,19 @@ function closeFlightSelectModal() {
 function applyFlightSelection(date, time) {
     var dateInput = document.getElementById('date');
     var timeInput = document.getElementById('time');
-    
+
     if (dateInput) dateInput.value = date;
     if (timeInput) timeInput.value = time;
-    
+
     if (orderType === 'instant') {
         switchOrderType('booking');
     }
-    
+
     updateTimeLabel();
     closeFlightSelectModal();
-    
-    var successMsg = currentLang === 'en' 
-        ? 'Flight time applied: ' + date + ' ' + time + ' (Switched to Booking Order)' 
+
+    var successMsg = currentLang === 'en'
+        ? 'Flight time applied: ' + date + ' ' + time + ' (Switched to Booking Order)'
         : '已套用航班時間：' + date + ' ' + time + '（已自動切換為預約訂單）';
     showFlightMsg(successMsg, 'ok');
 }
@@ -1242,7 +1282,7 @@ function lookupFlightArrival() {
     fetch('/.netlify/functions/get-flight-arrival', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ flightNo: flightNo }) 
+        body: JSON.stringify({ flightNo: flightNo })
     })
     .then(function(r) {
         return r.text().then(function(text) {
@@ -1253,14 +1293,14 @@ function lookupFlightArrival() {
         if (data.success && data.flights && data.flights.length > 0) {
             var listEl = document.getElementById('flight-options-list');
             if (!listEl) return;
-            
+
             listEl.innerHTML = '';
             data.flights.forEach(function(f) {
                 var btnItem = document.createElement('button');
                 btnItem.type = 'button';
                 btnItem.className = 'flight-option-btn';
                 btnItem.onclick = function() { applyFlightSelection(f.date, f.timeHHMM); };
-                
+
                 var statusText = f.status;
                 if (statusText === 'Scheduled') statusText = translations[currentLang].flight_status_scheduled;
                 else if (statusText === 'Arrived') statusText = translations[currentLang].flight_status_arrived;
@@ -1273,7 +1313,7 @@ function lookupFlightArrival() {
                     '<div class="text-xl font-extrabold text-brand-yellow">' + f.timeHHMM + '</div>';
                 listEl.appendChild(btnItem);
             });
-            
+
             document.getElementById('flight-select-modal').classList.remove('hidden');
             showFlightMsg(translations[currentLang].flight_msg_found.replace('{count}', data.flights.length), 'ok');
         } else {
@@ -1436,11 +1476,10 @@ function submitBookingAfterUpgrade() {
         discordMsgLines.push(passengerLine);
     }
 
-    var cleanPhone = (data.phone || '').replace(/\D/g, '');
-    var phoneWithCode = cleanPhone;
-    if (phoneWithCode.length === 8) phoneWithCode = '852' + phoneWithCode;
-    if (data.surname) discordMsgLines.push('👤 ' + data.surname + data.title + ' | 📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
-    else discordMsgLines.push('📞 [' + data.phone + '](tel:' + cleanPhone + ') | [WhatsApp](<https://wa.me/' + phoneWithCode + '>)');
+    // ⭐ 已改：用 normalizePhone 統一處理電話（香港 / 中國 / 其他國家）
+    var p = normalizePhone(data.phone);
+    if (data.surname) discordMsgLines.push('👤 ' + data.surname + data.title + ' | 📞 **[' + p.display + '](tel:' + p.tel + ')** | [WhatsApp](<https://wa.me/' + p.wa + '>)');
+    else discordMsgLines.push('📞 **[' + p.display + '](tel:' + p.tel + ')** | [WhatsApp](<https://wa.me/' + p.wa + '>)');
     discordMsgLines.push('🚘 ' + carDisplayText);
     if (data.paymentStr) discordMsgLines.push('💳 ' + data.paymentStr);
 
@@ -1564,34 +1603,34 @@ function submitBookingAfterUpgrade() {
 
 function submitBooking(event) {
     if (event) event.preventDefault();
-    
+
     // 防止重複提交
-    if (sessionStorage.getItem('taxiSubmitting') === '1') { 
-        showAppAlert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...'); 
-        return; 
+    if (sessionStorage.getItem('taxiSubmitting') === '1') {
+        showAppAlert(currentLang === 'en' ? 'Submitting, please wait...' : '正在提交中，請稍等...');
+        return;
     }
-    
+
     checkPassengerLimit();
 
     // 1. 檢查收費模式
-    if (!selectedFareMode) { 
-        showAppAlert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！"); 
-        return; 
+    if (!selectedFareMode) {
+        showAppAlert(currentLang === 'en' ? "Please select a fare mode!" : "請先選擇收費模式！");
+        return;
     }
 
     // 2. 檢查路線
     var routeData = loadRouteDataFromLocalStorage();
-    if (!routeData || !routeData.pickup || !routeData.dropoff) { 
-        showAppAlert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！"); 
-        return; 
+    if (!routeData || !routeData.pickup || !routeData.dropoff) {
+        showAppAlert(currentLang === 'en' ? "Please fill in Pickup and Destination!" : "請必須完整填寫「起點」和「終點」！");
+        return;
     }
 
     // 3. 檢查電話
     var phone = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
     var cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 8) { 
-        showAppAlert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！"); 
-        return; 
+    if (cleanPhone.length < 8) {
+        showAppAlert(currentLang === 'en' ? "Phone number must be at least 8 digits!" : "聯絡電話不可少於八位數字！");
+        return;
     }
 
     var stopoverTexts = [];
@@ -1631,15 +1670,15 @@ function submitBooking(event) {
     if (orderType === 'booking') {
         if (!date) { showAppAlert(currentLang === 'en' ? "Please select a date!" : "請選擇預約日期！"); return; }
         if (!time) { showAppAlert(currentLang === 'en' ? "Please select a time!" : "請選擇預約時間！"); return; }
-        
+
         var selectedDate = new Date(date);
         var today = new Date(); today.setHours(0, 0, 0, 0);
         var maxAllowedDate = new Date(today); maxAllowedDate.setDate(maxAllowedDate.getDate() + 4);
-        if (selectedDate < today || selectedDate > maxAllowedDate) { 
-            showAppAlert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！"); 
-            return; 
+        if (selectedDate < today || selectedDate > maxAllowedDate) {
+            showAppAlert(currentLang === 'en' ? "Booking date must be within 3 days!" : "預約日期必須在未來三日內！");
+            return;
         }
-        
+
         // 兼容性更好的時間解析：YYYY-MM-DDTHH:MM:00
         // 解決 iOS 解析問題：將 - 替換為 /
         var targetDateTime = new Date((date + 'T' + time + ':00').replace(/-/g, '/').replace('T', ' '));
@@ -1648,9 +1687,9 @@ function submitBooking(event) {
             return;
         }
         var diffMinutes = (targetDateTime.getTime() - Date.now()) / (1000 * 60);
-        if (diffMinutes < 15) { 
-            showAppAlert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！"); 
-            return; 
+        if (diffMinutes < 15) {
+            showAppAlert(currentLang === 'en' ? "⚠️ Booking time must be at least 15 minutes later." : "⚠️ 預約時間必須在15分鐘之後！");
+            return;
         }
     }
 
@@ -1668,7 +1707,7 @@ var payEls = document.getElementsByName('payment_method');
     var payments = [];
     for (var i = 0; i < payEls.length; i++) { if (payEls[i].checked) payments.push(payEls[i].value); }
     var paymentStr = payments.join(' / ');
-    
+
     if (paymentStr === '現金' || paymentStr.trim() === '') {
         paymentStr = '';
     }
@@ -1928,7 +1967,7 @@ function applyLookupResultIfAny() {
         if (o.stopovers) stopoversArr = String(o.stopovers).split(/[、,，]|➔|→/).map(function(s) { return s.trim(); }).filter(Boolean);
         var routeData = { pickup: o.pickup || '', pickupPlaceId: '', dropoff: o.dropoff || '', dropoffPlaceId: '', stopovers: stopoversArr, stopoverPlaceIds: stopoversArr.map(function() { return ''; }) };
         localStorage.setItem('taxiRouteData', JSON.stringify(routeData));
-        
+
         // ⭐ 修改：加入皇崗判斷，令佢變九折
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0 || routeData.pickup.indexOf('皇崗') >= 0 || routeData.pickup.indexOf('皇岗') >= 0);
 
@@ -1980,8 +2019,8 @@ function applyLookupResultIfAny() {
         if (o.carDisplayText) {
             var cd = String(o.carDisplayText);
             // ⭐ 加入「五/六人車款」判斷，解決 MIFA 升級後還原變回混能的 Bug
-            if (cd.indexOf('MIFA') >= 0 || cd.indexOf('五/六人車款') >= 0) { 
-                selectedCarName = 'MAXUS MIFA 7'; selectedCarNameEn = 'MAXUS MIFA 7'; selectedSurcharge = 50; selectedMinFare = 130; selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)'; selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)'; 
+            if (cd.indexOf('MIFA') >= 0 || cd.indexOf('五/六人車款') >= 0) {
+                selectedCarName = 'MAXUS MIFA 7'; selectedCarNameEn = 'MAXUS MIFA 7'; selectedSurcharge = 50; selectedMinFare = 130; selectedFeeMode = '附加費 HK$50 (最低消費 HK$130)'; selectedFeeModeEn = 'Surcharge HK$50 (Min. Fare HK$130)';
             }
             else if (cd.indexOf('E9') >= 0) { selectedCarName = '廣汽 E9'; selectedCarNameEn = 'GAC E9'; selectedSurcharge = 100; selectedMinFare = 180; selectedFeeMode = '附加費 HK$100 (最低消費 HK$180)'; selectedFeeModeEn = 'Surcharge HK$100 (Min. Fare HK$180)'; }
             else if (cd.indexOf('大黃蜂') >= 0 || cd.indexOf('Bumblebee') >= 0) { selectedCarName = '吉利大黃蜂'; selectedCarNameEn = 'Geely Bumblebee'; selectedSurcharge = 80; selectedMinFare = 160; selectedFeeMode = '附加費 HK$80 (最低消費 HK$160)'; selectedFeeModeEn = 'Surcharge HK$80 (Min. Fare HK$160)'; }
@@ -2043,7 +2082,7 @@ window.addEventListener('DOMContentLoaded', function() {
     if (routeData) {
         // ⭐ 修改：加入皇崗判斷，令佢變九折
         isShenzhenBay = (routeData.pickup.indexOf('深圳灣') >= 0 || routeData.pickup.indexOf('深圳湾') >= 0 || routeData.pickup.indexOf('皇崗') >= 0 || routeData.pickup.indexOf('皇岗') >= 0);
-        
+
         if (routeData.pickup) document.getElementById('booking-pickup-display').innerText = routeData.pickup;
         if (routeData.dropoff) document.getElementById('booking-dropoff-display').innerText = routeData.dropoff;
         if (routeData.stopovers && routeData.stopovers.length > 0) {
