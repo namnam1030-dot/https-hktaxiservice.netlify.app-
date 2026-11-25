@@ -40,6 +40,37 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
+// ⭐ 新增：將 tel: 後面嘅號碼統一成國際格式 +852XXXXXXXX / +86XXXXXXXXXXX
+// 前端 booking.html 會刪走 +，所以呢度要認長度 + 開頭補返 + 同國碼
+function normalizeTelNumber(value) {
+  if (!value) return value;
+  const raw = String(value).trim();
+  const hasPlus = raw.charAt(0) === '+';
+  let clean = raw.replace(/[^\d]/g, '');
+  if (!clean) return value;
+
+  // 00 國際前綴（例如 00852...）
+  if (clean.indexOf('00') === 0) clean = clean.substring(2);
+
+  // 本身有 +，直接保留
+  if (hasPlus) return '+' + clean;
+
+  // 香港：8 位
+  if (clean.length === 8) return '+852' + clean;
+  // 香港：11 位 852 開頭
+  if (clean.length === 11 && clean.indexOf('852') === 0) return '+' + clean;
+
+  // 中國：13 位 86 + 11 位手機
+  if (clean.length === 13 && clean.indexOf('86') === 0) return '+' + clean;
+  // 中國：12 位 86 + 10 位固話
+  if (clean.length === 12 && clean.indexOf('86') === 0) return '+' + clean;
+  // 中國：11 位 1 開頭（大陸手機冇國碼）
+  if (clean.length === 11 && clean.charAt(0) === '1') return '+86' + clean;
+
+  // 其他：原樣保留，唔亂加
+  return clean;
+}
+
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   if (text.indexOf('🆔') >= 0) return text;
@@ -169,7 +200,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 修改這裡：保留粗體，但剝走 tel: 連結，讓 Telegram 自動識別
+// ⭐ 已改：保留 tel: 連結（轉 <a href="tel:...">），Android Telegram 可撳撥號
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -181,20 +212,16 @@ function convertToTelegramHtml(text) {
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
   result = result.replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return '<b>' + text.replace(/\s/g, '') + '</b>'; // 保留粗體
     return '<a href="' + url + '"><b>' + text + '</b></a>';
   });
 
   result = result.replace(/\[([^\]]+)\]\(<([^>]+)>\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
   result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, text, url) {
-    if (url.startsWith('tel:')) return text.replace(/\s/g, '');
     return '<a href="' + url + '">' + text + '</a>';
   });
 
@@ -507,7 +534,11 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
-  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, '📞 **[$1](tel:$2)**');
+
+  // ⭐ 已改：加粗同時用 normalizeTelNumber 補 +852 / +86
+  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, function(m, label, tel) {
+    return '📞 **[' + label + '](tel:' + normalizeTelNumber(tel) + ')**';
+  });
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
