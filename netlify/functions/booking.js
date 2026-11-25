@@ -40,35 +40,44 @@ function parseDiscordWebhook(url) {
   return m ? { id: m[1], token: m[2] } : null;
 }
 
-// ⭐ 新增：將 tel: 後面嘅號碼統一成國際格式 +852XXXXXXXX / +86XXXXXXXXXXX
-// 前端 booking.html 會刪走 +，所以呢度要認長度 + 開頭補返 + 同國碼
-function normalizeTelNumber(value) {
-  if (!value) return value;
-  const raw = String(value).trim();
+// ============================================
+// ⭐ 電話號碼統一處理 - 必須與 booking.html 一字不差
+// 輸入：任何格式（91234567 / +852... / +86... / 00852...）
+// 輸出：{ display: 顯示用, tel: tel: 用（帶 + 國碼）, wa: wa.me 用（唔帶 +） }
+// ============================================
+function normalizePhone(input) {
+  const raw = String(input || '').trim();
+  if (!raw) return { display: '', tel: '', wa: '' };
+
   const hasPlus = raw.charAt(0) === '+';
   let clean = raw.replace(/[^\d]/g, '');
-  if (!clean) return value;
+  if (!clean) return { display: raw, tel: '', wa: '' };
 
-  // 00 國際前綴（例如 00852...）
+  // 00 國際前綴（00852... → 852...）
   if (clean.indexOf('00') === 0) clean = clean.substring(2);
 
-  // 本身有 +，直接保留
-  if (hasPlus) return '+' + clean;
+  let intl = '';
+  if (hasPlus) {
+    intl = '+' + clean;
+  } else if (clean.length === 8) {
+    intl = '+852' + clean;                                  // 香港 8 位
+  } else if (clean.length === 11 && clean.indexOf('852') === 0) {
+    intl = '+' + clean;                                     // 香港 852 開頭
+  } else if (clean.length === 13 && clean.indexOf('86') === 0) {
+    intl = '+' + clean;                                     // 中國 86 + 11 位
+  } else if (clean.length === 12 && clean.indexOf('86') === 0) {
+    intl = '+' + clean;                                     // 中國 86 + 10 位
+  } else if (clean.length === 11 && clean.charAt(0) === '1') {
+    intl = '+86' + clean;                                   // 中國大陸手機冇國碼
+  } else {
+    intl = clean;                                           // 其他：原樣（冇 +）
+  }
 
-  // 香港：8 位
-  if (clean.length === 8) return '+852' + clean;
-  // 香港：11 位 852 開頭
-  if (clean.length === 11 && clean.indexOf('852') === 0) return '+' + clean;
-
-  // 中國：13 位 86 + 11 位手機
-  if (clean.length === 13 && clean.indexOf('86') === 0) return '+' + clean;
-  // 中國：12 位 86 + 10 位固話
-  if (clean.length === 12 && clean.indexOf('86') === 0) return '+' + clean;
-  // 中國：11 位 1 開頭（大陸手機冇國碼）
-  if (clean.length === 11 && clean.charAt(0) === '1') return '+86' + clean;
-
-  // 其他：原樣保留，唔亂加
-  return clean;
+  return {
+    display: raw,
+    tel: intl,
+    wa: intl.replace(/^\+/, '')
+  };
 }
 
 function insertBookingIdAfterFare(text, bookingId) {
@@ -76,14 +85,14 @@ function insertBookingIdAfterFare(text, bookingId) {
   if (text.indexOf('🆔') >= 0) return text;
   const lines = text.split('\n');
   let insertIndex = -1;
-  
+
   for (let i = lines.length - 1; i >= 0; i--) {
     if (lines[i].indexOf('📝 備注：') >= 0 || lines[i].indexOf('📝 Remarks:') >= 0) {
       insertIndex = i + 1;
       break;
     }
   }
-  
+
   if (insertIndex === -1) {
     for (let i = lines.length - 1; i >= 0; i--) {
       if (lines[i].indexOf('💰') >= 0) {
@@ -535,9 +544,12 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 已改：加粗同時用 normalizeTelNumber 補 +852 / +86
+  // ⭐ 已改：加粗 + 用 normalizePhone 補 +852 / +86
+  // 前端 booking.html 若已用 normalizePhone 生成正確格式，呢個正則唔會再 match（因為已帶 **）
+  // 保留作為舊客戶端 / 舊快取的兜底
   body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, function(m, label, tel) {
-    return '📞 **[' + label + '](tel:' + normalizeTelNumber(tel) + ')**';
+    const p = normalizePhone(tel);
+    return '📞 **[' + label + '](tel:' + (p.tel || tel) + ')**';
   });
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
@@ -645,7 +657,7 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
 async function deleteDiscordMessage(messageId, channelType = 'booking') {
   if (!messageId) return false;
   const webhookUrl = channelType === 'instant' ? DISCORD_WEBHOOK_INSTANT : DISCORD_WEBHOOK_BOOKING;
-  
+
   if (!webhookUrl) return false;
 
   const wh = parseDiscordWebhook(webhookUrl);
@@ -672,7 +684,7 @@ async function updateDiscordNotification(existing, data, changedFields, channelT
   console.log('Discord：發新訊息 + 刪舊訊息 (' + channelType + ')');
   const oldMessageId = existing.discordMessageId;
   const newMessageId = await sendDiscordNotification(data, existing.bookingId, true, true, changedFields, channelType);
-  
+
   if (!newMessageId) {
     console.error('Discord 新訊息發送失敗，保留舊訊息唔刪');
     return;
