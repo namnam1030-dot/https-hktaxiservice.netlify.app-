@@ -80,6 +80,61 @@ function normalizePhone(input) {
   };
 }
 
+// ⭐ 顯示用號碼：唔顯示 +852（保留原有空格/分隔，只拎走 +852 / 852 / 00852 前綴）
+function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
+  const norm = telOrNormalized ? normalizePhone(telOrNormalized) : normalizePhone(labelOrRaw);
+  const rawLabel = String(labelOrRaw || norm.display || '').trim();
+
+  // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
+  if (/^\+852\d{8}$/.test(norm.tel)) {
+    const withoutPrefix = rawLabel
+      .replace(/^\+?0*852[\s\-]*/i, '')
+      .trim();
+    if (withoutPrefix) return withoutPrefix;
+    return norm.tel.slice(4);
+  }
+
+  return rawLabel || norm.display;
+}
+
+// ⭐ 依平台格式化電話撥號連結（Discord 用 <tel:+852...>，TG 用 [本地號碼](tel:+852...)）
+function formatPhoneLinksForPlatform(body, platform = 'discord') {
+  if (!body) return body;
+  let result = String(body);
+
+  function renderPhoneToken(labelText, telOrRaw) {
+    const p = normalizePhone(telOrRaw || labelText);
+    if (!p.tel) return labelText;
+
+    const displayNo852 = formatDisplayPhoneWithout852(labelText, p.tel);
+
+    if (platform === 'telegram') {
+      return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
+    }
+    // Discord：用 <tel:+852...> 尖括號，唔會顯示 +852 字樣
+    return '📞 **<tel:' + p.tel + '>**';
+  }
+
+  // 1. 處理前端已生成嘅 markdown：📞 **[號碼](tel:...)**
+  result = result.replace(/📞\s*\*\*\[([^\]]+)\]\(tel:([^)]+)\)\*\*/g, function(_, label, tel) {
+    return renderPhoneToken(label, tel);
+  });
+
+  // 2. 處理舊前端格式：📞 [號碼](tel:...)
+  result = result.replace(/📞\s*\[([^\]]+)\]\(tel:([^)]+)\)/g, function(_, label, tel) {
+    return renderPhoneToken(label, tel);
+  });
+
+  // 3. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
+  result = result.replace(/📞\s*(\+?\d[\d\s\-]{6,})/g, function(match, phone, offset) {
+    const after = result.slice(offset + match.length);
+    if (after.startsWith('](') || after.startsWith('**](')) return match;
+    return renderPhoneToken(phone, phone);
+  });
+
+  return result;
+}
+
 function insertBookingIdAfterFare(text, bookingId) {
   if (!bookingId) return text;
   if (text.indexOf('🆔') >= 0) return text;
@@ -179,7 +234,7 @@ exports.handler = async (event) => {
 
       await sendDiscordNotification(bookingData, instantBookingId, false, isEdit, changedFields, channelType);
 
-      const tgMsg = buildDiscordMessage(bookingData, instantBookingId, isEdit === true, changedFields || null);
+      const tgMsg = buildDiscordMessage(bookingData, instantBookingId, isEdit === true, changedFields || null, 'telegram');
       await sendTelegramNotification(tgMsg, channelType);
 
       return ok({ success: true, bookingId: instantBookingId, updated: isEdit });
@@ -190,7 +245,7 @@ exports.handler = async (event) => {
     const calendarEvent = await addToGoogleCalendar(bookingData, newBookingId, null);
     const discordMessageId = await sendDiscordNotification(bookingData, newBookingId, true, isEdit, changedFields, channelType);
 
-    const tgMsg = buildDiscordMessage(bookingData, newBookingId, isEdit === true, changedFields || null);
+    const tgMsg = buildDiscordMessage(bookingData, newBookingId, isEdit === true, changedFields || null, 'telegram');
     const tgResult = await sendTelegramNotification(tgMsg, channelType);
 
     if (calendarEvent && calendarEvent.id) {
@@ -209,7 +264,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 已改：保留 tel: 連結（轉 <a href="tel:...">），Android Telegram 可撳撥號
+// ⭐ 保留 tel: 連結（轉 <a href="tel:...">），Android Telegram 可撳撥號
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -339,7 +394,7 @@ async function updateTelegramNotification(existing, data, changedFields, channel
   console.log('Telegram：發新訊息 + 刪舊訊息 (' + channelType + ')');
   const oldMessageId = existing.telegramMessageId;
 
-  const message = buildDiscordMessage(data, existing.bookingId, true, changedFields || null);
+  const message = buildDiscordMessage(data, existing.bookingId, true, changedFields || null, 'telegram');
   const result = await sendTelegramNotification(message, channelType);
 
   if (!result.success) {
@@ -506,7 +561,7 @@ async function patchCalendarMessageIds(eventId, discordMessageId, telegramMessag
   }
 }
 
-function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
+function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform = 'discord') {
   let body = data.fullMessage || data.description || '收到新訂單';
 
   let stopoversStr = '';
@@ -544,24 +599,8 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 終極防禦：無論前端傳咩，強制將電話轉成標準 markdown
-  // 1. 處理前端已生成嘅 markdown：📞 **[號碼](tel:...)**
-  body = body.replace(/📞\s*\*\*\[([^\]]+)\]\(tel:([^)]+)\)\*\*/g, function(m, label, tel) {
-    const p = normalizePhone(tel);
-    return '📞 **[' + p.display + '](tel:' + p.tel + ')**';
-  });
-  // 2. 處理舊前端格式：📞 [號碼](tel:...)
-  body = body.replace(/📞\s*\[([^\]]+)\]\(tel:([^)]+)\)/g, function(m, label, tel) {
-    const p = normalizePhone(tel);
-    return '📞 **[' + p.display + '](tel:' + p.tel + ')**';
-  });
-  // 3. 處理完全冇連結嘅純文字：📞 77667766（或帶空格 📞 7766 7766）
-  body = body.replace(/📞\s*(\d[\d\s\-]{6,})/g, function(m, phone) {
-    if (m.indexOf('[') >= 0) return m; // 避免誤中已帶連結嘅字串
-    const p = normalizePhone(phone);
-    if (!p.tel) return m;
-    return '📞 **[' + p.display + '](tel:' + p.tel + ')**';
-  });
+  // ⭐ 依平台處理電話連結，顯示上唔帶 +852，但保留可撥號 tel:
+  body = formatPhoneLinksForPlatform(body, platform);
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
@@ -623,7 +662,7 @@ async function sendDiscordNotification(data, bookingId, waitForId, isUpdate, cha
   const randomDelay = Math.floor(Math.random() * 800);
   await new Promise(function(r) { setTimeout(r, randomDelay); });
 
-  const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null);
+  const message = buildDiscordMessage(data, bookingId, isUpdate === true, changedFields || null, 'discord');
   const reqBody = JSON.stringify({ content: message, flags: 4 });
 
   if (waitForId) {
