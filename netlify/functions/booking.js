@@ -70,7 +70,7 @@ function normalizePhone(input) {
   } else if (clean.length === 11 && clean.charAt(0) === '1') {
     intl = '+86' + clean;                                   // 中國大陸手機冇國碼
   } else {
-    intl = '+' + clean;                                     // 其他：補 + 方便 tel: 撥號
+    intl = clean;                                           // 其他：原樣（冇 +）
   }
 
   return {
@@ -601,18 +601,6 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
 
   // ⭐ 依平台處理電話連結，顯示上唔帶 +852，但保留可撥號 tel:
   body = formatPhoneLinksForPlatform(body, platform);
-
-  // ⭐ 修改訂單時，若訊息內未包含電話行，自動補返電話撥號連結
-  if (isUpdate && data.phone && body.indexOf('📞') < 0) {
-    const p = normalizePhone(data.phone);
-    if (p.tel) {
-      const displayNo852 = formatDisplayPhoneWithout852(data.phone, p.tel);
-      const phoneLine = platform === 'telegram'
-        ? '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**'
-        : '📞 **<tel:' + p.tel + '>**';
-      body = body + '\n' + phoneLine;
-    }
-  }
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
