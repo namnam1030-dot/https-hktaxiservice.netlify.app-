@@ -97,51 +97,40 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   return rawLabel || norm.display;
 }
 
-// ⭐ 依平台格式化電話撥號連結（修改訂單及新訂單都會穩定保留可撥號連結）
-function formatPhoneLinksForPlatform(body, platform = 'discord', fallbackPhone = '') {
-  if (!body && !fallbackPhone) return body;
-  let result = String(body || '');
+// ⭐ 依平台格式化電話撥號連結（Discord 用 <tel:+852...>，TG 用 [本地號碼](tel:+852...)）
+function formatPhoneLinksForPlatform(body, platform = 'discord') {
+  if (!body) return body;
+  let result = String(body);
 
   function renderPhoneToken(labelText, telOrRaw) {
     const p = normalizePhone(telOrRaw || labelText);
-    const displayNo852 = formatDisplayPhoneWithout852(labelText, p.tel) || String(labelText || '').trim();
+    if (!p.tel) return labelText;
 
-    if (!p.tel) {
-      return '📞 ' + displayNo852;
-    }
+    const displayNo852 = formatDisplayPhoneWithout852(labelText, p.tel);
 
     if (platform === 'telegram') {
-      return '📞 <a href="tel:' + p.tel + '">' + displayNo852 + '</a>';
+      return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
     }
-    return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
+    // Discord：用 <tel:+852...> 尖括號，唔會顯示 +852 字樣
+    return '📞 **<tel:' + p.tel + '>**';
   }
 
-  // 1. 處理已帶 markdown 連結格式：📞 **[號碼](tel:...)** 或 📞 [號碼](tel:...)
-  result = result.replace(/📞\s*\*{0,2}\[([^\]]+)\]\(tel:([^)]+)\)\*{0,2}/g, function(_, label, tel) {
+  // 1. 處理前端已生成嘅 markdown：📞 **[號碼](tel:...)**
+  result = result.replace(/📞\s*\*\*\[([^\]]+)\]\(tel:([^)]+)\)\*\*/g, function(_, label, tel) {
     return renderPhoneToken(label, tel);
   });
 
-  // 2. 處理已帶 <tel:...> 格式：📞 **<tel:...>** 或 📞 <tel:...>
-  result = result.replace(/📞\s*\*{0,2}<tel:([^>]+)>\*{0,2}/g, function(_, tel) {
-    return renderPhoneToken(tel, tel);
+  // 2. 處理舊前端格式：📞 [號碼](tel:...)
+  result = result.replace(/📞\s*\[([^\]]+)\]\(tel:([^)]+)\)/g, function(_, label, tel) {
+    return renderPhoneToken(label, tel);
   });
 
-  // 3. 處理普通文字電話：📞 77667766 或 📞 +852 7766 7766
-  let matchedAny = false;
-  result = result.replace(/📞\s*(\+?\d[\d\s\-]{5,})/g, function(match, phone, offset) {
+  // 3. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
+  result = result.replace(/📞\s*(\+?\d[\d\s\-]{6,})/g, function(match, phone, offset) {
     const after = result.slice(offset + match.length);
     if (after.startsWith('](') || after.startsWith('**](')) return match;
-    matchedAny = true;
     return renderPhoneToken(phone, phone);
   });
-
-  // 4. 若內文冇搵到電話但 data.phone 有值，自動補返可撥號電話行
-  if (!matchedAny && fallbackPhone) {
-    const phoneLine = renderPhoneToken(fallbackPhone, fallbackPhone);
-    if (result.indexOf('📞') < 0) {
-      result += '\n' + phoneLine;
-    }
-  }
 
   return result;
 }
@@ -275,7 +264,7 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 保留 tel: 連結（轉 <a href="tel:...">），支援 Telegram 撳掣撥號
+// ⭐ 保留 tel: 連結（轉 <a href="tel:...">），Android Telegram 可撳撥號
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -285,11 +274,6 @@ function convertToTelegramHtml(text) {
   });
 
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // 先將 markdown [顯示文字](tel:+852...) 轉成 <a href="tel:...">
-  result = result.replace(/\*{0,2}\[([^\]]+)\]\(tel:([^)]+)\)\*{0,2}/g, function(_, label, tel) {
-    return '<a href="tel:' + tel + '">' + label + '</a>';
-  });
 
   result = result.replace(/\*\*\[([^\]]+)\]\(<([^>]+)>\)\*\*/g, function(m, text, url) {
     return '<a href="' + url + '"><b>' + text + '</b></a>';
@@ -308,7 +292,7 @@ function convertToTelegramHtml(text) {
   result = result.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
   const placeholders = [];
-  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[\s\S]*?<\/b>|<code>[\s\S]*?<\/code>/g, function(m) {
+  result = result.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[^<]+<\/b>|<code>[^<]+<\/code>/g, function(m) {
     placeholders.push(m);
     return '\u0000' + (placeholders.length - 1) + '\u0000';
   });
@@ -615,8 +599,8 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 依平台處理電話連結，顯示上唔帶 +852，並保留可撥號連結
-  body = formatPhoneLinksForPlatform(body, platform, data.phone || '');
+  // ⭐ 依平台處理電話連結，顯示上唔帶 +852，但保留可撥號 tel:
+  body = formatPhoneLinksForPlatform(body, platform);
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
