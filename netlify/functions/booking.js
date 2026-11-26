@@ -70,7 +70,7 @@ function normalizePhone(input) {
   } else if (clean.length === 11 && clean.charAt(0) === '1') {
     intl = '+86' + clean;                                   // 中國大陸手機冇國碼
   } else {
-    intl = clean;                                           // 其他：原樣（冇 +）
+    intl = '+' + clean;                                     // 其他：補 + 方便 tel: 撥號
   }
 
   return {
@@ -85,7 +85,6 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   const norm = telOrNormalized ? normalizePhone(telOrNormalized) : normalizePhone(labelOrRaw);
   const rawLabel = String(labelOrRaw || norm.display || '').trim();
 
-  // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
   if (/^\+852\d{8}$/.test(norm.tel)) {
     const withoutPrefix = rawLabel
       .replace(/^\+?0*852[\s\-]*/i, '')
@@ -97,19 +96,21 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   return rawLabel || norm.display;
 }
 
-// ⭐ 依平台格式化電話撥號連結（修改前後保持一致嘅可撥號格式）
+// ⭐ 依平台格式化電話撥號連結（Discord 用 <tel:+852...>，TG 用 [本地號碼](tel:+852...)）
 function formatPhoneLinksForPlatform(body, platform = 'discord') {
   if (!body) return body;
   let result = String(body);
 
   function renderPhoneToken(labelText, telOrRaw) {
     const p = normalizePhone(telOrRaw || labelText);
-    const fallbackDigits = String(labelText || '').replace(/[^\d+]/g, '');
-    const dialTel = p.tel || (fallbackDigits ? (fallbackDigits.startsWith('+') ? fallbackDigits : '+' + fallbackDigits) : '');
-    if (!dialTel) return labelText;
+    if (!p.tel) return labelText;
 
-    const displayNo852 = formatDisplayPhoneWithout852(labelText, dialTel);
-    return '📞 **[' + displayNo852 + '](tel:' + dialTel + ')**';
+    const displayNo852 = formatDisplayPhoneWithout852(labelText, p.tel);
+
+    if (platform === 'telegram') {
+      return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
+    }
+    return '📞 **<tel:' + p.tel + '>**';
   }
 
   // 1. 處理前端已生成嘅 markdown：📞 **[號碼](tel:...)**
@@ -122,7 +123,12 @@ function formatPhoneLinksForPlatform(body, platform = 'discord') {
     return renderPhoneToken(label, tel);
   });
 
-  // 3. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
+  // 3. 處理 <tel:+852...> 格式
+  result = result.replace(/📞\s*\*\*<tel:([^>]+)>\*\*/g, function(_, tel) {
+    return renderPhoneToken(tel, tel);
+  });
+
+  // 4. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
   result = result.replace(/📞\s*(\+?\d[\d\s\-]{6,})/g, function(match, phone, offset) {
     const after = result.slice(offset + match.length);
     if (after.startsWith('](') || after.startsWith('**](')) return match;
@@ -596,7 +602,7 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 依平台處理電話連結，保持可撥號 tel:
+  // ⭐ 依平台處理電話連結，顯示上唔帶 +852，但保留可撥號 tel:
   body = formatPhoneLinksForPlatform(body, platform);
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
