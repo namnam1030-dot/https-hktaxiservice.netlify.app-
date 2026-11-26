@@ -544,12 +544,23 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields) {
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 已改：加粗 + 用 normalizePhone 補 +852 / +86
-  // 前端 booking.html 若已用 normalizePhone 生成正確格式，呢個正則唔會再 match（因為已帶 **）
-  // 保留作為舊客戶端 / 舊快取的兜底
-  body = body.replace(/📞\s+\[([^\]]+)\]\(tel:([^)]+)\)/g, function(m, label, tel) {
+  // ⭐ 終極防禦：無論前端傳咩，強制將電話轉成標準 markdown
+  // 1. 處理前端已生成嘅 markdown：📞 **[號碼](tel:...)**
+  body = body.replace(/📞\s*\*\*\[([^\]]+)\]\(tel:([^)]+)\)\*\*/g, function(m, label, tel) {
     const p = normalizePhone(tel);
-    return '📞 **[' + label + '](tel:' + (p.tel || tel) + ')**';
+    return '📞 **[' + p.display + '](tel:' + p.tel + ')**';
+  });
+  // 2. 處理舊前端格式：📞 [號碼](tel:...)
+  body = body.replace(/📞\s*\[([^\]]+)\]\(tel:([^)]+)\)/g, function(m, label, tel) {
+    const p = normalizePhone(tel);
+    return '📞 **[' + p.display + '](tel:' + p.tel + ')**';
+  });
+  // 3. 處理完全冇連結嘅純文字：📞 77667766（或帶空格 📞 7766 7766）
+  body = body.replace(/📞\s*(\d[\d\s\-]{6,})/g, function(m, phone) {
+    if (m.indexOf('[') >= 0) return m; // 避免誤中已帶連結嘅字串
+    const p = normalizePhone(phone);
+    if (!p.tel) return m;
+    return '📞 **[' + p.display + '](tel:' + p.tel + ')**';
   });
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
