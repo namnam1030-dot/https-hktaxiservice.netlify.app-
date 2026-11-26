@@ -85,6 +85,7 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   const norm = telOrNormalized ? normalizePhone(telOrNormalized) : normalizePhone(labelOrRaw);
   const rawLabel = String(labelOrRaw || norm.display || '').trim();
 
+  // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
   if (/^\+852\d{8}$/.test(norm.tel)) {
     const withoutPrefix = rawLabel
       .replace(/^\+?0*852[\s\-]*/i, '')
@@ -110,6 +111,7 @@ function formatPhoneLinksForPlatform(body, platform = 'discord') {
     if (platform === 'telegram') {
       return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
     }
+    // Discord：用 <tel:+852...> 尖括號，唔會顯示 +852 字樣
     return '📞 **<tel:' + p.tel + '>**';
   }
 
@@ -123,12 +125,7 @@ function formatPhoneLinksForPlatform(body, platform = 'discord') {
     return renderPhoneToken(label, tel);
   });
 
-  // 3. 處理 <tel:+852...> 格式
-  result = result.replace(/📞\s*\*\*<tel:([^>]+)>\*\*/g, function(_, tel) {
-    return renderPhoneToken(tel, tel);
-  });
-
-  // 4. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
+  // 3. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
   result = result.replace(/📞\s*(\+?\d[\d\s\-]{6,})/g, function(match, phone, offset) {
     const after = result.slice(offset + match.length);
     if (after.startsWith('](') || after.startsWith('**](')) return match;
@@ -604,6 +601,18 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
 
   // ⭐ 依平台處理電話連結，顯示上唔帶 +852，但保留可撥號 tel:
   body = formatPhoneLinksForPlatform(body, platform);
+
+  // ⭐ 修改訂單時，若訊息內未包含電話行，自動補返電話撥號連結
+  if (isUpdate && data.phone && body.indexOf('📞') < 0) {
+    const p = normalizePhone(data.phone);
+    if (p.tel) {
+      const displayNo852 = formatDisplayPhoneWithout852(data.phone, p.tel);
+      const phoneLine = platform === 'telegram'
+        ? '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**'
+        : '📞 **<tel:' + p.tel + '>**';
+      body = body + '\n' + phoneLine;
+    }
+  }
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
 
