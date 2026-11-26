@@ -53,24 +53,23 @@ function normalizePhone(input) {
   let clean = raw.replace(/[^\d]/g, '');
   if (!clean) return { display: raw, tel: '', wa: '' };
 
-  // 00 國際前綴（00852... → 852...）
   if (clean.indexOf('00') === 0) clean = clean.substring(2);
 
   let intl = '';
   if (hasPlus) {
     intl = '+' + clean;
   } else if (clean.length === 8) {
-    intl = '+852' + clean;                                  // 香港 8 位
+    intl = '+852' + clean;
   } else if (clean.length === 11 && clean.indexOf('852') === 0) {
-    intl = '+' + clean;                                     // 香港 852 開頭
+    intl = '+' + clean;
   } else if (clean.length === 13 && clean.indexOf('86') === 0) {
-    intl = '+' + clean;                                     // 中國 86 + 11 位
+    intl = '+' + clean;
   } else if (clean.length === 12 && clean.indexOf('86') === 0) {
-    intl = '+' + clean;                                     // 中國 86 + 10 位
+    intl = '+' + clean;
   } else if (clean.length === 11 && clean.charAt(0) === '1') {
-    intl = '+86' + clean;                                   // 中國大陸手機冇國碼
+    intl = '+86' + clean;
   } else {
-    intl = clean;                                           // 其他：原樣（冇 +）
+    intl = clean;
   }
 
   return {
@@ -85,7 +84,6 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   const norm = telOrNormalized ? normalizePhone(telOrNormalized) : normalizePhone(labelOrRaw);
   const rawLabel = String(labelOrRaw || norm.display || '').trim();
 
-  // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
   if (/^\+852\d{8}$/.test(norm.tel)) {
     const withoutPrefix = rawLabel
       .replace(/^\+?0*852[\s\-]*/i, '')
@@ -97,7 +95,7 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   return rawLabel || norm.display;
 }
 
-// ⭐ 依平台格式化電話撥號連結（修改訂單及新訂單都會穩定保留可撥號連結）
+// ⭐ 依平台格式化電話撥號連結（並附上 WhatsApp 連結方便一撳聯絡）
 function formatPhoneLinksForPlatform(body, platform = 'discord', fallbackPhone = '') {
   if (!body && !fallbackPhone) return body;
   let result = String(body || '');
@@ -110,11 +108,19 @@ function formatPhoneLinksForPlatform(body, platform = 'discord', fallbackPhone =
       return '📞 ' + displayNo852;
     }
 
+    const waUrl = p.wa ? 'https://wa.me/' + p.wa : '';
+
     if (platform === 'telegram') {
-      return '📞 <a href="tel:' + p.tel + '">' + displayNo852 + '</a>';
+      const telPart = '📞 <a href="tel:' + p.tel + '">' + displayNo852 + '</a>';
+      return waUrl ? telPart + ' · <a href="' + waUrl + '">WhatsApp</a>' : telPart;
     }
-    return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
+
+    const telPart = '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
+    return waUrl ? telPart + ' · [WhatsApp](' + waUrl + ')' : telPart;
   }
+
+  // 清除之前可能已經附加嘅重複 · [WhatsApp](...)
+  result = result.replace(/\s*·\s*(?:\[WhatsApp\]\([^)]+\)|<a href="https:\/\/wa\.me\/[^"]+">WhatsApp<\/a>)/g, '');
 
   // 1. 處理已帶 markdown 連結格式：📞 **[號碼](tel:...)** 或 📞 [號碼](tel:...)
   result = result.replace(/📞\s*\*{0,2}\[([^\]]+)\]\(tel:([^)]+)\)\*{0,2}/g, function(_, label, tel) {
@@ -275,7 +281,6 @@ exports.handler = async (event) => {
   }
 };
 
-// ⭐ 保留 tel: 連結（轉 <a href="tel:...">），支援 Telegram 撳掣撥號
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -286,7 +291,6 @@ function convertToTelegramHtml(text) {
 
   result = result.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-  // 先將 markdown [顯示文字](tel:+852...) 轉成 <a href="tel:...">
   result = result.replace(/\*{0,2}\[([^\]]+)\]\(tel:([^)]+)\)\*{0,2}/g, function(_, label, tel) {
     return '<a href="tel:' + tel + '">' + label + '</a>';
   });
@@ -615,7 +619,6 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 依平台處理電話連結，顯示上唔帶 +852，並保留可撥號連結
   body = formatPhoneLinksForPlatform(body, platform, data.phone || '');
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
