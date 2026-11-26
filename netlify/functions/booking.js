@@ -41,72 +41,88 @@ function parseDiscordWebhook(url) {
 }
 
 // ============================================
-// ⭐ 電話號碼統一處理（三份程式共用同一套規則）
-// raw          : 原始輸入
-// digits       : 純數字（含國碼，例如 85291234567 / 8613800138000）
-// e164         : tel: 用（帶 + 國碼，例如 +85291234567）
-// wa           : wa.me 用（唔帶 +，例如 85291234567）
-// localDisplay : 顯示用（香港 852 號碼唔顯示 +852；其他顯示 +國碼+號碼）
+// ⭐ 電話號碼統一處理 - 必須與 booking.html 一字不差
+// 輸入：任何格式（91234567 / +852... / +86... / 00852...）
+// 輸出：{ display: 顯示用, tel: tel: 用（帶 + 國碼）, wa: wa.me 用（唔帶 +） }
 // ============================================
-function parsePhone(input) {
+function normalizePhone(input) {
   const raw = String(input || '').trim();
-  if (!raw) return { raw: '', digits: '', e164: '', wa: '', localDisplay: '' };
+  if (!raw) return { display: '', tel: '', wa: '' };
 
+  const hasPlus = raw.charAt(0) === '+';
   let clean = raw.replace(/[^\d]/g, '');
-  if (!clean) return { raw: raw, digits: '', e164: '', wa: '', localDisplay: raw };
+  if (!clean) return { display: raw, tel: '', wa: '' };
 
-  if (clean.indexOf('00') === 0) {
-    clean = clean.substring(2);
-  }
+  // 00 國際前綴（00852... → 852...）
+  if (clean.indexOf('00') === 0) clean = clean.substring(2);
 
-  let digits = clean;
-  if (clean.length === 8) {
-    digits = '852' + clean;
+  let intl = '';
+  if (hasPlus) {
+    intl = '+' + clean;
+  } else if (clean.length === 8) {
+    intl = '+852' + clean;                                  // 香港 8 位
+  } else if (clean.length === 11 && clean.indexOf('852') === 0) {
+    intl = '+' + clean;                                     // 香港 852 開頭
+  } else if (clean.length === 13 && clean.indexOf('86') === 0) {
+    intl = '+' + clean;                                     // 中國 86 + 11 位
+  } else if (clean.length === 12 && clean.indexOf('86') === 0) {
+    intl = '+' + clean;                                     // 中國 86 + 10 位
   } else if (clean.length === 11 && clean.charAt(0) === '1') {
-    digits = '86' + clean;
+    intl = '+86' + clean;                                   // 中國大陸手機冇國碼
+  } else {
+    intl = clean;                                           // 其他：原樣（冇 +）
   }
-
-  const e164 = digits ? '+' + digits : '';
-  const localDisplay = /^852\d{8}$/.test(digits)
-    ? digits.slice(3)
-    : (e164 || raw);
 
   return {
-    raw: raw,
-    digits: digits,
-    e164: e164,
-    wa: digits,
-    localDisplay: localDisplay
+    display: raw,
+    tel: intl,
+    wa: intl.replace(/^\+/, '')
   };
 }
 
-// ⭐ 依平台格式化電話撥號連結（Discord 用 <tel:+852...>，TG 用 [本地號碼](tel:+852...)）
+// ⭐ 顯示用號碼：唔顯示 +852（保留原有空格/分隔，只拎走 +852 / 852 / 00852 前綴）
+function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
+  const norm = telOrNormalized ? normalizePhone(telOrNormalized) : normalizePhone(labelOrRaw);
+  const rawLabel = String(labelOrRaw || norm.display || '').trim();
+
+  // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
+  if (/^\+852\d{8}$/.test(norm.tel)) {
+    const withoutPrefix = rawLabel
+      .replace(/^\+?0*852[\s\-]*/i, '')
+      .trim();
+    if (withoutPrefix) return withoutPrefix;
+    return norm.tel.slice(4);
+  }
+
+  return rawLabel || norm.display;
+}
+
+// ⭐ 依平台格式化電話撥號連結（修改前後保持一致嘅可撥號格式）
 function formatPhoneLinksForPlatform(body, platform = 'discord') {
   if (!body) return body;
   let result = String(body);
 
-  function renderPhoneToken(labelText, phoneOrUrl) {
-    const p = parsePhone(phoneOrUrl || labelText);
-    if (!p.e164) return labelText;
+  function renderPhoneToken(labelText, telOrRaw) {
+    const p = normalizePhone(telOrRaw || labelText);
+    const fallbackDigits = String(labelText || '').replace(/[^\d+]/g, '');
+    const dialTel = p.tel || (fallbackDigits ? (fallbackDigits.startsWith('+') ? fallbackDigits : '+' + fallbackDigits) : '');
+    if (!dialTel) return labelText;
 
-    const shown = /^852\d{8}$/.test(p.digits)
-      ? (String(labelText || '').replace(/^\+?0*852[\s\-]*/i, '').trim() || p.localDisplay)
-      : p.localDisplay;
-
-    if (platform === 'telegram') {
-      return '📞 **[' + shown + '](tel:' + p.e164 + ')**';
-    }
-    return '📞 **<tel:' + p.e164 + '>**';
+    const displayNo852 = formatDisplayPhoneWithout852(labelText, dialTel);
+    return '📞 **[' + displayNo852 + '](tel:' + dialTel + ')**';
   }
 
+  // 1. 處理前端已生成嘅 markdown：📞 **[號碼](tel:...)**
   result = result.replace(/📞\s*\*\*\[([^\]]+)\]\(tel:([^)]+)\)\*\*/g, function(_, label, tel) {
     return renderPhoneToken(label, tel);
   });
 
+  // 2. 處理舊前端格式：📞 [號碼](tel:...)
   result = result.replace(/📞\s*\[([^\]]+)\]\(tel:([^)]+)\)/g, function(_, label, tel) {
     return renderPhoneToken(label, tel);
   });
 
+  // 3. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
   result = result.replace(/📞\s*(\+?\d[\d\s\-]{6,})/g, function(match, phone, offset) {
     const after = result.slice(offset + match.length);
     if (after.startsWith('](') || after.startsWith('**](')) return match;
@@ -245,6 +261,7 @@ exports.handler = async (event) => {
   }
 };
 
+// ⭐ 保留 tel: 連結（轉 <a href="tel:...">），Android Telegram 可撳撥號
 function convertToTelegramHtml(text) {
   if (!text) return '';
   let result = String(text);
@@ -428,7 +445,7 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
     .replace(/\n\n🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴$/, '')
     .replace(/\n\n🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸$/, '');
 
-  const phoneInfo = parsePhone(data.phone);
+  const cleanPhone = String(data.phone || '').replace(/\D/g, '');
   const stopoversStr = Array.isArray(data.stopoverTexts)
     ? data.stopoverTexts.map(function(s) {
         return String(s).replace(/中途站\d+:\s*/, '');
@@ -443,7 +460,7 @@ function buildCalendarEvent(data, bookingId, discordMessageId) {
 
   const privateProps = {
     bookingId: bookingId,
-    phone: phoneInfo.digits,
+    phone: cleanPhone,
     pickup: data.pickup || '',
     dropoff: data.dropoff || '',
     stopovers: stopoversStr,
@@ -578,6 +595,8 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
+
+  // ⭐ 依平台處理電話連結，保持可撥號 tel:
   body = formatPhoneLinksForPlatform(body, platform);
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
