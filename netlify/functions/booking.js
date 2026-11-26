@@ -57,6 +57,8 @@ function normalizePhone(input) {
   if (clean.indexOf('00') === 0) clean = clean.substring(2);
 
   let intl = '';
+  let display = raw; // 預設顯示原本輸入
+
   if (hasPlus) {
     intl = '+' + clean;
   } else if (clean.length === 8) {
@@ -73,8 +75,33 @@ function normalizePhone(input) {
     intl = clean;                                           // 其他：原樣（冇 +）
   }
 
+  // ⭐ 新增：美化顯示，拔走 +852，並自動加空格
+  if (clean.length === 8) {
+    // 香港 8 位（例如 91234567 -> 9123 4567）
+    display = clean.substring(0, 4) + ' ' + clean.substring(4);
+  } else if (clean.length === 11 && clean.indexOf('852') === 0) {
+    // 852 + 8位（例如 85291234567 -> 9123 4567）
+    display = clean.substring(3, 7) + ' ' + clean.substring(7);
+  } else if (clean.length === 11 && clean.charAt(0) === '1') {
+    // 大陸 11 位（例如 13812345678 -> 138 1234 5678）
+    display = clean.substring(0, 3) + ' ' + clean.substring(3, 7) + ' ' + clean.substring(7);
+  } else if (clean.length === 13 && clean.indexOf('86') === 0) {
+    // 86 + 11 位（例如 8613812345678 -> 138 1234 5678）
+    const main = clean.substring(2);
+    display = main.substring(0, 3) + ' ' + main.substring(3, 7) + ' ' + main.substring(7);
+  } else {
+    // 其他情況（例如美國號）：拔走前面嘅 +852 或 852，如果剩返 8 位就加空格
+    let stripped = raw.replace(/^\+\s*852\s*/, '').replace(/^852\s*/, '');
+    const strippedClean = stripped.replace(/\D/g, '');
+    if (strippedClean.length === 8 && clean.length > 8) {
+      display = strippedClean.substring(0, 4) + ' ' + strippedClean.substring(4);
+    } else {
+      display = stripped;
+    }
+  }
+
   return {
-    display: raw,
+    display: display,
     tel: intl,
     wa: intl.replace(/^\+/, '')
   };
