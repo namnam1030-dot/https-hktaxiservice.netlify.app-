@@ -70,7 +70,7 @@ function normalizePhone(input) {
   } else if (clean.length === 11 && clean.charAt(0) === '1') {
     intl = '+86' + clean;                                   // 中國大陸手機冇國碼
   } else {
-    intl = clean;                                           // 其他：原樣（冇 +）
+    intl = '+' + clean;                                     // 其他：補 + 方便 tel: 撥號
   }
 
   return {
@@ -85,7 +85,6 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   const norm = telOrNormalized ? normalizePhone(telOrNormalized) : normalizePhone(labelOrRaw);
   const rawLabel = String(labelOrRaw || norm.display || '').trim();
 
-  // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
   if (/^\+852\d{8}$/.test(norm.tel)) {
     const withoutPrefix = rawLabel
       .replace(/^\+?0*852[\s\-]*/i, '')
@@ -111,7 +110,6 @@ function formatPhoneLinksForPlatform(body, platform = 'discord') {
     if (platform === 'telegram') {
       return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
     }
-    // Discord：用 <tel:+852...> 尖括號，唔會顯示 +852 字樣
     return '📞 **<tel:' + p.tel + '>**';
   }
 
@@ -125,7 +123,12 @@ function formatPhoneLinksForPlatform(body, platform = 'discord') {
     return renderPhoneToken(label, tel);
   });
 
-  // 3. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
+  // 3. 處理 <tel:+852...> 格式
+  result = result.replace(/📞\s*\*\*<tel:([^>]+)>\*\*/g, function(_, tel) {
+    return renderPhoneToken(tel, tel);
+  });
+
+  // 4. 處理純文字電話：📞 77667766 或 📞 +852 7766 7766
   result = result.replace(/📞\s*(\+?\d[\d\s\-]{6,})/g, function(match, phone, offset) {
     const after = result.slice(offset + match.length);
     if (after.startsWith('](') || after.startsWith('**](')) return match;
@@ -264,6 +267,12 @@ exports.handler = async (event) => {
   }
 };
 
+function escapeHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, function(ch) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+  });
+}
+
 // ⭐ 保留 tel: 連結（轉 <a href="tel:...">），Android Telegram 可撳撥號
 function convertToTelegramHtml(text) {
   if (!text) return '';
@@ -305,6 +314,58 @@ function convertToTelegramHtml(text) {
   return result;
 }
 
+function buildTelegramRichHtml(message) {
+  const source = String(message || '');
+  if (!source) return '';
+
+  const lines = source.split(/\r\n|\r|\n/).map(function(line) {
+    if (/^[ \t]*```/.test(line)) return '';
+    let out = line;
+
+    out = out.replace(/\*\*\[([^\]]+)\]\((?:<([^>]+)>|([^)\r\n]+))\)\*\*/g, function(_, label, aUrl, rUrl) {
+      const href = String(aUrl || rUrl || '').trim();
+      if (/^tel:/i.test(href)) {
+        return '<a href="' + escapeHtml(href) + '"><b>' + escapeHtml(label) + '</b></a>';
+      }
+      if (/^(?:https?:\/\/|mailto:|tg:\/\/)[^\s<>"']+$/i.test(href)) {
+        return '<a href="' + escapeHtml(href) + '"><b>' + escapeHtml(label) + '</b></a>';
+      }
+      return '<b>' + escapeHtml(label) + '</b>';
+    });
+
+    out = out.replace(/\[([^\]]+)\]\((?:<([^>]+)>|([^)\r\n]+))\)/g, function(_, label, aUrl, rUrl) {
+      const href = String(aUrl || rUrl || '').trim();
+      if (/^(?:tel:|https?:\/\/|mailto:|tg:\/\/)[^\s<>"']+$/i.test(href)) {
+        return '<a href="' + escapeHtml(href) + '">' + escapeHtml(label) + '</a>';
+      }
+      return escapeHtml(label);
+    });
+
+    out = out.replace(/`([^`]+)`/g, function(_, code) {
+      return '<code>' + escapeHtml(code) + '</code>';
+    });
+
+    out = out.replace(/\*\*([^*]+)\*\*/g, function(_, b) {
+      return '<b>' + escapeHtml(b) + '</b>';
+    });
+
+    const tokens = [];
+    out = out.replace(/<a href="[^"]+">[\s\S]*?<\/a>|<b>[\s\S]*?<\/b>|<code>[\s\S]*?<\/code>/g, function(m) {
+      tokens.push(m);
+      return '\u0001' + (tokens.length - 1) + '\u0001';
+    });
+
+    out = escapeHtml(out);
+    out = out.replace(/\u0001(\d+)\u0001/g, function(_, idx) {
+      return tokens[parseInt(idx, 10)];
+    });
+
+    return out;
+  });
+
+  return '<p>' + lines.join('<br>') + '</p>';
+}
+
 async function sendTelegramNotification(message, channelType = 'booking') {
   const chatId = channelType === 'instant' ? TELEGRAM_CHAT_ID_INSTANT : TELEGRAM_CHAT_ID_BOOKING;
 
@@ -313,7 +374,32 @@ async function sendTelegramNotification(message, channelType = 'booking') {
     return { success: false, messageId: null };
   }
 
-  const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  const baseUrl = '[https://api.telegram.org/bot](https://api.telegram.org/bot)' + TELEGRAM_BOT_TOKEN + '/';
+  const richHtml = buildTelegramRichHtml(message);
+
+  if (richHtml && richHtml.length <= 30000) {
+    try {
+      const richRes = await fetch(baseUrl + 'sendRichMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          rich_message: { html: richHtml, skip_entity_detection: true }
+        })
+      });
+      const richData = await richRes.json().catch(function() { return null; });
+      if (richRes.ok && richData && richData.ok) {
+        const msgId = (richData.result && richData.result.message_id) || null;
+        console.log('✅ Telegram Rich 發送成功 (' + channelType + ')，message_id:', msgId);
+        return { success: true, messageId: msgId };
+      }
+      console.warn('[Telegram] sendRichMessage 未成功，改用 sendMessage (' + channelType + ')');
+    } catch (e) {
+      console.warn('[Telegram] sendRichMessage 拋錯，改用 sendMessage：', e.message);
+    }
+  }
+
+  const url = baseUrl + 'sendMessage';
   const htmlMessage = convertToTelegramHtml(message);
 
   const MAX_LEN = 4000;
@@ -367,7 +453,7 @@ async function deleteTelegramMessage(messageId, channelType = 'booking') {
 
   if (!messageId || !TELEGRAM_BOT_TOKEN || !chatId) return false;
 
-  const url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/deleteMessage';
+  const url = '[https://api.telegram.org/bot](https://api.telegram.org/bot)' + TELEGRAM_BOT_TOKEN + '/deleteMessage';
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -716,7 +802,7 @@ async function deleteDiscordMessage(messageId, channelType = 'booking') {
     return false;
   }
 
-  const deleteUrl = 'https://discord.com/api/webhooks/' + wh.id + '/' + wh.token + '/messages/' + messageId;
+  const deleteUrl = '[https://discord.com/api/webhooks/](https://discord.com/api/webhooks/)' + wh.id + '/' + wh.token + '/messages/' + messageId;
   try {
     const res = await fetchWithRetry(deleteUrl, { method: 'DELETE' }, 2);
     if (res && (res.ok || res.status === 404)) {
