@@ -904,6 +904,10 @@ function computeChangedFields(carDisplayText) {
         var routeData = loadRouteDataFromLocalStorage() || {};
         var payments = [];
         document.querySelectorAll('input[name="payment_method"]').forEach(function(el) { if (el.checked) payments.push(el.value); });
+        var curPaymentStr = payments.join(' / ');
+        if (curPaymentStr === '現金' || curPaymentStr.trim() === '') {
+            curPaymentStr = '';
+        }
 
         var cur = {
             pickup: routeData.pickup || '', dropoff: routeData.dropoff || '',
@@ -916,7 +920,7 @@ function computeChangedFields(carDisplayText) {
             hasPet: document.getElementById('has_pet') ? document.getElementById('has_pet').checked : false,
             hasWheelchair: document.getElementById('has_wheelchair') ? document.getElementById('has_wheelchair').checked : false,
             remarks: document.getElementById('remarks') ? document.getElementById('remarks').value.trim() : '',
-            payments: payments.join(' / '),
+            payments: curPaymentStr,
             contactTitle: document.getElementById('contact_title') ? document.getElementById('contact_title').value : '',
             contactSurname: document.getElementById('contact_surname') ? document.getElementById('contact_surname').value : '',
             phone: document.getElementById('phone') ? document.getElementById('phone').value : '',
