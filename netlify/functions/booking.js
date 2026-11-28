@@ -88,7 +88,7 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   // 如果 tel 係香港 +852 開頭（12位：+852 + 8位），優先拎最後 8 位或清走前綴
   if (/^\+852\d{8}$/.test(norm.tel)) {
     const withoutPrefix = rawLabel
-      .replace(/^\+?0*852[\s\-]*/i, '')
+      .replace(/^\(?\+?0*852\)?[\s\-]*/i, '')   // ⭐ 已修正：加入括號處理
       .trim();
     if (withoutPrefix) return withoutPrefix;
     return norm.tel.slice(4);
@@ -97,7 +97,10 @@ function formatDisplayPhoneWithout852(labelOrRaw, telOrNormalized) {
   return rawLabel || norm.display;
 }
 
-// ⭐ 依平台格式化電話撥號連結（Discord 用 <tel:+852...>，TG 用 [本地號碼](tel:+852...)）
+// ⭐ 依平台格式化電話撥號連結
+// Discord：用 <tel:+852...> 尖括號，Discord 會自動變成可點擊撥號
+// Telegram：改用純文字國際格式（+852...），讓 Telegram 客戶端自動偵測並變成可撥號連結
+//           原因：Android Telegram 對 <a href="tel:..."> 支援唔穩定
 function formatPhoneLinksForPlatform(body, platform = 'discord') {
   if (!body) return body;
   let result = String(body);
@@ -109,7 +112,9 @@ function formatPhoneLinksForPlatform(body, platform = 'discord') {
     const displayNo852 = formatDisplayPhoneWithout852(labelText, p.tel);
 
     if (platform === 'telegram') {
-      return '📞 **[' + displayNo852 + '](tel:' + p.tel + ')**';
+      // ⭐ 關鍵修改：唔用 tel: 連結，直接輸出帶 + 國碼嘅純文字號碼
+      // Telegram 會自動將 +85291234567 呢類格式轉換成可點擊嘅電話連結
+      return '📞 ' + p.tel;
     }
     // Discord：用 <tel:+852...> 尖括號，唔會顯示 +852 字樣
     return '📞 **<tel:' + p.tel + '>**';
@@ -599,7 +604,7 @@ function buildDiscordMessage(data, bookingId, isUpdate, changedFields, platform 
   body = body.replace(/🔸/g, '🔴');
   body = insertBookingIdAfterFare(body, bookingId);
 
-  // ⭐ 依平台處理電話連結，顯示上唔帶 +852，但保留可撥號 tel:
+  // ⭐ 依平台處理電話連結
   body = formatPhoneLinksForPlatform(body, platform);
 
   const isInstantOrder = (body.indexOf('⚡ 即時訂單 ⚡') >= 0) || (data.orderType === 'instant');
